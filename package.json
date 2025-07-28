@@ -14,10 +14,12 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "^12.6.0",
 		"@astrojs/react": "^4.3.0",
+		"@nanostores/persistent": "^1.1.0",
 		"@tailwindcss/vite": "^4.1.11",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
 		"astro": "^5.10.1",
+		"nanostores": "^1.0.1",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"tailwind-merge": "^3.3.1",

@@ -210,55 +210,95 @@ import GithubLogo from '../assets/github.svg';
 </style>
 
 <script>
-  function initializeHeroBanner() {
-    const heroBanner = document.getElementById('hero-banner-container');
-    const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
-    const urlParams = new URLSearchParams(window.location.search);
-    const skipIntro = urlParams.get('intro') === 'false';
+  import { $animationStore, $shouldSkipAnimations, AnimationPhase, animationActions } from '../stores/animationStore';
 
-    if (skipIntro) {
-      heroBanner?.classList.add('animations-skipped');
-      firstMenuItem?.focus();
-    } else {
-      // Remove any previous classes first
-      heroBanner?.classList.remove('animations-skipped');
+  // DOM element references
+  let heroBanner: HTMLElement | null = null;
+  let firstMenuItem: HTMLAnchorElement | null = null;
+  let unsubscribe: (() => void) | null = null;
+
+  function initializeElements() {
+    heroBanner = document.getElementById('hero-banner-container');
+    firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement;
+  }
+
+  function updateHeroBanner(state: typeof $animationStore.value) {
+    if (!heroBanner) return;
+
+    // Clear all animation classes
+    heroBanner.classList.remove('animations-started', 'animations-skipped');
+
+    // Apply appropriate class based on current phase
+    switch (state.phase) {
+      case AnimationPhase.INTRO_SKIPPED:
+        heroBanner.classList.add('animations-skipped');
+        firstMenuItem?.focus();
+        break;
       
-      document.addEventListener('introFinished', () => {
-        if (heroBanner) {
-          heroBanner.classList.add('animations-started');
-          setTimeout(() => {
-            firstMenuItem?.focus();
-          }, 8300);
-        }
-      });
+      case AnimationPhase.ANIMATIONS_ACTIVE:
+        heroBanner.classList.add('animations-started');
+        // Focus after animations complete (8.3s total)
+        setTimeout(() => {
+          firstMenuItem?.focus();
+        }, 8300);
+        break;
+      
+      case AnimationPhase.INTRO_PLAYING:
+      case AnimationPhase.INITIAL:
+        // Keep elements hidden until intro completes or is skipped
+        break;
     }
   }
 
-  // Force show elements when navigating back with skip intro
-  function forceShowElements() {
-    const heroBanner = document.getElementById('hero-banner-container');
-    const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
-    const newParams = new URLSearchParams(window.location.search);
-    
-    if (newParams.get('intro') === 'false') {
-      if (heroBanner) {
-        heroBanner.classList.remove('animations-started');
-        heroBanner.classList.add('animations-skipped');
-        firstMenuItem?.focus();
-      }
+  function setupStoreSubscription() {
+    // Clean up existing subscription
+    if (unsubscribe) {
+      unsubscribe();
     }
+
+    // Subscribe to store changes
+    unsubscribe = $animationStore.subscribe((state) => {
+      updateHeroBanner(state);
+    });
+  }
+
+  function initialize() {
+    initializeElements();
+    setupStoreSubscription();
+    
+    // Initialize store state based on current URL
+    animationActions.initializeFromURL();
+    
+    // Update UI immediately with current state
+    updateHeroBanner($animationStore.get());
+  }
+
+  // Listen for intro completion event from Intro component
+  function handleIntroFinished() {
+    animationActions.startAnimations();
+  }
+
+  // Handle view transition events
+  function handleViewTransition() {
+    // Re-initialize elements after DOM swap
+    initializeElements();
+    
+    // Handle navigation in store
+    animationActions.handleNavigation();
   }
 
   // Initialize on load
-  initializeHeroBanner();
+  initialize();
 
-  // Re-initialize on view transitions with fresh DOM queries
-  document.addEventListener('astro:page-load', () => {
-    initializeHeroBanner();
-    forceShowElements();
-  });
-  
-  document.addEventListener('astro:after-swap', () => {
-    forceShowElements();
+  // Set up event listeners
+  document.addEventListener('introFinished', handleIntroFinished);
+  document.addEventListener('astro:page-load', handleViewTransition);
+  document.addEventListener('astro:after-swap', handleViewTransition);
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
   });
 </script>
