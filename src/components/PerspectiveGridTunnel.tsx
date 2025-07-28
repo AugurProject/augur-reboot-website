@@ -1,98 +1,28 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
   lineColor?: string;
   animationSpeed?: number;
-  animationStarted?: boolean;
   maxOpacity?: number;
+  animationStarted?: boolean;
 }
 
 // Create a stable component ID for view transitions
 const COMPONENT_ID = 'perspective-grid-tunnel';
 
-// Global state for persistent animation values across view transitions
-declare global {
-  interface Window {
-    __perspectiveGridState?: {
-      frameCount: number;
-      animationFrameId: number | null;
-      isAnimating: boolean;
-    };
-  }
-}
-
 const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   numLines = 20,
   lineColor = '#00ff00',
   animationSpeed = 1,
-  animationStarted: initialAnimationStarted = false,
   maxOpacity = 1,
+  animationStarted: initialAnimationStarted = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
   const [animationStarted, setAnimationStarted] = useState(initialAnimationStarted);
-
-  // Initialize or restore persistent state
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (window.__perspectiveGridState) {
-        // Restore state from previous navigation
-        frameCount.current = window.__perspectiveGridState.frameCount;
-        animationFrameId.current = window.__perspectiveGridState.animationFrameId;
-        if (window.__perspectiveGridState.isAnimating) {
-          setAnimationStarted(true);
-        }
-      } else {
-        // Initialize global state
-        window.__perspectiveGridState = {
-          frameCount: 0,
-          animationFrameId: null,
-          isAnimating: false,
-        };
-      }
-    }
-  }, []);
-
-  // Update global state when local state changes
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.__perspectiveGridState) {
-      window.__perspectiveGridState.frameCount = frameCount.current;
-      window.__perspectiveGridState.animationFrameId = animationFrameId.current;
-      window.__perspectiveGridState.isAnimating = animationStarted;
-    }
-  }, [animationStarted]);
-
-  // Handle view transition events for state continuity
-  useEffect(() => {
-    const handlePageLoad = () => {
-      // Restore animation state after view transition
-      if (typeof window !== 'undefined' && window.__perspectiveGridState?.isAnimating) {
-        setAnimationStarted(true);
-      }
-    };
-
-    const handleBeforeSwap = () => {
-      // Save current state before view transition
-      if (typeof window !== 'undefined' && window.__perspectiveGridState) {
-        window.__perspectiveGridState.frameCount = frameCount.current;
-        window.__perspectiveGridState.animationFrameId = animationFrameId.current;
-        window.__perspectiveGridState.isAnimating = animationStarted;
-      }
-    };
-
-    // Listen for Astro view transition events
-    document.addEventListener('astro:page-load', handlePageLoad);
-    document.addEventListener('astro:before-swap', handleBeforeSwap);
-
-    return () => {
-      document.removeEventListener('astro:page-load', handlePageLoad);
-      document.removeEventListener('astro:before-swap', handleBeforeSwap);
-    };
-  }, [animationStarted]);
 
   useEffect(() => {
     const handleIntroFinished = () => {
@@ -234,18 +164,9 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
     const animate = () => {
       if (animationStarted) {
         frameCount.current++;
-        // Sync with global state for view transition continuity
-        if (typeof window !== 'undefined' && window.__perspectiveGridState) {
-          window.__perspectiveGridState.frameCount = frameCount.current;
-        }
         draw();
       }
       animationFrameId.current = requestAnimationFrame(animate);
-      
-      // Update global state
-      if (typeof window !== 'undefined' && window.__perspectiveGridState) {
-        window.__perspectiveGridState.animationFrameId = animationFrameId.current;
-      }
     };
 
     if (animationStarted) {
@@ -259,10 +180,6 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       window.removeEventListener('resize', resizeCanvas);
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
-        // Clear global animation frame reference
-        if (typeof window !== 'undefined' && window.__perspectiveGridState) {
-          window.__perspectiveGridState.animationFrameId = null;
-        }
       }
     };
   }, [numLines, lineColor, animationSpeed, animationStarted, maxOpacity]);

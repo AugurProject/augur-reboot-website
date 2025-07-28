@@ -210,28 +210,36 @@ import GithubLogo from '../assets/github.svg';
 </style>
 
 <script>
-  const heroBanner = document.getElementById('hero-banner-container');
-  const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
-  const urlParams = new URLSearchParams(window.location.search);
-  const skipIntro = urlParams.get('intro') === 'false';
+  function initializeHeroBanner() {
+    const heroBanner = document.getElementById('hero-banner-container');
+    const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const skipIntro = urlParams.get('intro') === 'false';
 
-  if (skipIntro) {
-    heroBanner?.classList.add('animations-skipped');
-    firstMenuItem?.focus();
-  } else {
-    document.addEventListener('introFinished', () => {
-      if (heroBanner) {
-        heroBanner.classList.add('animations-started');
-        setTimeout(() => {
-          firstMenuItem?.focus();
-        }, 8300);
-      }
-    });
+    if (skipIntro) {
+      heroBanner?.classList.add('animations-skipped');
+      firstMenuItem?.focus();
+    } else {
+      // Remove any previous classes first
+      heroBanner?.classList.remove('animations-skipped');
+      
+      document.addEventListener('introFinished', () => {
+        if (heroBanner) {
+          heroBanner.classList.add('animations-started');
+          setTimeout(() => {
+            firstMenuItem?.focus();
+          }, 8300);
+        }
+      });
+    }
   }
 
   // Force show elements when navigating back with skip intro
   function forceShowElements() {
+    const heroBanner = document.getElementById('hero-banner-container');
+    const firstMenuItem = document.getElementById('first-menu-item') as HTMLAnchorElement | null;
     const newParams = new URLSearchParams(window.location.search);
+    
     if (newParams.get('intro') === 'false') {
       if (heroBanner) {
         heroBanner.classList.remove('animations-started');
@@ -241,7 +249,16 @@ import GithubLogo from '../assets/github.svg';
     }
   }
 
-  // Try multiple events to catch view transitions
-  document.addEventListener('astro:page-load', forceShowElements);
-  document.addEventListener('astro:after-swap', forceShowElements);
+  // Initialize on load
+  initializeHeroBanner();
+
+  // Re-initialize on view transitions with fresh DOM queries
+  document.addEventListener('astro:page-load', () => {
+    initializeHeroBanner();
+    forceShowElements();
+  });
+  
+  document.addEventListener('astro:after-swap', () => {
+    forceShowElements();
+  });
 </script>
