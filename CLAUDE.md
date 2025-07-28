@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an Astro-based teaser website for the Augur prediction market reboot. The site is designed for deployment on Cloudflare Pages and uses React components within Astro pages. The project creates a retro-futuristic landing page with CRT-style animations and a technical mission statement.
 
+## Development Memories
+
+CRITICAL: Do not wait for `npm run dev` to complete in the background before proceeding with other tasks
+ALWAYS: Prefer to use the already running dev server in expected port for testing
+
+### Multi-Agent Coordination
+APPROACH: Use agile-project-orchestrator for complex implementations requiring multiple specialists
+PATTERN: Break complex features into parallel workstreams, delegate to specialized agents, avoid single-agent bottlenecks
+
 ## Development Commands
 
 | Command | Action |
@@ -27,7 +36,7 @@ This is an Astro-based teaser website for the Augur prediction market reboot. Th
 
 ### Component Architecture
 - **Astro Components** (.astro) - Server-rendered layout and static components
-- **React Components** (.tsx/.jsx) - Interactive elements requiring client-side JavaScript
+- **React Components** (.tsx) - Interactive elements requiring client-side JavaScript  
 - **Hybrid Approach** - Uses `client:load` and `client:only` directives for selective hydration
 
 ### Key Components
@@ -44,7 +53,7 @@ This is an Astro-based teaser website for the Augur prediction market reboot. Th
 - **Font Loading** - Google Fonts integration for "Press Start 2P" (retro) and "Barlow" (modern)
 
 ### Pages Structure
-- `index.astro` - Landing page with intro sequence and hero banner
+- `index.astro` - Landing page with intro sequence and hero banner  
 - `mission.astro` - Technical roadmap with detailed protocol specifications
 - `Layout.astro` - Base HTML layout with global styles and fonts
 
@@ -65,6 +74,26 @@ The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter 
 
 ### Content Structure
 Mission specifications are defined as structured data in `mission.astro` and rendered through reusable MissionSection components.
+
+## Project Documentation
+
+### View Transitions Architecture
+**REFERENCE**: @docs/view-transitions-design.md - Comprehensive design document for smooth page navigation, animation continuity, and state management patterns.
+
+## IMPORTANT: Updated Astro Knowledge
+
+These files bridge knowledge gaps in default Claude knowledge for current Astro patterns:
+
+**ALWAYS**: Refer to these docs over before Context7 and WebFetch
+
+- **@.claude/docs/astro-authentication.md** - Latest auth integration patterns (Auth.js, Better Auth, Clerk, Lucia)
+- **@.claude/docs/astro-framework-components.md** - Current hydration strategies and multi-framework composition
+- **@.claude/docs/astro-images.md** - Modern image optimization and responsive layout systems
+- **@.claude/docs/astro-middleware.md** - Updated middleware patterns and request handling
+- **@.claude/docs/astro-server-islands.md** - Server islands implementation with `server:defer`
+- **@.claude/docs/astro-styling.md** - Scoped styles, dynamic CSS variables, and class composition patterns
+- **@.claude/docs/astro-typescript.md** - Latest TypeScript integration and utility types
+- **@.claude/docs/astro-view-transitions.md** - View transitions API and SPA-mode patterns
 
 ## Task Master AI Instructions
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**

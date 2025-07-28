@@ -1,12 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Intro from '../components/Intro.jsx';
-import PerspectiveGridTunnel from '../components/PerspectiveGridTunnel.jsx';
+import Intro from '../components/Intro.tsx';
 import HeroBanner from '../components/HeroBanner.astro';
 ---
 
 <Layout title="Augur is Rebooting">
   <Intro client:only="react" />
-  <PerspectiveGridTunnel client:load animationStarted={false} numLines={12} animationSpeed={0.1} maxOpacity={0.1} lineColor="#2AE7A8" />
   <HeroBanner />
 </Layout>

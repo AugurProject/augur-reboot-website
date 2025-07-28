@@ -217,20 +217,31 @@ import GithubLogo from '../assets/github.svg';
 
   if (skipIntro) {
     heroBanner?.classList.add('animations-skipped');
-    // Use a minimal timeout to ensure the element is rendered and focusable.
-    setTimeout(() => firstMenuItem?.focus(), 0);
+    firstMenuItem?.focus();
   } else {
     document.addEventListener('introFinished', () => {
       if (heroBanner) {
         heroBanner.classList.add('animations-started');
-
-        // Set focus on the first menu item after animations complete.
-        // The last animation for menu items finishes at 7.7s + 0.5s duration = 8.2s.
-        // We set focus shortly after that.
         setTimeout(() => {
           firstMenuItem?.focus();
-        }, 8300); // 8.3 seconds
+        }, 8300);
       }
     });
   }
+
+  // Force show elements when navigating back with skip intro
+  function forceShowElements() {
+    const newParams = new URLSearchParams(window.location.search);
+    if (newParams.get('intro') === 'false') {
+      if (heroBanner) {
+        heroBanner.classList.remove('animations-started');
+        heroBanner.classList.add('animations-skipped');
+        firstMenuItem?.focus();
+      }
+    }
+  }
+
+  // Try multiple events to catch view transitions
+  document.addEventListener('astro:page-load', forceShowElements);
+  document.addEventListener('astro:after-swap', forceShowElements);
 </script>

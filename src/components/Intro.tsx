@@ -11,7 +11,14 @@ const bootSentences: string[] = [
 ];
 
 const Intro: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(() => {
+    // Check URL params immediately on initialization
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('intro') !== 'false';
+    }
+    return true;
+  });
   const [isPoweredOn, setIsPoweredOn] = useState(true);
 
   const handleSequenceComplete = () => {
@@ -41,6 +48,8 @@ const Intro: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('intro') === 'false') {
       handleSkip();
+      // Ensure the event is dispatched immediately for view transitions
+      document.dispatchEvent(new CustomEvent('introFinished'));
     }
   }, []);
 

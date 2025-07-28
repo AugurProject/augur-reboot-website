@@ -1,6 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
 import SocialLinks from "../components/SocialLinks.astro";
 import MissionSection from "../components/MissionSection.astro";
 import Footer from "../components/Footer.astro";
@@ -79,16 +78,17 @@ const missionSections = [
 ---
 
 <Layout title="Mission - Augur">
-  <PerspectiveGridTunnel
-    client:load
-    animationStarted={true}
-    numLines={12}
-    animationSpeed={0.1}
-    maxOpacity={0.1}
-    lineColor="#2AE7A8"
-  />
   <div class="max-w-screen-xl mx-auto px-4 md:px-8">
     <SocialLinks />
+    
+    <!-- BACK NAVIGATION -->
+    <div class="pt-8 pb-4">
+      <a href="/?intro=false" class="back-nav-button">
+        <span class="back-arrow">←</span>
+        <span>BACK TO HOME</span>
+      </a>
+    </div>
+    
     <!-- MAIN CONTENT -->
     <main class="py-16">
       <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-24">
@@ -114,6 +114,71 @@ const missionSections = [
 </Layout>
 
 <style>
+  /* Back navigation button */
+  .back-nav-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #2AE7A8;
+    text-decoration: none;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border: 2px solid #2AE7A8;
+    background: rgba(42, 231, 168, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .back-nav-button:hover {
+    background: rgba(42, 231, 168, 0.2);
+    box-shadow: 0 0 20px rgba(42, 231, 168, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .back-nav-button:active {
+    transform: translateY(0);
+  }
+
+  .back-arrow {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .back-nav-button:hover .back-arrow {
+    transform: translateX(-4px);
+    animation: pulse-arrow 1s infinite;
+  }
+
+  @keyframes pulse-arrow {
+    0%, 100% { transform: translateX(-4px); }
+    50% { transform: translateX(-8px); }
+  }
+
+  /* Retro scanline effect on hover */
+  .back-nav-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(42, 231, 168, 0.3),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .back-nav-button:hover::before {
+    left: 100%;
+  }
+
   /* The icon used in the main "UPDATES IN PROGRESS" title */
   .title-icon {
     display: block;
