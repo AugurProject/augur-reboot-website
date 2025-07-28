@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useStore } from '@nanostores/react';
+import { $isGridAnimating, animationActions, getAnimationState } from '../stores/animationStore';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
   lineColor?: string;
   animationSpeed?: number;
   maxOpacity?: number;
-  animationStarted?: boolean;
 }
 
 // Create a stable component ID for view transitions
@@ -16,24 +17,30 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   lineColor = '#00ff00',
   animationSpeed = 1,
   maxOpacity = 1,
-  animationStarted: initialAnimationStarted = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const frameCount = useRef(0);
   const [opacity, setOpacity] = useState(0);
-  const [animationStarted, setAnimationStarted] = useState(initialAnimationStarted);
+  
+  // Use nanostores for animation state instead of props/events
+  const isGridAnimating = useStore($isGridAnimating);
 
+  // Initialize animation based on current page context and restore frame state
   useEffect(() => {
-    const handleIntroFinished = () => {
-      setAnimationStarted(true);
-    };
-
-    document.addEventListener('introFinished', handleIntroFinished);
-
-    return () => {
-      document.removeEventListener('introFinished', handleIntroFinished);
-    };
+    // Restore frameCount from persistent store for animation continuity
+    const savedState = getAnimationState();
+    if (savedState.frameCount > 0) {
+      frameCount.current = savedState.frameCount;
+    }
+    
+    // For non-homepage (like /mission), start animation immediately
+    const isHomepage = typeof window !== 'undefined' && 
+      (window.location.pathname === '/' || window.location.pathname === '');
+    
+    if (!isHomepage) {
+      animationActions.startAnimations();
+    }
   }, []);
 
   useEffect(() => {
@@ -162,14 +169,16 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
     };
 
     const animate = () => {
-      if (animationStarted) {
+      if (isGridAnimating) {
         frameCount.current++;
+        // Update store with current frame data for persistence
+        animationActions.updateGridFrame(frameCount.current, animationFrameId.current);
         draw();
       }
       animationFrameId.current = requestAnimationFrame(animate);
     };
 
-    if (animationStarted) {
+    if (isGridAnimating) {
       setOpacity(maxOpacity);
       animate();
     } else {
@@ -182,7 +191,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [numLines, lineColor, animationSpeed, animationStarted, maxOpacity]);
+  }, [numLines, lineColor, animationSpeed, isGridAnimating, maxOpacity]);
 
   return (
     <canvas
