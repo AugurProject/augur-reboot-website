@@ -74,8 +74,13 @@ export const animationActions = {
       $animationStore.setKey('hasSkippedIntro', true);
       $animationStore.setKey('introCompleted', true);
       $animationStore.setKey('gridAnimationStarted', true);
-    } else if (currentState.phase === AnimationPhase.INITIAL) {
+    } else {
+      // For clean homepage visits (no ?intro=false), always show intro
+      // Reset to initial state regardless of persistent storage
       $animationStore.setKey('phase', AnimationPhase.INTRO_PLAYING);
+      $animationStore.setKey('hasSkippedIntro', false);
+      $animationStore.setKey('introCompleted', false);
+      $animationStore.setKey('gridAnimationStarted', false);
     }
   },
 

@@ -39,9 +39,22 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       (window.location.pathname === '/' || window.location.pathname === '');
     
     if (!isHomepage) {
+      // Ensure animation starts for mission page visits
       animationActions.startAnimations();
     }
   }, []);
+
+  // Additional safety check: if we're on mission page but grid isn't animating, start it
+  useEffect(() => {
+    const isHomepage = typeof window !== 'undefined' && 
+      (window.location.pathname === '/' || window.location.pathname === '');
+    
+    if (!isHomepage && !isGridAnimating) {
+      // Safety fallback: ensure animation starts on non-homepage
+      console.log('Safety fallback: starting animations on mission page');
+      animationActions.startAnimations();
+    }
+  }, [isGridAnimating]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

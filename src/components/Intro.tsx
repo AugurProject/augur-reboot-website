@@ -1,5 +1,7 @@
 
 import { useState, useEffect } from 'react';
+import { useStore } from '@nanostores/react';
+import { $shouldShowIntro, animationActions } from '../stores/animationStore';
 import CrtDisplay from './CrtDisplay.tsx';
 import TypewriterSequence from './TypewriterSequence.tsx';
 
@@ -11,14 +13,8 @@ const bootSentences: string[] = [
 ];
 
 const Intro: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(() => {
-    // Check URL params immediately on initialization
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('intro') !== 'false';
-    }
-    return true;
-  });
+  // Use nanostores to determine visibility instead of local state
+  const shouldShowIntro = useStore($shouldShowIntro);
   const [isPoweredOn, setIsPoweredOn] = useState(true);
 
   const handleSequenceComplete = () => {
@@ -27,42 +23,28 @@ const Intro: React.FC = () => {
       setTimeout(() => {
         setIsPoweredOn(true);
         setTimeout(() => {
-          setIsVisible(false);
+          // Use store action instead of local state
+          animationActions.startAnimations();
         }, 500);
       }, 200);
     }, 1000);
-  };
-
-  const handleSkip = () => {
-    setIsVisible(false);
   };
 
   const handleSkipClick = () => {
     const params = new URLSearchParams(window.location.search);
     params.set('intro', 'false');
     window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
-    handleSkip();
+    // Use store action instead of local state and events
+    animationActions.skipAnimations();
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('intro') === 'false') {
-      handleSkip();
-      // Ensure the event is dispatched immediately for view transitions
-      document.dispatchEvent(new CustomEvent('introFinished'));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible) {
-      document.dispatchEvent(new CustomEvent('introFinished'));
-    }
-  }, [isVisible]);
+  // Remove the old URL parameter checking - now handled by the store
+  // Remove the old event dispatching - now handled by store actions
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        handleSkip();
+        handleSkipClick(); // Use the same skip logic as clicking skip button
       }
     };
 
@@ -71,9 +53,9 @@ const Intro: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleSkip]);
+  }, []);
 
-  if (!isVisible) {
+  if (!shouldShowIntro) {
     return null;
   }
 
