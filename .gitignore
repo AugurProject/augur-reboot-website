@@ -26,3 +26,25 @@ pnpm-debug.log*
 # wrangler files
 .wrangler
 .dev.vars*
+
+# Logs
+logs
+*.log
+dev-debug.log
+# Dependency directories
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+.taskmaster
+
+# Claude commands directory
+.claude/commands/tm
