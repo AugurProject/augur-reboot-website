@@ -6,12 +6,12 @@ import Footer from "../components/Footer.astro";
 
 const missionSections = [
   {
-    title: "Protocol Architecture Overhaul",
+    title: "The Augur Reboot",
+    date: "March 31, 2025",
     details: [
       {
-        title: "MODULAR CORE CONTRACTS",
-        description:
-          "SPLITS MONOLITHIC AUGUR CONTRACT INTO MARKET, SETTLEMENT, & TREASURY MODULES ENABLES PERMISSIONLESS UPGRADES OF INDIVIDUAL MODULES VIA GOVERNANCE",
+        title: "",
+        description: "We officially announced the reboot of Augur under the guidance of the newly formed Lituus Foundation. Our immediate priorities included: Rebuilding infrastructure after years of project dormancy Restoring confidence in the REP token by acquiring a significant treasury stake Establishing clear direction for the oracle mechanism and community governance This marked the beginning of a deep research and development phase, focused on both game-theoretic soundness and practical usability."
       },
       {
         title: "LAYER-2 NATIVE SETTLEMENT",
@@ -22,6 +22,7 @@ const missionSections = [
   },
   {
     title: "Oracle System 2.0",
+    date: "June 15, 2025",
     details: [
       {
         title: "HYBRID ORACLE COUNCIL",
@@ -37,6 +38,7 @@ const missionSections = [
   },
   {
     title: "Governance & REP-V4 Tokenomics",
+    date: "September 1, 2025",
     details: [
       {
         title: "SUPPLY CONSOLIDATION",
@@ -57,6 +59,7 @@ const missionSections = [
   },
   {
     title: "Liquidity & Market Incentives",
+    date: "December 1, 2025",
     details: [
       {
         title: "AMM-BACKED ORDER BOOKS",
@@ -83,23 +86,31 @@ const missionSections = [
     
     <!-- BACK NAVIGATION -->
     <div class="fixed top-8 left-6 lg:left-10 z-50">
-      <a href="/?intro=false" class="text-green-500 hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none font-console-narrow text-2xl">
+      <a id="back-button" href="/?intro=false" autofocus class="text-green-500 hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none font-console-narrow text-2xl">
         &lt; BACK TO HOME
       </a>
     </div>
     
     <!-- MAIN CONTENT -->
     <main class="py-16">
-      <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-24">
+      <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mt-24 mb-8">
         <span class="title-icon"></span>
-        Updates in Progress
+        Or Work On Augur
       </h1>
 
       <div class="max-w-4xl mx-auto">
+        <p class="text-center mb-8">Augur has always represented a bold idea: a decentralized oracle system that lets anyone ask and resolve questions about the future — without trusted intermediaries. In 2025, the Lituus Foundation began rebooting Augur from the ground up, adapting its core ideas to a radically changed crypto landscape. Here's how our journey has unfolded so far:</p>
+
+        <h2 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-12">
+          <span class="title-icon"></span>
+          The Reboot Timeline
+        </h2>
+
         {
           missionSections.map((section, index) => (
             <MissionSection
               title={section.title}
+              date={section.date}
               details={section.details}
               isLast={index === missionSections.length - 1}
             />
@@ -125,3 +136,4 @@ const missionSections = [
       no-repeat center;
   }
 </style>
+
