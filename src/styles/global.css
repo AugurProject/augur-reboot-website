@@ -21,7 +21,11 @@
   --color-background: #111111;
 
   --font-console: "Press Start 2P", monospace;
-  --font-barlow: "Barlow", sans-serif;
+  --font-console-narrow: "Handjet", sans-serif;
+}
+
+.font-console-narrow {
+  letter-spacing: 0.4em;
 }
 
 @keyframes blink-animation {
