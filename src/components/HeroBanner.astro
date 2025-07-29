@@ -3,10 +3,11 @@ import AugurLogo from '../assets/augur.svg';
 import DiscordLogo from '../assets/discord.svg';
 import XLogo from '../assets/x.svg';
 import GithubLogo from '../assets/github.svg';
+import ForkMeter from './ForkMeter.tsx';
 ---
 
 <div class="fixed inset-0 h-screen w-screen overflow-scroll place-content-center">
-  <div id="hero-banner-container" class="flex flex-col justify-center items-center text-primary z-10 text-center min-h-[500px] overflow-y-scroll">
+  <div id="hero-banner-container" class="flex flex-col justify-center items-center text-green-500 z-10 text-center min-h-[500px] overflow-y-scroll">
     <div id="social-links" class="absolute top-8 right-10 flex gap-x-8">
       <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
         <XLogo />
@@ -21,7 +22,7 @@ import GithubLogo from '../assets/github.svg';
 
     <AugurLogo id="augur-logo" class:list="text-9xl" />
     
-    <p id="prediction-market-text" class="font-console-narrow border border-primary/30 px-3 py-1 mx-4 text-lg my-5 tracking-[0.4em] leading-tight text-foreground">
+    <p id="prediction-market-text" class="font-console-narrow border border-green-500/20 px-3 py-1 mx-4 text-lg my-5 tracking-[0.4em] leading-tight">
       THE FRONTIER OF PREDICTION MARKETS
     </p>
 
@@ -39,15 +40,24 @@ import GithubLogo from '../assets/github.svg';
     </h2>
 
     <div id="menu-items-container" class="flex flex-col place-items-center font-console-narrow mt-8 text-left w-full max-w-3xl mx-auto">
-      <a id="first-menu-item" href="/mission" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+      <a id="first-menu-item" href="/mission" class="text-green-700 py-1 block hover:text-green-500 focus:text-green-500 hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
         A FUTURE THOUGHTFULLY BEING BUILT 
       </a>
-      <a href="#" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+      <a href="#" class="text-green-700 hover:text-green-500 focus:text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
         THE MINDS BEHIND THE REBOOT
       </a>
-      <a href="#" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
-        IS MY REP SAFE?
-      </a>
+    </div>
+
+    <div id="fork-meter-container" class="mt-8 absolute bottom-0">
+      <ForkMeter 
+        client:load
+        prediction="ETH WILL BE ABOVE $4,000 BY JULY, 2026"
+        round="RD 2"
+        remaining_time="120 HRS"
+        staked="REP 4,000,000"
+        value={75}
+        animated={true}
+      />
     </div>
   </div>
 </div>
@@ -106,7 +116,8 @@ import GithubLogo from '../assets/github.svg';
   #line-left,
   #line-right,
   #prediction-market-text,
-  #menu-items-container a {
+  #menu-items-container a,
+  #fork-meter-container {
     opacity: 0;
   }
 
@@ -165,7 +176,8 @@ import GithubLogo from '../assets/github.svg';
   #hero-banner-container.animations-skipped #line-left,
   #hero-banner-container.animations-skipped #line-right,
   #hero-banner-container.animations-skipped #prediction-market-text,
-  #hero-banner-container.animations-skipped #menu-items-container a {
+  #hero-banner-container.animations-skipped #menu-items-container a,
+  #hero-banner-container.animations-skipped #fork-meter-container {
     opacity: 1;
     transform: none; /* Resets any initial transform */
   }
@@ -212,6 +224,10 @@ import GithubLogo from '../assets/github.svg';
   }
   #hero-banner-container.animations-started #menu-items-container a:nth-of-type(3) {
     animation: fade-in-up 0.5s ease-out 7.7s forwards;
+  }
+
+  #hero-banner-container.animations-started #fork-meter-container {
+    animation: fade-in-up 0.6s ease-out 8.0s forwards;
   }
 </style>
 
