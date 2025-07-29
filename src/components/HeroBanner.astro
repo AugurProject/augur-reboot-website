@@ -21,24 +21,31 @@ import GithubLogo from '../assets/github.svg';
 
     <AugurLogo id="augur-logo" class:list="text-9xl" />
     
-    <p id="prediction-market-text" class="font-console-narrow border border-primary/30 px-3 py-1 text-lg my-5 tracking-[0.4em] leading-tight text-foreground">
+    <p id="prediction-market-text" class="font-console-narrow border border-primary/30 px-3 py-1 mx-4 text-lg my-5 tracking-[0.4em] leading-tight text-foreground">
       THE FRONTIER OF PREDICTION MARKETS
     </p>
 
     <h2 class="text-[2.5em] flex items-center gap-5 title">
-      <span id="line-left" class="w-[50px] h-[1px] bg-foreground"></span>
-      <span id="is-rebooting-text" class="title font-console text-3xl md:text-[2.5rem]">IS REBOOTING</span>
-      <span id="line-right" class="w-[50px] h-[1px] bg-foreground"></span>
+      <span id="line-left" class="w-[2rem] h-[1px] bg-foreground"></span>
+      <pre id="is-rebooting-text" class="title leading-tight text-[size:clamp(0.27rem,_1vw,_0.6rem)]">
+██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗ 
+██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝ 
+██║ ███████╗     ██████╔╝ █████╗   ██████╔╝ ██║   ██║ ██║   ██║    ██║    ██║ ██╔██╗ ██║ ██║  ███╗
+██║ ╚════██║     ██╔══██╗ ██╔══╝   ██╔══██╗ ██║   ██║ ██║   ██║    ██║    ██║ ██║╚██╗██║ ██║   ██║
+██║ ███████║     ██║  ██║ ███████╗ ██████╔╝ ╚██████╔╝ ╚██████╔╝    ██║    ██║ ██║ ╚████║ ╚██████╔╝
+╚═╝ ╚══════╝     ╚═╝  ╚═╝ ╚══════╝ ╚═════╝   ╚═════╝   ╚═════╝     ╚═╝    ╚═╝ ╚═╝  ╚═══╝  ╚═════╝ 
+        </pre>
+      <span id="line-right" class="w-[2rem] h-[1px] bg-foreground"></span>
     </h2>
 
-    <div id="menu-items-container" class="flex flex-col place-items-center font-console mt-12 text-left w-full max-w-3xl mx-auto">
-      <a id="first-menu-item" href="/mission" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
-        REIMAGINED, TRANSFORMED, REFRESHED
+    <div id="menu-items-container" class="flex flex-col place-items-center font-console-narrow mt-8 text-left w-full max-w-3xl mx-auto">
+      <a id="first-menu-item" href="/mission" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+        A FUTURE THOUGHTFULLY BEING BUILT 
       </a>
-      <a href="#" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
-        THE VISIONARIES BEHIND AUGUR
+      <a href="#" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+        THE MINDS BEHIND THE REBOOT
       </a>
-      <a href="#" class="text-base py-1 block hover:text-foreground focus:text-foreground focus:outline-none">
+      <a href="#" class="text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
         IS MY REP SAFE?
       </a>
     </div>
@@ -123,7 +130,6 @@ import GithubLogo from '../assets/github.svg';
 
     /* Default hover and focus behavior */
     &:hover, &:focus {
-      color: var(--color-foreground);
       &::before {
         opacity: 1;
         animation: bounce-horizontal 1s ease-in-out infinite;
@@ -216,6 +222,9 @@ import GithubLogo from '../assets/github.svg';
   let heroBanner: HTMLElement | null = null;
   let firstMenuItem: HTMLAnchorElement | null = null;
   let unsubscribe: (() => void) | null = null;
+  let isInitialized = false;
+  let lastAppliedPhase: AnimationPhase | null = null;
+  let focusTimeout: number | null = null;
 
   function initializeElements() {
     heroBanner = document.getElementById('hero-banner-container');
@@ -224,6 +233,20 @@ import GithubLogo from '../assets/github.svg';
 
   function updateHeroBanner(state: typeof $animationStore.value) {
     if (!heroBanner) return;
+    
+    // Prevent redundant updates - only update if phase actually changed
+    if (lastAppliedPhase === state.phase) {
+      return;
+    }
+
+    console.log('HeroBanner: Updating from', lastAppliedPhase, 'to', state.phase);
+    lastAppliedPhase = state.phase;
+
+    // Clear any pending focus timeout
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+      focusTimeout = null;
+    }
 
     // Clear all animation classes
     heroBanner.classList.remove('animations-started', 'animations-skipped');
@@ -238,8 +261,9 @@ import GithubLogo from '../assets/github.svg';
       case AnimationPhase.ANIMATIONS_ACTIVE:
         heroBanner.classList.add('animations-started');
         // Focus after animations complete (8.3s total)
-        setTimeout(() => {
+        focusTimeout = setTimeout(() => {
           firstMenuItem?.focus();
+          focusTimeout = null;
         }, 8300);
         break;
       
@@ -253,16 +277,25 @@ import GithubLogo from '../assets/github.svg';
   function setupStoreSubscription() {
     // Clean up existing subscription
     if (unsubscribe) {
+      console.log('HeroBanner: Cleaning up existing subscription');
       unsubscribe();
+      unsubscribe = null;
     }
 
     // Subscribe to store changes
     unsubscribe = $animationStore.subscribe((state) => {
       updateHeroBanner(state);
     });
+    console.log('HeroBanner: Store subscription established');
   }
 
   function initialize() {
+    if (isInitialized) {
+      console.log('HeroBanner: Already initialized, skipping');
+      return;
+    }
+
+    console.log('HeroBanner: Initializing');
     initializeElements();
     setupStoreSubscription();
     
@@ -271,17 +304,24 @@ import GithubLogo from '../assets/github.svg';
     
     // Update UI immediately with current state
     updateHeroBanner($animationStore.get());
+    
+    isInitialized = true;
   }
 
   // Listen for intro completion event from Intro component
   function handleIntroFinished() {
+    console.log('HeroBanner: Intro finished event received');
     animationActions.startAnimations();
   }
 
   // Handle view transition events
   function handleViewTransition() {
-    // Re-initialize elements after DOM swap
+    console.log('HeroBanner: View transition detected');
+    // Re-initialize elements after DOM swap but don't re-setup subscription
     initializeElements();
+    
+    // Reset tracking variable to allow updates for new page context
+    lastAppliedPhase = null;
     
     // Handle navigation in store
     animationActions.handleNavigation();
@@ -297,8 +337,12 @@ import GithubLogo from '../assets/github.svg';
 
   // Clean up on page unload
   window.addEventListener('beforeunload', () => {
+    console.log('HeroBanner: Cleaning up on unload');
     if (unsubscribe) {
       unsubscribe();
+    }
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
     }
   });
 </script>

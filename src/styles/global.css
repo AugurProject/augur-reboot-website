@@ -24,8 +24,10 @@
   --font-console-narrow: "Handjet", sans-serif;
 }
 
-.font-console-narrow {
-  letter-spacing: 0.4em;
+@layer theme {
+  [class*=font-console-narrow] {
+    letter-spacing: 0.075em;
+  }
 }
 
 @keyframes blink-animation {
@@ -105,11 +107,20 @@
   }
 }
 
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
 .title {
-  background: linear-gradient(to bottom, var(--color-primary), #008000);
+  background: linear-gradient(to bottom, var(--color-green-700), var(--color-green-500), var(--color-green-700));
   background-size: 100% 200%;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient-animation 3s linear infinite;
+  animation: gradient-animation 2s linear infinite;
   filter: drop-shadow(0 4px 0 #ffffff15);
 }
