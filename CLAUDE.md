@@ -27,19 +27,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Deployment**: Cloudflare Pages with Wrangler
 - **Dev Server**: localhost:4321 (check with `lsof -ti:4321`)
 
-## Theme Variables (src/styles/global.css)
-```css
---color-primary: #2AE7A8
---color-foreground: #ffffff  
---color-background: #111111
-
---font-console: "Press Start 2P", monospace
---font-console-narrow: "Handjet", sans-serif
---font-sans: "Handjet", sans-serif
-
---glow-size-sm: 0.25rem
---glow-size: 0.5rem
---glow-size-lg: 1rem
+## Project Structure
+```
+src/
+├── styles/global.css      # Tailwind v4 @theme + @utility directives  
+├── components/            # Component types by rendering
+│   ├── *.astro           # Server-rendered (static)
+│   └── *.tsx             # Client-hydrated (interactive)
+├── stores/               # Nanostores state management
+├── assets/               # Static SVGs and resources  
+├── lib/                  # Shared utilities
+├── layouts/              # Base page layouts
+└── pages/                # Route definitions
 ```
 
 ## Custom Utilities Available
@@ -55,9 +54,8 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 
 ## Before Making Changes
 1. **CHECK**: Is dev server running? `lsof -ti:4321`
-2. **VERIFY**: Current theme in `src/styles/global.css` 
-3. **CONFIRM**: Font structure (Handjet, Press Start 2P)
-4. **REFERENCE**: Custom utilities in `@utility` sections
+2. **REFERENCE**: Use project structure tree above to locate styling, components, and state
+3. **PATTERN**: Follow Tailwind v4 @theme/@utility patterns in styles/global.css
 
 ## Development Commands
 | Command | Action |

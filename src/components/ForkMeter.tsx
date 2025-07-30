@@ -59,12 +59,12 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
   const needleAngle = (currentValue / 100) * 180;
 
   return (
-    <div className="mx-auto max-w-xl p-6">
+    <div className="mx-auto max-w-lg p-6">
       {/* SVG Gauge */}
       <div className="relative mb-2">
         <svg 
           viewBox="0 0 200 120" 
-          className="w-[100px] mx-auto overflow-visible"
+          className="w-[160px] mx-auto overflow-visible"
         >
           {/* Background arc */}
           <path
@@ -120,17 +120,13 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
       </div>
 
       {/* Prediction Text */}
-      <div className="mb-2">
-        <p className="font-bold text-green-700 text-center text-xl md:text-base break-words">
-          {prediction}
-        </p>
-      </div>
+      <p className="text-muted-foreground text-center break-words mb-1">{prediction}</p>
 
       {/* Metadata Row */}
       <div className="flex justify-center items-center">
-        <div className="text-xl px-4 border-r border-green-500/20">{round}</div>
-        <div className="text-xl px-4">{remaining_time}</div>
-        <div className="text-xl px-4 border-l border-green-500/20">{staked}</div>
+        <div className="font-bold px-4 border-r border-green-500/20">{round}</div>
+        <div className="font-bold px-4">{remaining_time}</div>
+        <div className="font-bold px-4 border-l border-green-500/20">{staked}</div>
       </div>
     </div>
   );

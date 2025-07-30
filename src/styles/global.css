@@ -15,6 +15,7 @@
   --text-base--line-height: calc(1.125 / 1);
   --text-lg--line-height: calc(1.125 / 1);
   --font-weight-normal: 300;
+  --font-weight-bold: 400;
   --tracking-normal: 0.05em;
 
   --font-display: "Press Start 2P", monospace;
