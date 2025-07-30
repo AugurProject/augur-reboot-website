@@ -4,19 +4,23 @@ import ForkMeter from './ForkMeter.tsx';
 import SocialLinks from './SocialLinks.astro';
 ---
 
-<div class="fixed inset-0 h-screen w-screen overflow-scroll place-content-center">
-  <div id="hero-banner-container" class="flex flex-col justify-center items-center z-10 text-center min-h-[500px] overflow-y-scroll">
-    <SocialLinks />
+<div class="fixed inset-0 h-screen w-screen overflow-scroll">
+  <div id="hero-banner-container" class="grid grid-rows-[1fr_auto_1fr] h-screen z-10 text-center overflow-y-scroll gap-y-8">
+    <!-- Top Section: Social Links Only -->
+    <div class="flex justify-center md:justify-end place-content-start py-4 px-8">
+      <SocialLinks />
+    </div>
 
-    <AugurLogo id="augur-logo" class:list="text-9xl" />
-    
-    <p id="prediction-market-text" class="border border-foreground/20 px-3 py-1 mx-4 text-lg my-5 tracking-[0.25rem] leading-none">
-      THE FRONTIER OF PREDICTION MARKETS
-    </p>
+    <!-- Middle Section: Main Content (Logo, Tagline, IS REBOOTING, Menu) -->
+    <div class="flex flex-col items-center place-items-center">
+      <AugurLogo id="augur-logo" class:list="text-9xl" />
+      <p id="prediction-market-text" class="border border-foreground/20 px-3 py-1 mx-4 text-lg my-5 tracking-[0.25rem] leading-none">
+        THE FRONTIER OF PREDICTION MARKETS
+      </p>
 
-    <h2 class="flex items-center gap-5 title">
-      <span id="line-left" class="w-[2rem] h-[1px] bg-foreground"></span>
-      <pre id="is-rebooting-text" class="title leading-none tracking-tight text-[size:clamp(0.25rem,_1vw,_0.5rem)]">
+      <h2 class="flex items-center gap-5 title">
+        <span id="line-left" class="w-[2rem] h-[1px] bg-foreground"></span>
+        <pre id="is-rebooting-text" class="title leading-none tracking-tight text-[size:clamp(0.25rem,_1vw,_0.5rem)]">
 ██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗ 
 ██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝ 
 ██║ ███████╗     ██████╔╝ █████╗   ██████╔╝ ██║   ██║ ██║   ██║    ██║    ██║ ██╔██╗ ██║ ██║  ███╗
@@ -24,19 +28,21 @@ import SocialLinks from './SocialLinks.astro';
 ██║ ███████║     ██║  ██║ ███████╗ ██████╔╝ ╚██████╔╝ ╚██████╔╝    ██║    ██║ ██║ ╚████║ ╚██████╔╝
 ╚═╝ ╚══════╝     ╚═╝  ╚═╝ ╚══════╝ ╚═════╝   ╚═════╝   ╚═════╝     ╚═╝    ╚═╝ ╚═╝  ╚═══╝  ╚═════╝ 
         </pre>
-      <span id="line-right" class="w-[2rem] h-[1px] bg-foreground"></span>
-    </h2>
+        <span id="line-right" class="w-[2rem] h-[1px] bg-foreground"></span>
+      </h2>
 
-    <div id="menu-items-container" class="flex flex-col place-items-center mt-8 text-left w-full max-w-3xl mx-auto">
-      <a id="first-menu-item" href="/mission" class="text-lg font-bold text-muted-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
-        A FUTURE THOUGHTFULLY BEING BUILT 
-      </a>
-      <a href="#" class="text-lg font-bold text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
-        THE MINDS BEHIND THE REBOOT
-      </a>
+      <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
+        <a id="first-menu-item" href="/mission" class="text-lg font-bold text-muted-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
+          A FUTURE THOUGHTFULLY BEING BUILT 
+        </a>
+        <a href="#" class="text-lg font-bold text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
+          THE MINDS BEHIND THE REBOOT
+        </a>
+      </div>
     </div>
 
-    <div id="fork-meter-container" class="mt-8 absolute bottom-0">
+    <!-- Bottom Section: ForkMeter -->
+    <div id="fork-mlter-container" class="place-content-end pb-8">
       <ForkMeter 
         client:load
         prediction="ETH WILL BE ABOVE $4,000 BY JULY, 2026"

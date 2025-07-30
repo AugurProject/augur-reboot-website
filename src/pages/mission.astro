@@ -81,46 +81,51 @@ const missionSections = [
 ---
 
 <Layout title="Mission - Augur">
-  <div class="max-w-screen-xl mx-auto px-4 md:px-8 relative">
-    <SocialLinks />
-    
-    <!-- BACK NAVIGATION -->
-    <div class="fixed top-8 left-6 lg:left-10 z-50">
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    <!-- Top Section: Navigation -->
+    <div class="flex justify-between items-start p-8">
+      <!-- Back Button -->
       <a id="back-button" href="/?intro=false" autofocus class="text-green-500 hover:fx-glow focus:fx-glow focus:outline-none text-2xl">
         &lt; BACK TO HOME
       </a>
+      
+      <!-- Social Links -->
+      <SocialLinks />
     </div>
     
-    <!-- MAIN CONTENT -->
-    <main class="py-16">
-      <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mt-24 mb-8">
-        <span class="title-icon"></span>
-        Or Work On Augur
-      </h1>
-
-      <div class="max-w-4xl mx-auto">
-        <p class="text-center mb-8">Augur has always represented a bold idea: a decentralized oracle system that lets anyone ask and resolve questions about the future — without trusted intermediaries. In 2025, the Lituus Foundation began rebooting Augur from the ground up, adapting its core ideas to a radically changed crypto landscape. Here's how our journey has unfolded so far:</p>
-
-        <h2 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-12">
+    <!-- Middle Section: Scrollable Content -->
+    <main class="overflow-y-auto px-4 md:px-8">
+      <div class="max-w-screen-xl mx-auto">
+        <h1 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mt-16 mb-8">
           <span class="title-icon"></span>
-          The Reboot Timeline
-        </h2>
+          Or Work On Augur
+        </h1>
 
-        {
-          missionSections.map((section, index) => (
-            <MissionSection
-              title={section.title}
-              date={section.date}
-              details={section.details}
-              isLast={index === missionSections.length - 1}
-            />
-          ))
-        }
+        <div class="max-w-4xl mx-auto">
+          <p class="text-center mb-8">Augur has always represented a bold idea: a decentralized oracle system that lets anyone ask and resolve questions about the future — without trusted intermediaries. In 2025, the Lituus Foundation began rebooting Augur from the ground up, adapting its core ideas to a radically changed crypto landscape. Here's how our journey has unfolded so far:</p>
+
+          <h2 class="flex justify-center items-center gap-3 text-white text-2xl tracking-[4px] uppercase mb-12">
+            <span class="title-icon"></span>
+            The Reboot Timeline
+          </h2>
+
+          {
+            missionSections.map((section, index) => (
+              <MissionSection
+                title={section.title}
+                date={section.date}
+                details={section.details}
+                isLast={index === missionSections.length - 1}
+              />
+            ))
+          }
+        </div>
       </div>
     </main>
-  </div>
 
-  <Footer />
+    <!-- Bottom Section: Footer -->
+    <Footer />
+  </div>
 </Layout>
 
 <style>
