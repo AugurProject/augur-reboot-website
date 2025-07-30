@@ -1,135 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
+import ForkMeterUI, { type ForkMeterMetadata, ForkMeterState } from './ForkMeterUI.tsx';
 
 interface ForkMeterProps {
-  prediction: string;
-  round: string;
-  remaining_time: string;
-  staked: string;
-  value: number; // 0-100 for pointer position
+  value?: number; // 0-100 for pointer position
   animated?: boolean;
+  // Future: could add props for data source, refresh interval, etc.
 }
 
 const ForkMeter: React.FC<ForkMeterProps> = ({
-  prediction,
-  round,
-  remaining_time,
-  staked,
-  value,
+  value = 75,
   animated = true,
 }) => {
-  const [currentValue, setCurrentValue] = useState(animated ? 0 : value);
-
-  // Smooth animation to target value
-  useEffect(() => {
-    if (!animated) {
-      setCurrentValue(value);
-      return;
-    }
-
-    const targetValue = Math.max(0, Math.min(100, value));
-    const startValue = currentValue;
-    const duration = 1500; // 1.5 seconds
-    const startTime = Date.now();
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing function
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const newValue = startValue + (targetValue - startValue) * easeOut;
-      
-      setCurrentValue(newValue);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    animate();
-  }, [value, animated]);
-
-  // SVG circle calculations
-  const radius = 80;
-  const circumference = Math.PI * radius; // Half circle circumference
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (currentValue / 100) * circumference;
+  // Generate stable timestamp once
+  const timestamp = useMemo(() => new Date().toISOString(), []);
   
-  // Needle angle calculation (0° = left, 180° = right)
-  const needleAngle = (currentValue / 100) * 180;
+  // Generate metadata based on component props and state
+  const metadata: ForkMeterMetadata = useMemo(() => {
+    // For values > 60%, we need prediction data
+    if (value > 60) {
+      return {
+        value,
+        animated,
+        last_updated: timestamp,
+        prediction: "ETH WILL BE ABOVE $4,000 BY JULY, 2026",
+        round: "RD 2",
+        remaining_time: "120 HRS",
+        staked: "REP 4,000,000",
+      };
+    }
+    
+    // For low values, just basic metadata
+    return {
+      value,
+      animated,
+      last_updated: timestamp,
+    };
+  }, [value, animated, timestamp]);
 
-  return (
-    <div className="mx-auto max-w-lg p-6">
-      {/* SVG Gauge */}
-      <div className="relative mb-2">
-        <svg 
-          viewBox="0 0 200 120" 
-          className="w-[160px] mx-auto overflow-visible"
-        >
-          {/* Background arc */}
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="var(--color-green-500)"
-            strokeWidth="10"
-            strokeLinecap="round"
-            opacity="0.3"
-          />
-          
-          {/* Foreground arc */}
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="var(--color-green-500)"
-            strokeWidth="10"
-            strokeLinecap="round"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            style={{
-              filter: 'drop-shadow(0 0 6px var(--color-green-500))',
-              transition: animated ? 'stroke-dashoffset 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
-            }}
-          />
-          
-          {/* Needle */}
-          <line
-            x1="100"
-            y1="100"
-            x2="100"
-            y2="28"
-            stroke="var(--color-green-500)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            style={{
-              transformOrigin: '100px 100px',
-              transform: `rotate(${needleAngle - 90}deg)`,
-              filter: 'drop-shadow(0 0 4px var(--color-green-500))',
-              transition: animated ? 'transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
-            }}
-          />
-          
-          {/* Center dot */}
-          <circle
-            cx="100"
-            cy="100"
-            r="4"
-            fill="var(--color-green-500)"
-            style={{ filter: 'drop-shadow(0 0 4px var(--color-green-500))' }}
-          />
-        </svg>
-      </div>
-
-      {/* Prediction Text */}
-      <p className="text-muted-foreground text-center break-words mb-1">{prediction}</p>
-
-      {/* Metadata Row */}
-      <div className="flex justify-center items-center">
-        <div className="font-bold px-4 border-r border-green-500/20">{round}</div>
-        <div className="font-bold px-4">{remaining_time}</div>
-        <div className="font-bold px-4 border-l border-green-500/20">{staked}</div>
-      </div>
-    </div>
-  );
+  return <ForkMeterUI metadata={metadata} />;
 };
 
 export default ForkMeter;
