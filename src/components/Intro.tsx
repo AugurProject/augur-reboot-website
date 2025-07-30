@@ -63,11 +63,11 @@ const Intro: React.FC = () => {
     <CrtDisplay isPoweredUp={isPoweredOn}>
       <button
         onClick={handleSkipClick}
-        className="fixed top-8 right-10 z-50 font-console text-green-500/50 hover:text-foreground/100 focus:text-green-500/100 transition-colors duration-300 cursor-pointer"
+        className="fixed top-8 right-10 z-50 font-display text-green-500/50 hover:text-foreground/100 focus:text-green-500/100 transition-colors duration-300 cursor-pointer"
       >
         &gt; SKIP INTRO (ESC)
       </button>
-      <div className="flex items-center justify-center h-screen font-console uppercase text-green-500">
+      <div className="flex items-center justify-center h-screen font-display uppercase text-green-500">
         <TypewriterSequence
           sentences={bootSentences}
           defaultTypingSpeed={40}

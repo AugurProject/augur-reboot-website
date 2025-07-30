@@ -47,7 +47,7 @@ const Typewriter: React.FC<TypewriterProps> = ({ segments, defaultTypingSpeed = 
   }, [currentSegmentIndex, currentCharIndex, segments, defaultTypingSpeed, onComplete]);
 
   return (
-    <span className="typewriter-text font-console">
+    <span className="typewriter-text font-display">
       {displayedText}
       <span ref={cursorRef} className="cursor">
         █

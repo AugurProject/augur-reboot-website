@@ -121,13 +121,13 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
 
       {/* Prediction Text */}
       <div className="mb-2">
-        <p className="font-console-narrow font-bold text-green-700 text-center text-xl md:text-base break-words">
+        <p className="font-bold text-green-700 text-center text-xl md:text-base break-words">
           {prediction}
         </p>
       </div>
 
       {/* Metadata Row */}
-      <div className="flex justify-center items-center font-console-narrow">
+      <div className="flex justify-center items-center">
         <div className="text-xl px-4 border-r border-green-500/20">{round}</div>
         <div className="text-xl px-4">{remaining_time}</div>
         <div className="text-xl px-4 border-l border-green-500/20">{staked}</div>

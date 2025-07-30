@@ -2,15 +2,30 @@
 
 @theme {
   --color-primary: #2AE7A8;
-  --color-foreground: #ffffff;
+  --color-foreground: var(--color-green-600);
+  --color-muted-foreground: var(--color-green-700);
+  --color-loud-foreground: var(--color-green-500);
   --color-background: #111111;
 
   --font-console: "Press Start 2P", monospace;
   --font-console-narrow: "Handjet", sans-serif;
 
+  --default-font-family: "Handjet", sans-serif;
+  --text-base: 1.25rem;
+  --text-base--line-height: calc(1.125 / 1);
+  --text-lg--line-height: calc(1.125 / 1);
+  --font-weight-normal: 300;
+  --tracking-normal: 0.05em;
+
+  --font-display: "Press Start 2P", monospace;
+
   --glow-size-sm: 0.25rem;
-  --glow-size: 0.5rem;
+  --glow-size: 0.375rem;
   --glow-size-lg: 1rem;
+}
+
+html {
+  @apply bg-background text-foreground text-base font-normal tracking-normal;
 }
 
 @utility fx-glow {
@@ -27,12 +42,6 @@
 
 @utility fx-box-glow-* {
   box-shadow: 0 0 --value(--glow-size-*) var(--color-primary);
-}
-
-@layer theme {
-  [class*=font-console-narrow] {
-    letter-spacing: 0.075em;
-  }
 }
 
 @keyframes blink-animation {
@@ -95,6 +104,15 @@
   }
 }
 
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
 .crt {
   background: linear-gradient(to top, #000000, #000000, #222222, #222222);
   background-size: cover;
@@ -112,17 +130,8 @@
   }
 }
 
-@keyframes gradient-animation {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 0% 200%;
-  }
-}
-
 .title {
-  background: linear-gradient(to bottom, var(--color-green-700), var(--color-green-500), var(--color-green-700));
+  background: linear-gradient(to bottom, var(--color-green-600), var(--color-green-400), var(--color-green-600));
   background-size: 100% 200%;
   background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -217,7 +217,6 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 0,
         opacity: opacity,
         background: 'transparent',
       }}
