@@ -1,20 +1,5 @@
 @import "tailwindcss";
 
-.cursor {
-  display: inline-block;
-  width: 0.5em;
-  margin-left: 2px;
-  vertical-align: text-bottom;
-}
-
-.cursor.blink-active {
-  animation: blink-animation 1s steps(2, start) infinite;
-}
-
-.cursor.hidden {
-  visibility: hidden;
-}
-
 @theme {
   --color-primary: #2AE7A8;
   --color-foreground: #ffffff;
@@ -22,6 +7,26 @@
 
   --font-console: "Press Start 2P", monospace;
   --font-console-narrow: "Handjet", sans-serif;
+
+  --glow-size-sm: 0.25rem;
+  --glow-size: 0.5rem;
+  --glow-size-lg: 1rem;
+}
+
+@utility fx-glow {
+  filter: drop-shadow(0 0 var(--glow-size) var(--color-primary));
+}
+
+@utility fx-glow-* {
+  filter: drop-shadow(0 0 --value(--glow-size-*) var(--color-primary));
+}
+
+@utility fx-box-glow {
+  box-shadow: 0 0 --value(--glow-size) var(--color-primary);
+}
+
+@utility fx-box-glow-* {
+  box-shadow: 0 0 --value(--glow-size-*) var(--color-primary);
 }
 
 @layer theme {
@@ -123,4 +128,19 @@
   -webkit-text-fill-color: transparent;
   animation: gradient-animation 2s linear infinite;
   filter: drop-shadow(0 4px 0 #ffffff15);
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.5em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+.cursor.blink-active {
+  animation: blink-animation 1s steps(2, start) infinite;
+}
+
+.cursor.hidden {
+  visibility: hidden;
 }

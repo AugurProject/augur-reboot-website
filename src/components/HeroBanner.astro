@@ -1,24 +1,12 @@
 ---
 import AugurLogo from '../assets/augur.svg';
-import DiscordLogo from '../assets/discord.svg';
-import XLogo from '../assets/x.svg';
-import GithubLogo from '../assets/github.svg';
 import ForkMeter from './ForkMeter.tsx';
+import SocialLinks from './SocialLinks.astro';
 ---
 
 <div class="fixed inset-0 h-screen w-screen overflow-scroll place-content-center">
   <div id="hero-banner-container" class="flex flex-col justify-center items-center text-green-500 z-10 text-center min-h-[500px] overflow-y-scroll">
-    <div id="social-links" class="absolute top-8 right-10 flex gap-x-8">
-      <a id="twitter-link" href="https://x.com/AugurProject" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
-        <XLogo />
-      </a>
-      <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
-        <DiscordLogo />
-      </a>
-      <a id="github-link" href="https://github.com/AugurProject/" class="text-primary hover:text-foreground focus:text-foreground no-underline font-console text-3xl">
-        <GithubLogo />
-      </a>
-    </div>
+    <SocialLinks />
 
     <AugurLogo id="augur-logo" class:list="text-9xl" />
     
@@ -40,10 +28,10 @@ import ForkMeter from './ForkMeter.tsx';
     </h2>
 
     <div id="menu-items-container" class="flex flex-col place-items-center font-console-narrow mt-8 text-left w-full max-w-3xl mx-auto">
-      <a id="first-menu-item" href="/mission" class="text-green-700 py-1 block hover:text-green-500 focus:text-green-500 hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+      <a id="first-menu-item" href="/mission" class="text-green-700 py-1 block hover:text-green-500 focus:text-green-500 hover:fx-glow focus:fx-glow focus:outline-none text-2xl">
         A FUTURE THOUGHTFULLY BEING BUILT 
       </a>
-      <a href="#" class="text-green-700 hover:text-green-500 focus:text-green-500 py-1 block hover:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:text-shadow-[0_0_0.5rem_var(--color-green-500)] focus:outline-none text-2xl">
+      <a href="#" class="text-green-700 hover:text-green-500 focus:text-green-500 py-1 block hover:fx-glow focus:fx-glow focus:outline-none text-2xl">
         THE MINDS BEHIND THE REBOOT
       </a>
     </div>
