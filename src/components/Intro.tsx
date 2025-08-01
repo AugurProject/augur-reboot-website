@@ -9,9 +9,9 @@ import Pointer from './Pointer';
 
 const bootSentences: string[] = [
   "", // Start with a blank line for the "warm-up"
-  "AUGUR BOOT SEQUENCE INITIATED",
+  "RESEARCH AND DEVELOPMENT HAS RETURNED TO ETHEREUM'S FIRST ICO",
   "PERFORMING SYSTEM CHECKS... UPDATE REQUIRED",
-  "AUGUR REBOOT BEGIN"
+  "AUGUR REBOOT BEGINS"
 ];
 
 const Intro: React.FC = () => {

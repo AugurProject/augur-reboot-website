@@ -7,6 +7,8 @@ import Button from "../components/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
 import PageHeading from "../components/PageHeading.astro";
 import SectionHeading from "../components/SectionHeading.astro";
+import LituusLogo from "../assets/lituus.svg";
+import DarkFloristLogo from "../assets/darkflorist.svg";
 ---
 
 <Layout title="Team - Augur">
@@ -44,10 +46,14 @@ import SectionHeading from "../components/SectionHeading.astro";
             <TeamCard 
               name="Lituus Labs" 
               description="Focused on oracle architecture, cryptoeconomic security, and protocol design. Their current work centers on a generalized, finalizing oracle."
+              SvgLogo={LituusLogo}
+              url="lituus.io"
             />
             <TeamCard 
               name="Dark Florist" 
               description="Focused on alternative oracle structures, user-facing applications, and incentive models. Their approach emphasizes a non-finalizing oracle design."
+              SvgLogo={DarkFloristLogo}
+              url="dark.florist"
             />
           </div>
 

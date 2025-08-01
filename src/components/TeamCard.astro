@@ -2,28 +2,43 @@
 interface Props {
   name: string;
   description: string;
-  logoPlaceholder?: boolean;
+  SvgLogo?: any;
+  url?: string;
 }
 
-const { name, description, logoPlaceholder = true } = Astro.props;
+const { name, description, SvgLogo, url } = Astro.props;
 ---
 
 <div class="team-card border border-foreground/20 bg-background/70 p-6">
-  {logoPlaceholder && (
-    <div class="logo-placeholder mb-4">
-    <div class="w-16 h-16 border-2 border-dashed border-muted-foreground/30 flex items-center justify-center text-primary/50 text-xs">
-        LOGO
+  <div class="flex flex-col gap-4 items-center md:flex-col md:items-center lg:flex-row lg:gap-6 lg:items-center">
+    {SvgLogo ? (
+      <div class="logo-placeholder flex-shrink-0">
+        <SvgLogo class="max-w-20 fx-pulse-glow" />
       </div>
+    ) : (
+      <div class="logo-placeholder flex-shrink-0">
+        <div class="w-20 h-20 border-2 border-dashed border-muted-foreground/30 flex items-center justify-center text-primary/50 text-xs">
+          LOGO
+        </div>
+      </div>
+    )}
+    
+    <div class="flex-1 text-center md:text-center lg:text-left">
+      <h3 class="text-xl font-bold text-loud-foreground tracking-[0.125em] uppercase mb-2">
+        {name}
+      </h3>
+      
+      <p class="mb-3">
+        {description}
+      </p>
+      
+      {url && (
+        <a href={`https://${url}`} target="_blank" rel="noopener noreferrer" class="text-loud-foreground hover:fx-glow transition-all duration-200 text-sm font-bold uppercase tracking-wider">
+          {url} →
+        </a>
+      )}
     </div>
-  )}
-  
-  <h3 class="text-xl font-bold text-loud-foreground tracking-[0.125em] uppercase">
-    {name}
-  </h3>
-  
-  <p>
-    {description}
-  </p>
+  </div>
 </div>
 
 <style>

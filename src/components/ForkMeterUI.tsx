@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 enum ForkMeterState {
   STABLE = 'STABLE',
@@ -83,11 +83,47 @@ const ForkMeterUI: React.FC<ForkMeterProps> = ({
   // Destructure metadata
   const { value, last_updated, animated = true, ...rest } = metadata;
   const [currentValue, setCurrentValue] = useState(animated ? 0 : value);
+  const [shouldStartAnimation, setShouldStartAnimation] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Smooth animation to target value
+  // Check hero banner animation state and start animation with proper timing
   useEffect(() => {
     if (!animated) {
       setCurrentValue(value);
+      return;
+    }
+
+    const heroBanner = document.getElementById('hero-banner-container');
+    if (!heroBanner) return;
+
+    // Check if animations are skipped (immediate start) or started (delayed start)
+    const isSkipped = heroBanner.classList.contains('animations-skipped');
+    const isStarted = heroBanner.classList.contains('animations-started');
+
+    if (isSkipped) {
+      // Skip scenario: start animation immediately
+      setShouldStartAnimation(true);
+    } else if (isStarted) {
+      // Intro sequence: wait for CSS fade-in to complete
+      // CSS animation: 8.0s delay + 0.6s duration = 8.6s total
+      const delay = 8600; // 8.6 seconds
+      const timeoutId = setTimeout(() => {
+        setShouldStartAnimation(true);
+      }, delay);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [animated]);
+
+  // Smooth animation to target value - only start when shouldStartAnimation is true
+  useEffect(() => {
+    if (!animated) {
+      setCurrentValue(value);
+      return;
+    }
+
+    // Don't start animation until timing is right
+    if (!shouldStartAnimation) {
       return;
     }
 
@@ -112,7 +148,7 @@ const ForkMeterUI: React.FC<ForkMeterProps> = ({
     };
 
     animate();
-  }, [value, animated]);
+  }, [value, animated, shouldStartAnimation]);
 
   // Dynamic state resolution function
   const getCurrentState = (value: number, stateMap: Record<ForkMeterState, StateConfig>): ForkMeterState => {
@@ -155,7 +191,7 @@ const ForkMeterUI: React.FC<ForkMeterProps> = ({
   const needleAngle = (currentValue / 100) * 180;
 
   return (
-    <div className="mx-auto max-w-lg p-6">
+    <div ref={containerRef} className="mx-auto max-w-lg p-6">
       {/* SVG Gauge */}
       <div className="relative mb-2">
         <svg 

@@ -21,13 +21,8 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
       const shouldShow = state.uiState === UIState.MAIN_CONTENT;
       setIsVisible(shouldShow);
       
-      // Check if intro was skipped by looking at URL params
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('intro') === 'false') {
-        setShouldAnimate(false);
-      } else {
-        setShouldAnimate(animated);
-      }
+      // Always animate when the component becomes visible, regardless of intro skip
+      setShouldAnimate(animated);
     });
 
     // Initialize with current state
@@ -35,10 +30,8 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
     const shouldShow = currentState.uiState === UIState.MAIN_CONTENT;
     setIsVisible(shouldShow);
     
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('intro') === 'false') {
-      setShouldAnimate(false);
-    }
+    // Always use the animated prop, don't disable based on URL params
+    setShouldAnimate(animated);
 
     return unsubscribe;
   }, [animated]);

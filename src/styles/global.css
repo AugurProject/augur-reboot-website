@@ -20,6 +20,7 @@
 
   --font-display: "Press Start 2P", monospace;
 
+  --glow-size-xs: 0.1375rem;
   --glow-size-sm: 0.25rem;
   --glow-size: 0.375rem;
   --glow-size-lg: 1rem;
@@ -43,6 +44,10 @@ html {
 
 @utility fx-box-glow-* {
   box-shadow: 0 0 --value(--glow-size-*) var(--color-primary);
+}
+
+@utility fx-pulse-glow {
+  animation: pulse-glow 6s ease-in-out infinite;
 }
 
 @keyframes blink-animation {
@@ -121,6 +126,53 @@ html {
   50% {
     transform: translateX(-8px);
   }
+}
+
+@keyframes pulse-glow {
+  0%, 67% {
+    filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
+  }
+  83% {
+    filter: drop-shadow(0 0 var(--glow-size-lg) var(--color-primary));
+  }
+  100% {
+    filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
+  }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes logo-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes logo-scale-down {
+  from { transform: scale(2) translateY(50%); }
+  to { transform: scale(1) translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-from-right {
+  from { opacity: 0; transform: translateX(25px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-from-left {
+  from { opacity: 0; transform: translateX(-25px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .crt {
@@ -249,4 +301,40 @@ html {
     }
   }
 
+}
+
+/* --- Social Media Icons Animation Rules --- */
+/* Initial hidden state for social media icons (homepage only) */
+#discord-link,
+#twitter-link,
+#github-link {
+  opacity: 0;
+}
+
+/* Show social media icons on non-homepage pages (when hero-banner-container is not present) */
+body:not(:has(#hero-banner-container)) #discord-link,
+body:not(:has(#hero-banner-container)) #twitter-link,
+body:not(:has(#hero-banner-container)) #github-link {
+  opacity: 1;
+}
+
+/* Animation skip state - show immediately */
+#hero-banner-container.animations-skipped #discord-link,
+#hero-banner-container.animations-skipped #twitter-link,
+#hero-banner-container.animations-skipped #github-link {
+  opacity: 1;
+  transform: none;
+}
+
+/* Animation trigger - show with timing */
+#hero-banner-container.animations-started #twitter-link {
+  animation: fade-in-down 0.5s ease-out 0.5s forwards;
+}
+
+#hero-banner-container.animations-started #discord-link {
+  animation: fade-in-down 0.5s ease-out 0.7s forwards;
+}
+
+#hero-banner-container.animations-started #github-link {
+  animation: fade-in-down 0.5s ease-out 0.9s forwards;
 }
