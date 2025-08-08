@@ -1,0 +1,85 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import { withBase } from "../lib/utils";
+---
+
+<Layout title="404 - Page Not Found | Augur">
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    <!-- Top Section: Navigation -->
+    <div class="flex justify-between items-start p-4 md:p-8">
+      <!-- Home Button -->
+  <Button id="home-button" variant="link" size="lg" href={withBase('/?intro=false')}>
+        <Pointer animated="auto" direction="left" />
+        BACK TO HOME
+      </Button>
+      
+      <!-- Social Links -->
+      <SocialLinks />
+    </div>
+    
+    <!-- Middle Section: 404 Content -->
+    <main class="flex-1 flex items-center justify-center px-4 md:px-8">
+      <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
+  <h1 class="sr-only">404 — Page Not Found</h1>
+        <!-- ASCII Art 404 -->
+        <div class="mb-8">
+          <pre class="title leading-none tracking-tight text-[size:clamp(0.3rem,_1.8vw,_0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" aria-label="404 - Page Not Found">
+██╗  ██╗ ██████╗ ██╗  ██╗
+██║  ██║██╔═████╗██║  ██║
+███████║██║██╔██║███████║
+╚════██║████╔╝██║╚════██║
+     ██║╚██████╔╝     ██║
+     ╚═╝ ╚═════╝      ╚═╝
+
+ORACLE QUERY FAILED
+          </pre>
+        </div>
+
+        <!-- Error Message -->
+        <div class="space-y-6 uppercase w-full">
+          <p class="text-xl md:text-2xl text-foreground font-console tracking-[0.2em]">
+            PAGE NOT FOUND
+          </p>
+          
+          <div class="border border-foreground/20 p-6 mx-auto max-w-lg">
+            <p class="text-lg text-muted-foreground leading-relaxed normal-case">
+              The oracle has spoken: <span class="text-loud-foreground">This page does not exist in our reality</span>. 
+              Perhaps it's in an alternate timeline, or maybe the prediction market for its existence 
+              resolved to <span class="text-rose-500 font-bold">FALSE</span>.
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+            <Button variant="outline" size="lg" href={withBase('/?intro=false')}>
+              <Pointer animated="always" direction="left" />
+              Return Home
+            </Button>
+            
+            <Button variant="outline" size="lg" href={withBase('/mission')}>
+              <Pointer animated="always" direction="right" />
+              View Mission
+            </Button>
+          </div>
+
+          <!-- Flavor Text -->
+          <div class="mt-12 text-sm text-muted-foreground font-console-narrow">
+            <p class="opacity-60">
+              Error Code: <span class="text-primary">AUGUR_404_TIMELINE_DIVERGENCE</span>
+            </p>
+            <p class="opacity-60 mt-1">
+              Suggestion: Check your URL or try a different prediction
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  <!-- Restore footer; page-level scroll is acceptable -->
+  <Footer />
+  </div>
+</Layout>
