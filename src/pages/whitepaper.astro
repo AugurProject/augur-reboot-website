@@ -1,0 +1,90 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import PageHeading from "../components/PageHeading.astro";
+import { withBase } from "../lib/utils";
+
+const EXTERNAL_PDF = "https://www.allcryptowhitepapers.com/wp-content/uploads/2018/05/Augur-white-paper.pdf";
+---
+
+<Layout title="Augur Whitepaper">
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen uppercase">
+    <!-- Top Section: Navigation -->
+    <div class="flex justify-between items-start p-8">
+      <!-- Back Button -->
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autoFocus>
+        <Pointer direction="left" animated="auto" />
+        BACK TO HOME
+      </Button>
+
+      <!-- Social Links -->
+      <SocialLinks />
+    </div>
+
+    <!-- Middle Section: Scrollable Content -->
+  <main class="overflow-auto px-4 md:px-8 mb-12">
+      <div class="max-w-screen-xl mx-auto w-full">
+        <PageHeading text="Augur Whitepaper" />
+
+        <div class="mx-auto max-w-6xl">
+          <div class="flex justify-between items-center gap-4 mb-4">
+            <div class="text-sm text-muted-foreground">
+              Inline viewer for the original whitepaper PDF.
+            </div>
+            <div class="flex gap-2">
+              <Button as="a" variant="outline" size="sm" href={EXTERNAL_PDF} external>
+                DOWNLOAD PDF
+              </Button>
+              <Button as="a" variant="secondary" size="sm" href={EXTERNAL_PDF} external>
+                OPEN SOURCE URL
+              </Button>
+            </div>
+          </div>
+
+          <div class="border border-primary/20 bg-background/60 relative">
+            <div id="wp-loading" class="absolute inset-0 flex items-center justify-center bg-background/40 z-10">
+              <div class="flex flex-col items-center gap-3">
+                <div
+                  aria-hidden="true"
+                  class="w-7 h-7 rounded-full border-2 border-primary/20 animate-spin [border-top-color:rgba(42,231,168,0.9)] [filter:drop-shadow(0_0_3px_rgba(42,231,168,0.25))]"
+                ></div>
+                <div class="text-muted-foreground text-[10px] tracking-[0.3em]">LOADING</div>
+              </div>
+            </div>
+            <div class="absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-background/40 to-transparent pointer-events-none"></div>
+            <iframe
+              id="wp-frame"
+              title="Augur Whitepaper PDF"
+              src={EXTERNAL_PDF}
+              class="w-full bg-background h-[87dvh] min-h-[720px] md:h-[92dvh] lg:h-[94dvh]"
+            />
+            <div class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-background/40 to-transparent pointer-events-none"></div>
+          </div>
+          <p class="text-center text-xs text-muted-foreground mt-3">
+            If the inline viewer doesn’t load, <a class="underline hover:text-loud-foreground" href={EXTERNAL_PDF}>open the PDF directly</a>.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Section: Footer -->
+    <Footer />
+  </div>
+</Layout>
+
+<script>
+  // Hide the loading overlay when the iframe finishes loading
+  const frame = document.getElementById('wp-frame');
+  const overlay = document.getElementById('wp-loading');
+  if (frame && overlay) {
+    frame.addEventListener('load', () => {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 200ms ease-out';
+      setTimeout(() => overlay.remove(), 220);
+    });
+  }
+</script>
+
