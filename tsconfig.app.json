@@ -1,10 +1,13 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.scripts.json" }
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*"
   ],
-  "files": [],
+  "exclude": [
+    "dist",
+    "scripts"
+  ],
   "compilerOptions": {
     "types": [
       "./worker-configuration.d.ts",
