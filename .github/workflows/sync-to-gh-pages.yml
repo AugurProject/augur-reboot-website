@@ -1,6 +1,16 @@
-name: Sync Main to GitHub Pages Branch
+name: Sync Main to GitHub Pages Branch & Monitor Fork Risk
 
 on:
+  schedule:
+    # Run every hour at minute 5 for fork risk monitoring
+    - cron: '5 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger for testing
+    inputs:
+      custom_rpc_url:
+        description: 'Custom Ethereum RPC URL for testing'
+        required: false
+        type: string
   push:
     branches: [main]
   pull_request:
@@ -13,7 +23,7 @@ permissions:
 
 jobs:
   sync:
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true) || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     
     steps:
@@ -39,7 +49,11 @@ jobs:
           # Get latest main content - only files needed for build
           git checkout main -- src/
           git checkout main -- public/
+          git checkout main -- scripts/
+          git checkout main -- contracts/
           git checkout main -- tsconfig.json
+          git checkout main -- tsconfig.app.json
+          git checkout main -- tsconfig.scripts.json
           git checkout main -- astro.config.mjs
           git checkout main -- package.json
           git checkout main -- package-lock.json
@@ -50,6 +64,13 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Calculate fork risk data
+        run: npm run build:fork-data
+        env:
+          # Optional: Custom RPC can be provided via secrets or manual dispatch input
+          # If not provided, will use public RPCs (no API key needed!)
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || github.event.inputs.custom_rpc_url }}
+          
       - name: Install dependencies and build
         run: |
           npm ci
@@ -85,6 +106,38 @@ jobs:
           git add .
           git commit -m "Sync from main: $(git log main -1 --pretty=format:'%h %s')"
           git push origin gh-pages
+
+      - name: Create deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "**Site URL:** https://${{ github.repository_owner }}.github.io/$(basename ${{ github.repository }})/" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract key metrics from JSON using jq (more reliable than grep)
+          if [ -f public/data/fork-risk.json ]; then
+            if command -v jq >/dev/null 2>&1; then
+              RISK_LEVEL=$(jq -r '.riskLevel' public/data/fork-risk.json)
+              RISK_PERCENT=$(jq -r '.riskPercentage' public/data/fork-risk.json)
+              LARGEST_BOND=$(jq -r '.metrics.largestDisputeBond' public/data/fork-risk.json)
+              THRESHOLD_PERCENT=$(jq -r '.metrics.forkThresholdPercent' public/data/fork-risk.json)
+              ACTIVE_DISPUTES=$(jq -r '.metrics.activeDisputes' public/data/fork-risk.json)
+              RPC_ENDPOINT=$(jq -r '.rpcInfo.endpoint' public/data/fork-risk.json)
+              RPC_LATENCY=$(jq -r '.rpcInfo.latency' public/data/fork-risk.json)
+              
+              echo "**Risk Level:** ${RISK_LEVEL}" >> $GITHUB_STEP_SUMMARY
+              echo "**Risk Percentage:** ${RISK_PERCENT}%" >> $GITHUB_STEP_SUMMARY
+              echo "**Largest Dispute Bond:** ${LARGEST_BOND} REP" >> $GITHUB_STEP_SUMMARY
+              echo "**Fork Threshold Progress:** ${THRESHOLD_PERCENT}% of 275,000 REP" >> $GITHUB_STEP_SUMMARY
+              echo "**Active Disputes:** ${ACTIVE_DISPUTES}" >> $GITHUB_STEP_SUMMARY
+              echo "**RPC Used:** ${RPC_ENDPOINT} (${RPC_LATENCY}ms)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "**Status:** Fork risk data calculated and deployed" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            echo "✅ **Deployment:** Static site and data deployed to gh-pages branch" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Warning:** Fork risk data file not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Summary
         if: steps.changes.outputs.has_changes == 'true'
