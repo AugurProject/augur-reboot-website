@@ -44,7 +44,15 @@ src/
 ├── styles/global.css      # Tailwind v4 @theme + @utility directives  
 ├── components/            # Component types by rendering
 │   ├── *.astro           # Server-rendered (static)
-│   └── *.tsx             # Client-hydrated (interactive)
+│   ├── *.tsx             # Client-hydrated (interactive)
+│   ├── ForkMeter.tsx     # Real-time fork risk gauge with demo integration
+│   ├── GaugeDisplay.tsx  # SVG-based percentage visualization
+│   └── DemoOverlay.tsx   # Development-only demo controls (Ctrl+Shift+D)
+├── contexts/             # React Context providers
+│   ├── ForkRiskContext.tsx # Fork risk data loading with auto-refresh
+│   └── DemoContext.tsx   # Demo mode state management
+├── scripts/              # Node.js blockchain data collection
+│   └── calculate-fork-risk.ts # Ethereum contract interaction with RPC failover
 ├── stores/               # Nanostores state management
 ├── assets/               # Static SVGs and resources  
 ├── lib/                  # Shared utilities
@@ -61,6 +69,8 @@ src/
 ## Project Overview
 Astro-based teaser website for the Augur prediction market reboot. Retro-futuristic landing page with CRT-style animations, deployed on Cloudflare Pages with React components for interactivity.
 
+**NEW**: Integrated real-time fork risk monitoring system displaying Augur v2 protocol fork risk based on active dispute bonds. Features automated blockchain data collection, interactive gauge visualization, and development demo modes.
+
 # DEVELOPMENT WORKFLOW
 
 ## Before Making Changes
@@ -69,6 +79,8 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 3. **PATTERN**: Follow Tailwind v4 @theme/@utility patterns in styles/global.css
 
 ## Development Commands
+
+**Core Development**
 | Command | Action |
 |---------|---------|
 | `npm run dev` | Start development server at localhost:4321 |
@@ -76,6 +88,13 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 | `npm run preview` | Build and preview with Wrangler (Cloudflare) |
 | `npm run deploy` | Deploy to Cloudflare Pages |
 | `npm run cf-typegen` | Generate Cloudflare Worker types |
+
+**Data & Risk Calculation**
+| Command | Action |
+|---------|---------|
+| `npm run build:fork-data` | Calculate fork risk data using TypeScript scripts (requires Node.js 22+ with --experimental-strip-types) |
+| `npm run typecheck` | Type-check all TypeScript files using project references |
+| `npm run lint` | Run Biome linter with tab indentation and single quotes |
 
 # REFERENCE - Architecture & Components
 
@@ -92,12 +111,22 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 - **Hybrid Approach** - Uses `client:load` and `client:only` directives for selective hydration
 
 ## Key Components
+
+**Core Website Components**
 - `Intro.tsx` - Interactive terminal-style intro with typewriter effects
 - `PerspectiveGridTunnel.tsx` - Animated 3D perspective grid background
 - `CrtDisplay.tsx` - CRT monitor simulation with power-on/off animations
 - `TypewriterSequence.tsx` - Sequential text animation system
 - `HeroBanner.astro` - Main hero section with social links
 - `MissionSection.astro` - Technical specification display sections
+
+**Fork Risk Monitoring Components**
+- `ForkMeter.tsx` - Main component integrating gauge, data panels, and demo controls
+- `GaugeDisplay.tsx` - Animated SVG gauge showing risk percentage (0-100%)
+- `DataPanels.tsx` - Responsive grid displaying risk level, REP staked, and dispute count
+- `DemoOverlay.tsx` - Development-only overlay with demo scenarios (production-safe)
+- `ForkRiskContext.tsx` - Data provider with 5-minute auto-refresh and error handling
+- `DemoContext.tsx` - Demo state management with scenario generation
 
 ## Pages Structure
 - `index.astro` - Landing page with intro sequence and hero banner  
@@ -128,6 +157,73 @@ The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter 
 - **@.claude/docs/astro-styling.md** - Scoped styles, dynamic CSS variables, and class composition patterns
 - **@.claude/docs/astro-typescript.md** - Latest TypeScript integration and utility types
 - **@.claude/docs/astro-view-transitions.md** - View transitions API and SPA-mode patterns
+
+# FORK RISK MONITORING SYSTEM
+
+## Architecture Overview
+The fork risk monitoring system uses a dual-runtime architecture with TypeScript project references:
+
+**Frontend Runtime (Astro + React)**
+- Config: `tsconfig.app.json` 
+- Location: `src/` directory
+- Purpose: Interactive web UI with gauge visualization and data panels
+- Key patterns: React Context for state management, 5-minute auto-refresh, demo mode integration
+
+**Backend Scripts (Node.js)**
+- Config: `tsconfig.scripts.json`
+- Location: `scripts/` directory  
+- Purpose: Ethereum blockchain data collection and risk calculation
+- Uses Node.js 22's native TypeScript support via --experimental-strip-types
+
+## Data Flow & Risk Calculation
+1. **Collection**: GitHub Actions runs `calculate-fork-risk.ts` hourly with RPC failover
+2. **Storage**: Results saved to `public/data/fork-risk.json` (gitignored for fresh data)
+3. **Consumption**: Frontend loads JSON via ForkRiskContext provider with auto-refresh
+4. **Visualization**: React components render risk data in interactive SVG gauge
+
+**Risk Formula**: `(Largest Dispute Bond / 275,000 REP) × 100 = Risk %`
+
+## Key Development Patterns
+
+**React Context Architecture**
+- `ForkRiskContext.tsx` - Manages fork risk data loading with 5-minute refresh cycle
+- `DemoContext.tsx` - Handles demo mode state with 5 risk scenarios (dev-only)
+- Auto-failover to default data on fetch errors
+
+**Demo Mode System (Development Only)**
+- Activation: `Ctrl+Shift+D` keyboard shortcut
+- Scenarios: None, Low (1-10%), Moderate (10-25%), High (25-75%), Critical (75-98%)
+- Production Safety: `if (!isDemoAvailable) return null` guards prevent demo in production builds
+
+**TypeScript Project References**
+- Root `tsconfig.json` coordinates both runtimes via project references
+- `tsconfig.app.json` - Astro frontend with React integration
+- `tsconfig.scripts.json` - Node.js scripts with ethers.js blockchain interaction
+- Build cache in `.tscache/` (gitignored)
+
+## Blockchain Integration Details
+- **Smart Contracts**: Augur v2 mainnet addresses with ABI definitions in `contracts/augur-abis.json`
+- **RPC Endpoints**: Automatic failover across LlamaRPC, LinkPool, PublicNode, 1RPC, Ankr
+- **No API Keys**: Uses only public endpoints for zero-cost infrastructure
+- **Error Handling**: Graceful degradation with fallback to cached/default data
+
+## GitHub Actions Integration
+- **Workflow**: `.github/workflows/sync-to-gh-pages.yml` runs `npm run build:fork-data` before build
+- **Schedule**: Hourly cron job + manual dispatch with custom RPC URL support
+- **Deployment**: Fresh data calculated and committed with each deployment
+
+## Development Commands Specific to Fork Risk
+
+```bash
+# Calculate fresh fork risk data locally
+npm run build:fork-data
+
+# Check RPC endpoint being used
+cat public/data/fork-risk.json | grep -A 3 "rpcInfo"
+
+# Enable demo mode in development
+# Press Ctrl+Shift+D in browser, then select risk scenarios
+```
 
 ## Task Master AI Integration
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
