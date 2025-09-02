@@ -1,0 +1,130 @@
+{
+	"universe": {
+		"address": "0xe991247b78f937d7b69cfc00f1a487a293557677",
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getOpenInterestInAttoEth",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "isForking",
+				"outputs": [{ "name": "", "type": "bool" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getForkEndTime",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getDisputeThresholdForFork",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getRepMarketCapInAttoeth",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getCurrentDisputeWindow",
+				"outputs": [{ "name": "", "type": "address" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getDisputeRoundDurationInSeconds",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			}
+		]
+	},
+	"repV2Token": {
+		"address": "0x221657776846890989a759ba2973e427dff5c9bb",
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "totalSupply",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [{ "name": "_owner", "type": "address" }],
+				"name": "balanceOf",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			}
+		]
+	},
+	"augur": {
+		"address": "0x75228dce4d82566d93068a8d5d49435216551599",
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getTimestamp",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [{ "name": "_universe", "type": "address" }],
+				"name": "isKnownUniverse",
+				"outputs": [{ "name": "", "type": "bool" }],
+				"type": "function"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{ "indexed": true, "name": "universe", "type": "address" },
+					{ "indexed": true, "name": "market", "type": "address" },
+					{
+						"indexed": false,
+						"name": "disputeCrowdsourcer",
+						"type": "address"
+					},
+					{ "indexed": false, "name": "payoutNumerators", "type": "uint256[]" },
+					{ "indexed": false, "name": "size", "type": "uint256" },
+					{ "indexed": false, "name": "invalid", "type": "bool" }
+				],
+				"name": "DisputeCrowdsourcerCreated",
+				"type": "event"
+			}
+		]
+	},
+	"cash": {
+		"address": "0xd5524179cb7ae012f5b642c1d6d700bbaa76b96b",
+		"abi": [
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "totalSupply",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [{ "name": "_owner", "type": "address" }],
+				"name": "balanceOf",
+				"outputs": [{ "name": "", "type": "uint256" }],
+				"type": "function"
+			}
+		]
+	}
+}
