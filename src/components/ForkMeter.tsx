@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { GaugeDisplay } from './GaugeDisplay'
 import { DataPanels } from './DataPanels'
+import { DemoOverlay } from './DemoOverlay'
 import { useForkRisk } from '../contexts/ForkRiskContext'
 import { $appStore, UIState } from '../stores/animationStore'
 
@@ -44,23 +45,28 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
   }
 
   return (
-    <div className="max-w-4xl w-full text-center">
-      {isLoading && <div className="mb-4 text-muted-foreground">Loading fork risk data...</div>}
+    <>
+      <div className="max-w-4xl w-full text-center">
+        {isLoading && <div className="mb-4 text-muted-foreground">Loading fork risk data...</div>}
 
-      {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
+        {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
-      <GaugeDisplay percentage={gaugeData.percentage} />
+        <GaugeDisplay percentage={gaugeData.percentage} />
 
-      <DataPanels
-        riskLevel={riskLevel}
-        repStaked={gaugeData.repStaked}
-        activeDisputes={gaugeData.activeDisputes}
-      />
+        <DataPanels
+          riskLevel={riskLevel}
+          repStaked={gaugeData.repStaked}
+          activeDisputes={gaugeData.activeDisputes}
+        />
 
-      <div className="text-sm font-light tracking-[0.05em] uppercase text-muted-foreground">
-        Last updated: <span className="text-primary">{lastUpdated}</span>
+        <div className="text-sm font-light tracking-[0.05em] uppercase text-muted-foreground">
+          Last updated: <span className="text-primary">{lastUpdated}</span>
+        </div>
       </div>
-    </div>
+      
+      {/* Demo overlay - only visible in development */}
+      <DemoOverlay />
+    </>
   )
 }
 

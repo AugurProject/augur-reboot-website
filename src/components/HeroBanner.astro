@@ -3,6 +3,7 @@ import AugurLogo from '../assets/augur.svg';
 import ForkMeter from './ForkMeter.tsx';
 import SocialLinks from './SocialLinks.astro';
 import { ForkRiskProvider } from '../contexts/ForkRiskContext.tsx';
+import { DemoProvider } from '../contexts/DemoContext.tsx';
 import { withBase } from '../lib/utils';
 ---
 
@@ -46,7 +47,9 @@ import { withBase } from '../lib/utils';
     <!-- Bottom Section: ForkMeter -->
     <div id="fork-meter-container" class="place-content-end pb-8">
       <ForkRiskProvider client:load>
-        <ForkMeter client:load animated={true} />
+        <DemoProvider client:load>
+          <ForkMeter client:load animated={true} />
+        </DemoProvider>
       </ForkRiskProvider>
     </div>
   </div>
