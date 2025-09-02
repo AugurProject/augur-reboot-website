@@ -1,73 +1,67 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import ForkMeterUI, { type ForkMeterMetadata, ForkMeterState } from './ForkMeterUI.tsx';
-import { $appStore, UIState } from '../stores/animationStore';
+import React, { useState, useEffect } from 'react'
+import { GaugeDisplay } from './GaugeDisplay'
+import { DataPanels } from './DataPanels'
+import { useForkRisk } from '../contexts/ForkRiskContext'
+import { $appStore, UIState } from '../stores/animationStore'
 
 interface ForkMeterProps {
-  value?: number; // 0-100 for pointer position
-  animated?: boolean;
-  // Future: could add props for data source, refresh interval, etc.
+  // Keep props for compatibility, but will use real data
+  animated?: boolean
 }
 
 const ForkMeter: React.FC<ForkMeterProps> = ({
-  value = 75,
   animated = true,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(animated);
+  const [isVisible, setIsVisible] = useState(false)
   
+  // Use the fork risk hook to get real data
+  const {
+    gaugeData,
+    riskLevel,
+    lastUpdated,
+    isLoading,
+    error,
+  } = useForkRisk()
+
   // Subscribe to animation state
   useEffect(() => {
     const unsubscribe = $appStore.subscribe((state) => {
-      const shouldShow = state.uiState === UIState.MAIN_CONTENT;
-      setIsVisible(shouldShow);
-      
-      // Always animate when the component becomes visible, regardless of intro skip
-      setShouldAnimate(animated);
-    });
+      const shouldShow = state.uiState === UIState.MAIN_CONTENT
+      setIsVisible(shouldShow)
+    })
 
     // Initialize with current state
-    const currentState = $appStore.get();
-    const shouldShow = currentState.uiState === UIState.MAIN_CONTENT;
-    setIsVisible(shouldShow);
-    
-    // Always use the animated prop, don't disable based on URL params
-    setShouldAnimate(animated);
+    const currentState = $appStore.get()
+    const shouldShow = currentState.uiState === UIState.MAIN_CONTENT
+    setIsVisible(shouldShow)
 
-    return unsubscribe;
-  }, [animated]);
-
-  // Generate stable timestamp once
-  const timestamp = useMemo(() => new Date().toISOString(), []);
-  
-  // Generate metadata based on component props and state
-  const metadata: ForkMeterMetadata = useMemo(() => {
-    // For values > 60%, we need prediction data
-    if (value > 60) {
-      return {
-        value,
-        animated: shouldAnimate,
-        last_updated: timestamp,
-        prediction: "ETH WILL BE ABOVE $4,000 BY JULY, 2026",
-        round: "RD 2",
-        remaining_time: "120 HRS",
-        staked: "REP 4,000,000",
-      };
-    }
-    
-    // For low values, just basic metadata
-    return {
-      value,
-      animated: shouldAnimate,
-      last_updated: timestamp,
-    };
-  }, [value, shouldAnimate, timestamp]);
+    return unsubscribe
+  }, [])
 
   // Don't render anything until animation state allows it
   if (!isVisible) {
-    return null;
+    return null
   }
 
-  return <ForkMeterUI metadata={metadata} />;
-};
+  return (
+    <div className="max-w-4xl w-full text-center">
+      {isLoading && <div className="mb-4 text-muted-foreground">Loading fork risk data...</div>}
+
+      {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
+
+      <GaugeDisplay percentage={gaugeData.percentage} />
+
+      <DataPanels
+        riskLevel={riskLevel}
+        repStaked={gaugeData.repStaked}
+        activeDisputes={gaugeData.activeDisputes}
+      />
+
+      <div className="text-sm font-light tracking-[0.05em] uppercase text-muted-foreground">
+        Last updated: <span className="text-primary">{lastUpdated}</span>
+      </div>
+    </div>
+  )
+}
 
 export default ForkMeter;
