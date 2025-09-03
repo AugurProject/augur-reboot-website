@@ -36,7 +36,9 @@ html {
 }
 
 @utility fx-glow-* {
-  filter: drop-shadow(0 0 --value(--glow-size-*) var(--color-primary));
+  --color: --value([*]);
+  --size: --value(--glow-size-*);
+  filter: drop-shadow(0 0 var(--size) var(--color, var(--color-primary)));
 }
 
 @utility fx-box-glow {

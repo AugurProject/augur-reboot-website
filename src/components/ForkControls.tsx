@@ -1,5 +1,6 @@
 import type React from 'react'
 import { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 import { useForkMock } from '../providers/ForkMockProvider'
 import { DisputeBondScenario } from '../utils/demoDataGenerator'
 
@@ -12,10 +13,10 @@ export const ForkControls = (): React.JSX.Element | null => {
 		return null
 	}
 	
-	// Keyboard shortcut to toggle demo overlay (Ctrl+Shift+D)
+	// Keyboard shortcut to toggle demo overlay (F2)
 	useEffect(() => {
 		const handleKeydown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+			if (e.key === 'F2') {
 				e.preventDefault()
 				setIsVisible(prev => !prev)
 			}
@@ -26,14 +27,15 @@ export const ForkControls = (): React.JSX.Element | null => {
 	}, [])
 	
 	if (!isVisible) {
-		return (
+		return ReactDOM.createPortal(
 			<div className="fixed top-4 left-4 z-50 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded">
-				DEV: Ctrl+Shift+D for demo
-			</div>
+				DEV: F2 for demo
+			</div>,
+			document.body
 		)
 	}
 	
-	return (
+	return ReactDOM.createPortal(
 		<div className="fixed top-4 left-4 z-50 bg-background/95 border border-primary/30 p-4 rounded text-sm max-w-xs">
 			<div className="flex justify-between items-center mb-3">
 				<h3 className="text-primary font-bold">Demo Controls</h3>
@@ -99,6 +101,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 			<div className="mt-3 text-xs text-muted-foreground">
 				Demo data shows different dispute bond scenarios for testing UI behavior.
 			</div>
-		</div>
+		</div>,
+		document.body
 	)
 }

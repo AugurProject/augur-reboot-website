@@ -34,9 +34,7 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({
   }, [])
 
   // Don't render anything until animation state allows it
-  if (!isVisible) {
-    return null
-  }
+  if (!isVisible) return null
 
   return (
     <>

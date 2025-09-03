@@ -62,7 +62,7 @@ export const ForkGauge = ({
 		if (forkThresholdPercent < 10) return 'var(--color-green-400)'
 		if (forkThresholdPercent < 25) return 'var(--color-yellow-400)'
 		if (forkThresholdPercent < 75) return 'var(--color-orange-400)'
-		return 'var(--color-red-400)'
+		return 'var(--color-red-500)'
 	}
 
 	return (
@@ -95,7 +95,7 @@ export const ForkGauge = ({
 						/>
 						<stop
 							offset="100%"
-							style={{ stopColor: 'var(--color-red-400)' }}
+							style={{ stopColor: 'var(--color-red-500)' }}
 						/>
 					</linearGradient>
 				</defs>
@@ -126,9 +126,9 @@ export const ForkGauge = ({
 					y="195"
 					textAnchor="middle"
 					fill={getRiskColor(percentage)}
-					fontSize="3rem"
+					fontSize="2.5rem"
 					fontWeight="bold"
-					className="fx-glow"
+					className={cn('fx-glow-sm', `fx-glow-[${getRiskColor(percentage)}]`)}
 				>
 					{getRiskLevel(percentage)}
 				</text>
