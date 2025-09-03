@@ -45,12 +45,15 @@ src/
 ├── components/            # Component types by rendering
 │   ├── *.astro           # Server-rendered (static)
 │   ├── *.tsx             # Client-hydrated (interactive)
-│   ├── ForkMeter.tsx     # Real-time fork risk gauge with demo integration
-│   ├── GaugeDisplay.tsx  # SVG-based percentage visualization
-│   └── DemoOverlay.tsx   # Development-only demo controls (Ctrl+Shift+D)
-├── contexts/             # React Context providers
-│   ├── ForkRiskContext.tsx # Fork risk data loading with auto-refresh
-│   └── DemoContext.tsx   # Demo mode state management
+│   ├── ForkMonitor.tsx   # Real-time fork risk gauge with demo integration
+│   ├── ForkGauge.tsx     # SVG-based percentage visualization
+│   ├── ForkStats.tsx     # Data panels for risk metrics
+│   ├── ForkDisplay.tsx   # Main display component
+│   ├── ForkControls.tsx  # Development-only demo controls (F2)
+│   └── ForkBadge.tsx     # Badge component for fork status
+├── providers/            # React Context providers
+│   ├── ForkDataProvider.tsx # Fork risk data loading with auto-refresh
+│   └── ForkMockProvider.tsx # Demo mode state management
 ├── scripts/              # Node.js blockchain data collection
 │   └── calculate-fork-risk.ts # Ethereum contract interaction with RPC failover
 ├── stores/               # Nanostores state management
@@ -121,12 +124,14 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 - `MissionSection.astro` - Technical specification display sections
 
 **Fork Risk Monitoring Components**
-- `ForkMeter.tsx` - Main component integrating gauge, data panels, and demo controls
-- `GaugeDisplay.tsx` - Animated SVG gauge showing risk percentage (0-100%)
-- `DataPanels.tsx` - Responsive grid displaying risk level, REP staked, and dispute count
-- `DemoOverlay.tsx` - Development-only overlay with demo scenarios (production-safe)
-- `ForkRiskContext.tsx` - Data provider with 5-minute auto-refresh and error handling
-- `DemoContext.tsx` - Demo state management with scenario generation
+- `ForkMonitor.tsx` - Main component integrating gauge, data panels, and demo controls
+- `ForkGauge.tsx` - Animated SVG gauge showing risk percentage (0-100%)
+- `ForkStats.tsx` - Responsive grid displaying risk level, REP staked, and dispute count
+- `ForkDisplay.tsx` - Display component orchestrating gauge and stats
+- `ForkControls.tsx` - Development-only overlay with demo scenarios (production-safe)
+- `ForkBadge.tsx` - Badge component for fork status display
+- `ForkDataProvider.tsx` - Data provider with 5-minute auto-refresh and error handling
+- `ForkMockProvider.tsx` - Demo state management with scenario generation
 
 ## Pages Structure
 - `index.astro` - Landing page with intro sequence and hero banner  
@@ -191,7 +196,7 @@ The fork risk monitoring system uses a dual-runtime architecture with TypeScript
 - Auto-failover to default data on fetch errors
 
 **Demo Mode System (Development Only)**
-- Activation: `Ctrl+Shift+D` keyboard shortcut
+- Activation: `F2` keyboard shortcut
 - Scenarios: None, Low (1-10%), Moderate (10-25%), High (25-75%), Critical (75-98%)
 - Production Safety: `if (!isDemoAvailable) return null` guards prevent demo in production builds
 
@@ -222,7 +227,7 @@ npm run build:fork-data
 cat public/data/fork-risk.json | grep -A 3 "rpcInfo"
 
 # Enable demo mode in development
-# Press Ctrl+Shift+D in browser, then select risk scenarios
+# Press F2 in browser, then select risk scenarios
 ```
 
 ## Task Master AI Integration
