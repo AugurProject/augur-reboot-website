@@ -1,10 +1,10 @@
 import type React from 'react'
 import { useState, useEffect } from 'react'
-import { useDemo } from '../contexts/DemoContext'
+import { useForkMock } from '../providers/ForkMockProvider'
 import { DisputeBondScenario } from '../utils/demoDataGenerator'
 
-export const DemoOverlay = (): React.JSX.Element | null => {
-	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useDemo()
+export const ForkControls = (): React.JSX.Element | null => {
+	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useForkMock()
 	const [isVisible, setIsVisible] = useState(false)
 	
 	// Only show in development mode

@@ -2,7 +2,7 @@ import type React from 'react'
 import { cn } from '../lib/utils'
 import type { GaugeDisplayProps } from '../types/gauge'
 
-export const GaugeDisplay = ({
+export const ForkGauge = ({
 	percentage,
 }: GaugeDisplayProps): React.JSX.Element => {
 	/**
@@ -66,8 +66,8 @@ export const GaugeDisplay = ({
 	}
 
 	return (
-		<div className={cn('relative mb-4 flex flex-col gap-y-1 items-center')}>
-			<svg className="max-w-[200px] w-full" viewBox="60 60 280 160">
+		<div className={cn('relative mb-2 flex flex-col items-center')}>
+			<svg className="max-w-[180px] w-full" viewBox="60 60 280 160">
 				<defs>
 					<linearGradient
 						id="forkMeterGradient"
@@ -126,7 +126,7 @@ export const GaugeDisplay = ({
 					y="195"
 					textAnchor="middle"
 					fill={getRiskColor(percentage)}
-					fontSize="3em"
+					fontSize="3rem"
 					fontWeight="bold"
 					className="fx-glow"
 				>
@@ -134,7 +134,7 @@ export const GaugeDisplay = ({
 				</text>
 			</svg>
 
-			<div className="text-xl uppercase tracking-[0.2em] font-light text-muted-foreground">
+			<div className="text-sm uppercase tracking-[0.5em] font-light text-muted-foreground">
 				FORK PRESSURE
 			</div>
 		</div>

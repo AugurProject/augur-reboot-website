@@ -1,14 +1,14 @@
 import type React from 'react'
 import { cn } from '../lib/utils'
-import { useForkRisk } from '../contexts/ForkRiskContext'
+import { useForkData } from '../providers/ForkDataProvider'
 import type { DataPanelsProps } from '../types/gauge'
 
-export const DataPanels = ({
+export const ForkStats = ({
 	riskLevel,
 	repStaked,
 	activeDisputes,
 }: DataPanelsProps): React.JSX.Element => {
-	const { rawData } = useForkRisk()
+	const { rawData } = useForkData()
 	
 	const formatNumber = (num: number): string => {
 		return num.toLocaleString()
@@ -25,9 +25,9 @@ export const DataPanels = ({
 		: null
 
 	return (
-		<div className="w-full mb-4">
+		<div className="w-full mb-1">
 			{isStable ? (
-				<div className="text-lg uppercase font-light text-green-400 tracking-[0.1em] flex items-center gap-2 justify-center fx-glow">
+				<div className="uppercase font-light text-green-400 tracking-[0.1em] flex items-center gap-2 justify-center fx-glow">
 					<span>✓</span>
 					<span>System healthy - No market disputes</span>
 				</div>

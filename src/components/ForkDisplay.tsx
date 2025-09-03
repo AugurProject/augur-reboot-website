@@ -1,28 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { GaugeDisplay } from './GaugeDisplay'
-import { DataPanels } from './DataPanels'
-import { DemoOverlay } from './DemoOverlay'
-import { useForkRisk } from '../contexts/ForkRiskContext'
+import { ForkGauge } from './ForkGauge'
+import { ForkStats } from './ForkStats'
+import { ForkControls } from './ForkControls'
+import { useForkData } from '../providers/ForkDataProvider'
 import { $appStore, UIState } from '../stores/animationStore'
 
-interface ForkMeterProps {
+interface ForkDisplayProps {
   // Keep props for compatibility, but will use real data
   animated?: boolean
 }
 
-const ForkMeter: React.FC<ForkMeterProps> = ({
+const ForkDisplay: React.FC<ForkDisplayProps> = ({
   animated = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   
   // Use the fork risk hook to get real data
-  const {
-    gaugeData,
-    riskLevel,
-    lastUpdated,
-    isLoading,
-    error,
-  } = useForkRisk()
+  const { gaugeData, riskLevel, lastUpdated, isLoading, error } = useForkData()
 
   // Subscribe to animation state
   useEffect(() => {
@@ -46,28 +40,24 @@ const ForkMeter: React.FC<ForkMeterProps> = ({
 
   return (
     <>
-      <div className="max-w-4xl w-full text-center">
+      <div className="w-full text-center">
         {isLoading && <div className="mb-4 text-muted-foreground">Loading fork risk data...</div>}
 
         {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
-        <GaugeDisplay percentage={gaugeData.percentage} />
+        <ForkGauge percentage={gaugeData.percentage} />
 
-        <DataPanels
-          riskLevel={riskLevel}
-          repStaked={gaugeData.repStaked}
-          activeDisputes={gaugeData.activeDisputes}
-        />
+        <ForkStats riskLevel={riskLevel} repStaked={gaugeData.repStaked} activeDisputes={gaugeData.activeDisputes} />
 
         <div className="text-sm font-light tracking-[0.05em] uppercase text-muted-foreground">
-          Last updated: <span className="text-primary">{lastUpdated}</span>
+          Last updated: <span>{lastUpdated}</span>
         </div>
       </div>
       
       {/* Demo overlay - only visible in development */}
-      <DemoOverlay />
+      <ForkControls />
     </>
   )
 }
 
-export default ForkMeter;
+export default ForkDisplay;

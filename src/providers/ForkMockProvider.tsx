@@ -5,11 +5,11 @@ import {
 	useState,
 	useCallback,
 } from 'react'
-import { useForkRisk } from './ForkRiskContext'
+import { useForkData } from './ForkDataProvider'
 import { generateDemoForkRiskData, DisputeBondScenario } from '../utils/demoDataGenerator'
 import type { ForkRiskData } from '../types/gauge'
 
-interface DemoContextValue {
+interface ForkMockContextValue {
 	isDemo: boolean
 	isDemoAvailable: boolean
 	generateRisk: (percentage: number) => void
@@ -18,15 +18,15 @@ interface DemoContextValue {
 	resetToLive: () => void
 }
 
-const DemoContext = createContext<DemoContextValue | undefined>(undefined)
+const ForkMockContext = createContext<ForkMockContextValue | undefined>(undefined)
 
-interface DemoProviderProps {
+interface ForkMockProviderProps {
 	children: React.ReactNode
 }
 
-export const DemoProvider = ({ children }: DemoProviderProps): React.JSX.Element => {
+export const ForkMockProvider = ({ children }: ForkMockProviderProps): React.JSX.Element => {
 	const [isDemo, setIsDemo] = useState(false)
-	const { setData } = useForkRisk()
+	const { setData } = useForkData()
 	
 	// Demo is only available in development mode
 	const isDemoAvailable = !import.meta.env.PROD
@@ -74,7 +74,7 @@ export const DemoProvider = ({ children }: DemoProviderProps): React.JSX.Element
 		}
 	}, [setData])
 
-	const contextValue: DemoContextValue = {
+	const contextValue: ForkMockContextValue = {
 		isDemo,
 		isDemoAvailable,
 		generateRisk,
@@ -84,16 +84,16 @@ export const DemoProvider = ({ children }: DemoProviderProps): React.JSX.Element
 	}
 
 	return (
-		<DemoContext.Provider value={contextValue}>
+		<ForkMockContext.Provider value={contextValue}>
 			{children}
-		</DemoContext.Provider>
+		</ForkMockContext.Provider>
 	)
 }
 
-export const useDemo = (): DemoContextValue => {
-	const context = useContext(DemoContext)
+export const useForkMock = (): ForkMockContextValue => {
+	const context = useContext(ForkMockContext)
 	if (!context) {
-		throw new Error('useDemo must be used within a DemoProvider')
+		throw new Error('useForkMock must be used within a ForkMockProvider')
 	}
 	return context
 }

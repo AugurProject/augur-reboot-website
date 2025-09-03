@@ -8,7 +8,7 @@ import {
 } from 'react'
 import type { ForkRiskData, GaugeData, RiskLevel } from '../types/gauge'
 
-interface ForkRiskContextValue {
+interface ForkDataContextValue {
 	gaugeData: GaugeData
 	riskLevel: RiskLevel
 	lastUpdated: string
@@ -19,19 +19,19 @@ interface ForkRiskContextValue {
 	refetch: () => void
 }
 
-const ForkRiskContext = createContext<ForkRiskContextValue | undefined>(
+const ForkDataContext = createContext<ForkDataContextValue | undefined>(
 	undefined,
 )
 
-interface ForkRiskProviderProps {
+interface ForkDataProviderProps {
 	children: React.ReactNode
 	updateInterval?: number // in milliseconds, defaults to 5 minutes
 }
 
-export const ForkRiskProvider = ({
+export const ForkDataProvider = ({
 	children,
 	updateInterval = 5 * 60 * 1000, // 5 minutes default
-}: ForkRiskProviderProps): React.JSX.Element => {
+}: ForkDataProviderProps): React.JSX.Element => {
 	// Create stable default data that doesn't change between renders
 	const [defaultData] = useState<ForkRiskData>(() => ({
 		timestamp: new Date().toISOString(),
@@ -143,7 +143,7 @@ export const ForkRiskProvider = ({
 		setForkRiskData(data)
 	}, [])
 
-	const contextValue: ForkRiskContextValue = {
+	const contextValue: ForkDataContextValue = {
 		gaugeData: convertToGaugeData(currentData),
 		riskLevel: convertToRiskLevel(currentData),
 		lastUpdated: formatLastUpdated(currentData),
@@ -155,17 +155,17 @@ export const ForkRiskProvider = ({
 	}
 
 	return (
-		<ForkRiskContext.Provider value={contextValue}>
+		<ForkDataContext.Provider value={contextValue}>
 			{children}
-		</ForkRiskContext.Provider>
+		</ForkDataContext.Provider>
 	)
 }
 
-export const useForkRisk = (): ForkRiskContextValue => {
-	const context = useContext(ForkRiskContext)
+export const useForkData = (): ForkDataContextValue => {
+	const context = useContext(ForkDataContext)
 
 	if (!context) {
-		throw new Error('useForkRisk must be used within a ForkRiskProvider')
+		throw new Error('useForkData must be used within a ForkDataProvider')
 	}
 
 	return context

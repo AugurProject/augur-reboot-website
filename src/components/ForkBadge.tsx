@@ -1,10 +1,10 @@
 import type React from 'react'
 
-interface RiskBadgeProps {
+interface ForkBadgeProps {
 	level: 'Low' | 'Medium' | 'High' | 'Critical'
 }
 
-export const RiskBadge = ({ level }: RiskBadgeProps): React.JSX.Element => {
+export const ForkBadge = ({ level }: ForkBadgeProps): React.JSX.Element => {
 	const getTextColor = (level: string) => {
 		switch (level) {
 			case 'Low':
