@@ -305,7 +305,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>): Promise<DisputeDetails[]> {
 	try {
-		console.log('Querying DisputeCrowdsourcerCreated events...')
+		console.log('Querying dispute events for accurate stake calculation...')
 
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
 		const currentBlock = await provider.getBlockNumber()
@@ -313,31 +313,34 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		const searchPeriod = 7 * blocksPerDay // Last 7 days
 		const fromBlock = currentBlock - searchPeriod
 
-		const allEvents: ethers.EventLog[] = []
+		const allCreatedEvents: ethers.EventLog[] = []
+		const allContributionEvents: ethers.EventLog[] = []
+		const allCompletedEvents: ethers.EventLog[] = []
 		const chunkSize = 1000 // Max blocks per query for most RPC providers
 
-		// Query in chunks to avoid RPC limits
+		// Query all relevant events in chunks
 		for (let start = fromBlock; start < currentBlock; start += chunkSize) {
 			const end = Math.min(start + chunkSize - 1, currentBlock)
 
 			try {
-				const eventFilter =
-					contracts.augur.filters.DisputeCrowdsourcerCreated()
-				const chunkEvents = await contracts.augur.queryFilter(
-					eventFilter,
-					start,
-					end,
-				)
-				allEvents.push(
-					...(chunkEvents.filter(
-						(e) => e instanceof ethers.EventLog,
-					) as ethers.EventLog[]),
-				)
+				// Query Created events (for dispute initialization)
+				const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
+				const createdEvents = await contracts.augur.queryFilter(createdFilter, start, end)
+				allCreatedEvents.push(...(createdEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
 
-				if (chunkEvents.length > 0) {
-					console.log(
-						`Found ${chunkEvents.length} events in blocks ${start}-${end}`,
-					)
+				// Query Contribution events (for actual stake amounts - MOST IMPORTANT)
+				const contributionFilter = contracts.augur.filters.DisputeCrowdsourcerContribution()
+				const contributionEvents = await contracts.augur.queryFilter(contributionFilter, start, end)
+				allContributionEvents.push(...(contributionEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+
+				// Query Completed events (for finalized disputes)
+				const completedFilter = contracts.augur.filters.DisputeCrowdsourcerCompleted()
+				const completedEvents = await contracts.augur.queryFilter(completedFilter, start, end)
+				allCompletedEvents.push(...(completedEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+
+				const totalEvents = createdEvents.length + contributionEvents.length + completedEvents.length
+				if (totalEvents > 0) {
+					console.log(`Found ${totalEvents} dispute events in blocks ${start}-${end} (${createdEvents.length} created, ${contributionEvents.length} contributions, ${completedEvents.length} completed)`)
 				}
 			} catch (chunkError) {
 				console.warn(
@@ -349,107 +352,139 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			}
 		}
 
-		const events = allEvents
+		console.log(`Total events found: ${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed`)
 
-		console.log(
-			`Found ${events.length} DisputeCrowdsourcerCreated events in last 30 days`,
-		)
+		// Create a map to track dispute crowdsourcer states
+		const disputeStates = new Map<string, {
+			marketId: string,
+			currentStake: number,
+			disputeRound: number,
+			isCompleted: boolean,
+			lastContributionTimestamp: number
+		}>()
 
-		const disputes: DisputeDetails[] = []
-
-		for (const event of events) {
+		// First, process Created events to initialize disputes
+		for (const event of allCreatedEvents) {
 			try {
-					// Each event should have args: [universe, market, disputeCrowdsourcer, payoutNumerators, size, invalid]
-					if (
-						!event.args ||
-						!Array.isArray(event.args) ||
-						event.args.length < 6
-					)
-						continue
+				if (!event.args || !Array.isArray(event.args) || event.args.length < 6) continue
 
-					const [
-						_universe,
-						marketAddress,
-						_disputeCrowdsourcerAddress,
-						_payoutNumerators,
-						bondSizeWei,
-						isInvalid,
-					] = event.args
+				const [_universe, marketAddress, disputeCrowdsourcerAddress, _payoutNumerators, initialSizeWei, _isInvalid] = event.args
+				const initialSizeRep = Number(ethers.formatEther(initialSizeWei))
 
-					// Convert bond size from wei to REP tokens
-					const bondSizeRep = Number(ethers.formatEther(bondSizeWei))
-
-					// Try to get market details (this might fail for old/finalized markets)
-					const marketTitle = `Market ${marketAddress.substring(0, 10)}...`
-					let disputeRound = 1
-					const daysRemaining = 7
-
-					try {
-						// Create market contract instance to get more details
-						const marketContract = new ethers.Contract(
-							marketAddress,
-							[
-								{
-									constant: true,
-									inputs: [],
-									name: 'getNumParticipants',
-									outputs: [{ name: '', type: 'uint256' }],
-									type: 'function',
-								},
-								{
-									constant: true,
-									inputs: [],
-									name: 'isFinalized',
-									outputs: [{ name: '', type: 'bool' }],
-									type: 'function',
-								},
-							],
-							provider,
-						)
-
-						// Skip if market is finalized
-						const isFinalized = await marketContract.isFinalized()
-						if (isFinalized) continue
-
-						// Estimate dispute round based on bond size
-						// Initial bond is ~$12.5k, doubles each round
-						const initialBondRep = 625 // Approximate initial bond in REP
-						disputeRound = Math.max(
-							1,
-							Math.ceil(Math.log2(bondSizeRep / initialBondRep)),
-						)
-					} catch (_marketError) {
-						// If we can't get market details, use defaults
-						console.warn(`Could not get details for market ${marketAddress}`)
-					}
-
-					disputes.push({
-						marketId: marketAddress,
-						title: marketTitle,
-						disputeBondSize: bondSizeRep,
-						disputeRound,
-						daysRemaining,
-					})
-				} catch (eventError) {
-					console.warn(
-						'Error processing dispute event:',
-						eventError instanceof Error
-							? eventError.message
-							: String(eventError),
-					)
-				}
+				disputeStates.set(disputeCrowdsourcerAddress, {
+					marketId: marketAddress,
+					currentStake: initialSizeRep, // Will be updated by contribution events
+					disputeRound: 1, // Will be updated by contribution events
+					isCompleted: false,
+					lastContributionTimestamp: 0
+				})
+			} catch (error) {
+				console.warn('Error processing created event:', error instanceof Error ? error.message : String(error))
 			}
+		}
+
+		// Second, process Contribution events to get ACTUAL stake amounts
+		for (const event of allContributionEvents) {
+			try {
+				if (!event.args || !Array.isArray(event.args) || event.args.length < 11) continue
+
+				const [
+					_universe, _reporter, marketAddress, disputeCrowdsourcerAddress,
+					_amountStaked, _description, _payoutNumerators,
+					currentStakeWei, _stakeRemaining, disputeRound, timestamp
+				] = event.args
+
+				const currentStakeRep = Number(ethers.formatEther(currentStakeWei))
+				const disputeRoundNum = Number(disputeRound)
+				const timestampNum = Number(timestamp)
+
+				// Update or create dispute state with actual stake
+				const existing = disputeStates.get(disputeCrowdsourcerAddress)
+				if (existing) {
+					// Update with latest contribution data
+					existing.currentStake = currentStakeRep
+					existing.disputeRound = disputeRoundNum
+					existing.lastContributionTimestamp = Math.max(existing.lastContributionTimestamp, timestampNum)
+				} else {
+					// Create new entry if we missed the Created event
+					disputeStates.set(disputeCrowdsourcerAddress, {
+						marketId: marketAddress,
+						currentStake: currentStakeRep,
+						disputeRound: disputeRoundNum,
+						isCompleted: false,
+						lastContributionTimestamp: timestampNum
+					})
+				}
+			} catch (error) {
+				console.warn('Error processing contribution event:', error instanceof Error ? error.message : String(error))
+			}
+		}
+
+		// Third, mark completed disputes
+		for (const event of allCompletedEvents) {
+			try {
+				if (!event.args || !Array.isArray(event.args) || event.args.length < 11) continue
+
+				const [_universe, marketAddress, disputeCrowdsourcerAddress] = event.args
+				const existing = disputeStates.get(disputeCrowdsourcerAddress)
+				if (existing) {
+					existing.isCompleted = true
+				}
+			} catch (error) {
+				console.warn('Error processing completed event:', error instanceof Error ? error.message : String(error))
+			}
+		}
+
+		// Convert to DisputeDetails array, filtering out completed disputes
+		const disputes: DisputeDetails[] = []
+		for (const [disputeCrowdsourcerAddress, state] of disputeStates.entries()) {
+			// Only include active (non-completed) disputes
+			if (state.isCompleted) continue
+
+			// Check if market is finalized (skip finalized markets)
+			try {
+				const marketContract = new ethers.Contract(
+					state.marketId,
+					[{
+						constant: true,
+						inputs: [],
+						name: 'isFinalized',
+						outputs: [{ name: '', type: 'bool' }],
+						type: 'function',
+					}],
+					provider,
+				)
+
+				const isFinalized = await marketContract.isFinalized()
+				if (isFinalized) continue
+			} catch (_marketError) {
+				// If we can't check finalization, assume it's active
+			}
+
+			// Create dispute details with ACTUAL stake from contribution events
+			disputes.push({
+				marketId: state.marketId,
+				title: `Market ${state.marketId.substring(0, 10)}...`,
+				disputeBondSize: state.currentStake, // This is the REAL stake amount!
+				disputeRound: state.disputeRound,
+				daysRemaining: 7, // Estimate based on dispute window
+			})
+		}
 
 		// Sort by bond size (largest first) and return top 10
 		const sortedDisputes = disputes.sort(
 			(a, b) => b.disputeBondSize - a.disputeBondSize,
 		)
-		console.log(`Processed ${sortedDisputes.length} active disputes`)
+		
+		console.log(`Processed ${sortedDisputes.length} active disputes from ${disputeStates.size} total dispute crowdsourcers`)
+		if (sortedDisputes.length > 0) {
+			console.log(`Largest dispute bond: ${sortedDisputes[0].disputeBondSize.toLocaleString()} REP`)
+		}
 
 		return sortedDisputes.slice(0, 10)
 	} catch (error) {
 		console.warn(
-			'Failed to query dispute events, using empty array:',
+			'Failed to query dispute events (contribution/completed), using empty array:',
 			error instanceof Error ? error.message : String(error),
 		)
 		return []

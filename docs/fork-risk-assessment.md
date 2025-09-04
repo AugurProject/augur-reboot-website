@@ -73,7 +73,7 @@ These thresholds replace previously conservative levels that would have triggere
   - REPv2 Token: `0x221657776846890989a759ba2973e427dff5c9bb`
   - Augur Main: `0x75228dce4d82566d93068a8d5d49435216551599`
   - Cash (DAI): `0xd5524179cb7ae012f5b642c1d6d700bbaa76b96b`
-- **Event Monitoring**: DisputeCrowdsourcerCreated, DisputeCrowdsourcerCompleted events
+- **Event Monitoring**: DisputeCrowdsourcerCreated, DisputeCrowdsourcerContribution, DisputeCrowdsourcerCompleted events
 
 ### Infrastructure Design
 - **GitHub Actions**: Hourly automated calculations (sufficient for 7-day dispute windows)
@@ -118,12 +118,13 @@ Anyone can verify calculations by:
 ### Current Implementation Status
 **✅ Fully Operational**: This version uses verified Augur v2 contract addresses and real blockchain data:
 
-1. **Dispute Monitoring**: Real-time parsing of `DisputeCrowdsourcerCreated` events from Augur contracts
-2. **Fork Threshold Calculation**: Direct comparison against the 275,000 REP threshold
+1. **Dispute Monitoring**: Real-time parsing of `DisputeCrowdsourcerCreated`, `DisputeCrowdsourcerContribution`, and `DisputeCrowdsourcerCompleted` events from Augur contracts
+2. **Accurate Stake Tracking**: Uses actual contributed REP amounts from contribution events (not initial bond sizes)
+3. **Fork Threshold Calculation**: Direct comparison against the 275,000 REP threshold
 
 ### Known Limitations
 1. **Limited Augur Activity**: Augur v2 on mainnet has very low activity due to high gas fees
-2. **Event Parsing**: Full dispute event monitoring requires additional development
+2. **Historical Event Limits**: Only monitors events from the last 7 days (sufficient for dispute window timings)
 
 ### Timing Considerations
 - **Dispute Windows**: 7 days each, hourly monitoring is sufficient
@@ -148,8 +149,9 @@ Anyone can verify calculations by:
 ```
 
 ### Key Events Monitored
-- `DisputeCrowdsourcerCreated`: New dispute bonds created
-- `DisputeCrowdsourcerCompleted`: Dispute bonds filled
+- `DisputeCrowdsourcerCreated`: New dispute bonds created (initialization)
+- `DisputeCrowdsourcerContribution`: REP contributions to existing disputes (PRIMARY for stake amounts)
+- `DisputeCrowdsourcerCompleted`: Dispute bonds filled and escalated
 - `UniverseForked`: Fork has been triggered
 
 ### Calculation Schedule

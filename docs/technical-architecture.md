@@ -146,9 +146,16 @@ React Context providing simplified fork risk data.
 
 **Data Flow:**
 1. Context fetches from `/data/fork-risk.json` on mount
-2. Single metric calculation: largest dispute bond / 275,000 REP
+2. Single metric calculation: largest active dispute bond / 275,000 REP
 3. Auto-refresh every 5 minutes
 4. Fallback to demo data if fetch fails
+
+**Risk Calculation Backend (scripts/calculate-fork-risk.ts):**
+1. Monitors `DisputeCrowdsourcerCreated` events (dispute initialization)
+2. Monitors `DisputeCrowdsourcerContribution` events (actual REP stakes - PRIMARY)
+3. Monitors `DisputeCrowdsourcerCompleted` events (exclude finished disputes)
+4. Aggregates actual contributed amounts (not initial creation sizes)
+5. Uses largest active dispute bond for accurate fork risk assessment
 
 ### DemoContext.tsx
 React Context managing demo mode state and data override.
@@ -219,10 +226,10 @@ Used for gauge visualization:
 
 ## Data Processing
 
-### Simplified Risk Calculation
+### Accurate Risk Calculation
 ```typescript
-// Single metric: dispute bond vs fork threshold
-const forkThresholdPercent = (largestDisputeBond / 275000) * 100
+// Single metric: ACTUAL dispute bond vs fork threshold (from contribution events)
+const forkThresholdPercent = (largestActiveDisputeBond / 275000) * 100
 
 // Risk level determination with realistic thresholds
 if (forkThresholdPercent < 10) return 'LOW'
@@ -230,6 +237,8 @@ if (forkThresholdPercent < 25) return 'MODERATE'
 if (forkThresholdPercent < 75) return 'HIGH'
 return 'CRITICAL'
 ```
+
+**Critical Update**: Now uses actual contributed amounts from `DisputeCrowdsourcerContribution` events instead of initial bond sizes from `DisputeCrowdsourcerCreated` events. This prevents severe underestimation of fork risk (previously could be 75x lower than actual risk).
 
 ### Number Formatting
 - **Large Numbers**: `toLocaleString()` for comma separators

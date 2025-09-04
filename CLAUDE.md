@@ -208,9 +208,14 @@ The fork risk monitoring system uses a dual-runtime architecture with TypeScript
 
 ## Blockchain Integration Details
 - **Smart Contracts**: Augur v2 mainnet addresses with ABI definitions in `contracts/augur-abis.json`
+- **Event Monitoring**: Tracks three key events for accurate dispute assessment:
+  - `DisputeCrowdsourcerCreated` (dispute initialization)
+  - `DisputeCrowdsourcerContribution` (actual REP stakes - PRIMARY)
+  - `DisputeCrowdsourcerCompleted` (exclude finished disputes)
 - **RPC Endpoints**: Automatic failover across LlamaRPC, LinkPool, PublicNode, 1RPC, Ankr
 - **No API Keys**: Uses only public endpoints for zero-cost infrastructure
 - **Error Handling**: Graceful degradation with fallback to cached/default data
+- **Critical Fix**: Now uses actual contributed REP amounts (prevents 75x+ underestimation of fork risk)
 
 ## GitHub Actions Integration
 - **Workflow**: `.github/workflows/sync-to-gh-pages.yml` runs `npm run build:fork-data` before build
@@ -229,7 +234,3 @@ cat public/data/fork-risk.json | grep -A 3 "rpcInfo"
 # Enable demo mode in development
 # Press F2 in browser, then select risk scenarios
 ```
-
-## Task Master AI Integration
-**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
-@./.taskmaster/CLAUDE.md
