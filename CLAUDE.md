@@ -25,6 +25,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **NEVER** add "safety fallbacks" or "defensive code" that violates separation of concerns
 **ALWAYS** handle page initialization logic in store initialization, not component effects
 
+## Deployment & SEO Architecture
+**CRITICAL**: Production deployment is GitHub Pages (static), NOT Cloudflare
+**NEVER** add site URL to Cloudflare config - only needed for GitHub Pages production builds
+**ALWAYS** remember: sitemap generation happens in GitHub Actions, not local development
+**MUST** ensure SEO features work in static output mode for production
+
 ## WebGL & Resource Management
 **ALWAYS** implement proper dispose() methods for WebGL resources (buffers, programs, shaders)
 **MUST** call dispose() in React component cleanup effects to prevent GPU memory leaks
@@ -35,7 +41,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Active Configuration
 - **Astro**: v5.10+ with React 19 integration
 - **Tailwind CSS**: v4.1 via `@tailwindcss/vite` plugin (NO separate config file)
-- **Deployment**: Cloudflare Pages with Wrangler
+- **Production Deployment**: GitHub Pages (static) - main branch auto-deploys to https://augur.net
+- **Development Environment**: Cloudflare adapter (SSR) for local development
 - **Dev Server**: localhost:4321 (check with `lsof -ti:4321`)
 
 ## Project Structure

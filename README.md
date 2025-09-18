@@ -18,10 +18,19 @@ This is a modern static website built with cutting-edge web technologies:
 
 ### Deployment Strategy
 
-The project supports dual deployment to maximize reach and reliability:
+The project supports dual deployment architecture with clear separation of purposes:
 
-- Cloudflare Pages with Wrangler integration
-- GitHub Pages with automated syncing from main branch
+**Production Deployment:**
+- **GitHub Pages** - Primary production deployment at `https://augur.net`
+- Automatically deploys from `main` branch via GitHub Actions
+- Uses static site generation (`output: 'static'`)
+- Handles sitemap generation and SEO optimization
+
+**Development Environment:**
+- **Cloudflare Pages** - Local development and preview environment
+- Uses server-side rendering capabilities (`output: 'server'`)
+- Provides Wrangler integration for edge computing features
+- Optimized for development workflow and testing
 
 ## Key Features
 
@@ -102,29 +111,29 @@ The project uses Tailwind CSS 4.1 with a CSS-first approach:
 
 ## Deployment
 
-### Dual Deployment Architecture
+### Environment Detection
 
-This project maintains two deployment targets:
+The project automatically detects the deployment environment:
 
-**Main Branch (Cloudflare Pages)**:
-- Primary deployment target
-- Uses `@astrojs/cloudflare` adapter
-- Optimized for edge computing and global CDN
-- Supports server-side rendering capabilities
+```javascript
+// Check if building in GitHub Actions (for GitHub Pages)
+const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
 
-**GitHub Pages Branch**:
-- Automatically synced from main via GitHub Actions
-- Static site deployment with different base path configuration
-- Provides fallback hosting option
-- Uses GitHub's global CDN infrastructure
+// Configuration selection
+...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig)
+```
 
-### Automatic Syncing
+**GitHub Actions Environment:**
+- Triggers static site generation with sitemap
+- Optimized for production deployment
+- Uses `https://augur.net` as canonical site URL
+- Generates SEO-optimized meta tags and structured data
 
-Changes to the main branch trigger an automated workflow that:
-1. Syncs source code changes to the `gh-pages` branch
-2. Preserves deployment-specific configurations
-3. Maintains both deployment targets without manual intervention
-4. Ensures consistency across both hosting platforms
+**Local Development Environment:**
+- Uses Cloudflare adapter for SSR capabilities
+- Provides development server at `localhost:4321`
+- Enables real-time preview of changes
+- No sitemap generation (not needed for development)
 
 ### Manual Deployment
 

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 // Check if building in GitHub Actions (for GitHub Pages)
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
@@ -18,7 +19,7 @@ const baseConfig = {
       } : undefined
     }
   },
-  integrations: [react()]
+  integrations: [react(), sitemap()]
 };
 
 // GitHub Pages specific configuration
@@ -28,7 +29,7 @@ const gitHubPagesConfig = {
   output: /** @type {'static'} */ ('static')
 };
 
-// Cloudflare specific configuration
+// Cloudflare specific configuration (for local development and preview)
 const cloudflareConfig = {
   adapter: cloudflare({
     platformProxy: {
