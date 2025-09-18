@@ -1,6 +1,6 @@
 ---
 import AugurLogo from '../assets/augur.svg';
-import ForkMeter from './ForkMeter.tsx';
+import ForkMonitor from './ForkMonitor.tsx';
 import SocialLinks from './SocialLinks.astro';
 import { withBase } from '../lib/utils';
 ---
@@ -33,18 +33,18 @@ import { withBase } from '../lib/utils';
       </h2>
 
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
-        <a id="first-menu-item" href={withBase('/mission')} class="text-2xl font-bold text-foreground py-1 block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
+        <a id="first-menu-item" href={withBase('/mission')} class="text-2xl font-bold text-foreground block hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none">
           THE NEXT GENERATION OF ORACLES
         </a>
-        <a href={withBase('/team')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground py-1 block hover:fx-glow focus:fx-glow focus:outline-none ">
+        <a href={withBase('/team')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none ">
           THE MINDS BEHIND THE REBOOT
         </a>
       </div>
     </div>
 
-    <!-- Bottom Section: ForkMeter -->
-    <div id="fork-meter-container" class="place-content-end pb-8">
-      <ForkMeter client:load value={10} animated={true} />
+    <!-- Bottom Section: Fork Monitor -->
+    <div id="fork-meter-container" class="place-content-end pb-4">
+      <ForkMonitor client:load animated={true} />
     </div>
   </div>
 </div>

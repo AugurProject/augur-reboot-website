@@ -15,6 +15,7 @@ This is a modern static website built with cutting-edge web technologies:
 - **Tailwind CSS 4.1** - Utility-first styling with @theme directive approach
 - **TypeScript** - Full type safety across components and utilities
 - **Nanostores** - Lightweight state management for cross-component communication
+- **ethers.js 6** - Ethereum blockchain interaction for fork risk monitoring
 
 ### Deployment Strategy
 
@@ -37,6 +38,9 @@ The project supports dual deployment architecture with clear separation of purpo
 - **Retro-Futuristic Design**: CRT monitor aesthetics with power-on/off animations
 - **3D Perspective Grid**: WebGL-powered animated tunnel background
 - **Interactive Intro Sequence**: Terminal-style typewriter effects with smart skip functionality
+- **Fork Risk Monitoring**: Real-time Augur v2 fork risk assessment with interactive gauge
+- **Blockchain Integration**: Automated hourly data collection from Ethereum mainnet
+- **Demo Mode**: Development-only testing interface for risk scenarios
 - **View Transitions**: Smooth page navigation with animation continuity
 - **Responsive Layout**: Optimized for desktop and mobile experiences
 - **Performance Optimized**: Static-first with selective hydration for interactivity
@@ -47,11 +51,19 @@ The project supports dual deployment architecture with clear separation of purpo
 src/
 ├── components/           # React and Astro components
 │   ├── *.astro          # Server-rendered static components
-│   └── *.tsx            # Client-hydrated interactive components
+│   ├── *.tsx            # Client-hydrated interactive components
+│   ├── ForkMeter.tsx    # Real-time fork risk gauge
+│   ├── GaugeDisplay.tsx # SVG-based risk visualization
+│   └── DemoOverlay.tsx  # Development-only demo controls
+├── contexts/            # React Context providers
+│   ├── ForkRiskContext.tsx # Fork risk data management
+│   └── DemoContext.tsx  # Demo mode state
 ├── pages/               # Route definitions
 │   ├── index.astro      # Landing page with intro sequence
 │   ├── mission.astro    # Technical roadmap
 │   └── team.astro       # Team information
+├── scripts/             # Node.js blockchain data collection
+│   └── calculate-fork-risk.ts # Ethereum contract interaction
 ├── layouts/             # Base page layouts
 ├── stores/              # Nanostores state management
 ├── styles/              # Tailwind CSS with custom utilities
@@ -82,6 +94,7 @@ src/
 
 All commands are run from the root of the project:
 
+**Core Development**
 | Command           | Action                                                    |
 | :---------------- | :-------------------------------------------------------- |
 | `npm run dev`     | Starts development server at `localhost:4321`            |
@@ -89,6 +102,13 @@ All commands are run from the root of the project:
 | `npm run preview` | Builds and previews with Wrangler (Cloudflare)          |
 | `npm run deploy`  | Deploys to Cloudflare Pages                              |
 | `npm run cf-typegen` | Generates Cloudflare Worker types                     |
+
+**Fork Risk Monitoring**
+| Command                    | Action                                                |
+| :------------------------- | :---------------------------------------------------- |
+| `npm run build:fork-data`  | Calculate fork risk data using blockchain scripts     |
+| `npm run typecheck`        | Type-check all TypeScript files                       |
+| `npm run lint`             | Run Biome linter with project standards               |
 
 ### Development Workflow
 
@@ -123,6 +143,8 @@ const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
 ...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig)
 ```
 
+### Automatic Syncing & Data Updates
+
 **GitHub Actions Environment:**
 - Triggers static site generation with sitemap
 - Optimized for production deployment
@@ -135,9 +157,57 @@ const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
 - Enables real-time preview of changes
 - No sitemap generation (not needed for development)
 
+Changes to the main branch trigger an automated workflow that:
+1. Syncs source code changes to the `gh-pages` branch
+2. Preserves deployment-specific configurations
+3. **Calculates fresh fork risk data** from Ethereum mainnet
+4. Updates the live site with current dispute bond metrics from actual contribution events
+5. Maintains both deployment targets without manual intervention
+6. Ensures consistency across both hosting platforms
+
+**Fork Risk Data Collection:**
+- Runs automatically every hour via GitHub Actions
+- Uses public Ethereum RPC endpoints with failover
+- Monitors Augur v2 dispute events for accurate stake tracking and fork risk calculation
+- Zero infrastructure costs - completely serverless data pipeline
+
 ### Manual Deployment
 
 To deploy manually to Cloudflare Pages:
 ```sh
 npm run deploy
 ```
+
+## Fork Risk Monitoring System
+
+### Overview
+The website features a real-time fork risk monitoring system for Augur v2, displaying the current risk of a protocol fork based on active dispute bonds. This system uses blockchain event data to accurately track REP contributions and calculate risk percentages with an interactive gauge visualization.
+
+### Architecture
+- **Data Collection**: Node.js scripts using ethers.js to query Ethereum mainnet
+- **Storage**: Static JSON files updated via GitHub Actions (zero infrastructure cost)  
+- **Frontend**: React Context API for state management with 5-minute auto-refresh
+- **Visualization**: Custom SVG gauge with animated risk levels
+
+### Risk Calculation
+Fork risk is calculated using the simple formula:
+```
+Risk % = (Largest Dispute Bond / 275,000 REP) × 100
+```
+
+Where 275,000 REP represents the fork threshold (2.5% of total REP supply).
+
+### Data Sources
+- **Primary**: LlamaRPC, LinkPool, PublicNode, 1RPC public endpoints
+- **Failover**: Automatic fallback across 5 RPC providers
+- **Update Frequency**: Hourly via GitHub Actions, 5-minute UI refresh
+
+### Development Features
+In development mode, access demo controls with `Ctrl+Shift+D`:
+- **No Disputes**: Clean baseline state
+- **Low Risk**: 0.4-10% of fork threshold scenarios  
+- **Moderate Risk**: 10-25% threshold scenarios
+- **High Risk**: 25-75% threshold scenarios
+- **Critical Risk**: 75-98% threshold scenarios
+
+Demo mode is automatically disabled in production builds.

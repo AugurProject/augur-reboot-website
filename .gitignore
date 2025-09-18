@@ -48,3 +48,9 @@ dev-debug.log
 
 # Claude commands directory
 .claude/commands/tm
+
+# Generated fork risk data
+public/data/fork-risk.json
+
+# TypeScript build cache
+.tscache/
