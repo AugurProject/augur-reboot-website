@@ -5,8 +5,8 @@ import SocialLinks from './SocialLinks.astro';
 import { withBase } from '../lib/utils';
 ---
 
-<div class="fixed inset-0 h-screen w-screen overflow-scroll">
-  <div id="hero-banner-container" class="grid grid-rows-[1fr_auto_1fr] h-screen z-10 text-center gap-y-8">
+<div class="h-screen min-h-fit w-full relative">
+  <div id="hero-banner-container" class="grid grid-rows-[auto_auto_auto] min-h-full z-10 text-center content-between">
     <!-- Top Section: Social Links Only -->
     <div class="flex justify-center md:justify-end place-content-start p-8">
       <SocialLinks />
