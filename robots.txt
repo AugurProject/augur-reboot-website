@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://augur.net/sitemap-index.xml
+Sitemap: https://augur.net/sitemap-0.xml
+
+# Crawl delay (be respectful to server resources)
+Crawl-delay: 1
+
+# Block common bot paths
+Disallow: /api/
+Disallow: /_astro/
+Disallow: /admin/
