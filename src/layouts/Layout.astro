@@ -6,21 +6,110 @@ import { withBase } from "../lib/utils";
 
 interface Props {
 	title: string;
+	description?: string;
+	ogImage?: string;
+	ogType?: string;
+	canonicalURL?: string;
+	noindex?: boolean;
+	author?: string;
+	keywords?: string[];
 }
 
-const { title } = Astro.props;
+const {
+	title,
+	description = "Augur is rebooting. The frontier of prediction markets is returning with next-generation oracles and decentralized forecasting technology.",
+	ogImage = "/og-image.png",
+	ogType = "website",
+	canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+	noindex = false,
+	author = "Augur Project",
+	keywords = [
+		"prediction markets",
+		"blockchain",
+		"oracles",
+		"decentralized finance",
+		"forecasting",
+		"augur",
+		"REP token",
+		"cryptocurrency",
+		"defi",
+		"web3"
+	]
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
+		<!-- Basic meta tags -->
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="generator" content={Astro.generator} />
+
+		<!-- SEO meta tags -->
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="author" content={author} />
+		<meta name="keywords" content={keywords.join(", ")} />
+		<link rel="canonical" href={canonicalURL} />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+		<!-- Open Graph meta tags -->
+		<meta property="og:type" content={ogType} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:site_name" content="Augur" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card meta tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@AugurProject" />
+		<meta name="twitter:creator" content="@AugurProject" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={new URL(ogImage, Astro.site).href} />
+
+		<!-- Additional meta tags -->
+		<meta name="theme-color" content="#2AE7A8" />
+		<meta name="msapplication-TileColor" content="#000000" />
+		<meta name="application-name" content="Augur" />
+
+		<!-- Icons and manifest -->
+		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<link rel="apple-touch-icon" href={withBase('/favicon.svg')} />
+
+		<!-- DNS prefetch for external resources -->
+		<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+		<link rel="dns-prefetch" href="//github.com" />
+		<link rel="dns-prefetch" href="//etherscan.io" />
+
+		<!-- Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Handjet:wght@300;400&display=swap" rel="stylesheet">
+
+		<!-- Structured data -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				"name": "Augur",
+				"url": {JSON.stringify(Astro.site)},
+				"logo": {JSON.stringify(new URL('/favicon.svg', Astro.site).href)},
+				"description": "Decentralized prediction market platform and oracle technology",
+				"sameAs": [
+					"https://github.com/AugurProject/",
+					"https://x.com/AugurProject",
+					"https://discord.gg/Y3tCZsSmz3",
+					"https://t.me/AugurProject"
+				],
+				"foundingDate": "2014",
+				"industry": "Blockchain Technology",
+				"keywords": "prediction markets, blockchain, oracles, decentralized finance"
+			}
+		</script>
+
 		<ClientRouter />
 	</head>
 	<body>
