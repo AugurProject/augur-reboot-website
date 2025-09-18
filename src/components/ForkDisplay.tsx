@@ -38,7 +38,7 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({
 
   return (
     <>
-      <div className="w-full text-center">
+      <div className="w-full text-center py-8">
         {isLoading && <div className="mb-4 text-muted-foreground">Loading fork risk data...</div>}
 
         {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}

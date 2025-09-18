@@ -15,12 +15,16 @@ interface Props {
 	keywords?: string[];
 }
 
+// Safe URL construction for Cloudflare Workers
+const siteUrl = Astro.site || new URL(Astro.url.origin);
+const defaultCanonicalURL = new URL(Astro.url.pathname, siteUrl).href;
+
 const {
 	title,
 	description = "Augur is rebooting. The frontier of prediction markets is returning with next-generation oracles and decentralized forecasting technology.",
 	ogImage = "/og-image.png",
 	ogType = "website",
-	canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+	canonicalURL = defaultCanonicalURL,
 	noindex = false,
 	author = "Augur Project",
 	keywords = [
@@ -58,7 +62,7 @@ const {
 		<meta property="og:type" content={ogType} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
-		<meta property="og:image" content={new URL(ogImage, Astro.site).href} />
+		<meta property="og:image" content={new URL(ogImage, siteUrl).href} />
 		<meta property="og:url" content={canonicalURL} />
 		<meta property="og:site_name" content="Augur" />
 		<meta property="og:locale" content="en_US" />
@@ -69,7 +73,7 @@ const {
 		<meta name="twitter:creator" content="@AugurProject" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
-		<meta name="twitter:image" content={new URL(ogImage, Astro.site).href} />
+		<meta name="twitter:image" content={new URL(ogImage, siteUrl).href} />
 
 		<!-- Additional meta tags -->
 		<meta name="theme-color" content="#2AE7A8" />
@@ -95,8 +99,8 @@ const {
 				"@context": "https://schema.org",
 				"@type": "Organization",
 				"name": "Augur",
-				"url": {JSON.stringify(Astro.site)},
-				"logo": {JSON.stringify(new URL('/favicon.svg', Astro.site).href)},
+				"url": {JSON.stringify(siteUrl.href)},
+				"logo": {JSON.stringify(new URL('/favicon.svg', siteUrl).href)},
 				"description": "Decentralized prediction market platform and oracle technology",
 				"sameAs": [
 					"https://github.com/AugurProject/",
