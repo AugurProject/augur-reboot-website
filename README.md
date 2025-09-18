@@ -144,14 +144,14 @@ Changes to the main branch trigger an automated workflow that:
 1. Syncs source code changes to the `gh-pages` branch
 2. Preserves deployment-specific configurations
 3. **Calculates fresh fork risk data** from Ethereum mainnet
-4. Updates the live site with current dispute bond metrics
+4. Updates the live site with current dispute bond metrics from actual contribution events
 5. Maintains both deployment targets without manual intervention
 6. Ensures consistency across both hosting platforms
 
 **Fork Risk Data Collection:**
 - Runs automatically every hour via GitHub Actions
 - Uses public Ethereum RPC endpoints with failover
-- Monitors Augur v2 dispute bonds and calculates fork risk percentage
+- Monitors Augur v2 dispute events for accurate stake tracking and fork risk calculation
 - Zero infrastructure costs - completely serverless data pipeline
 
 ### Manual Deployment
@@ -164,7 +164,7 @@ npm run deploy
 ## Fork Risk Monitoring System
 
 ### Overview
-The website features a real-time fork risk monitoring system for Augur v2, displaying the current risk of a protocol fork based on active dispute bonds. This system uses blockchain data to calculate risk percentages and provides an interactive gauge visualization.
+The website features a real-time fork risk monitoring system for Augur v2, displaying the current risk of a protocol fork based on active dispute bonds. This system uses blockchain event data to accurately track REP contributions and calculate risk percentages with an interactive gauge visualization.
 
 ### Architecture
 - **Data Collection**: Node.js scripts using ethers.js to query Ethereum mainnet
