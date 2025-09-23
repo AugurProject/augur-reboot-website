@@ -28,7 +28,7 @@ export const ForkStats = ({
 		<div className="w-full mb-1">
 			{isStable ? (
 				<div className="uppercase font-light text-green-400 tracking-[0.1em] fx-glow">
-					System healthy - No market disputes
+					System steady - No market disputes
 				</div>
 			) : (
 				<div className="grid md:grid-cols-[8rem_8rem_8rem] md:place-content-center md:gap-y-2">

@@ -66,7 +66,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 					onClick={() => generateScenario(DisputeBondScenario.NO_DISPUTES)}
 					className="block w-full text-left text-xs bg-green-900/20 hover:bg-green-900/30 px-2 py-1 rounded"
 				>
-					No Disputes (Healthy)
+					No Disputes (Steady)
 				</button>
 				
 				<button
