@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-23T14:50:34.828Z",
+  "blockNumber": 23426437,
+  "riskLevel": "low",
+  "riskPercentage": 0,
+  "metrics": {
+    "largestDisputeBond": 0,
+    "forkThresholdPercent": 0,
+    "activeDisputes": 0,
+    "disputeDetails": []
+  },
+  "nextUpdate": "2025-09-23T15:51:07.392Z",
+  "rpcInfo": {
+    "endpoint": "https://eth.llamarpc.com",
+    "latency": 376,
+    "fallbacksAttempted": 0
+  },
+  "calculation": {
+    "method": "GitHub Actions + Public RPC",
+    "forkThreshold": 275000
+  }
+}
