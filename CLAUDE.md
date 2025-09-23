@@ -219,7 +219,7 @@ The fork risk monitoring system uses a dual-runtime architecture with TypeScript
   - `DisputeCrowdsourcerCreated` (dispute initialization)
   - `DisputeCrowdsourcerContribution` (actual REP stakes - PRIMARY)
   - `DisputeCrowdsourcerCompleted` (exclude finished disputes)
-- **RPC Endpoints**: Automatic failover across LlamaRPC, LinkPool, PublicNode, 1RPC, Ankr
+- **RPC Endpoints**: Automatic failover across LlamaRPC, LinkPool, PublicNode, 1RPC
 - **No API Keys**: Uses only public endpoints for zero-cost infrastructure
 - **Error Handling**: Graceful degradation with fallback to cached/default data
 - **Critical Fix**: Now uses actual contributed REP amounts (prevents 75x+ underestimation of fork risk)

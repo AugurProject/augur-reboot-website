@@ -24,8 +24,8 @@ App (Provider Wrapper)
         │   └── Reset Button (demo mode only)
         ├── ForkMeter (Main Content)
         │   ├── Title & Subtitle
-        │   ├── GaugeDisplay (SVG Risk Level Visualization)
-        │   ├── DataPanels (Progressive Disclosure)
+        │   ├── ForkGauge (SVG Risk Level Visualization)
+        │   ├── ForkStats (Progressive Disclosure)
         │   └── Last Updated Info
         └── DemoSidebar (Slide-out Panel)
             ├── Current Values Display
@@ -61,7 +61,7 @@ Main content container displaying the core fork meter interface.
 - Error and loading state display
 - Orchestrates gauge and data panels
 
-### 4. GaugeDisplay.tsx
+### 4. ForkGauge.tsx
 SVG-based semicircular gauge showing fork risk level.
 
 **Features:**
@@ -77,15 +77,37 @@ SVG-based semicircular gauge showing fork risk level.
 - "FORK RISK LEVEL" subtitle
 
 **Key Functions:**
-- `getVisualPercentage()`: Maps actual percentages to gauge fill levels
-  - 0-10% → 0-25% gauge fill
+- `getVisualPercentage()`: Maps actual percentages to gauge fill levels with minimum visual indication
+  - 0% → 3% gauge fill (minimum visual fill for "system active" indication)
+  - 0.1-10% → 3-25% gauge fill (smooth transition from minimum)
   - 10-25% → 25-50% gauge fill
   - 25-75% → 50-90% gauge fill
   - 75%+ → 90-100% gauge fill
 - `getRiskLevel()`: Determines text based on thresholds (10%, 25%, 75%)
 - `getRiskColor()`: Returns CSS custom property for dynamic coloring
 
-### 5. DemoSidebar.tsx
+**Minimum Visual Fill Feature:**
+The gauge always shows at least 3% visual fill, even when fork risk is 0%, to provide user feedback that the monitoring system is active and functioning. This prevents the gauge from appearing "empty" or "broken" and maintains visual continuity during state transitions.
+
+### 5. ForkStats.tsx
+Data display component with progressive disclosure based on dispute activity.
+
+**Progressive Disclosure Logic:**
+- **Stable State (no disputes)**: Shows "System steady - No market disputes" message
+- **Active Disputes**: Shows three-column layout with metrics
+
+**Active Dispute Display:**
+- **Dispute Bond**: Largest active dispute bond in REP
+- **Threshold**: Percentage of 275,000 REP fork threshold
+- **Dispute Round**: Current escalation level of largest dispute
+
+**Features:**
+- Clean, centered layout with divider pipes
+- Formatted numbers with locale-specific separators
+- Uppercase labels with tracking for consistent typography
+- Conditional rendering based on dispute activity
+
+### 6. DemoSidebar.tsx
 Slide-out panel with data inspection and demo controls.
 
 **Features:**
@@ -201,7 +223,7 @@ Used for gauge visualization:
 - Top bar transparent background
 - "Demo" button in top-right with subtle border styling
 - Shows actual dispute bond calculations
-- DataPanels show "All markets are stable" when no disputes active
+- ForkStats shows "System steady - No market disputes" when no disputes active
 
 ### Demo Mode
 - Activated via sidebar risk scenario buttons
@@ -273,7 +295,7 @@ This prevents the gauge from appearing "empty" during normal operation while mai
 
 ### Progressive Disclosure Pattern
 The UI adapts to show relevant information:
-- **No Disputes**: Simple "All markets are stable" message
+- **No Disputes**: Simple "System steady - No market disputes" message
 - **Active Disputes**: Detailed metrics with dispute bond, threshold %, and round
 - **Demo Mode**: Additional controls and current values display
 

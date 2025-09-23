@@ -198,8 +198,8 @@ Risk % = (Largest Dispute Bond / 275,000 REP) × 100
 Where 275,000 REP represents the fork threshold (2.5% of total REP supply).
 
 ### Data Sources
-- **Primary**: LlamaRPC, LinkPool, PublicNode, 1RPC public endpoints
-- **Failover**: Automatic fallback across 5 RPC providers
+- **RPC Endpoints**: LlamaRPC, LinkPool, PublicNode, 1RPC (public endpoints with automatic failover)
+- **Failover**: Automatic fallback across 4 RPC providers
 - **Update Frequency**: Hourly via GitHub Actions, 5-minute UI refresh
 
 ### Development Features

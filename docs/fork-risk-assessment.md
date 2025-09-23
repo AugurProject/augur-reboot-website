@@ -78,8 +78,8 @@ These thresholds replace previously conservative levels that would have triggere
 ### Infrastructure Design
 - **GitHub Actions**: Hourly automated calculations (sufficient for 7-day dispute windows)
 - **Public RPC Endpoints**: No API keys required, fully transparent access
-  - Primary: Ankr Public RPC (`https://rpc.ankr.com/eth`)
-  - Fallbacks: LlamaRPC, LinkPool, PublicNode, 1RPC
+  - Primary: LlamaRPC (`https://eth.llamarpc.com`)
+  - Fallbacks: LinkPool, PublicNode, 1RPC
 - **Static JSON Storage**: Results saved to version-controlled JSON file
 - **Audit Trail**: All calculations and changes tracked in git history
 - **No Private Infrastructure**: No databases, no API keys, fully auditable
