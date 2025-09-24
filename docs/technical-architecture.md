@@ -66,7 +66,7 @@ SVG-based semicircular gauge showing fork risk level.
 
 **Features:**
 - Visual percentage scaling for intuitive display (non-linear mapping)
-- Risk level text display (LOW/MODERATE/HIGH/CRITICAL) with dynamic coloring
+- Risk level text display (NORMAL/LOW/MODERATE/HIGH/ELEVATED) with dynamic coloring
 - Smooth gradient arc from green to red
 - Responsive design with viewBox scaling
 
@@ -139,7 +139,7 @@ Slide-out panel with data inspection and demo controls.
 Progressive disclosure panel showing detailed metrics when needed.
 
 **Progressive Disclosure Logic:**
-- **Stable State (no disputes)**: Shows "✓ All markets are stable" message
+- **Normal State (no disputes)**: Shows "✓ All markets are normal" message
 - **Active Disputes**: Shows three-column layout with metrics
 
 **Active Dispute Display:**
@@ -207,14 +207,14 @@ Used for gauge visualization:
 --gauge-color-safe-mid: #eab308  /* Green-yellow transition */
 --gauge-color-warning: #f59e0b   /* Yellow for MODERATE */
 --gauge-color-danger: #ef4444    /* Orange for HIGH */
---gauge-color-critical: #dc2626  /* Red for CRITICAL */
+--gauge-color-elevated: #dc2626  /* Red for ELEVATED */
 ```
 
 ### Risk Level Color Mapping
 - **LOW**: `var(--gauge-color-safe)` - Green
 - **MODERATE**: `var(--gauge-color-warning)` - Yellow  
 - **HIGH**: `var(--gauge-color-danger)` - Orange
-- **CRITICAL**: `var(--gauge-color-critical)` - Red
+- **ELEVATED**: `var(--gauge-color-elevated)` - Red
 
 ## Interface Modes
 
@@ -257,7 +257,7 @@ const forkThresholdPercent = (largestActiveDisputeBond / 275000) * 100
 if (forkThresholdPercent < 10) return 'LOW'
 if (forkThresholdPercent < 25) return 'MODERATE'  
 if (forkThresholdPercent < 75) return 'HIGH'
-return 'CRITICAL'
+return 'ELEVATED'
 ```
 
 **Critical Update**: Now uses actual contributed amounts from `DisputeCrowdsourcerContribution` events instead of initial bond sizes from `DisputeCrowdsourcerCreated` events. This prevents severe underestimation of fork risk (previously could be 75x lower than actual risk).
@@ -289,7 +289,7 @@ return 'CRITICAL'
 The gauge uses non-linear visual scaling to provide intuitive feedback:
 - Actual 5% risk → 25% gauge fill (more visible than linear)
 - Actual 25% risk → 50% gauge fill (clear moderate warning)
-- Actual 75% risk → 90% gauge fill (obvious critical state)
+- Actual 75% risk → 90% gauge fill (obvious elevated state)
 
 This prevents the gauge from appearing "empty" during normal operation while maintaining accuracy.
 

@@ -39,7 +39,7 @@ The system assigns risk levels based directly on the fork threshold percentage:
 if risk_percentage < 10%:    RISK_LEVEL = LOW
 if risk_percentage < 25%:    RISK_LEVEL = MODERATE  
 if risk_percentage < 75%:    RISK_LEVEL = HIGH
-if risk_percentage >= 75%:   RISK_LEVEL = CRITICAL
+if risk_percentage >= 75%:   RISK_LEVEL = ELEVATED
 ```
 
 This direct mapping provides clear, understandable risk assessment without complex multi-factor adjustments.

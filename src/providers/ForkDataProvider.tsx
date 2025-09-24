@@ -109,20 +109,23 @@ export const ForkDataProvider = ({
 		let level: RiskLevel['level']
 
 		switch (data.riskLevel) {
+			case 'normal':
+				level = 'Normal'
+				break
 			case 'low':
 				level = 'Low'
 				break
 			case 'moderate':
-				level = 'Medium'
+				level = 'Moderate'
 				break
 			case 'high':
 				level = 'High'
 				break
-			case 'critical':
-				level = 'Critical'
+			case 'elevated':
+				level = 'Elevated'
 				break
 			default:
-				level = 'Low'
+				level = 'Normal'
 		}
 
 		return { level }

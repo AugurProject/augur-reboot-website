@@ -11,7 +11,7 @@ export enum DisputeBondScenario {
 	LOW_RISK = 'low_risk',
 	MODERATE_RISK = 'moderate_risk', 
 	HIGH_RISK = 'high_risk',
-	CRITICAL_RISK = 'critical_risk'
+	ELEVATED_RISK = 'elevated_risk'
 }
 
 /**
@@ -54,8 +54,8 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			activeDisputes = Math.floor(Math.random() * 5) + 3 // 3-7 disputes
 			break
 			
-		case DisputeBondScenario.CRITICAL_RISK:
-			// Critical risk bonds: 75-98% of threshold (206250-269500 REP)
+		case DisputeBondScenario.ELEVATED_RISK:
+			// Elevated risk bonds: 75-98% of threshold (206250-269500 REP)
 			largestDisputeBond = 206250 + Math.floor(Math.random() * 63250)
 			activeDisputes = Math.floor(Math.random() * 8) + 4 // 4-11 disputes
 			break
@@ -87,14 +87,16 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	const forkThresholdPercent = (largestDisputeBond / FORK_THRESHOLD_REP) * 100
 	
 	// Determine risk level based on actual fork threshold percentage
-	if (forkThresholdPercent < 10) {
+	if (forkThresholdPercent === 0) {
+		riskLevel = 'normal'
+	} else if (forkThresholdPercent < 10) {
 		riskLevel = 'low'
 	} else if (forkThresholdPercent < 25) {
 		riskLevel = 'moderate'
 	} else if (forkThresholdPercent < 75) {
 		riskLevel = 'high'
 	} else {
-		riskLevel = 'critical'
+		riskLevel = 'elevated'
 	}
 	
 	// Use the actual calculated percentage
@@ -136,7 +138,7 @@ const generateVariedBondSize = (largestBond: number, scenario: DisputeBondScenar
 			return Math.floor(largestBond * (0.3 + Math.random() * 0.5)) // 30%-80% of largest
 		case DisputeBondScenario.HIGH_RISK:
 			return Math.floor(largestBond * (0.4 + Math.random() * 0.4)) // 40%-80% of largest
-		case DisputeBondScenario.CRITICAL_RISK:
+		case DisputeBondScenario.ELEVATED_RISK:
 			return Math.floor(largestBond * (0.5 + Math.random() * 0.3)) // 50%-80% of largest
 		default:
 			return Math.floor(largestBond * 0.5)
@@ -178,6 +180,6 @@ export const generateHighRiskDemo = (): ForkRiskData => {
 	return generateDemoForkRiskData(DisputeBondScenario.HIGH_RISK)
 }
 
-export const generateCriticalRiskDemo = (): ForkRiskData => {
-	return generateDemoForkRiskData(DisputeBondScenario.CRITICAL_RISK)
+export const generateElevatedRiskDemo = (): ForkRiskData => {
+	return generateDemoForkRiskData(DisputeBondScenario.ELEVATED_RISK)
 }

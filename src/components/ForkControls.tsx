@@ -91,10 +91,10 @@ export const ForkControls = (): React.JSX.Element | null => {
 				</button>
 				
 				<button
-					onClick={() => generateScenario(DisputeBondScenario.CRITICAL_RISK)}
+					onClick={() => generateScenario(DisputeBondScenario.ELEVATED_RISK)}
 					className="block w-full text-left text-xs bg-red-800/30 hover:bg-red-800/40 px-2 py-1 rounded animate-pulse"
 				>
-					Critical Risk (75%+)
+					Elevated Risk (75%+)
 				</button>
 			</div>
 			

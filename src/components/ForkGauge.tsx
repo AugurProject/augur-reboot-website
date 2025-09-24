@@ -11,7 +11,7 @@ export const ForkGauge = ({
 	 */
 	const getVisualPercentage = (forkThresholdPercent: number): number => {
 		// Minimum 3% visual fill for "system active" indication when stable
-		const MIN_VISUAL_FILL = 3
+		const MIN_VISUAL_FILL = 0 
 
 		if (forkThresholdPercent === 0) {
 			// Show minimal green fill when stable to indicate system is monitoring
@@ -52,11 +52,11 @@ export const ForkGauge = ({
 	}
 
 	const getRiskLevel = (forkThresholdPercent: number): string => {
-		if (forkThresholdPercent === 0) return 'STABLE'
+		if (forkThresholdPercent === 0) return 'NORMAL'
 		if (forkThresholdPercent < 10) return 'LOW'
 		if (forkThresholdPercent < 25) return 'MODERATE'
 		if (forkThresholdPercent < 75) return 'HIGH'
-		return 'CRITICAL'
+		return 'ELEVATED'
 	}
 
 	const getRiskColor = (forkThresholdPercent: number): string => {
@@ -66,6 +66,23 @@ export const ForkGauge = ({
 		if (forkThresholdPercent < 75) return 'var(--color-orange-400)'
 		return 'var(--color-red-500)'
 	}
+
+	// Calculate needle endpoint to match the arc endpoint
+	const getNeedleEndpoint = (forkThresholdPercent: number): {x: number, y: number} => {
+		const visualPercentage = getVisualPercentage(forkThresholdPercent)
+		const angle = Math.PI - (visualPercentage / 100) * Math.PI
+		const centerX = 200
+		const centerY = 200
+		const radius = 120
+
+		return {
+			x: centerX + radius * Math.cos(angle),
+			y: centerY - radius * Math.sin(angle)
+		}
+	}
+
+	const needleEndpoint = getNeedleEndpoint(percentage)
+	const riskColor = getRiskColor(percentage)
 
 	return (
 		<div className={cn('relative mb-2 flex flex-col items-center')}>
@@ -122,13 +139,55 @@ export const ForkGauge = ({
 					className="fx-glow"
 				/>
 
+				{/* Needle pointer group */}
+				<g
+					style={{
+						transition: 'all 0.3s ease-in-out',
+					}}
+				>
+					{/* Needle shadow for depth */}
+					<line
+						x1="200"
+						y1="200"
+						x2={needleEndpoint.x + 2}
+						y2={needleEndpoint.y + 2}
+						stroke="rgba(0, 0, 0, 0.3)"
+						strokeWidth="4"
+						strokeLinecap="round"
+					/>
+					{/* Main needle */}
+					<line
+						x1="200"
+						y1="200"
+						x2={needleEndpoint.x}
+						y2={needleEndpoint.y}
+						stroke={riskColor}
+						strokeWidth="4"
+						strokeLinecap="round"
+						style={{
+							filter: `drop-shadow(0 0 6px ${riskColor})`,
+						}}
+					/>
+				</g>
+
+				{/* Center hub */}
+				<circle
+					cx="200"
+					cy="200"
+					r="8"
+					fill={riskColor}
+					style={{
+						filter: `drop-shadow(0 0 6px ${riskColor})`,
+					}}
+				/>
+
 				{/* Risk level text at baseline of arc */}
 				<text
 					x="200"
-					y="195"
+					y="165"
 					textAnchor="middle"
 					fill={getRiskColor(percentage)}
-					fontSize="2.5rem"
+					fontSize="2.15rem"
 					fontWeight="bold"
 					className={cn('fx-glow-sm', `fx-glow-[${getRiskColor(percentage)}]`)}
 				>
