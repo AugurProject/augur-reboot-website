@@ -1,5 +1,11 @@
 # Development Workflow
 
+## Critical Development Rules
+**NEVER** spawn new dev servers - **ALWAYS** check `lsof -ti:4321` first
+**MUST** use existing server on localhost:4321 for all testing
+**DO NOT** wait for `npm run dev` to complete before proceeding with other tasks
+**ALWAYS** create development worktrees in `.workbench` directory for isolated feature development
+
 ## Before Making Changes
 1. **CHECK**: Is dev server running? `lsof -ti:4321`
 2. **REFERENCE**: Use project structure tree in project-architecture.md to locate styling, components, and state
