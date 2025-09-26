@@ -29,7 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project-Specific Documentation
 - **Architecture**: `.claude/docs/augur-architecture.md` - Framework stack, organizational principles
 - **Development**: `.claude/docs/augur-development-guidelines.md` - Universal development rituals and workflows
-- **Styling**: `.claude/docs/augur-styling-patterns.md` - CSS utilities, Tailwind patterns, custom effects
+- **Styling**: `.claude/docs/augur-styling-guidelines.md` - Design system strategy, Tailwind guidelines, visual effects
 - **Components**: `.claude/docs/augur-component-patterns.md` - Component architecture, state management, animations
 
 ## Product Requirements Documents (PRDs)
