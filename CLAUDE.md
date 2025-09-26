@@ -25,11 +25,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **NEVER** add "safety fallbacks" or "defensive code" that violates separation of concerns
 **ALWAYS** handle page initialization logic in store initialization, not component effects
 
-## Deployment & SEO Architecture
-**CRITICAL**: Production deployment is GitHub Pages (static), NOT Cloudflare
-**NEVER** add site URL to Cloudflare config - only needed for GitHub Pages production builds
-**ALWAYS** remember: sitemap generation happens in GitHub Actions, not local development
-**MUST** ensure SEO features work in static output mode for production
 
 ## WebGL & Resource Management
 **ALWAYS** implement proper dispose() methods for WebGL resources (buffers, programs, shaders)
@@ -39,11 +34,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # CURRENT PROJECT STATE
 
 ## Active Configuration
-- **Astro**: v5.10+ with React 19 integration
-- **Tailwind CSS**: v4.1 via `@tailwindcss/vite` plugin (NO separate config file)
+
+### Framework Stack
+- **Astro 5.10+** - Static site generator with component islands
+- **React 19** - For interactive components (client-side hydration)
+- **Tailwind CSS 4.1** - CSS-first styling approach via `@tailwindcss/vite` plugin (NO separate config file)
+- **Cloudflare Pages** - Static hosting with edge functions
+- **Wrangler** - Cloudflare deployment tooling
+
+### Environment Setup
 - **Production Deployment**: GitHub Pages (static) - main branch auto-deploys to https://augur.net
 - **Development Environment**: Cloudflare adapter (SSR) for local development
 - **Dev Server**: localhost:4321 (check with `lsof -ti:4321`)
+
+### Deployment & SEO Notes
+**CRITICAL**: Production deployment is GitHub Pages (static), NOT Cloudflare
+**NEVER** add site URL to Cloudflare config - only needed for GitHub Pages production builds
+**ALWAYS** remember: sitemap generation happens in GitHub Actions, not local development
+**MUST** ensure SEO features work in static output mode for production
 
 ## Project Structure
 ```
@@ -88,6 +96,20 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 2. **REFERENCE**: Use project structure tree above to locate styling, components, and state
 3. **PATTERN**: Follow Tailwind v4 @theme/@utility patterns in styles/global.css
 
+## Git Worktrees
+**ALWAYS** create development worktrees in `.workbench` directory for isolated feature development
+**MUST** use descriptive branch names: `feature-name`, `fix-issue`, `workflow-enhancements`
+**PATTERN**: `git worktree add .workbench/branch-name -b branch-name`
+
+```bash
+# Create new worktree for feature development
+git worktree add .workbench/my-feature -b my-feature
+
+# Remove worktree when done
+git worktree remove .workbench/my-feature
+git branch -d my-feature
+```
+
 ## Development Commands
 
 **Core Development**
@@ -108,52 +130,20 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 
 # REFERENCE - Architecture & Components
 
-## Framework Stack
-- **Astro 5.10+** - Static site generator with component islands
-- **React 19** - For interactive components (client-side hydration)
-- **Tailwind CSS 4.1** - CSS-first styling approach
-- **Cloudflare Pages** - Static hosting with edge functions
-- **Wrangler** - Cloudflare deployment tooling
-
 ## Component Architecture
 - **Astro Components** (.astro) - Server-rendered layout and static components
-- **React Components** (.tsx) - Interactive elements requiring client-side JavaScript  
+- **React Components** (.tsx) - Interactive elements requiring client-side JavaScript
 - **Hybrid Approach** - Uses `client:load` and `client:only` directives for selective hydration
 
-## Key Components
-
-**Core Website Components**
-- `Intro.tsx` - Interactive terminal-style intro with typewriter effects
-- `PerspectiveGridTunnel.tsx` - Animated 3D perspective grid background
-- `CrtDisplay.tsx` - CRT monitor simulation with power-on/off animations
-- `TypewriterSequence.tsx` - Sequential text animation system
-- `HeroBanner.astro` - Main hero section with social links
-- `MissionSection.astro` - Technical specification display sections
-
-**Fork Risk Monitoring Components**
-- `ForkMonitor.tsx` - Main component integrating gauge, data panels, and demo controls
-- `ForkGauge.tsx` - Animated SVG gauge showing risk percentage (0-100%)
-- `ForkStats.tsx` - Responsive grid displaying risk level, REP staked, and dispute count
-- `ForkDisplay.tsx` - Display component orchestrating gauge and stats
-- `ForkControls.tsx` - Development-only overlay with demo scenarios (production-safe)
-- `ForkBadge.tsx` - Badge component for fork status display
-- `ForkDataProvider.tsx` - Data provider with 5-minute auto-refresh and error handling
-- `ForkMockProvider.tsx` - Demo state management with scenario generation
-
-## Pages Structure
-- `index.astro` - Landing page with intro sequence and hero banner  
-- `mission.astro` - Technical roadmap with detailed protocol specifications
-- `Layout.astro` - Base HTML layout with global styles and fonts
-
-## Client-Side Hydration
+### Client-Side Hydration
 Components requiring interactivity use Astro's client directives:
 - `client:only="react"` - Components that only run on client
 - `client:load` - Hydrate immediately on page load
 
-## Animation System
+### Animation System
 The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter animations. The PerspectiveGridTunnel component creates the signature animated background.
 
-## View Transitions Architecture
+### View Transitions Architecture
 **REFERENCE**: @docs/view-transitions-design.md - Comprehensive design document for smooth page navigation, animation continuity, and state management patterns.
 
 # EXTENDED KNOWLEDGE
