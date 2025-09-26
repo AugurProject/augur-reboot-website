@@ -12,36 +12,28 @@
 - **Development Environment**: Cloudflare adapter (SSR) for local development
 - **Dev Server**: localhost:4321 (check with `lsof -ti:4321`)
 
-## Project Structure
-```
-src/
-├── styles/global.css      # Tailwind v4 @theme + @utility directives
-├── components/            # Component types by rendering
-│   ├── *.astro           # Server-rendered (static)
-│   ├── *.tsx             # Client-hydrated (interactive)
-│   ├── ForkMonitor.tsx   # Real-time fork risk gauge with demo integration
-│   ├── ForkGauge.tsx     # SVG-based percentage visualization
-│   ├── ForkStats.tsx     # Data panels for risk metrics
-│   ├── ForkDisplay.tsx   # Main display component
-│   ├── ForkControls.tsx  # Development-only demo controls (F2)
-│   └── ForkBadge.tsx     # Badge component for fork status
-├── providers/            # React Context providers
-│   ├── ForkDataProvider.tsx # Fork risk data loading with auto-refresh
-│   └── ForkMockProvider.tsx # Demo mode state management
-├── scripts/              # Node.js blockchain data collection
-│   └── calculate-fork-risk.ts # Ethereum contract interaction with RPC failover
-├── stores/               # Nanostores state management
-├── assets/               # Static SVGs and resources
-├── lib/                  # Shared utilities
-├── layouts/              # Base page layouts
-└── pages/                # Route definitions
-```
+## Project Organization Principles
 
-## Custom Utilities Available
-- `fx-glow` - Drop shadow with primary color glow
-- `fx-glow-*` - Variable glow sizes (sm, lg)
-- `fx-box-glow` - Box shadow glow effects
-- `fx-box-glow-*` - Variable box glow sizes
+### Directory Structure Guidelines
+- **`src/styles/`** - Global styles and Tailwind configuration (CSS-first approach)
+- **`src/components/*.astro`** - Server-rendered, static components
+- **`src/components/*.tsx`** - Client-side interactive components requiring hydration
+- **`src/providers/`** - React Context providers for state management
+- **`src/scripts/`** - Node.js scripts for data collection and build processes
+- **`src/stores/`** - Nanostores for global state management
+- **`src/assets/`** - Static resources (SVGs, images, etc.)
+- **`src/lib/`** - Shared utilities and helper functions
+- **`src/layouts/`** - Page layout components
+- **`src/pages/`** - Route definitions and page components
+
+### Component Organization
+- **Static content**: Use `.astro` components for server-rendered content
+- **Interactive features**: Use `.tsx` components with appropriate client directives
+- **State management**: Separate providers from presentation components
+- **Shared logic**: Extract to `/lib` utilities when used across components
+
+### File Discovery
+Use `git ls-files` or similar tools to find specific files within this structure.
 
 ## Project Overview
 Astro-based teaser website for the Augur prediction market reboot. Retro-futuristic landing page with CRT-style animations, deployed on GitHub Pages with React components for interactivity.

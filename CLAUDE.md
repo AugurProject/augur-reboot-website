@@ -27,10 +27,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # DETAILED DOCUMENTATION
 
 ## Project-Specific Documentation
-- **Architecture**: `.claude/docs/project-architecture.md` - Framework stack, project structure, custom utilities
+- **Architecture**: `.claude/docs/project-architecture.md` - Framework stack, organizational principles
 - **Development**: `.claude/docs/development-workflow.md` - Git worktrees, commands, build process
+- **Styling**: `.claude/docs/styling-patterns.md` - CSS utilities, Tailwind patterns, custom effects
+- **Components**: `.claude/docs/component-patterns.md` - Component architecture, state management, animations
 - **Fork Risk System**: `.claude/docs/fork-risk-monitoring.md` - Complete system architecture and patterns
-- **Component Patterns**: `.claude/docs/component-patterns.md` - Component architecture, state management, animations
 
 ## Astro Framework Patterns
 - **Authentication**: `.claude/docs/astro-authentication.md` - Auth.js, Better Auth, Clerk, Lucia integrations

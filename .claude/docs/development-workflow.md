@@ -8,8 +8,9 @@
 
 ## Before Making Changes
 1. **CHECK**: Is dev server running? `lsof -ti:4321`
-2. **REFERENCE**: Use project structure tree in project-architecture.md to locate styling, components, and state
-3. **PATTERN**: Follow Tailwind v4 @theme/@utility patterns in styles/global.css
+2. **REFERENCE**: Use project organization principles in project-architecture.md to locate components and state
+3. **STYLING**: For CSS utilities and patterns, see styling-patterns.md
+4. **DISCOVERY**: Use `git ls-files` to find specific files within the project structure
 
 ## Git Worktrees
 **ALWAYS** create development worktrees in `.workbench` directory for isolated feature development
