@@ -27,13 +27,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # DETAILED DOCUMENTATION
 
 ## Project-Specific Documentation
-- **Architecture**: `.claude/docs/project-architecture.md` - Framework stack, organizational principles
-- **Development**: `.claude/docs/development-guidelines.md` - Universal development rituals and workflows
-- **Styling**: `.claude/docs/styling-patterns.md` - CSS utilities, Tailwind patterns, custom effects
-- **Components**: `.claude/docs/component-patterns.md` - Component architecture, state management, animations
+- **Architecture**: `.claude/docs/augur-architecture.md` - Framework stack, organizational principles
+- **Development**: `.claude/docs/augur-development-guidelines.md` - Universal development rituals and workflows
+- **Styling**: `.claude/docs/augur-styling-patterns.md` - CSS utilities, Tailwind patterns, custom effects
+- **Components**: `.claude/docs/augur-component-patterns.md` - Component architecture, state management, animations
 
 ## Product Requirements Documents (PRDs)
-- **Fork Risk System**: `.claude/docs/prd/fork-risk-monitoring.md` - Complete feature specification and requirements
+- **Fork Risk System**: `requirements/prd-fork-risk-monitoring.md` - Complete feature specification and requirements
 
 ## Astro Framework Patterns
 - **Authentication**: `.claude/docs/astro-authentication.md` - Auth.js, Better Auth, Clerk, Lucia integrations

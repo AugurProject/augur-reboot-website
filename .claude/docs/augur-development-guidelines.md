@@ -2,14 +2,14 @@
 
 ## Rules & Recommendations
 
-**MUST** read `.claude/docs/project-architecture.md` prior to any development work
+**MUST** read `.claude/docs/augur-architecture.md` prior to any development work
 **MUST** create development worktrees in `.workbench` directory for isolated feature development
 **ALWAYS** use descriptive branch names: `feature-name`, `fix-issue`, `workflow-enhancements`
 **NEVER** commit work nor push changes in `main` branch
 **ALWAYS** run `npm run cf-typegen` when changing `wrangler.jsonc` file
 
 ## Source Code Navigation
-Use `.claude/docs/project-architecture.md` as reference to understand tech stack and codebase structure
+Use `.claude/docs/augur-architecture.md` as reference to understand tech stack and codebase structure
 Use `git ls-files` or similar tools to understand codebase structure
 
 ## Development Workflow
