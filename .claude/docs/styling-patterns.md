@@ -1,18 +1,18 @@
 # Styling Patterns
 
-## Styling Architecture
-**ALWAYS** look in `src/styles/global.css` for ALL styling customization
-**MUST** use `@theme` directive for theme customization - NO config files
-**NEVER** assume tailwind.config.js exists - this project uses CSS-first approach
+## Constraints
+**ALWAYS** use `src/styles/global.css` for ALL styling & customization
+**ALWAYS** use `@theme` directive for theme customization - NO config files
+**NEVER** create tailwind.config.js, use CSS-first approach
 **ALWAYS** use `@utility` directive for custom utilities like `fx-glow`
 
-## Tailwind CSS 4.1 Approach
+## Tailwind CSS 4.1 Implementation
 This project uses Tailwind CSS 4.1 via `@tailwindcss/vite` plugin with a CSS-first configuration approach:
 
-- **NO separate config file** - all configuration in CSS
-- **Use `@theme` directive** for theme customization
-- **Use `@utility` directive** for custom utility classes
-- **Location**: `src/styles/global.css` contains all styling configuration
+- **Configuration location**: `src/styles/global.css` contains all styling configuration
+- **No separate config file** - all configuration embedded in CSS
+- **Theme customization**: Uses `@theme` directive for theme modifications
+- **Custom utilities**: Defined via `@utility` directive for project-specific classes
 
 ## Custom Utilities Available
 
@@ -31,20 +31,12 @@ This project uses Tailwind CSS 4.1 via `@tailwindcss/vite` plugin with a CSS-fir
 <div class="fx-box-glow-lg">Box with large glow</div>
 ```
 
-## Implementation Location
-All custom utilities and theme configuration are defined in:
+## Implementation Details
+All custom utilities and theme configuration are located in:
 ```
 src/styles/global.css
 ```
-
-This file contains:
-- Tailwind v4 @theme configurations
-- Custom @utility definitions
-- Project-specific CSS variables
-- Global styling patterns
-
-## Development Guidelines
-- **Never create** separate Tailwind config files
-- **Always extend** utilities through the `@utility` directive in global.css
-- **Reference** existing patterns before creating new utilities
-- **Follow** the fx-* naming convention for custom effects
+## Naming Conventions
+- **Custom effects**: Follow `fx-*` naming pattern (fx-glow, fx-box-glow)
+- **Size variants**: Use standard Tailwind suffixes (-sm, -lg)
+- **Utility organization**: Group related utilities in @utility blocks

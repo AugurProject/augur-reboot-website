@@ -38,3 +38,20 @@ The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter 
 - Use `git ls-files "src/components/*.astro"` to find static components
 - Follow existing patterns for similar component types
 - Extract shared logic to utilities in `/lib` when appropriate
+
+## Component Architecture
+
+### Fork Risk Monitoring System
+Hierarchical component organization:
+```
+ForkMonitor (main container)
+├── ForkDisplay (layout orchestrator)
+│   ├── ForkGauge (SVG visualization)
+│   └── ForkStats (data panels)
+├── ForkControls (development tools)
+└── ForkBadge (status indicator)
+
+Data Flow:
+ForkDataProvider → ForkRiskContext → Components
+ForkMockProvider → DemoContext → Components (dev mode)
+```
