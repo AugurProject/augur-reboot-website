@@ -10,15 +10,15 @@ export const ForkGauge = ({
 	 * Maps the actual risk to intuitive visual representation
 	 */
 	const getVisualPercentage = (forkThresholdPercent: number): number => {
-		// Minimum 3% visual fill for "system active" indication when stable
-		const MIN_VISUAL_FILL = 0 
+		// No minimum fill - 0% risk shows 0% visual fill
+		const MIN_VISUAL_FILL = 0
 
 		if (forkThresholdPercent === 0) {
-			// Show minimal green fill when stable to indicate system is monitoring
+			// No visual fill when no risk detected
 			return MIN_VISUAL_FILL
 		} else if (forkThresholdPercent <= 10) {
-			// 0-10% fork threshold = 3-25% gauge (Low risk zone)
-			// Start from MIN_VISUAL_FILL to avoid visual gap
+			// 0-10% fork threshold = 0-25% gauge (Low risk zone)
+			// Linear scaling from 0% to 25%
 			return MIN_VISUAL_FILL + ((forkThresholdPercent / 10) * (25 - MIN_VISUAL_FILL))
 		} else if (forkThresholdPercent <= 25) {
 			// 10-25% fork threshold = 25-50% gauge (Moderate risk zone)
@@ -47,7 +47,7 @@ export const ForkGauge = ({
 		const endX = centerX + radius * Math.cos(angle)
 		const endY = centerY - radius * Math.sin(angle)
 
-		// Always create arc path - minimum visual fill ensures we never have 0% visual
+		// Create arc path based on visual percentage (can be 0% for no fill)
 		return `M 80 200 A 120 120 0 0 1 ${endX} ${endY}`
 	}
 
@@ -73,7 +73,7 @@ export const ForkGauge = ({
 		const angle = Math.PI - (visualPercentage / 100) * Math.PI
 		const centerX = 200
 		const centerY = 200
-		const radius = 120
+		const radius = 100 // Reduced from 120 to create gap from arc edge
 
 		return {
 			x: centerX + radius * Math.cos(angle),

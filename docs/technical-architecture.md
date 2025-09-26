@@ -77,17 +77,14 @@ SVG-based semicircular gauge showing fork risk level.
 - "FORK RISK LEVEL" subtitle
 
 **Key Functions:**
-- `getVisualPercentage()`: Maps actual percentages to gauge fill levels with minimum visual indication
-  - 0% → 3% gauge fill (minimum visual fill for "system active" indication)
-  - 0.1-10% → 3-25% gauge fill (smooth transition from minimum)
+- `getVisualPercentage()`: Maps actual percentages to gauge fill levels for intuitive display
+  - 0% → 0% gauge fill (no visual fill when no risk detected)
+  - 0.1-10% → 0-25% gauge fill (smooth transition from zero)
   - 10-25% → 25-50% gauge fill
   - 25-75% → 50-90% gauge fill
   - 75%+ → 90-100% gauge fill
 - `getRiskLevel()`: Determines text based on thresholds (10%, 25%, 75%)
 - `getRiskColor()`: Returns CSS custom property for dynamic coloring
-
-**Minimum Visual Fill Feature:**
-The gauge always shows at least 3% visual fill, even when fork risk is 0%, to provide user feedback that the monitoring system is active and functioning. This prevents the gauge from appearing "empty" or "broken" and maintains visual continuity during state transitions.
 
 ### 5. ForkStats.tsx
 Data display component with progressive disclosure based on dispute activity.
