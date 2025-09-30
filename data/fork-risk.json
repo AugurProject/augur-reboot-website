@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-09-30T14:20:02.847Z",
-  "blockNumber": 23476359,
+  "timestamp": "2025-09-30T15:18:20.764Z",
+  "blockNumber": 23476648,
   "riskLevel": "low",
   "riskPercentage": 0,
   "metrics": {
@@ -9,11 +9,11 @@
     "activeDisputes": 0,
     "disputeDetails": []
   },
-  "nextUpdate": "2025-09-30T15:20:29.741Z",
+  "nextUpdate": "2025-09-30T16:18:50.479Z",
   "rpcInfo": {
-    "endpoint": "https://ethereum.publicnode.com",
-    "latency": 292,
-    "fallbacksAttempted": 2
+    "endpoint": "https://eth.llamarpc.com",
+    "latency": 228,
+    "fallbacksAttempted": 0
   },
   "calculation": {
     "method": "GitHub Actions + Public RPC",
