@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-01T10:20:45.588Z",
-  "blockNumber": 23482320,
+  "timestamp": "2025-10-01T11:17:14.145Z",
+  "blockNumber": 23482600,
   "riskLevel": "low",
   "riskPercentage": 0,
   "metrics": {
@@ -9,10 +9,10 @@
     "activeDisputes": 0,
     "disputeDetails": []
   },
-  "nextUpdate": "2025-10-01T11:28:01.418Z",
+  "nextUpdate": "2025-10-01T12:22:01.478Z",
   "rpcInfo": {
     "endpoint": "https://eth.llamarpc.com",
-    "latency": 228,
+    "latency": 122,
     "fallbacksAttempted": 0
   },
   "calculation": {
