@@ -43,11 +43,7 @@ dev-debug.log
 *.sw?
 # OS specific
 
-# Task files
-.taskmaster
-
-# Claude commands directory
-.claude/commands/tm
+.claude/settings.local.json
 
 # Generated fork risk data
 public/data/fork-risk.json
