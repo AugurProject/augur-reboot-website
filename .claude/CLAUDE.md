@@ -1,102 +1,93 @@
 # CLAUDE.md
 
-Guidance for Claude Code working on the Augur website project. See `.claude/memory/` for detailed architecture and conventions.
+Guidance for Claude Code working on the Augur website project. See `.claude/memory/` for detailed architecture, decisions, and conventions.
 
-# CRITICAL OVERRIDES
-
-## Development Server
-**NEVER** spawn new servers - **ALWAYS** check `lsof -ti:4321` first
-**MUST** use existing server on localhost:4321
-**DO NOT** wait for `npm run dev` to complete
-
-## Styling
-**ALWAYS** edit `src/styles/global.css` (NO config files)
-**MUST** use `@theme` and `@utility` directives (Tailwind v4)
-**NEVER** assume tailwind.config.js exists
-
-## Architecture
-**NEVER** add state logic to rendering components - use stores
-**ALWAYS** make components purely reactive to state
-**NEVER** add defensive code that violates separation of concerns
-**ALWAYS** handle initialization in stores, not component effects
-
-## Deployment
-**CRITICAL**: Production is GitHub Pages (static), NOT Cloudflare
-**NEVER** add site URL to Cloudflare config
-**ALWAYS** ensure SEO works in static output mode
-
-## WebGL
-**ALWAYS** implement dispose() for GPU resources
-**MUST** call dispose() in React cleanup effects
-**NEVER** render after disposal - add isDisposed guards
-
-# QUICK START
+## ⚡ Quick Checklist Before Changes
+1. Check dev server: `lsof -ti:4321` (see [development workflow](`./.claude/memory/conventions/development-workflow.md`))
+2. Run type check: `npm run typecheck`
+3. Reference: [project overview](`./.claude/memory/project_overview.md`)
 
 ## Stack & Architecture
 - **Framework**: Astro 5.10+ + React 19 (selective hydration)
 - **Styling**: Tailwind CSS 4.1 (CSS-first with @theme/@utility)
-- **Hosting**: GitHub Pages (production), Cloudflare (dev)
-- **Dev Server**: localhost:4321
 - **State**: Nanostores (global), React Context (providers)
+- **Hosting**: GitHub Pages (production, static), Cloudflare (development)
+- **Dev Server**: localhost:4321
 
-See `.claude/memory/architecture/components.md` for detailed component architecture.
+## Key Conventions 📋
+See `.claude/memory/conventions/` for detailed patterns and rationale:
 
-## Before Changes
-1. Check server: `lsof -ti:4321`
-2. Type check: `npm run typecheck`
-3. Reference: `.claude/memory/project_overview.md`
+| Topic | Convention | Reference |
+|-------|-----------|-----------|
+| **Styling** | Always edit `src/styles/global.css`, never config files | [Styling Standards](`./.claude/memory/conventions/styling-standards.md`) |
+| **Components** | State in stores, components purely reactive | [Component Architecture](`./.claude/memory/conventions/component-architecture.md`) |
+| **Dev Workflow** | Check server before starting, use existing instance | [Development Workflow](`./.claude/memory/conventions/development-workflow.md`) |
+| **Resources** | Call `dispose()` for GPU cleanup in React effects | [Resource Management](`./.claude/memory/conventions/resource-management.md`) |
 
-## Core Commands
-```
+## Architecture Decisions 🏗️
+See `.claude/memory/decisions/` for decision rationale:
+
+| Decision | Details |
+|----------|---------|
+| **Deployment** | [GitHub Pages static](`./.claude/memory/decisions/deployment-architecture.md`), not Cloudflare production |
+| **Framework** | [Astro + React selective hydration](`./.claude/memory/decisions/frontend-framework.md`) |
+| **Styling** | [Tailwind v4 CSS-first](`./.claude/memory/decisions/styling-architecture.md`) with `@theme` and `@utility` |
+| **State** | [Nanostores + React Context](`./.claude/memory/decisions/state-management.md`) |
+
+## Core Commands 🛠️
+```bash
 npm run dev              # Start dev server (localhost:4321)
-npm run build            # Production build
 npm run typecheck        # Type validation (project refs)
-npm run lint             # Biome linter (tabs + single quotes)
+npm run lint             # Biome linter
+npm run build            # Production build
+npm run preview          # Preview built site
 npm run build:fork-data  # Calculate fork risk data
 ```
 
-# FORK RISK MONITORING
+## Architecture Docs 📚
+- [Component Architecture](`./.claude/memory/architecture/components.md`) - Structure, hydration, lifecycle
+- [Fork Risk System](`./.claude/memory/architecture/fork-risk-system.md`) - Dual-runtime, data flow, blockchain integration
+- [Project Overview](`./.claude/memory/project_overview.md`) - Features, structure, troubleshooting
 
-Real-time visualization of Augur v2 protocol fork risk with dual-runtime architecture:
+## Fork Risk Monitoring 🔍
+Real-time Augur v2 protocol fork risk visualization:
+- **Formula**: `(Largest Dispute Bond / 275,000 REP) × 100 = Risk %`
+- **Data**: Hourly blockchain collection → `public/data/fork-risk.json` → 5-min client refresh
+- **Demo Mode**: Press `F2` in development (dev-only scenarios)
+- **Components**: `ForkMonitor.tsx`, `ForkGauge.tsx`, `ForkStats.tsx`, `ForkDisplay.tsx`
 
-**Risk Formula**: `(Largest Dispute Bond / 275,000 REP) × 100 = Risk %`
+See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`) for integration details and RPC failover.
 
-**Data Flow**:
-- GitHub Actions: Hourly blockchain data collection
-- Storage: `public/data/fork-risk.json` (fresh on each build)
-- Frontend: 5-minute auto-refresh with fallback
-- Demo Mode: `F2` shortcut (dev-only scenarios)
-
-See `.claude/memory/architecture/fork-risk-system.md` for detailed integration, RPC failover, and event monitoring.
-
-## Key Fork Risk Patterns
-- `ForkDataProvider.tsx` - Data loading + 5min refresh
-- `ForkMockProvider.tsx` - Demo mode (F2 key)
-- `ForkGauge.tsx` - SVG animated gauge
-- `ForkStats.tsx` - Data panels
-- `calculate-fork-risk.ts` - Blockchain script (Node.js 22+)
-
-```bash
-npm run build:fork-data          # Local calculation
-cat public/data/fork-risk.json   # View data
+## Memory Structure 🧠
+```
+.claude/memory/
+├── project_overview.md              # Quick reference & troubleshooting
+├── conventions/                     # How we implement decisions
+│   ├── development-workflow.md
+│   ├── styling-standards.md
+│   ├── component-architecture.md
+│   └── resource-management.md
+├── decisions/                       # Why we made these choices
+│   ├── deployment-architecture.md
+│   ├── frontend-framework.md
+│   ├── styling-architecture.md
+│   └── state-management.md
+├── architecture/                    # Technical deep dives
+│   ├── components.md
+│   └── fork-risk-system.md
+├── learnings/                       # Solutions from past sessions
+└── conventions/                     # Standards & patterns
 ```
 
-# MEMORY STRUCTURE
+## Skills Available 🎯
+- **astro-dev**: Latest Astro framework patterns and best practices
+- **claude-code-memory**: Memory management workflows and audits
 
-Project knowledge organized in `.claude/memory/`:
-
-| Location | Purpose |
-|----------|---------|
-| `project_overview.md` | Quick reference (stack, features, commands) |
-| `architecture/components.md` | Component structure and hydration |
-| `architecture/fork-risk-system.md` | Fork risk integration details |
-| `conventions/` | Project patterns and standards |
-| `learnings/` | Solutions from past sessions |
-| `decisions/` | Architecture Decision Records |
-
-# ADDITIONAL RESOURCES
-
-- **Framework**: Use `astro-dev` skill for latest Astro patterns
-- **Memory Management**: Use `claude-code-memory` skill for memory maintenance
-- **View Transitions**: See `.claude/memory/architecture/view-transitions.md`
-- **Project Details**: See `.claude/memory/project_overview.md`
+## Troubleshooting 🔧
+See [project overview](`./.claude/memory/project_overview.md`) for common issues like:
+- Dev server port conflicts
+- Type checking failures
+- Stale fork risk data
+- Styling not applied
+- Demo mode issues
+- GPU memory leaks
