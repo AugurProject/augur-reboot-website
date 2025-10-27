@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Server Behavior
 **NEVER** spawn new dev servers - **ALWAYS** check `lsof -ti:4321` first
-**MUST** use existing server on localhost:4321 for all testing  
+**MUST** use existing server on localhost:4321 for all testing
 **DO NOT** wait for `npm run dev` to complete before proceeding with other tasks
 
 ## Styling Architecture
@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **NEVER** assume tailwind.config.js exists - this project uses CSS-first approach
 **ALWAYS** use `@utility` directive for custom utilities like `fx-glow`
 
-## Multi-Agent Coordination  
+## Multi-Agent Coordination
 **MUST** use agile-project-orchestrator for complex implementations requiring multiple specialists
 **ALWAYS** break complex features into parallel workstreams, delegate to specialized agents, avoid single-agent bottlenecks
 
@@ -48,7 +48,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Structure
 ```
 src/
-├── styles/global.css      # Tailwind v4 @theme + @utility directives  
+├── styles/global.css      # Tailwind v4 @theme + @utility directives
 ├── components/            # Component types by rendering
 │   ├── *.astro           # Server-rendered (static)
 │   ├── *.tsx             # Client-hydrated (interactive)
@@ -64,7 +64,7 @@ src/
 ├── scripts/              # Node.js blockchain data collection
 │   └── calculate-fork-risk.ts # Ethereum contract interaction with RPC failover
 ├── stores/               # Nanostores state management
-├── assets/               # Static SVGs and resources  
+├── assets/               # Static SVGs and resources
 ├── lib/                  # Shared utilities
 ├── layouts/              # Base page layouts
 └── pages/                # Route definitions
@@ -77,7 +77,7 @@ src/
 - `fx-box-glow-*` - Variable box glow sizes
 
 ## Project Overview
-Astro-based teaser website for the Augur prediction market reboot. Retro-futuristic landing page with CRT-style animations, deployed on Cloudflare Pages with React components for interactivity.
+Astro-based teaser website for the Augur prediction market reboot. Retro-futuristic landing page with CRT-style animations, deployed on GitHub Pages with React components for interactivity.
 
 **NEW**: Integrated real-time fork risk monitoring system displaying Augur v2 protocol fork risk based on active dispute bonds. Features automated blockchain data collection, interactive gauge visualization, and development demo modes.
 
@@ -112,12 +112,12 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 - **Astro 5.10+** - Static site generator with component islands
 - **React 19** - For interactive components (client-side hydration)
 - **Tailwind CSS 4.1** - CSS-first styling approach
-- **Cloudflare Pages** - Static hosting with edge functions
-- **Wrangler** - Cloudflare deployment tooling
+- **GitHub Pages** - Static hosting (production)
+- **Cloudflare Pages** - Development environment with Wrangler
 
 ## Component Architecture
 - **Astro Components** (.astro) - Server-rendered layout and static components
-- **React Components** (.tsx) - Interactive elements requiring client-side JavaScript  
+- **React Components** (.tsx) - Interactive elements requiring client-side JavaScript
 - **Hybrid Approach** - Uses `client:load` and `client:only` directives for selective hydration
 
 ## Key Components
@@ -141,7 +141,7 @@ Astro-based teaser website for the Augur prediction market reboot. Retro-futuris
 - `ForkMockProvider.tsx` - Demo state management with scenario generation
 
 ## Pages Structure
-- `index.astro` - Landing page with intro sequence and hero banner  
+- `index.astro` - Landing page with intro sequence and hero banner
 - `mission.astro` - Technical roadmap with detailed protocol specifications
 - `Layout.astro` - Base HTML layout with global styles and fonts
 
@@ -154,21 +154,14 @@ Components requiring interactivity use Astro's client directives:
 The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter animations. The PerspectiveGridTunnel component creates the signature animated background.
 
 ## View Transitions Architecture
-**REFERENCE**: @docs/view-transitions-design.md - Comprehensive design document for smooth page navigation, animation continuity, and state management patterns.
+**REFERENCE**: @memory/architecture/view-transitions.md - Comprehensive design document for smooth page navigation, animation continuity, and state management patterns.
 
-# EXTENDED KNOWLEDGE
+# ASTRO FRAMEWORK DOCUMENTATION
 
-## Updated Astro Patterns
-**ALWAYS**: Refer to these docs before Context7 and WebFetch
+**Use the astro-dev skill for latest Astro patterns.** Memory contains project-specific architectural docs.
 
-- **@.claude/docs/astro-authentication.md** - Latest auth integration patterns (Auth.js, Better Auth, Clerk, Lucia)
-- **@.claude/docs/astro-framework-components.md** - Current hydration strategies and multi-framework composition
-- **@.claude/docs/astro-images.md** - Modern image optimization and responsive layout systems
-- **@.claude/docs/astro-middleware.md** - Updated middleware patterns and request handling
-- **@.claude/docs/astro-server-islands.md** - Server islands implementation with `server:defer`
-- **@.claude/docs/astro-styling.md** - Scoped styles, dynamic CSS variables, and class composition patterns
-- **@.claude/docs/astro-typescript.md** - Latest TypeScript integration and utility types
-- **@.claude/docs/astro-view-transitions.md** - View transitions API and SPA-mode patterns
+- **Skill**: `astro-dev` - Comprehensive Astro development with React, Tailwind v4, and Cloudflare Workers deployment
+- **Memory Reference**: See `.claude/memory/architecture/` for project-specific architecture decisions
 
 # FORK RISK MONITORING SYSTEM
 
@@ -176,14 +169,14 @@ The site uses CSS keyframes for CRT-style effects and JavaScript for typewriter 
 The fork risk monitoring system uses a dual-runtime architecture with TypeScript project references:
 
 **Frontend Runtime (Astro + React)**
-- Config: `tsconfig.app.json` 
+- Config: `tsconfig.app.json`
 - Location: `src/` directory
 - Purpose: Interactive web UI with gauge visualization and data panels
 - Key patterns: React Context for state management, 5-minute auto-refresh, demo mode integration
 
 **Backend Scripts (Node.js)**
 - Config: `tsconfig.scripts.json`
-- Location: `scripts/` directory  
+- Location: `scripts/` directory
 - Purpose: Ethereum blockchain data collection and risk calculation
 - Uses Node.js 22's native TypeScript support via --experimental-strip-types
 
@@ -241,3 +234,15 @@ cat public/data/fork-risk.json | grep -A 3 "rpcInfo"
 # Enable demo mode in development
 # Press F2 in browser, then select risk scenarios
 ```
+
+# CLAUDE CODE MEMORY STRUCTURE
+
+Project memory is organized in `.claude/memory/`:
+
+- **`.claude/memory/project_overview.md`** - High-level project context and quick reference
+- **`.claude/memory/learnings/`** - Troubleshooting solutions and development gotchas
+- **`.claude/memory/conventions/`** - Project-specific standards and established patterns
+- **`.claude/memory/architecture/`** - System design decisions and technical rationale
+- **`.claude/memory/decisions/`** - Architecture Decision Records (ADRs) with rationale
+
+See memory files for accumulated project knowledge and solutions from past development sessions.
