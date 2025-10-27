@@ -15,7 +15,7 @@ See `.claude/memory/conventions/` for detailed patterns and rationale:
 | Topic | Convention | Reference |
 |-------|-----------|-----------|
 | **Styling** | Always edit `src/styles/global.css`, never config files | [Styling Standards](`./.claude/memory/conventions/styling-standards.md`) |
-| **Components** | State in stores, components purely reactive | [Component Architecture](`./.claude/memory/conventions/component-architecture.md`) |
+| **Components** | State in stores, components purely reactive, hydration patterns | [Component Patterns](`./.claude/memory/conventions/component-patterns.md`) |
 | **Dev Workflow** | Check server before starting, use existing instance | [Development Workflow](`./.claude/memory/conventions/development-workflow.md`) |
 | **Resources** | Call `dispose()` for GPU cleanup in React effects | [Resource Management](`./.claude/memory/conventions/resource-management.md`) |
 
@@ -40,9 +40,7 @@ npm run build:fork-data  # Calculate fork risk data
 ```
 
 ## Architecture Docs
-- [Component Architecture](`./.claude/memory/architecture/components.md`) - Structure, hydration, lifecycle
 - [Fork Risk System](`./.claude/memory/architecture/fork-risk-system.md`) - Dual-runtime, data flow, blockchain integration
-- [Project Overview](`./.claude/memory/project_overview.md`) - Features, structure, troubleshooting
 
 ## Fork Risk Monitoring
 Real-time Augur v2 protocol fork risk visualization:
@@ -56,22 +54,19 @@ See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`) f
 ## Memory Structure
 ```
 .claude/memory/
-├── project_overview.md              # Quick reference & troubleshooting
 ├── conventions/                     # How we implement decisions
-│   ├── development-workflow.md
-│   ├── styling-standards.md
-│   ├── component-architecture.md
-│   └── resource-management.md
+│   ├── component-patterns.md        # Component architecture + hydration
+│   ├── development-workflow.md      # Dev server, build, git workflow
+│   ├── styling-standards.md         # Tailwind v4 @theme/@utility patterns
+│   └── resource-management.md       # WebGL cleanup, dispose() patterns
 ├── decisions/                       # Why we made these choices
-│   ├── deployment-architecture.md
-│   ├── frontend-framework.md
-│   ├── styling-architecture.md
-│   └── state-management.md
+│   ├── deployment-architecture.md   # GitHub Pages static deployment
+│   ├── frontend-framework.md        # Astro 5.10+ + React 19 islands
+│   ├── styling-architecture.md      # Tailwind v4 CSS-first
+│   └── state-management.md          # Nanostores + React Context
 ├── architecture/                    # Technical deep dives
-│   ├── components.md
-│   └── fork-risk-system.md
-├── learnings/                       # Solutions from past sessions
-└── conventions/                     # Standards & patterns
+│   └── fork-risk-system.md          # Dual-runtime, data pipeline, blockchain
+└── learnings/                       # Solutions from past sessions (future)
 ```
 
 ## Skills Available
@@ -79,10 +74,19 @@ See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`) f
 - **claude-code-memory**: Memory management workflows and audits
 
 ## Troubleshooting
-See [project overview](`./.claude/memory/project_overview.md`) for common issues like:
-- Dev server port conflicts
-- Type checking failures
-- Stale fork risk data
-- Styling not applied
-- Demo mode issues
-- GPU memory leaks
+
+**Dev Server Issues**: See [development-workflow.md](`./.claude/memory/conventions/development-workflow.md`)
+- Dev server port conflicts (`lsof -ti:4321`)
+- Type checking failures (`npm run typecheck`)
+
+**Fork Risk Data**: See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`)
+- Stale fork risk data (`npm run build:fork-data`)
+- RPC endpoint failover, demo mode (`F2`)
+
+**Styling Issues**: See [styling-standards.md](`./.claude/memory/conventions/styling-standards.md`)
+- Styling not applied (check `src/styles/global.css`)
+- Custom utilities (fx-glow, fx-box-glow)
+
+**GPU Memory Leaks**: See [resource-management.md](`./.claude/memory/conventions/resource-management.md`)
+- Always implement `dispose()` for WebGL resources
+- Call in React cleanup effects

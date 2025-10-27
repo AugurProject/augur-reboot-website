@@ -1,40 +1,82 @@
 # Frontend Framework Decision
 
 ## Decision
-**Use Astro 5.10+ with React 19 for selective component hydration**
+**Use Astro 5.10+ with React 19 for selective component hydration (islands architecture)**
 
 ## Rationale
-- Astro enables static site generation with selective client-side interactivity
-- Server-renders `.astro` components as static HTML (zero JavaScript)
-- React components selectively hydrate only when needed (`client:load`, `client:visible`)
-- Combines static site performance with dynamic component capabilities
-- React 19 provides modern patterns for interactive features (animations, gauges, state)
-- Allows mixing frameworks: React + Svelte + Vue in same page if needed
+
+### Why Astro + React
+1. **Static by Default**: Astro server-renders `.astro` files to pure HTML (zero JavaScript)
+2. **Selective Hydration**: React components hydrate only when explicitly marked
+3. **Performance Balance**: Static site speed + dynamic component capabilities
+4. **Modern React**: React 19 with latest hooks, server components patterns
+5. **Framework Flexibility**: Can mix Svelte, Vue, or other frameworks on same page
+6. **Build-Time Optimization**: Automatic code splitting, CSS tree-shaking
+
+### Alternatives Considered
+
+**Option 1: Next.js 14+**
+- *Rejected*: Over-engineered for a marketing site
+- *Trade-off*: Better for apps with heavy server logic, but adds complexity
+- *Why not*: Full SSR overkill when static site is target
+
+**Option 2: Pure Static Generator (Hugo, Jekyll)**
+- *Rejected*: No dynamic components or interactivity
+- *Trade-off*: Simpler but can't handle real-time fork risk visualization
+- *Why not*: Needed animated gauges and React state for demo mode
+
+**Option 3: Single Page App (React + Vite)**
+- *Rejected*: Ships entire React bundle to every visitor
+- *Trade-off*: All JavaScript on page load, poor initial render time
+- *Why not*: Marketing pages should render fast before JavaScript loads
+
+**Option 4: Remix/SvelteKit**
+- *Rejected*: Smaller ecosystems, fewer animation libraries for our needs
+- *Trade-off*: Could work but React has better WebGL support libraries
 
 ## Implementation
-- **Astro Components** (`.astro`) - Server-rendered, static output, no JavaScript
-  - Layout.astro, HeroBanner.astro, MissionSection.astro
-  - Used for static content, structure, and templates
-- **React Components** (`.tsx`) - Client-hydrated with selective directives
-  - Intro.tsx, CrtDisplay.tsx, PerspectiveGridTunnel.tsx
-  - ForkMonitor.tsx, ForkGauge.tsx, ForkStats.tsx, etc.
-  - Use `client:load` for immediate interactivity
-  - Use `client:visible` for viewport-triggered loading
-  - Use `client:only="react"` for client-only components
+
+**Component Strategy**:
+| File Type | Rendering | JavaScript | Use Case |
+|-----------|-----------|------------|----------|
+| `*.astro` | Server-only | None | Static layout, content, templates |
+| `*.tsx` | Server → Client | Selective | Interactive features, animations |
+
+**Specific Components**:
+- Static: `Layout.astro`, `HeroBanner.astro`, `MissionSection.astro`
+- Interactive (React with `client:load`):
+  - `Intro.tsx` - Typewriter animation (critical path)
+  - `PerspectiveGridTunnel.tsx` - 3D WebGL background (critical path)
+  - `CrtDisplay.tsx` - Power-on animation (critical path)
+  - `ForkMonitor.tsx` - Real-time gauge + stats
+
+**Hydration Directives**:
+- `client:load` - Immediate hydration (animations)
+- `client:visible` - Hydrate when in viewport (optional)
+- `client:only="react"` - Skip server rendering (rarely needed)
 
 ## Critical Rules
-- Astro components (.astro) are purely server-rendered - **NO** JavaScript
-- React components (.tsx) are hydrated - **ALWAYS** specify hydration directive
-- **NEVER** assume a component is interactive without explicit directive
-- **MUST** use `client:load` for critical animations (intro, grid, CRT effects)
-- **MUST** use proper hydration directives to minimize JavaScript sent
+- **Astro** components (.astro) **NEVER** contain JavaScript logic
+- **React** components (.tsx) **ALWAYS** specify hydration directive
+- **NEVER** forget hydration directives - component won't be interactive
+- **MUST** use `client:load` only for critical animations (first contentful paint)
+- **MUST** minimize React bundle by hydrating only what's needed
 
 ## TypeScript Configuration
-- Frontend uses `tsconfig.app.json` for type checking Astro + React
-- Enables cross-file imports of `.astro` files in `.ts` files via plugin
-- Run `npm run typecheck` for full validation
+- `tsconfig.app.json` - Type checks frontend (Astro + React)
+- `@astrojs/ts-plugin` - Enables importing `.astro` files in `.ts` files
+- `npm run typecheck` - Full validation across both configs
+
+## Trade-offs Made
+
+| Choice | Benefit | Cost |
+|--------|---------|------|
+| Astro Islands | Fast HTML + dynamic components | Learning curve for multi-framework |
+| React 19 | Modern patterns, good ecosystem | Extra bundle weight for simple features |
+| Selective Hydration | Only load JS where needed | Must carefully choose directives |
+| Build-time Data | Type-safe fork risk data | Can't do real-time blockchain queries |
 
 ## Related Decisions
-- See `styling-architecture.md` for CSS approach in Astro
-- See `state-management.md` for managing state across hydrated components
-- See `.claude/memory/architecture/components.md` for detailed hydration patterns
+- See `styling-architecture.md` for Tailwind CSS integration
+- See `state-management.md` for Nanostores + React Context patterns
+- See `deployment-architecture.md` for static site build pipeline
