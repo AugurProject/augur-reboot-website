@@ -2,11 +2,6 @@
 
 Guidance for Claude Code working on the Augur website project. See `.claude/memory/` for detailed architecture, decisions, and conventions.
 
-## ⚡ Quick Checklist Before Changes
-1. Check dev server: `lsof -ti:4321` (see [development workflow](`./.claude/memory/conventions/development-workflow.md`))
-2. Run type check: `npm run typecheck`
-3. Reference: [project overview](`./.claude/memory/project_overview.md`)
-
 ## Stack & Architecture
 - **Framework**: Astro 5.10+ + React 19 (selective hydration)
 - **Styling**: Tailwind CSS 4.1 (CSS-first with @theme/@utility)
@@ -14,7 +9,7 @@ Guidance for Claude Code working on the Augur website project. See `.claude/memo
 - **Hosting**: GitHub Pages (production, static), Cloudflare (development)
 - **Dev Server**: localhost:4321
 
-## Key Conventions 📋
+## Key Conventions
 See `.claude/memory/conventions/` for detailed patterns and rationale:
 
 | Topic | Convention | Reference |
@@ -24,7 +19,7 @@ See `.claude/memory/conventions/` for detailed patterns and rationale:
 | **Dev Workflow** | Check server before starting, use existing instance | [Development Workflow](`./.claude/memory/conventions/development-workflow.md`) |
 | **Resources** | Call `dispose()` for GPU cleanup in React effects | [Resource Management](`./.claude/memory/conventions/resource-management.md`) |
 
-## Architecture Decisions 🏗️
+## Architecture Decisions
 See `.claude/memory/decisions/` for decision rationale:
 
 | Decision | Details |
@@ -34,7 +29,7 @@ See `.claude/memory/decisions/` for decision rationale:
 | **Styling** | [Tailwind v4 CSS-first](`./.claude/memory/decisions/styling-architecture.md`) with `@theme` and `@utility` |
 | **State** | [Nanostores + React Context](`./.claude/memory/decisions/state-management.md`) |
 
-## Core Commands 🛠️
+## Core Commands
 ```bash
 npm run dev              # Start dev server (localhost:4321)
 npm run typecheck        # Type validation (project refs)
@@ -44,12 +39,12 @@ npm run preview          # Preview built site
 npm run build:fork-data  # Calculate fork risk data
 ```
 
-## Architecture Docs 📚
+## Architecture Docs
 - [Component Architecture](`./.claude/memory/architecture/components.md`) - Structure, hydration, lifecycle
 - [Fork Risk System](`./.claude/memory/architecture/fork-risk-system.md`) - Dual-runtime, data flow, blockchain integration
 - [Project Overview](`./.claude/memory/project_overview.md`) - Features, structure, troubleshooting
 
-## Fork Risk Monitoring 🔍
+## Fork Risk Monitoring
 Real-time Augur v2 protocol fork risk visualization:
 - **Formula**: `(Largest Dispute Bond / 275,000 REP) × 100 = Risk %`
 - **Data**: Hourly blockchain collection → `public/data/fork-risk.json` → 5-min client refresh
@@ -58,7 +53,7 @@ Real-time Augur v2 protocol fork risk visualization:
 
 See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`) for integration details and RPC failover.
 
-## Memory Structure 🧠
+## Memory Structure
 ```
 .claude/memory/
 ├── project_overview.md              # Quick reference & troubleshooting
@@ -79,11 +74,11 @@ See [fork-risk-system.md](`./.claude/memory/architecture/fork-risk-system.md`) f
 └── conventions/                     # Standards & patterns
 ```
 
-## Skills Available 🎯
+## Skills Available
 - **astro-dev**: Latest Astro framework patterns and best practices
 - **claude-code-memory**: Memory management workflows and audits
 
-## Troubleshooting 🔧
+## Troubleshooting
 See [project overview](`./.claude/memory/project_overview.md`) for common issues like:
 - Dev server port conflicts
 - Type checking failures
