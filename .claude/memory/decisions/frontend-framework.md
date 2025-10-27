@@ -13,27 +13,6 @@
 5. **Framework Flexibility**: Can mix Svelte, Vue, or other frameworks on same page
 6. **Build-Time Optimization**: Automatic code splitting, CSS tree-shaking
 
-### Alternatives Considered
-
-**Option 1: Next.js 14+**
-- *Rejected*: Over-engineered for a marketing site
-- *Trade-off*: Better for apps with heavy server logic, but adds complexity
-- *Why not*: Full SSR overkill when static site is target
-
-**Option 2: Pure Static Generator (Hugo, Jekyll)**
-- *Rejected*: No dynamic components or interactivity
-- *Trade-off*: Simpler but can't handle real-time fork risk visualization
-- *Why not*: Needed animated gauges and React state for demo mode
-
-**Option 3: Single Page App (React + Vite)**
-- *Rejected*: Ships entire React bundle to every visitor
-- *Trade-off*: All JavaScript on page load, poor initial render time
-- *Why not*: Marketing pages should render fast before JavaScript loads
-
-**Option 4: Remix/SvelteKit**
-- *Rejected*: Smaller ecosystems, fewer animation libraries for our needs
-- *Trade-off*: Could work but React has better WebGL support libraries
-
 ## Implementation
 
 **Component Strategy**:

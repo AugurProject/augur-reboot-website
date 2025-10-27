@@ -2,17 +2,7 @@
 
 ## Development Server Management
 
-### Check Before Starting Work
-```bash
-# Check if dev server is already running
-lsof -ti:4321
-```
-
-**Convention**: Always check if the server exists first. Starting a new server when one is already running causes port conflicts.
-
 ### Server Rules
-- **NEVER** spawn new dev servers - **ALWAYS** check `lsof -ti:4321` first
-- **MUST** use existing server on localhost:4321 for all testing
 - **DO NOT** wait for `npm run dev` to complete before proceeding with other tasks
 - Dev server runs at localhost:4321 via Cloudflare adapter (SSR mode for development)
 
@@ -20,11 +10,6 @@ lsof -ti:4321
 ```bash
 npm run dev  # Only if no server found by lsof check
 ```
-
-## Before Making Changes
-1. Check server running: `lsof -ti:4321`
-2. Type check entire project: `npm run typecheck`
-3. Reference `project_overview.md` for context
 
 ## Build & Testing Workflow
 
