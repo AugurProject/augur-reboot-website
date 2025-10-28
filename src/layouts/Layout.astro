@@ -2,6 +2,7 @@
 import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
+import GoogleAnalytics from "../components/GoogleAnalytics.astro";
 import { withBase } from "../lib/utils";
 
 interface Props {
@@ -115,7 +116,9 @@ const {
 		</script>
 
 		<ClientRouter />
-	</head>
+	<!-- Google Analytics -->
+	<GoogleAnalytics gaId={import.meta.env.PUBLIC_GA_ID} />
+</head>
 	<body>
 		<PerspectiveGridTunnel 
 			client:load 

@@ -7,7 +7,6 @@ import sitemap from '@astrojs/sitemap';
 
 // Check if building in GitHub Actions (for GitHub Pages)
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
-const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1]; // Extract repo name from "owner/repo"
 
 // Base configuration shared by both environments
 const baseConfig = {

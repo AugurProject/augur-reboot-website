@@ -1,0 +1,68 @@
+---
+/**
+ * GoogleAnalytics Component
+ *
+ * Integrates Google Analytics 4 with support for Astro View Transitions.
+ * Tracks pageviews on both initial page load and soft navigations via View Transitions.
+ *
+ * Usage in layout:
+ * <GoogleAnalytics gaId="G-XXXXXXXXXX" />
+ */
+
+interface Props {
+  /**
+   * Google Analytics 4 Measurement ID (e.g., "G-XXXXXXXXXX")
+   * Get this from your GA4 property settings
+   */
+  gaId?: string;
+}
+
+const { gaId = '' } = Astro.props as Props;
+
+if (!gaId) {
+  console.warn('GoogleAnalytics: gaId prop is required. Analytics will not be initialized.');
+}
+---
+
+<!-- Google Analytics Script -->
+{gaId && (
+  <>
+    <!-- Load gtag library -->
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+
+    <!-- Initialize GA and handle View Transitions -->
+    <script define:vars={{ gaId }}>
+      // Initialize GA data layer
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', gaId, {
+        // Allow tracking of View Transitions (soft navigations)
+        'allow_google_signals': true,
+        'allow_ad_personalization_signals': true,
+      });
+
+      // Track pageviews on View Transitions (soft navigation)
+      document.addEventListener('astro:page-load', () => {
+        // Fire pageview event when page transitions complete
+        gtag('event', 'page_view', {
+          'page_path': window.location.pathname + window.location.search,
+          'page_title': document.title,
+        });
+      });
+
+      // Fallback: Also track on visibility change to catch edge cases
+      // This ensures GA knows the current page if the user returns to tab
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          gtag('event', 'page_view', {
+            'page_path': window.location.pathname + window.location.search,
+            'page_title': document.title,
+          });
+        }
+      });
+    </script>
+  </>
+)}
