@@ -43,10 +43,11 @@ dev-debug.log
 *.sw?
 # OS specific
 
-.claude/settings.local.json
-
 # Generated fork risk data
 public/data/fork-risk.json
 
 # TypeScript build cache
 .tscache/
+
+# LLM
+.claude/settings.local.json
