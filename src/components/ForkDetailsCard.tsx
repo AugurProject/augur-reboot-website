@@ -113,9 +113,10 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 			{/* Gauge Container with Info Icon */}
 			<div
 				ref={gaugeContainerRef}
-				className="relative inline-block"
+				className="relative inline-block cursor-pointer"
 				onMouseEnter={() => setIsHovering(true)}
 				onMouseLeave={() => setIsHovering(false)}
+				onClick={handleInfoClick}
 			>
 				{/* Gauge */}
 				<div className="mb-2">
@@ -126,7 +127,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 				<button
 					onClick={handleInfoClick}
 					className={cn(
-						'absolute top-0 right-0 p-2 rounded-full',
+						'absolute -top-4 -right-2 p-2 rounded-full',
 						'transition-all duration-200',
 						isHovering
 							? 'bg-primary/20 border border-primary/60'
@@ -176,9 +177,10 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 						ref={modalRef}
 						className={cn(
 							'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-							'z-50 w-96 max-w-[calc(100vw-2rem)]',
+							'z-50 w-96 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-4rem)]',
 							'bg-background border border-primary/30',
 							'rounded px-6 py-6 backdrop-blur-sm',
+							'overflow-y-auto',
 							'animate-in fade-in-50 zoom-in-95 duration-200',
 						)}
 					>
