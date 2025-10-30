@@ -6,33 +6,24 @@ import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
 import { ForkLegend } from './ForkLegend'
 
-export const ForkDetailsCard = (): React.JSX.Element => {
+interface ForkDetailsCardProps {
+	gauge: React.ReactNode
+}
+
+export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Element => {
 	const { gaugeData, riskLevel, lastUpdated, rawData, isLoading, error } =
 		useForkData()
 	const [isOpen, setIsOpen] = useState(false)
-	const [isMobile, setIsMobile] = useState(false)
-	const cardRef = useRef<HTMLDivElement>(null)
-	const triggerRef = useRef<HTMLDivElement>(null)
+	const [isHovering, setIsHovering] = useState(false)
+	const gaugeContainerRef = useRef<HTMLDivElement>(null)
+	const modalRef = useRef<HTMLDivElement>(null)
 
-	// Detect mobile and set interaction mode
-	useEffect(() => {
-		const checkMobile = () => {
-			setIsMobile(window.innerWidth < 768)
-		}
-
-		checkMobile()
-		window.addEventListener('resize', checkMobile)
-		return () => window.removeEventListener('resize', checkMobile)
-	}, [])
-
-	// Close on click outside
+	// Close on click outside modal
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (
-				cardRef.current &&
-				!cardRef.current.contains(event.target as Node) &&
-				triggerRef.current &&
-				!triggerRef.current.contains(event.target as Node)
+				modalRef.current &&
+				!modalRef.current.contains(event.target as Node)
 			) {
 				setIsOpen(false)
 			}
@@ -42,6 +33,21 @@ export const ForkDetailsCard = (): React.JSX.Element => {
 			document.addEventListener('mousedown', handleClickOutside)
 			return () =>
 				document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [isOpen])
+
+	// Handle escape key to close modal
+	useEffect(() => {
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setIsOpen(false)
+			}
+		}
+
+		if (isOpen) {
+			document.addEventListener('keydown', handleEscape)
+			return () =>
+				document.removeEventListener('keydown', handleEscape)
 		}
 	}, [isOpen])
 
@@ -91,15 +97,9 @@ export const ForkDetailsCard = (): React.JSX.Element => {
 		return 'var(--color-red-500)'
 	}
 
-	const handleTriggerClick = (e: React.MouseEvent) => {
+	const handleInfoClick = (e: React.MouseEvent) => {
 		e.stopPropagation()
-		setIsOpen(!isOpen)
-	}
-
-	const handleTriggerHover = (open: boolean) => {
-		if (!isMobile) {
-			setIsOpen(open)
-		}
+		setIsOpen(true)
 	}
 
 	if (isLoading || error) {
@@ -109,47 +109,122 @@ export const ForkDetailsCard = (): React.JSX.Element => {
 	const riskColor = getRiskColor()
 
 	return (
-		<div className="relative">
-			{/* Trigger - the gauge area */}
+		<>
+			{/* Gauge Container with Info Icon */}
 			<div
-				ref={triggerRef}
-				onMouseEnter={() => handleTriggerHover(true)}
-				onMouseLeave={() => handleTriggerHover(false)}
-				onClick={handleTriggerClick}
-				className="cursor-pointer"
-				role="button"
-				tabIndex={0}
-				aria-label="View fork meter details"
-				aria-pressed={isOpen}
-			/>
+				ref={gaugeContainerRef}
+				className="relative inline-block"
+				onMouseEnter={() => setIsHovering(true)}
+				onMouseLeave={() => setIsHovering(false)}
+			>
+				{/* Gauge */}
+				<div className="mb-2">
+					{gauge}
+				</div>
 
-			{/* Details Card */}
-			{isOpen && (
-				<div
-					ref={cardRef}
+				{/* Info Icon - Top Right */}
+				<button
+					onClick={handleInfoClick}
 					className={cn(
-						'absolute top-full mt-3 left-1/2 -translate-x-1/2',
-						'z-50 w-80 max-w-[calc(100vw-2rem)]',
-						'bg-background/95 border border-primary/30',
-						'rounded px-4 py-3 backdrop-blur-sm',
-						'md:left-auto md:right-0 md:-translate-x-0',
+						'absolute top-0 right-0 p-2 rounded-full',
+						'transition-all duration-200',
+						isHovering
+							? 'bg-primary/20 border border-primary/60'
+							: 'bg-primary/10 border border-primary/30',
+						'hover:bg-primary/30 hover:border-primary/80',
+						'focus:outline-none focus:ring-2 focus:ring-primary/50',
 					)}
+					style={{
+						filter: isHovering
+							? `drop-shadow(0 0 0.625rem var(--color-primary))`
+							: 'none',
+						transition: 'filter 0.2s',
+					}}
+					aria-label="View fork meter details"
+					title="Click for more information"
 				>
-					{/* Header with Risk Badge */}
+					{/* Info Icon SVG */}
+					<svg
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="text-primary"
+					>
+						<circle cx="12" cy="12" r="10" />
+						<line x1="12" y1="16" x2="12" y2="12" />
+						<line x1="12" y1="8" x2="12.01" y2="8" />
+					</svg>
+				</button>
+			</div>
+
+			{/* Modal Popup */}
+			{isOpen && (
+				<>
+					{/* Backdrop */}
+					<div
+						className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+						onClick={() => setIsOpen(false)}
+					/>
+
+					{/* Modal */}
+					<div
+						ref={modalRef}
+						className={cn(
+							'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+							'z-50 w-96 max-w-[calc(100vw-2rem)]',
+							'bg-background border border-primary/30',
+							'rounded px-6 py-6 backdrop-blur-sm',
+							'animate-in fade-in-50 zoom-in-95 duration-200',
+						)}
+					>
+					{/* Header with Risk Badge and Close Button */}
 					<div className="mb-4 pb-3 border-b border-primary/20">
 						<div className="flex items-center justify-between mb-2">
 							<span className="text-xs font-light uppercase tracking-widest text-muted-foreground">
 								Fork Risk Status
 							</span>
-							<div
-								className="px-2 py-1 rounded text-xs font-light uppercase tracking-widest"
-								style={{
-									backgroundColor: `${riskColor}20`,
-									color: riskColor,
-									border: `1px solid ${riskColor}40`,
-								}}
-							>
-								{riskLevel.level}
+							<div className="flex items-center gap-3">
+								<div
+									className="px-2 py-1 rounded text-xs font-light uppercase tracking-widest"
+									style={{
+										backgroundColor: `${riskColor}20`,
+										color: riskColor,
+										border: `1px solid ${riskColor}40`,
+									}}
+								>
+									{riskLevel.level}
+								</div>
+								{/* Close Button */}
+								<button
+									onClick={() => setIsOpen(false)}
+									className={cn(
+										'p-1 rounded-full',
+										'text-muted-foreground hover:text-primary',
+										'hover:bg-primary/10 transition-colors',
+										'focus:outline-none focus:ring-2 focus:ring-primary/50',
+									)}
+									aria-label="Close"
+									title="Close (Esc)"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<line x1="18" y1="6" x2="6" y2="18" />
+										<line x1="6" y1="6" x2="18" y2="18" />
+									</svg>
+								</button>
 							</div>
 						</div>
 
@@ -253,8 +328,9 @@ export const ForkDetailsCard = (): React.JSX.Element => {
 							Read Whitepaper
 						</a>
 					</div>
-				</div>
+					</div>
+				</>
 			)}
-		</div>
+		</>
 	)
 }

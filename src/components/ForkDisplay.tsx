@@ -44,13 +44,8 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({
 
         {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
-        {/* Gauge with Details Card */}
-        <div className="relative mb-4">
-          <div className="inline-block">
-            <ForkGauge percentage={gaugeData.percentage} />
-          </div>
-          <ForkDetailsCard />
-        </div>
+        {/* Gauge with Details Card - ForkDetailsCard wraps the gauge */}
+        <ForkDetailsCard gauge={<ForkGauge percentage={gaugeData.percentage} />} />
 
         <ForkStats riskLevel={riskLevel} repStaked={gaugeData.repStaked} activeDisputes={gaugeData.activeDisputes} />
 
