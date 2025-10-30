@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { ForkGauge } from './ForkGauge'
 import { ForkStats } from './ForkStats'
 import { ForkControls } from './ForkControls'
+import { ForkDetailsCard } from './ForkDetailsCard'
 import { useForkData } from '../providers/ForkDataProvider'
 import { $appStore, UIState } from '../stores/animationStore'
 
@@ -43,7 +44,13 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({
 
         {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
-        <ForkGauge percentage={gaugeData.percentage} />
+        {/* Gauge with Details Card */}
+        <div className="relative mb-4">
+          <div className="inline-block">
+            <ForkGauge percentage={gaugeData.percentage} />
+          </div>
+          <ForkDetailsCard />
+        </div>
 
         <ForkStats riskLevel={riskLevel} repStaked={gaugeData.repStaked} activeDisputes={gaugeData.activeDisputes} />
 
@@ -51,7 +58,7 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({
           Last updated: <span>{lastUpdated}</span>
         </div>
       </div>
-      
+
       {/* Demo overlay - only visible in development */}
       <ForkControls />
     </>
