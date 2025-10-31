@@ -65,7 +65,7 @@ const currentPath = Astro.url.pathname
 				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 					{/* Sidebar Navigation */}
 					<nav class="md:col-span-1">
-						<div class="sticky top-24">
+						<div class="sticky top-24 border border-foreground/30 bg-background px-4 py-4">
 							<p class="text-xs font-bold tracking-widest text-muted-foreground mb-4">
 								TOPICS
 							</p>
@@ -74,10 +74,10 @@ const currentPath = Astro.url.pathname
 									topics.map((topic) => (
 										<a
 											href={topic.path}
-											class={`block text-sm font-light uppercase tracking-widest px-3 py-2 rounded transition-colors ${
+											class={`block text-sm font-light uppercase tracking-widest px-2 py-1.5 transition-colors ${
 												currentPath === topic.path
-													? 'bg-primary/20 text-primary border border-primary/40'
-													: 'text-muted-foreground hover:text-foreground hover:bg-primary/5'
+													? 'bg-foreground/10 text-primary border border-foreground/30'
+													: 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
 											}`}
 										>
 											{topic.title}
@@ -87,7 +87,7 @@ const currentPath = Astro.url.pathname
 							</div>
 
 							{/* Link back to main fork meter */}
-							<div class="mt-6 pt-6 border-t border-primary/20">
+							<div class="mt-6 pt-6 border-t border-foreground/30">
 								<a
 									href="/"
 									class="text-xs font-bold tracking-widest text-muted-foreground hover:text-primary transition-colors"
