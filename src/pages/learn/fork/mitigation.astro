@@ -183,44 +183,50 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 
 	<h2>Risk Management Summary</h2>
 
-	<table>
-		<tr>
-			<th>Risk Level</th>
-			<th>Position Strategy</th>
-			<th>Monitoring</th>
-			<th>Action Items</th>
-		</tr>
-		<tr>
-			<td><strong>Normal</strong></td>
-			<td>Standard sizing</td>
-			<td>Occasional checks</td>
-			<td>Monitor routinely</td>
-		</tr>
-		<tr>
-			<td><strong>Low</strong></td>
-			<td>Standard sizing</td>
-			<td>Weekly checks</td>
-			<td>Understand disputes</td>
-		</tr>
-		<tr>
-			<td><strong>Moderate</strong></td>
-			<td>Reduce exposure</td>
-			<td>2-3x weekly</td>
-			<td>Plan exits if needed</td>
-		</tr>
-		<tr>
-			<td><strong>High</strong></td>
-			<td>Significantly reduce</td>
-			<td>Daily checks</td>
-			<td>Exit or hedge</td>
-		</tr>
-		<tr>
-			<td><strong>Elevated</strong></td>
-			<td>Exit unless confident</td>
-			<td>Multiple times daily</td>
-			<td>Prepare for fork</td>
-		</tr>
-	</table>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/20">
+					<th class="text-left py-3 px-3">RISK LEVEL</th>
+					<th class="text-left py-3 px-3">POSITION STRATEGY</th>
+					<th class="text-left py-3 px-3">MONITORING</th>
+					<th class="text-left py-3 px-3">ACTIONS</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">NORMAL</td>
+					<td class="py-2 px-3">Standard sizing</td>
+					<td class="py-2 px-3">Occasional</td>
+					<td class="py-2 px-3">Monitor routinely</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">LOW</td>
+					<td class="py-2 px-3">Standard sizing</td>
+					<td class="py-2 px-3">Weekly</td>
+					<td class="py-2 px-3">Understand disputes</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">MODERATE</td>
+					<td class="py-2 px-3">Reduce exposure</td>
+					<td class="py-2 px-3">2-3x weekly</td>
+					<td class="py-2 px-3">Plan exits if needed</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">HIGH</td>
+					<td class="py-2 px-3">Significantly reduce</td>
+					<td class="py-2 px-3">Daily</td>
+					<td class="py-2 px-3">Exit or hedge</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">ELEVATED</td>
+					<td class="py-2 px-3">Exit unless confident</td>
+					<td class="py-2 px-3">Multiple daily</td>
+					<td class="py-2 px-3">Prepare for fork</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 	<h2>Key Principles</h2>
 

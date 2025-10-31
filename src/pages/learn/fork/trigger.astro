@@ -37,12 +37,14 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		Each new dispute bond is typically 2x the previous bond. This exponential growth means:
 	</p>
 
-	<ul>
-		<li>Early disputes have manageable bond amounts</li>
-		<li>Later disputes become prohibitively expensive</li>
-		<li>At some point, the next dispute would exceed 275,000 REP</li>
-		<li>That's when the fork is triggered</li>
-	</ul>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<ul class="space-y-2 m-0">
+			<li>Early disputes have manageable bond amounts</li>
+			<li>Later disputes become prohibitively expensive</li>
+			<li>At some point, the next dispute would exceed 275,000 REP</li>
+			<li>That's when the fork is triggered</li>
+		</ul>
+	</div>
 
 	<p>
 		<strong>Example:</strong> If a dispute bond reaches 150,000 REP, the next challenger would need
@@ -56,18 +58,20 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		The 275,000 REP threshold was chosen as a balance between:
 	</p>
 
-	<ul>
-		<li>
-			<strong>Accessibility:</strong> Low enough that disputes can escalate naturally without
-			requiring astronomical sums
-		</li>
-		<li>
-			<strong>Safety:</strong> High enough that only serious, well-funded disputes trigger forks
-		</li>
-		<li>
-			<strong>Governance:</strong> Ensures that protocol-level disagreements go to REP holders
-		</li>
-	</ul>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<ul class="space-y-3 m-0">
+			<li>
+				<strong class="text-loud-foreground">ACCESSIBILITY:</strong> Low enough that disputes can escalate naturally without
+				requiring astronomical sums
+			</li>
+			<li>
+				<strong class="text-loud-foreground">SAFETY:</strong> High enough that only serious, well-funded disputes trigger forks
+			</li>
+			<li>
+				<strong class="text-loud-foreground">GOVERNANCE:</strong> Ensures that protocol-level disagreements go to REP holders
+			</li>
+		</ul>
+	</div>
 
 	<h2>Fork Window Timing</h2>
 
@@ -75,18 +79,20 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		Once a fork is triggered, there's a critical timing mechanism:
 	</p>
 
-	<ul>
-		<li>
-			<strong>Fork Period:</strong> 60 days for REP holders to choose which fork they support
-		</li>
-		<li>
-			<strong>During Fork:</strong> Markets are frozen. No new trading occurs.
-		</li>
-		<li>
-			<strong>After Fork:</strong> The winning fork becomes the canonical Augur. The losing fork
-			essentially becomes abandoned.
-		</li>
-	</ul>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<ul class="space-y-3 m-0">
+			<li>
+				<strong class="text-loud-foreground">FORK PERIOD:</strong> 60 days for REP holders to choose which fork they support
+			</li>
+			<li>
+				<strong class="text-loud-foreground">DURING FORK:</strong> Markets are frozen. No new trading occurs.
+			</li>
+			<li>
+				<strong class="text-loud-foreground">AFTER FORK:</strong> The winning fork becomes the canonical Augur. The losing fork
+				essentially becomes abandoned.
+			</li>
+		</ul>
+	</div>
 
 	<h2>Impact on Fork Risk</h2>
 

@@ -15,9 +15,11 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 
 	<h2>The Formula</h2>
 
-	<p>
-		<code>(Largest Dispute Bond ÷ 275,000 REP) × 100 = Fork Risk %</code>
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<p class="text-center">
+			<code class="text-lg">(Largest Dispute Bond ÷ 275,000 REP) × 100 = Fork Risk %</code>
+		</p>
+	</div>
 
 	<h2>Breaking It Down</h2>
 
@@ -46,53 +48,61 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 
 	<h2>Examples</h2>
 
-	<h3>Example 1: Low Risk</h3>
-	<p>
-		Current largest dispute bond: <strong>15,000 REP</strong>
-	</p>
-	<p>
-		Calculation: (15,000 ÷ 275,000) × 100 = <strong>5.5%</strong>
-	</p>
-	<p>
-		Interpretation: The fork meter shows 5.5%. A fork is possible but not imminent. The next dispute
-		would need to be ~30,000 REP.
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 1: LOW RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>15,000 REP</strong>
+		</p>
+		<p class="mb-2 text-primary font-mono">
+			(15,000 ÷ 275,000) × 100 = <strong>5.5%</strong>
+		</p>
+		<p>
+			Interpretation: The fork meter shows 5.5%. A fork is possible but not imminent. The next dispute
+			would need to be ~30,000 REP.
+		</p>
+	</div>
 
-	<h3>Example 2: Moderate Risk</h3>
-	<p>
-		Current largest dispute bond: <strong>75,000 REP</strong>
-	</p>
-	<p>
-		Calculation: (75,000 ÷ 275,000) × 100 = <strong>27%</strong>
-	</p>
-	<p>
-		Interpretation: Moderate fork risk. Disputes are escalating significantly. The next dispute would
-		need ~150,000 REP.
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 2: MODERATE RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>75,000 REP</strong>
+		</p>
+		<p class="mb-2 text-primary font-mono">
+			(75,000 ÷ 275,000) × 100 = <strong>27%</strong>
+		</p>
+		<p>
+			Interpretation: Moderate fork risk. Disputes are escalating significantly. The next dispute would
+			need ~150,000 REP.
+		</p>
+	</div>
 
-	<h3>Example 3: High Risk</h3>
-	<p>
-		Current largest dispute bond: <strong>200,000 REP</strong>
-	</p>
-	<p>
-		Calculation: (200,000 ÷ 275,000) × 100 = <strong>73%</strong>
-	</p>
-	<p>
-		Interpretation: High fork risk. The next dispute would need ~400,000 REP, exceeding the threshold.
-		A fork is likely with one more dispute escalation.
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 3: HIGH RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>200,000 REP</strong>
+		</p>
+		<p class="mb-2 text-primary font-mono">
+			(200,000 ÷ 275,000) × 100 = <strong>73%</strong>
+		</p>
+		<p>
+			Interpretation: High fork risk. The next dispute would need ~400,000 REP, exceeding the threshold.
+			A fork is likely with one more dispute escalation.
+		</p>
+	</div>
 
-	<h3>Example 4: Fork Imminent</h3>
-	<p>
-		Current largest dispute bond: <strong>275,000+ REP</strong>
-	</p>
-	<p>
-		Calculation: (275,000 ÷ 275,000) × 100 = <strong>100%+</strong>
-	</p>
-	<p>
-		Interpretation: Fork threshold reached or exceeded. A fork has been triggered or is actively
-		occurring. REP holders are now voting to resolve the disagreement.
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 4: FORK IMMINENT</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>275,000+ REP</strong>
+		</p>
+		<p class="mb-2 text-primary font-mono">
+			(275,000 ÷ 275,000) × 100 = <strong>100%+</strong>
+		</p>
+		<p>
+			Interpretation: Fork threshold reached or exceeded. A fork has been triggered or is actively
+			occurring. REP holders are now voting to resolve the disagreement.
+		</p>
+	</div>
 
 	<h2>Data Sources</h2>
 

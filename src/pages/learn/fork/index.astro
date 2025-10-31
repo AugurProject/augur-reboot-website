@@ -35,9 +35,14 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		this threshold, the higher the fork risk.
 	</p>
 
-	<p>
-		<strong>Fork Risk Formula:</strong> (Largest Dispute Bond ÷ 275,000 REP) × 100 = Risk %
-	</p>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<p class="text-center mb-2">
+			<strong class="text-loud-foreground">FORK RISK FORMULA:</strong>
+		</p>
+		<p class="text-center text-primary font-mono text-lg">
+			(Largest Dispute Bond ÷ 275,000 REP) × 100 = Risk %
+		</p>
+	</div>
 
 	<h2>Understanding Risk Levels</h2>
 
@@ -45,23 +50,44 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		The fork meter displays five risk levels, each indicating how likely a fork is:
 	</p>
 
-	<ul>
-		<li>
-			<strong>Normal (0%):</strong> No active disputes. Markets are operating normally.
-		</li>
-		<li>
-			<strong>Low (0-10%):</strong> Small disputes exist, but fork risk is minimal.
-		</li>
-		<li>
-			<strong>Moderate (10-25%):</strong> Significant disputes are active. Monitor the situation.
-		</li>
-		<li>
-			<strong>High (25-75%):</strong> Large dispute bonds create serious fork risk.
-		</li>
-		<li>
-			<strong>Elevated (75-100%):</strong> A fork is likely imminent. Take action immediately.
-		</li>
-	</ul>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/20">
+					<th class="text-left py-3 px-3">LEVEL</th>
+					<th class="text-left py-3 px-3">RANGE</th>
+					<th class="text-left py-3 px-3">MEANING</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">NORMAL</td>
+					<td class="py-2 px-3">0%</td>
+					<td class="py-2 px-3">No active disputes. Markets operating normally.</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">LOW</td>
+					<td class="py-2 px-3">0-10%</td>
+					<td class="py-2 px-3">Small disputes exist. Fork risk is minimal.</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">MODERATE</td>
+					<td class="py-2 px-3">10-25%</td>
+					<td class="py-2 px-3">Significant disputes active. Monitor closely.</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">HIGH</td>
+					<td class="py-2 px-3">25-75%</td>
+					<td class="py-2 px-3">Large dispute bonds. Serious fork risk.</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">ELEVATED</td>
+					<td class="py-2 px-3">75-100%</td>
+					<td class="py-2 px-3">Fork likely imminent. Take action immediately.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 	<h2>What Happens During a Fork</h2>
 

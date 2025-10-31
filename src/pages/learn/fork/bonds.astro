@@ -62,23 +62,25 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 
 	<h2>Bond Economics</h2>
 
-	<h3>Winning a Dispute</h3>
-	<p>
-		If your dispute outcome is chosen (by winning a fork or being accepted by the next disputer), you receive:
-	</p>
-	<ul>
-		<li>Your original bond back</li>
-		<li>A fee (additional REP as a reward for being right)</li>
-	</ul>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<h3 class="text-loud-foreground font-bold mb-4">WINNING A DISPUTE</h3>
+		<p class="mb-3">
+			If your dispute outcome is chosen (by winning a fork or being accepted by the next disputer), you receive:
+		</p>
+		<ul class="space-y-1 mb-6">
+			<li>Your original bond back</li>
+			<li>A fee (additional REP as a reward for being right)</li>
+		</ul>
 
-	<h3>Losing a Dispute</h3>
-	<p>
-		If your dispute outcome is incorrect, you lose your bond. The bond is redistributed:
-	</p>
-	<ul>
-		<li>Some goes to winning disputers</li>
-		<li>Some goes to the protocol or REP holders</li>
-	</ul>
+		<h3 class="text-loud-foreground font-bold mb-4">LOSING A DISPUTE</h3>
+		<p class="mb-3">
+			If your dispute outcome is incorrect, you lose your bond. The bond is redistributed:
+		</p>
+		<ul>
+			<li>Some goes to winning disputers</li>
+			<li>Some goes to the protocol or REP holders</li>
+		</ul>
+	</div>
 
 	<h2>Bond Amounts Over Time</h2>
 
@@ -86,38 +88,44 @@ import LearnLayout from '../../../layouts/LearnLayout.astro'
 		As disputes escalate, bond requirements grow exponentially:
 	</p>
 
-	<table>
-		<tr>
-			<th>Dispute Round</th>
-			<th>Typical Bond Size (REP)</th>
-			<th>Fork Risk %</th>
-		</tr>
-		<tr>
-			<td>1st Dispute</td>
-			<td>Initial (varies)</td>
-			<td>Low</td>
-		</tr>
-		<tr>
-			<td>2nd Dispute</td>
-			<td>2x initial</td>
-			<td>Low</td>
-		</tr>
-		<tr>
-			<td>3rd Dispute</td>
-			<td>4x initial</td>
-			<td>Moderate</td>
-		</tr>
-		<tr>
-			<td>4th Dispute</td>
-			<td>8x initial</td>
-			<td>High</td>
-		</tr>
-		<tr>
-			<td>5th+ Disputes</td>
-			<td>16x+ initial</td>
-			<td>Elevated</td>
-		</tr>
-	</table>
+	<div class="bg-background/30 border border-foreground/20 p-6 mb-8">
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/20">
+					<th class="text-left py-3 px-3">ROUND</th>
+					<th class="text-left py-3 px-3">BOND SIZE (REP)</th>
+					<th class="text-left py-3 px-3">FORK RISK</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">1ST DISPUTE</td>
+					<td class="py-2 px-3">Initial (varies)</td>
+					<td class="py-2 px-3">Low</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">2ND DISPUTE</td>
+					<td class="py-2 px-3">2x initial</td>
+					<td class="py-2 px-3">Low</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">3RD DISPUTE</td>
+					<td class="py-2 px-3">4x initial</td>
+					<td class="py-2 px-3">Moderate</td>
+				</tr>
+				<tr class="border-b border-foreground/10">
+					<td class="py-2 px-3 font-bold">4TH DISPUTE</td>
+					<td class="py-2 px-3">8x initial</td>
+					<td class="py-2 px-3">High</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">5TH+ DISPUTES</td>
+					<td class="py-2 px-3">16x+ initial</td>
+					<td class="py-2 px-3">Elevated</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 	<h2>Strategic Considerations</h2>
 
