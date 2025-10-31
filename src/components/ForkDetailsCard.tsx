@@ -11,7 +11,7 @@ interface ForkDetailsCardProps {
 }
 
 export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Element => {
-	const { gaugeData, riskLevel, lastUpdated, rawData, isLoading, error } =
+	const { gaugeData, riskLevel, rawData, isLoading, error } =
 		useForkData()
 	const [isOpen, setIsOpen] = useState(false)
 	const gaugeContainerRef = useRef<HTMLDivElement>(null)
@@ -50,24 +50,6 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 		}
 	}, [isOpen])
 
-	// Get risk description based on risk level
-	const getRiskDescription = (): string => {
-		switch (riskLevel.level) {
-			case 'Normal':
-				return 'No fork risk detected. Markets are operating normally.'
-			case 'Low':
-				return 'Minimal fork risk. Markets have small disputes but risk is low.'
-			case 'Moderate':
-				return 'Moderate fork risk. Significant disputes are active. Monitor closely.'
-			case 'High':
-				return 'High fork risk. Large dispute bonds pose a serious threat of forking.'
-			case 'Elevated':
-				return 'Critical fork risk. A fork is likely imminent. Take immediate action.'
-			default:
-				return 'Fork risk status unknown.'
-		}
-	}
-
 	// Format large numbers with commas
 	const formatNumber = (num: number): string => {
 		return Math.round(num).toLocaleString()
@@ -105,7 +87,6 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 		return <div />
 	}
 
-	const riskColor = getRiskColor()
 	const asciiArt = `
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -289,48 +270,16 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 
 						{/* CTA Links */}
 						<div className="space-y-2">
-							<Button 
-								variant="outline"
-								href="/learn/fork"
-								className={cn(
-									'w-full',
-									'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
-									'hover:bg-foreground/5 focus:bg-foreground/5',
-									'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
-								)}
-							>
+							<CTAButton href="/learn/fork">
 								Learn More About Forking
-							</Button>
-							<Button
-								variant="outline"
+							</CTAButton>
+							<CTAButton
 								href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
 								target="_blank"
 								rel="noopener noreferrer"
-								className={cn(
-									'w-full gap-2',
-									'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
-									'hover:bg-foreground/5 focus:bg-foreground/5',
-									'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
-								)}
 							>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="flex-shrink-0"
-								>
-									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-									<polyline points="14 2 14 8 20 8" />
-									<line x1="12" y1="13" x2="12" y2="17" />
-									<line x1="9" y1="15" x2="15" y2="15" />
-								</svg>
-								Read The Whitepaper
-							</Button>
+								<DocumentIcon /> Read The Whitepaper
+							</CTAButton>
 						</div>
 					</div>
 				</>
@@ -338,3 +287,24 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 		</>
 	)
 }
+
+type CTAButtonProps = {
+	href: string
+	children: React.ReactNode
+	target?: '_blank'
+	rel?: string
+}
+
+const CTAButton = ({ href, children }: CTAButtonProps) => <Button 
+	variant="outline"
+	href={href}
+	className={cn(
+		'w-full',
+		'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
+		'hover:bg-foreground/5 focus:bg-foreground/5',
+		'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+	)}
+>{ children }
+</Button>
+
+const DocumentIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
