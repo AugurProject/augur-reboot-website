@@ -1,0 +1,60 @@
+---
+interface Props {
+	currentPath: string
+	currentTitle: string
+	topics: Array<{ title: string; slug: string; path: string }>
+}
+
+const { currentPath, currentTitle, topics } = Astro.props
+
+// Find current topic index
+const currentIndex = topics.findIndex((t) => t.path === currentPath)
+const prevTopic = currentIndex > 0 ? topics[currentIndex - 1] : null
+const nextTopic = currentIndex < topics.length - 1 ? topics[currentIndex + 1] : null
+---
+
+<nav class="sticky bottom-0 border-t border-foreground/30 bg-background uppercase">
+	<div class="max-w-5xl mx-auto px-4 md:px-8 py-3 md:py-6">
+		{/* Mobile View: Just current topic */}
+		<div class="md:hidden">
+			<p class="text-xs font-bold tracking-widest text-muted-foreground mb-2">
+				CURRENT TOPIC
+			</p>
+			<p class="text-sm font-light tracking-widest text-primary">
+				{currentTitle}
+			</p>
+		</div>
+
+		{/* Desktop View: Full nav with prev/next */}
+		<div class="hidden md:flex items-center justify-between">
+			<div>
+				<p class="text-xs font-bold tracking-widest text-muted-foreground mb-1">
+					CURRENT TOPIC
+				</p>
+				<p class="text-sm font-light tracking-widest text-primary">
+					{currentTitle}
+				</p>
+			</div>
+
+			<div class="flex gap-6">
+				{prevTopic && (
+					<a
+						href={prevTopic.path}
+						class="text-xs font-light tracking-widest text-muted-foreground hover:text-primary transition-colors"
+					>
+						← PREVIOUS
+					</a>
+				)}
+
+				{nextTopic && (
+					<a
+						href={nextTopic.path}
+						class="text-xs font-light tracking-widest text-muted-foreground hover:text-primary transition-colors"
+					>
+						NEXT →
+					</a>
+				)}
+			</div>
+		</div>
+	</div>
+</nav>

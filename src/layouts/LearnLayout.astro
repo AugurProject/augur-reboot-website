@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 import Footer from "../components/Footer.astro";
+import LearnNavigation from "../components/LearnNavigation.astro";
 import Button from "../components/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
 import PageHeading from "../components/PageHeading.astro";
@@ -85,16 +86,6 @@ const currentPath = Astro.url.pathname
 									))
 								}
 							</div>
-
-							{/* Link back to main fork meter */}
-							<div class="mt-6 pt-6 border-t border-foreground/30">
-								<a
-									href="/"
-									class="text-xs font-bold tracking-widest text-muted-foreground hover:text-primary transition-colors"
-								>
-									VIEW FORK METER →
-								</a>
-							</div>
 						</div>
 					</nav>
 
@@ -106,7 +97,8 @@ const currentPath = Astro.url.pathname
 			</div>
 		</main>
 
-		{/* Bottom Section: Footer */}
+		{/* Bottom Section: Sticky Navigation + Footer */}
+		<LearnNavigation currentPath={currentPath} currentTitle={title} topics={topics} />
 		<Footer />
 	</div>
 
