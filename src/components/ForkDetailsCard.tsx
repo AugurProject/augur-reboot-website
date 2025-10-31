@@ -4,7 +4,6 @@ import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
-import { ForkLegend } from './ForkLegend'
 
 interface ForkDetailsCardProps {
 	gauge: React.ReactNode
@@ -249,11 +248,6 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 						<p className="text-xs font-light leading-relaxed text-foreground">
 							{getRiskDescription()}
 						</p>
-					</div>
-
-					{/* Legend */}
-					<div className="mb-4 pb-3 border-b border-primary/20">
-						<ForkLegend />
 					</div>
 
 					{/* Current Metrics */}
