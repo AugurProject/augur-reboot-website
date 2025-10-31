@@ -4,6 +4,7 @@ import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
+import Button from './Button'
 
 interface ForkDetailsCardProps {
 	gauge: React.ReactNode
@@ -13,7 +14,6 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 	const { gaugeData, riskLevel, lastUpdated, rawData, isLoading, error } =
 		useForkData()
 	const [isOpen, setIsOpen] = useState(false)
-	const [isHovering, setIsHovering] = useState(false)
 	const gaugeContainerRef = useRef<HTMLDivElement>(null)
 	const modalRef = useRef<HTMLDivElement>(null)
 
@@ -106,15 +106,47 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 	}
 
 	const riskColor = getRiskColor()
+	const asciiArt = `
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+----------------------------------------------------------+++++-----------------
+-------------------------------------------------------+++++-++++---------------
+-----------------------------------------------------+#+++-++####---------------
+---------------------------------------------------+#+++++#######---------------
+----------------------------------+++++++++------++++++########++---------------
+-------------------------------+++++++++++++++++++++########++------------------
+-----------------------------++++++######++++++++++#####++----------------------
+--------------------------+++++++###########++++++++----------------------------
+-----------------------++++++#######----+#####+++++++--+++++--------------------
+-------------------+++++++#######----------+###+++++++++++++++------------------
+----------------+++++++#######+-------------+++++++##++++++++-------------------
+---------------+##+++#####++------------++++++++#####+++++----------------------
+---------------+#######++----++++++++++++++++#####++++--------------------------
+-----------------+##++-----+++++++++++++++#####++++-----------------------------
+------------------------+++++++++++++++######+++++------------------------------
+---------------------++++++++-##++++#####++++++++++-----------------------------
+------------------++++++++----+#######++-++++++++++-----------------------------
+---------------+++++++++-------+###+----+++++++++++-----------------------------
+---------------+++++++-----------------+++++++++++------------------------------
+-------------------------------------++++++++++---------------------------------
+---------------------------------+++++++++++------------------------------------
+------------------------------+++++++++++---------------------------------------
+----------------------------+++++++++++-----------------------------------------
+----------------------------++++++++--------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+`
 
 	return (
 		<>
 			{/* Gauge Container with Info Icon */}
 			<div
 				ref={gaugeContainerRef}
-				className="relative inline-block cursor-pointer"
-				onMouseEnter={() => setIsHovering(true)}
-				onMouseLeave={() => setIsHovering(false)}
+				className="relative inline-block cursor-pointer group"
 				onClick={handleInfoClick}
 			>
 				{/* Gauge */}
@@ -126,20 +158,11 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 				<button
 					onClick={handleInfoClick}
 					className={cn(
-						'absolute -top-4 -right-2 p-2 rounded-full',
-						'transition-all duration-200',
-						isHovering
-							? 'bg-primary/20 border border-primary/60'
-							: 'bg-primary/10 border border-primary/30',
-						'hover:bg-primary/30 hover:border-primary/80',
-						'focus:outline-none focus:ring-2 focus:ring-primary/50',
+						'absolute -top-2 -right-2 p-2 rounded-full',
+						'group-hover:fx-glow group-focus-within:fx-glow focus:outline-hidden',
+						'transition-all duration-200 focus-visible:ouline-hidden',
+						'text-muted-foreground group-focus-within:text-loud-foreground group-hover:text-loud-foreground group-focus:text-loud-foreground'
 					)}
-					style={{
-						filter: isHovering
-							? `drop-shadow(0 0 0.625rem var(--color-primary))`
-							: 'none',
-						transition: 'filter 0.2s',
-					}}
 					aria-label="View fork meter details"
 					title="Click for more information"
 				>
@@ -153,7 +176,6 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
-						className="text-primary"
 					>
 						<circle cx="12" cy="12" r="10" />
 						<line x1="12" y1="16" x2="12" y2="12" />
@@ -167,7 +189,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 				<>
 					{/* Backdrop */}
 					<div
-						className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+						className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
 						onClick={() => setIsOpen(false)}
 					/>
 
@@ -176,154 +198,124 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 						ref={modalRef}
 						className={cn(
 							'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-							'z-50 w-96 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-4rem)]',
-							'bg-background border border-primary/30',
-							'rounded px-6 py-6 backdrop-blur-sm',
+							'z-50 w-[calc(100vw-2rem)] max-w-md max-h-[calc(100vh-4rem)]',
+							'bg-background border border-foreground/30',
+							'px-6 pt-4 pb-6 backdrop-blur-sm',
 							'overflow-y-auto',
 							'animate-in fade-in-50 zoom-in-95 duration-200',
 						)}
 					>
-					{/* Header with Risk Badge and Close Button */}
-					<div className="mb-4 pb-3 border-b border-primary/20">
-						<div className="flex items-center justify-between mb-2">
-							<span className="text-xs font-light uppercase tracking-widest text-muted-foreground">
-								Fork Risk Status
-							</span>
-							<div className="flex items-center gap-3">
-								<div
-									className="px-2 py-1 rounded text-xs font-light uppercase tracking-widest"
-									style={{
-										backgroundColor: `${riskColor}20`,
-										color: riskColor,
-										border: `1px solid ${riskColor}40`,
-									}}
-								>
-									{riskLevel.level}
+						{/* Header with Accent and Close Button */}
+						<div className="mb-4">
+							<div className="flex items-center justify-between mb-2">
+								<div className="grid grid-cols-[auto_auto_auto] gap-x-2">
+									<div className="h-2 w-12 bg-muted-foreground/50" />
+									<div className="h-2 w-8 bg-muted-foreground/50" />
+									<div className="h-2 w-4 bg-muted-foreground/50" />
 								</div>
 								{/* Close Button */}
 								<button
 									onClick={() => setIsOpen(false)}
 									className={cn(
-										'p-1 rounded-full',
-										'text-muted-foreground hover:text-primary',
-										'hover:bg-primary/10 transition-colors',
-										'focus:outline-none focus:ring-2 focus:ring-primary/50',
+										'p-1 rounded-full cursor-pointer',
+										'text-muted-foreground hover:text-primary text-sm',
+										'transition-colors',
+										'focus:outline-none focus:text-foreground focus:fx-glow',
 									)}
 									aria-label="Close"
 									title="Close (Esc)"
 								>
-									<svg
-										width="16"
-										height="16"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									>
-										<line x1="18" y1="6" x2="6" y2="18" />
-										<line x1="6" y1="6" x2="18" y2="18" />
-									</svg>
+									[ x ] CLOSE
 								</button>
 							</div>
 						</div>
 
-						{/* Percentage Display */}
-						<div className="flex items-baseline gap-2">
-							<span
-								className="text-2xl font-light"
-								style={{ color: riskColor }}
+						{/* Current Metrics */}
+						<div className="pb-3 border-b border-foreground/30">
+							<div className="text-sm">
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">
+										Largest Bond
+									</span>
+									<span className="text-foreground">
+										{formatNumber(
+											rawData.metrics.largestDisputeBond,
+										)}{' '}
+										REP
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">
+										Active Disputes
+									</span>
+									<span className="text-foreground">
+										{rawData.metrics.activeDisputes}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">
+										Fork Threshold
+									</span>
+									<span className="text-foreground">
+										{formatNumber(
+											rawData.calculation.forkThreshold,
+										)}{' '}
+										REP
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">
+										Last Updated
+									</span>
+									<span className="text-foreground text-xs">
+										{formatTime(rawData.timestamp)}
+									</span>
+								</div>
+							</div>
+						</div>
+
+						{/* Ascii Art + Description */}
+						<div className="grid items-center sm:grid-cols-2 gap-4 py-4">
+							<div>
+								<pre className='text-[size:clamp(0.2rem,_100%,_0.25rem)] tracking-[-0.025em]'>
+									{asciiArt}
+								</pre>
+							</div>
+							<div className="text-left uppercase">
+								<div className="pb-2 mb-2 border-b text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
+								<p className="text-sm font-normal leading-tight">Forking is the last market resolution method. It is a very disruptive process and is intended to be a rare occurrence.</p>
+							</div>
+						</div>
+
+						{/* CTA Links */}
+						<div className="space-y-2">
+							<Button 
+								variant="outline"
+								href="/learn/fork"
+								className={cn(
+									'w-full',
+									'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
+									'hover:bg-foreground/5 focus:bg-foreground/5',
+									'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+								)}
 							>
-								{formatNumber(gaugeData.percentage)}
-							</span>
-							<span className="text-sm text-muted-foreground">
-								% of fork threshold
-							</span>
+								Learn More About Forking
+							</Button>
+							<Button 
+								variant="outline"
+								href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
+								target="_blank"
+								rel="noopener noreferrer"
+								className={cn(
+									'w-full',
+									'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
+									'hover:bg-foreground/5 focus:bg-foreground/5',
+									'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+								)}
+							>
+								Read The Whitepaper
+							</Button>
 						</div>
-					</div>
-
-					{/* What Does This Mean */}
-					<div className="mb-4 pb-3 border-b border-primary/20">
-						<p className="text-xs font-light leading-relaxed text-foreground">
-							{getRiskDescription()}
-						</p>
-					</div>
-
-					{/* Current Metrics */}
-					<div className="mb-4 pb-3 border-b border-primary/20">
-						<p className="text-xs font-light uppercase tracking-widest text-muted-foreground mb-3">
-							Current Metrics
-						</p>
-						<div className="space-y-2 text-sm">
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">
-									Largest Bond
-								</span>
-								<span className="text-foreground">
-									{formatNumber(
-										rawData.metrics.largestDisputeBond,
-									)}{' '}
-									REP
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">
-									Active Disputes
-								</span>
-								<span className="text-foreground">
-									{rawData.metrics.activeDisputes}
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">
-									Fork Threshold
-								</span>
-								<span className="text-foreground">
-									{formatNumber(
-										rawData.calculation.forkThreshold,
-									)}{' '}
-									REP
-								</span>
-							</div>
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">
-									Last Updated
-								</span>
-								<span className="text-foreground text-xs">
-									{formatTime(rawData.timestamp)}
-								</span>
-							</div>
-						</div>
-					</div>
-
-					{/* CTA Links */}
-					<div className="space-y-2">
-						<a
-							href="/learn/fork"
-							className={cn(
-								'block text-xs font-light uppercase tracking-widest text-center',
-								'px-3 py-2 rounded border',
-								'border-primary/40 text-primary hover:border-primary/60 hover:bg-primary/5',
-								'transition-colors duration-200',
-							)}
-						>
-							Learn About Forks
-						</a>
-						<a
-							href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
-							target="_blank"
-							rel="noopener noreferrer"
-							className={cn(
-								'block text-xs font-light uppercase tracking-widest text-center',
-								'px-3 py-2 rounded border',
-								'border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/60 hover:bg-muted-foreground/5',
-								'transition-colors duration-200',
-							)}
-						>
-							Read Whitepaper
-						</a>
-					</div>
 					</div>
 				</>
 			)}

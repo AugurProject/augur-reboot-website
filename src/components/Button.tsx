@@ -1,4 +1,4 @@
-import { clsx } from 'clsx';
+import { cn } from '../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
@@ -46,7 +46,7 @@ function buttonVariants({ variant, size }: { variant: string; size: string }) {
   // Link variant doesn't use size classes
   const sizeClass = variant === 'link' ? '' : sizes[size as keyof typeof sizes];
   
-  return clsx(base, variants[variant as keyof typeof variants], sizeClass);
+  return cn(base, variants[variant as keyof typeof variants], sizeClass);
 }
 
 const Button: React.FC<Props> = ({ 
@@ -66,7 +66,7 @@ const Button: React.FC<Props> = ({
   const isExternal = external ?? (href?.startsWith('http') || href?.startsWith('//'));
   
   const buttonClasses = buttonVariants({ variant, size });
-  const allClasses = clsx(buttonClasses, className);
+  const allClasses = cn(buttonClasses, className);
 
   if (element === 'a' && href) {
     const externalProps = isExternal ? { 
