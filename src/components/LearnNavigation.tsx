@@ -39,7 +39,7 @@ export default function LearnNavigation({
 	}, [isExpanded])
 
 	return (
-		<nav
+		<aside
 			ref={drawerRef}
 			className="sticky bottom-0 border-t border-foreground/30 bg-background uppercase transition-all duration-300"
 			style={{
@@ -47,7 +47,7 @@ export default function LearnNavigation({
 			}}
 		>
 			{/* Collapsed State */}
-			<div className="max-w-5xl mx-auto px-4 md:px-8 py-3 md:py-6">
+			<div className="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6">
 				<div className="flex items-center justify-between">
 					{/* Left: Jump to Topic */}
 					<button
@@ -76,7 +76,7 @@ export default function LearnNavigation({
 			{/* Expanded Drawer */}
 			{isExpanded && (
 				<div className="border-t border-foreground/30 bg-background overflow-hidden animate-in fade-in duration-200">
-					<div className="max-w-5xl mx-auto px-4 md:px-8 py-4">
+					<div className="max-w-2xl mx-auto px-4 md:px-8 py-4">
 						<div className="space-y-2">
 							{topics.map((topic) => (
 								<a
@@ -95,6 +95,6 @@ export default function LearnNavigation({
 					</div>
 				</div>
 			)}
-		</nav>
+		</aside>
 	)
 }

@@ -60,40 +60,13 @@ const currentPath = Astro.url.pathname
 
 		{/* Middle Section: Scrollable Content */}
 		<main class="overflow-y-auto px-4 md:px-8 mb-12">
-			<div class="max-w-5xl mx-auto">
+			<div class="max-w-2xl mx-auto">
 				<PageHeading text={title} />
 
-				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-					{/* Sidebar Navigation */}
-					<nav class="md:col-span-1">
-						<div class="sticky top-24 border border-foreground/30 bg-background px-4 py-4">
-							<p class="text-xs font-bold tracking-widest text-muted-foreground mb-4">
-								TOPICS
-							</p>
-							<div class="space-y-2">
-								{
-									topics.map((topic) => (
-										<a
-											href={topic.path}
-											class={`block text-sm font-light uppercase tracking-widest px-2 py-1.5 transition-colors ${
-												currentPath === topic.path
-													? 'bg-foreground/10 text-primary border border-foreground/30'
-													: 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
-											}`}
-										>
-											{topic.title}
-										</a>
-									))
-								}
-							</div>
-						</div>
-					</nav>
-
-					{/* Main Content */}
-					<article class="md:col-span-3 prose prose-invert max-w-none">
-						<slot />
-					</article>
-				</div>
+				{/* Main Content */}
+				<article class="prose prose-invert max-w-none">
+					<slot />
+				</article>
 			</div>
 		</main>
 
