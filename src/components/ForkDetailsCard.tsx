@@ -301,18 +301,34 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 							>
 								Learn More About Forking
 							</Button>
-							<Button 
+							<Button
 								variant="outline"
 								href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
 								target="_blank"
 								rel="noopener noreferrer"
 								className={cn(
-									'w-full',
+									'w-full gap-2',
 									'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
 									'hover:bg-foreground/5 focus:bg-foreground/5',
 									'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
 								)}
 							>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="flex-shrink-0"
+								>
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+									<polyline points="14 2 14 8 20 8" />
+									<line x1="12" y1="13" x2="12" y2="17" />
+									<line x1="9" y1="15" x2="15" y2="15" />
+								</svg>
 								Read The Whitepaper
 							</Button>
 						</div>
