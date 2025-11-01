@@ -17,3 +17,12 @@ Press F2 in development to toggle 5 fork risk scenarios. Dev-only feature with p
 ## RPC Endpoint Failover
 Uses 4 public endpoints (LlamaRPC, LinkPool, PublicNode, 1RPC) with auto-fallback. No API keys needed.
 
+## Dialog TypeScript imports: Must add baseUrl and paths to tsconfig.app.json (not inherited from root tsconfig.json) for @/* aliases to work in UI components
+
+---
+## Dialog Close Button: Custom-styled text button '[ X ] Close' (not lucide icon) via linter. Uses fx-glow hover effect and matches terminal aesthetic. Icon div has pointer-events-none.
+
+---
+## Icon Library: Project uses lucide-react exclusively. Remove @radix-ui/react-icons and use lucide icons (X for close, etc) for consistency.
+
+---

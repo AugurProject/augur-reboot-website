@@ -22,3 +22,6 @@ Use astro-dev skill for modern Astro framework patterns and best practices with 
 ## Fork risk demo mode: Press F2 in dev to toggle scenarios (None, Low, Moderate, High, Critical). Dev-only with production guards—safe to leave in code.
 
 ---
+## Dialog Trigger Pattern: Wrap entire interactive container (gauge + icon) as DialogTrigger asChild button. Makes keyboard navigation and focus handling transparent.
+
+---

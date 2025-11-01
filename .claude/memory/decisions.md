@@ -19,3 +19,6 @@ Frontend and backend scripts in same repo with separate tsconfig files. Enables 
 
 ## SVG-Based Fork Gauge
 SVG provides resolution-independent visualization, GPU-accelerated animations, easy styling. Preferred over Canvas for this use case.
+## Dialog Focus Restoration: Always use DialogTrigger with asChild prop to preserve proper focus restoration. Avoid manual dialog state management in components - let Radix UI handle focus return automatically.
+
+---
