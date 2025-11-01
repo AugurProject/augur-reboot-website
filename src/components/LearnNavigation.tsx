@@ -47,14 +47,18 @@ export default function LearnNavigation({
 			}}
 		>
 			{/* Collapsed State */}
-			<div className="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6">
+			<div className="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6 w-full">
 				<div className="flex items-center justify-between">
 					{/* Left: Jump to Topic */}
 					<button
 						onClick={() => setIsExpanded(!isExpanded)}
-						className="text-xs font-light tracking-widest text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+						className={`text-xs font-light tracking-widest uppercase transition-colors cursor-pointer ${
+							isExpanded
+								? 'text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow'
+								: 'text-muted-foreground hover:text-primary'
+						}`}
 					>
-						{isExpanded ? '← CLOSE' : 'JUMP TO TOPIC →'}
+						{isExpanded ? '[ X ] CLOSE' : 'JUMP TO TOPIC →'}
 					</button>
 
 					{/* Right: Up Next */}
@@ -75,8 +79,8 @@ export default function LearnNavigation({
 
 			{/* Expanded Drawer */}
 			{isExpanded && (
-				<div className="border-t border-foreground/30 bg-background overflow-hidden animate-in fade-in duration-200">
-					<div className="max-w-2xl mx-auto px-4 md:px-8 py-4">
+				<div className="border-t border-foreground/30 bg-background overflow-hidden animate-in fade-in duration-200 w-full">
+					<div className="max-w-2xl mx-auto px-4 md:px-8 py-4 w-full">
 						<div className="space-y-2">
 							{topics.map((topic) => (
 								<a
