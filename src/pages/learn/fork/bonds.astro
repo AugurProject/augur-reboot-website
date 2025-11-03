@@ -1,0 +1,184 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="Dispute Process & Bonds"
+	description="Understand how disputes work and the role of bonds in the Augur protocol."
+>
+	<h1>Dispute Process & Bonds</h1>
+
+	<p>
+		Bonds are the financial mechanism that makes Augur's dispute system work. They align incentives,
+		prevent spam, and ensure serious participants have skin in the game.
+	</p>
+
+	<h2>What is a Dispute Bond?</html>
+
+	<p>
+		A dispute bond is REP (Augur's native token) that a user must lock up to challenge a market
+		outcome. It serves three purposes:
+	</p>
+
+	<ol>
+		<li>
+			<strong>Skin in the game:</strong> Disputers must risk their own capital to challenge outcomes
+		</li>
+		<li>
+			<strong>Spam prevention:</strong> High bond amounts deter frivolous disputes
+		</li>
+		<li>
+			<strong>Fair resolution:</strong> The bond gets returned plus a fee if your dispute is correct
+		</li>
+	</ol>
+
+	<h2>How the Dispute Process Works</h2>
+
+	<p>
+		Here's the step-by-step flow of a typical market dispute:
+	</p>
+
+	<h3>Step 1: Initial Report</h3>
+	<p>
+		The designated reporter submits their view of the market outcome (e.g., "Yes" for a binary market).
+	</p>
+
+	<h3>Step 2: First Dispute</h3>
+	<p>
+		If someone disagrees, they post an initial dispute bond (size varies based on protocol params) and
+		submit their alternative outcome. If no one disputes this, the market settles with the dispute's outcome.
+	</p>
+
+	<h3>Step 3: Escalation</h3>
+	<p>
+		If another user disputes the dispute, they must post a bond that's typically 2x larger than the previous bond.
+		This continues escalating with each dispute round.
+	</p>
+
+	<h3>Step 4: Fork Trigger</h3>
+	<p>
+		When a bond reaches or exceeds 275,000 REP, a fork is triggered instead of continuing escalation.
+	</p>
+
+	<h2>Bond Economics</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-4">WINNING A DISPUTE</h3>
+		<p class="mb-3">
+			If your dispute outcome is chosen (by winning a fork or being accepted by the next disputer), you receive:
+		</p>
+		<ul class="space-y-1 mb-6">
+			<li>Your original bond back</li>
+			<li>A fee (additional REP as a reward for being right)</li>
+		</ul>
+
+		<h3 class="text-loud-foreground font-bold mb-4">LOSING A DISPUTE</h3>
+		<p class="mb-3">
+			If your dispute outcome is incorrect, you lose your bond. The bond is redistributed:
+		</p>
+		<ul>
+			<li>Some goes to winning disputers</li>
+			<li>Some goes to the protocol or REP holders</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Bond Amounts Over Time</h2>
+
+	<p>
+		As disputes escalate, bond requirements grow exponentially:
+	</p>
+
+	<ProseCard>
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/30">
+					<th class="text-left py-3 px-3">ROUND</th>
+					<th class="text-left py-3 px-3">BOND SIZE (REP)</th>
+					<th class="text-left py-3 px-3">FORK RISK</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">1ST DISPUTE</td>
+					<td class="py-2 px-3">Initial (varies)</td>
+					<td class="py-2 px-3">Low</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">2ND DISPUTE</td>
+					<td class="py-2 px-3">2x initial</td>
+					<td class="py-2 px-3">Low</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">3RD DISPUTE</td>
+					<td class="py-2 px-3">4x initial</td>
+					<td class="py-2 px-3">Moderate</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">4TH DISPUTE</td>
+					<td class="py-2 px-3">8x initial</td>
+					<td class="py-2 px-3">High</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">5TH+ DISPUTES</td>
+					<td class="py-2 px-3">16x+ initial</td>
+					<td class="py-2 px-3">Elevated</td>
+				</tr>
+			</tbody>
+		</table>
+	</ProseCard>
+
+	<h2>Strategic Considerations</h2>
+
+	<h3>For Disputers</h3>
+	<ul>
+		<li>
+			<strong>High conviction disputes:</strong> Only worth posting if you're confident you'll win
+		</li>
+		<li>
+			<strong>Cost escalation:</strong> Later disputes become prohibitively expensive for casual participants
+		</li>
+		<li>
+			<strong>Fork risk:</strong> High-stakes disputes push toward fork, which affects all markets
+		</li>
+	</ul>
+
+	<h3>For Market Users</h3>
+	<ul>
+		<li>
+			<strong>Monitor disputes:</strong> Watch the fork meter if your market outcome is disputed
+		</li>
+		<li>
+			<strong>Expect delays:</strong> Disputed markets settle slower than undisputed ones
+		</li>
+		<li>
+			<strong>Fork possibility:</strong> High-risk markets might not settle until after a fork
+		</li>
+	</ul>
+
+	<h2>Current Metrics</h2>
+
+	<p>
+		The fork meter tracks:
+	</p>
+
+	<ul>
+		<li>
+			<strong>Largest Dispute Bond:</strong> The biggest bond currently active across all markets
+		</li>
+		<li>
+			<strong>Active Disputes:</strong> How many markets have ongoing disputes
+		</li>
+		<li>
+			<strong>Fork Risk %:</strong> (Largest Bond ÷ 275,000 REP) × 100
+		</li>
+	</ul>
+
+	<p>
+		These metrics give you a real-time view of how close Augur is to a fork event.
+	</p>
+
+	<p>
+		<a href="/learn/fork/calculation">Next: How Fork Risk is Calculated →</a>
+	</p>
+</LearnLayout>

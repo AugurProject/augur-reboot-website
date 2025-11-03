@@ -1,0 +1,259 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="Risk Mitigation"
+	description="Strategies to manage and mitigate fork risk in Augur."
+>
+	<h1>Risk Mitigation Strategies</h1>
+
+	<p>
+		While forks are a core feature of Augur's security model, there are strategies you can use to
+		manage fork risk and protect your positions.
+	</p>
+
+	<h2>Position Management</h2>
+
+	<h3>Size Your Positions Appropriately</h3>
+	<p>
+		Don't commit more capital to a market than you can afford to lose in a fork scenario. Consider:
+	</p>
+
+	<ul>
+		<li>Your total Augur exposure across all markets</li>
+		<li>How much each individual position represents</li>
+		<li>What percentage of your capital is at risk to disputed markets</li>
+	</ul>
+
+	<h3>Diversify Across Risk Levels</h3>
+	<p>
+		Balance positions in different types of markets:
+	</p>
+
+	<ul>
+		<li>
+			<strong>Low-risk markets:</strong> Established markets with clear outcomes, low dispute activity
+		</li>
+		<li>
+			<strong>Medium-risk markets:</strong> Active markets with occasional disputes
+		</li>
+		<li>
+			<strong>High-risk markets:</strong> Markets with significant dispute activity (smaller positions)
+		</li>
+	</ul>
+
+	<h3>Avoid Concentration</h3>
+	<p>
+		Don't put a large percentage of your capital in any single disputed market. Spread positions
+		across multiple markets and outcomes.
+	</p>
+
+	<h2>Market Selection</h2>
+
+	<h3>Research Dispute History</h3>
+	<p>
+		Before entering a market, check:
+	</p>
+
+	<ul>
+		<li>Has this market been disputed before?</li>
+		<li>How many dispute rounds has it gone through?</li>
+		<li>Are there disagreements about the outcome?</li>
+	</ul>
+
+	<h3>Choose Clear-Cut Markets</h3>
+	<p>
+		Markets with unambiguous, objective outcomes are less likely to be disputed. Avoid:
+	</p>
+
+	<ul>
+		<li>Markets dependent on interpretation or judgment</li>
+		<li>Markets with significant external dependencies</li>
+		<li>Markets where multiple "reasonable" outcomes exist</li>
+	</ul>
+
+	<h3>Monitor Market Maturity</h3>
+	<p>
+		Established markets with long resolution periods typically have fewer disputes than newly resolved ones.
+	</p>
+
+	<h2>Time-Based Strategies</h2>
+
+	<h3>Exit Before High Risk</h3>
+	<p>
+		Monitor the fork meter and consider exiting positions when risk rises:
+	</p>
+
+	<ul>
+		<li>
+			<strong>Moderate risk (10-25%):</strong> Consider exiting or reducing positions
+		</li>
+		<li>
+			<strong>High risk (25-75%):</strong> Be very selective about remaining positions
+		</li>
+		<li>
+			<strong>Elevated risk (75%+):</strong> Seriously consider exiting unless you have strong conviction
+		</li>
+	</ul>
+
+	<h3>Hedge with Short Positions</h3>
+	<p>
+		If you expect a disputed outcome:
+	</p>
+
+	<ul>
+		<li>
+			Consider hedging long positions with small short positions on alternative outcomes
+		</li>
+		<li>This reduces your directional exposure while keeping you in the market</li>
+		<li>Useful during moderate risk periods</li>
+	</ul>
+
+	<h2>Information Strategies</h2>
+
+	<h3>Monitor Dispute Activity</h3>
+	<p>
+		Stay informed about what's being disputed:
+	</p>
+
+	<ul>
+		<li>Check the fork meter daily or more often during disputes</li>
+		<li>Understand what outcomes are in conflict</li>
+		<li>Follow community discussions about disputed outcomes</li>
+	</ul>
+
+	<h3>Engage with Community</h3>
+	<p>
+		Participate in governance discussions:
+	</p>
+
+	<ul>
+		<li>Share your perspective on disputed outcomes</li>
+		<li>Learn from other participants' views</li>
+		<li>Build conviction about the "right" outcome</li>
+		<li>Prepare for fork voting</li>
+	</ul>
+
+	<h3>Plan Your Fork Position</h3>
+	<p>
+		Before a fork occurs, think through:
+	</p>
+
+	<ul>
+		<li>Which fork version would you support?</li>
+		<li>Why would you choose that version?</li>
+		<li>How would that choice affect your positions?</li>
+	</ul>
+
+	<h2>Post-Fork Strategies</h2>
+
+	<h3>Plan for Migration</h3>
+	<p>
+		During a fork, you'll need to migrate your REP to the fork version you support:
+	</p>
+
+	<ul>
+		<li>Understand the migration mechanics ahead of time</li>
+		<li>Prepare your strategy before the fork window opens</li>
+		<li>Ensure you can execute timely decisions</li>
+	</ul>
+
+	<h3>Prepare for Market Freeze</h3>
+	<p>
+		Markets freeze during the 60-day fork period:
+	</p>
+
+	<ul>
+		<li>You won't be able to exit positions during the fork</li>
+		<li>Plan for this liquidity lock-up in advance</li>
+		<li>Don't overcommit capital that you might need</li>
+	</ul>
+
+	<h3>Monitor Fork Resolution</h3>
+	<p>
+		Once a fork is triggered:
+	</p>
+
+	<ul>
+		<li>Follow the 60-day voting period closely</li>
+		<li>Make your fork choice based on conviction</li>
+		<li>Be ready to migrate REP on a timeline you're comfortable with</li>
+	</ul>
+
+	<h2>Risk Management Summary</h2>
+
+	<ProseCard>
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/30">
+					<th class="text-left py-3 px-3">RISK LEVEL</th>
+					<th class="text-left py-3 px-3">POSITION STRATEGY</th>
+					<th class="text-left py-3 px-3">MONITORING</th>
+					<th class="text-left py-3 px-3">ACTIONS</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">NORMAL</td>
+					<td class="py-2 px-3">Standard sizing</td>
+					<td class="py-2 px-3">Occasional</td>
+					<td class="py-2 px-3">Monitor routinely</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">LOW</td>
+					<td class="py-2 px-3">Standard sizing</td>
+					<td class="py-2 px-3">Weekly</td>
+					<td class="py-2 px-3">Understand disputes</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">MODERATE</td>
+					<td class="py-2 px-3">Reduce exposure</td>
+					<td class="py-2 px-3">2-3x weekly</td>
+					<td class="py-2 px-3">Plan exits if needed</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">HIGH</td>
+					<td class="py-2 px-3">Significantly reduce</td>
+					<td class="py-2 px-3">Daily</td>
+					<td class="py-2 px-3">Exit or hedge</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">ELEVATED</td>
+					<td class="py-2 px-3">Exit unless confident</td>
+					<td class="py-2 px-3">Multiple daily</td>
+					<td class="py-2 px-3">Prepare for fork</td>
+				</tr>
+			</tbody>
+		</table>
+	</ProseCard>
+
+	<h2>Key Principles</h2>
+
+	<ul>
+		<li>
+			<strong>Knowledge is power:</strong> Understanding fork mechanics helps you make better decisions
+		</li>
+		<li>
+			<strong>Size appropriately:</strong> Only hold what you can afford to lose in worst-case scenarios
+		</li>
+		<li>
+			<strong>Stay informed:</strong> Regular fork meter checks are part of prudent risk management
+		</li>
+		<li>
+			<strong>Plan ahead:</strong> Think through fork scenarios before they happen
+		</li>
+		<li>
+			<strong>Engage with community:</strong> Forks are collective decisions, not just individual ones
+		</li>
+		<li>
+			<strong>Be flexible:</strong> Adjust your positions and plans as risk levels change
+		</li>
+	</ul>
+
+	<p>
+		By following these strategies, you can manage fork risk effectively while still participating
+		in Augur's markets.
+	</p>
+</LearnLayout>

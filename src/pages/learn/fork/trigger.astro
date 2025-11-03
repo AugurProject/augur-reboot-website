@@ -1,0 +1,128 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="Fork Trigger Mechanics"
+	description="Learn what causes a fork and how the dispute escalation process works."
+>
+	<h1>Fork Trigger Mechanics</h1>
+
+	<p>
+		A fork doesn't happen randomly. It's triggered by a specific sequence of escalating disputes,
+		each building on the previous one. Understanding this mechanism is key to grasping why fork
+		risk increases over time.
+	</p>
+
+	<h2>The Dispute Escalation Process</h2>
+
+	<p>
+		When someone disagrees with a market outcome, they can post a dispute bond to challenge it.
+		If someone disputes that dispute, the bond size grows. This escalation continues until one of
+		two things happens:
+	</p>
+
+	<ol>
+		<li>
+			<strong>Agreement is reached:</strong> The dispute stops escalating and the market is settled.
+		</li>
+		<li>
+			<strong>Fork trigger is hit:</strong> The bond reaches or exceeds 275,000 REP, triggering a fork.
+		</li>
+	</ol>
+
+	<h2>Bond Escalation Rules</h2>
+
+	<p>
+		Each new dispute bond is typically 2x the previous bond. This exponential growth means:
+	</p>
+
+	<ProseCard>
+		<ul class="space-y-2 m-0">
+			<li>Early disputes have manageable bond amounts</li>
+			<li>Later disputes become prohibitively expensive</li>
+			<li>At some point, the next dispute would exceed 275,000 REP</li>
+			<li>That's when the fork is triggered</li>
+		</ul>
+	</ProseCard>
+
+	<p>
+		<strong>Example:</strong> If a dispute bond reaches 150,000 REP, the next challenger would need
+		to post 300,000 REP to dispute it. Since this exceeds the 275,000 REP fork threshold, a fork
+		is triggered instead.
+	</p>
+
+	<h2>Why 275,000 REP?</h2>
+
+	<p>
+		The 275,000 REP threshold was chosen as a balance between:
+	</p>
+
+	<ProseCard>
+		<ul class="space-y-3 m-0">
+			<li>
+				<strong class="text-loud-foreground">ACCESSIBILITY:</strong> Low enough that disputes can escalate naturally without
+				requiring astronomical sums
+			</li>
+			<li>
+				<strong class="text-loud-foreground">SAFETY:</strong> High enough that only serious, well-funded disputes trigger forks
+			</li>
+			<li>
+				<strong class="text-loud-foreground">GOVERNANCE:</strong> Ensures that protocol-level disagreements go to REP holders
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Fork Window Timing</h2>
+
+	<p>
+		Once a fork is triggered, there's a critical timing mechanism:
+	</p>
+
+	<ProseCard>
+		<ul class="space-y-3 m-0">
+			<li>
+				<strong class="text-loud-foreground">FORK PERIOD:</strong> 60 days for REP holders to choose which fork they support
+			</li>
+			<li>
+				<strong class="text-loud-foreground">DURING FORK:</strong> Markets are frozen. No new trading occurs.
+			</li>
+			<li>
+				<strong class="text-loud-foreground">AFTER FORK:</strong> The winning fork becomes the canonical Augur. The losing fork
+				essentially becomes abandoned.
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Impact on Fork Risk</h2>
+
+	<p>
+		The fork risk percentage tells you how far the current largest dispute bond has escalated:
+	</p>
+
+	<ul>
+		<li><strong>0-25% risk:</strong> Still early in the dispute escalation</li>
+		<li><strong>25-50% risk:</strong> Disputes are becoming serious</li>
+		<li><strong>50-75% risk:</strong> Fork risk is becoming material</li>
+		<li><strong>75-100% risk:</strong> Fork is imminent or may have already occurred</li>
+	</ul>
+
+	<p>
+		As bond amounts grow closer to 275,000 REP, the fork becomes increasingly likely. The fork
+		meter visualizes this progression in real time.
+	</p>
+
+	<h2>Key Takeaways</h2>
+
+	<ul>
+		<li>Forks are triggered by escalating dispute bonds, not arbitrarily</li>
+		<li>The 275,000 REP threshold ensures meaningful disputes reach the protocol's highest level</li>
+		<li>Once triggered, a 60-day fork period begins where REP holders vote on outcomes</li>
+		<li>Understanding the escalation process helps you anticipate fork risk</li>
+	</ul>
+
+	<p>
+		<a href="/learn/fork/bonds">Next: Learn about the Dispute Process & Bonds →</a>
+	</p>
+</LearnLayout>

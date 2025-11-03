@@ -1,0 +1,171 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="Fork Risk Calculation"
+	description="Learn how fork risk percentage is calculated from on-chain data."
+>
+	<h1>Fork Risk Calculation</h1>
+
+	<p>
+		The fork meter's percentage is derived from a simple but important formula. Understanding how
+		it's calculated helps you interpret the risk level and make informed decisions.
+	</p>
+
+	<h2>The Formula</h2>
+
+	<ProseCard>
+		<p class="text-center">
+			<code class="text-lg">(Largest Dispute Bond ÷ 275,000 REP) × 100 = Fork Risk %</code>
+		</p>
+	</ProseCard>
+
+	<h2>Breaking It Down</h2>
+
+	<h3>Largest Dispute Bond</h3>
+	<p>
+		This is the single largest bond currently active across all markets in Augur. The protocol
+		continuously monitors every open dispute and tracks which one has the most REP at stake.
+	</p>
+
+	<p>
+		Why the largest? Because fork risk depends on the <strong>minimum cost</strong> needed to trigger
+		a fork. If the largest bond is 150,000 REP, the next challenger would need to post ~300,000 REP
+		to dispute it—which exceeds the threshold and triggers a fork.
+	</p>
+
+	<h3>Fork Threshold (275,000 REP)</h3>
+	<p>
+		275,000 REP is the canonical threshold defined in the Augur protocol. This constant represents:
+	</p>
+
+	<ul>
+		<li>The amount at which a dispute bond will trigger a fork</li>
+		<li>A balance between accessibility and safety</li>
+		<li>A protocol-level consensus on what constitutes a "significant disagreement"</li>
+	</ul>
+
+	<h2>Examples</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 1: LOW RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>15,000 REP</strong>
+		</p>
+		<p class="mb-2 text-loud-foreground font-mono">
+			(15,000 ÷ 275,000) × 100 = <strong>5.5%</strong>
+		</p>
+		<p>
+			Interpretation: The fork meter shows 5.5%. A fork is possible but not imminent. The next dispute
+			would need to be ~30,000 REP.
+		</p>
+	</ProseCard>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 2: MODERATE RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>75,000 REP</strong>
+		</p>
+		<p class="mb-2 text-loud-foreground font-mono">
+			(75,000 ÷ 275,000) × 100 = <strong>27%</strong>
+		</p>
+		<p>
+			Interpretation: Moderate fork risk. Disputes are escalating significantly. The next dispute would
+			need ~150,000 REP.
+		</p>
+	</ProseCard>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 3: HIGH RISK</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>200,000 REP</strong>
+		</p>
+		<p class="mb-2 text-loud-foreground font-mono">
+			(200,000 ÷ 275,000) × 100 = <strong>73%</strong>
+		</p>
+		<p>
+			Interpretation: High fork risk. The next dispute would need ~400,000 REP, exceeding the threshold.
+			A fork is likely with one more dispute escalation.
+		</p>
+	</ProseCard>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">EXAMPLE 4: FORK IMMINENT</h3>
+		<p class="mb-2">
+			Current largest dispute bond: <strong>275,000+ REP</strong>
+		</p>
+		<p class="mb-2 text-loud-foreground font-mono">
+			(275,000 ÷ 275,000) × 100 = <strong>100%+</strong>
+		</p>
+		<p>
+			Interpretation: Fork threshold reached or exceeded. A fork has been triggered or is actively
+			occurring. REP holders are now voting to resolve the disagreement.
+		</p>
+	</ProseCard>
+
+	<h2>Data Sources</h2>
+
+	<p>
+		The fork risk calculation pulls real-time data from:
+	</p>
+
+	<ul>
+		<li>
+			<strong>Ethereum blockchain:</strong> On-chain dispute records and bond amounts
+		</li>
+		<li>
+			<strong>Augur smart contracts:</strong> Current market states and dispute escalation data
+		</li>
+		<li>
+			<strong>Public RPC nodes:</strong> Decentralized data retrieval with automatic fallback
+		</li>
+	</ul>
+
+	<p>
+		The calculation is deterministic and transparent—anyone can verify the math by checking the
+		blockchain directly.
+	</p>
+
+	<h2>Visual Representation</h2>
+
+	<p>
+		The fork meter uses a <strong>non-linear visual scale</strong> to make small percentages visible:
+	</p>
+
+	<ul>
+		<li><strong>0-10% risk:</strong> 0-25% visual fill (stretched)</li>
+		<li><strong>10-25% risk:</strong> 25-50% visual fill</li>
+		<li><strong>25-75% risk:</strong> 50-90% visual fill</li>
+		<li><strong>75-100% risk:</strong> 90-100% visual fill</li>
+	</ul>
+
+	<p>
+		This non-linear mapping ensures that even small disputes are visible on the meter while reserving
+		the right half for truly critical risk levels.
+	</p>
+
+	<h2>Why This Matters</h2>
+
+	<ul>
+		<li>
+			<strong>Transparency:</strong> The calculation is auditable and verifiable
+		</li>
+		<li>
+			<strong>Predictability:</strong> You can anticipate when a fork might be triggered
+		</li>
+		<li>
+			<strong>Risk management:</strong> The percentage helps you decide how to respond
+		</li>
+	</ul>
+
+	<p>
+		By understanding the calculation, you can better interpret the fork meter and make strategic
+		decisions about your positions in Augur markets.
+	</p>
+
+	<p>
+		<a href="/learn/fork/what-to-do">Next: What To Do at Different Risk Levels →</a>
+	</p>
+</LearnLayout>

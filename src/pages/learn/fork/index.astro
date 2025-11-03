@@ -1,0 +1,135 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="What is a Fork?"
+	description="Learn about Augur protocol forks, how they work, and why fork pressure matters."
+>
+	<h1>What is a Fork?</h1>
+
+	<p>
+		A fork in the Augur protocol is a critical mechanism that activates when the protocol
+		faces a severe disagreement about market outcomes. If a market reaches a "fork trigger"
+		through escalating dispute bonds, the protocol splits into two branches, each with its own
+		version of market outcomes.
+	</p>
+
+	<h2>Why Forks Matter</h2>
+
+	<p>
+		Forks are Augur's ultimate security mechanism. They ensure that:
+	</p>
+
+	<ul>
+		<li><strong>Disputes can be resolved</strong> - No single entity can control market outcomes</li>
+		<li><strong>REP holders govern</strong> - The community decides which fork is "correct"</li>
+		<li><strong>Bad actors face consequences</strong> - Invalid outcomes get rejected by the network</li>
+	</ul>
+
+	<h2>How Fork pressure is Measured</h2>
+
+	<p>
+		The fork meter visualizes how close Augur is to a fork event. It tracks the largest active
+		dispute bond and measures it against the fork threshold (275,000 REP). The closer we get to
+		this threshold, the higher the fork pressure.
+	</p>
+
+	<ProseCard>
+		<p class="text-center mb-2">
+			<strong class="text-loud-foreground uppercase">Fork Pressure Formula</strong>
+		</p>
+		<p class="text-center text-loud-foreground font-mono text-lg">
+			(Largest Dispute Bond ÷ 275,000 REP) × 100 = Pressure %
+		</p>
+	</ProseCard>
+
+	<h2>Understanding Pressure Levels</h2>
+
+	<p>
+		The fork meter displays five pressure levels, each indicating how likely a fork is:
+	</p>
+
+	<ProseCard>
+		<table class="w-full">
+			<thead>
+				<tr class="border-b border-foreground/30">
+					<th class="text-left py-3 px-3">LEVEL</th>
+					<th class="text-left py-3 px-3">RANGE</th>
+					<th class="text-left py-3 px-3">MEANING</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">NORMAL</td>
+					<td class="py-2 px-3">0%</td>
+					<td class="py-2 px-3">No active disputes. Markets operating normally.</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">LOW</td>
+					<td class="py-2 px-3">0-10%</td>
+					<td class="py-2 px-3">Small disputes exist. Fork pressure is minimal.</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">MODERATE</td>
+					<td class="py-2 px-3">10-25%</td>
+					<td class="py-2 px-3">Significant disputes active. Monitor closely.</td>
+				</tr>
+				<tr class="border-b border-foreground/20">
+					<td class="py-2 px-3 font-bold">HIGH</td>
+					<td class="py-2 px-3">25-75%</td>
+					<td class="py-2 px-3">Large dispute bonds. Serious fork pressure.</td>
+				</tr>
+				<tr>
+					<td class="py-2 px-3 font-bold">ELEVATED</td>
+					<td class="py-2 px-3">75-100%</td>
+					<td class="py-2 px-3">Fork likely imminent. Take action immediately.</td>
+				</tr>
+			</tbody>
+		</table>
+	</ProseCard>
+
+	<h2>What Happens During a Fork</h2>
+
+	<p>
+		When fork conditions are met, the Augur protocol enters a 60-day fork period:
+	</p>
+
+	<ol>
+		<li>REP holders must choose which version of events they believe is correct</li>
+		<li>REP is migrated to the chosen fork</li>
+		<li>The fork with the most REP becomes the canonical Augur</li>
+		<li>Markets on the losing fork become worthless</li>
+		<li>Bets on the winning fork are settled according to that fork's outcomes</li>
+	</ol>
+
+	<p>
+		This is why monitoring fork pressure is crucial—a fork event affects all open markets and requires
+		active participation from REP holders.
+	</p>
+
+	<h2>Next Steps</h2>
+
+	<p>
+		Dive deeper into how forks work:
+	</p>
+
+	<ul>
+		<li>
+			<a href="/learn/fork/trigger">Fork Trigger Mechanics</a> - What causes a fork and the escalation process
+		</li>
+		<li>
+			<a href="/learn/fork/bonds">Dispute Process & Bonds</a> - How disputes work and bond mechanisms
+		</li>
+		<li>
+			<a href="/learn/fork/calculation">Pressure Calculation</a> - How fork pressure is calculated
+		</li>
+		<li>
+			<a href="/learn/fork/what-to-do">What To Do</a> - Actions to take at different pressure levels
+		</li>
+		<li>
+			<a href="/learn/fork/mitigation">Pressure Mitigation</a> - Strategies to manage fork pressure
+		</li>
+	</ul>
+</LearnLayout>

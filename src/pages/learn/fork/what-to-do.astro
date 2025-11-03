@@ -1,0 +1,215 @@
+---
+import LearnLayout from '../../../layouts/LearnLayout.astro'
+import ProseCard from '../../../components/ProseCard.astro'
+---
+
+<LearnLayout
+	title="What To Do"
+	description="Action items to take at different fork risk levels."
+>
+	<h1>What To Do During Rising Fork Risk</h1>
+
+	<p>
+		Fork risk doesn't require panic, but it does require awareness and preparation. Here's what
+		you should consider at each risk level.
+	</p>
+
+	<h2>Normal Risk (0%)</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT'S HAPPENING</h3>
+		<p class="mb-6">No active disputes. Markets are trading normally.</p>
+
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT TO DO</h3>
+		<ul class="space-y-2">
+			<li>Monitor market activity as usual</li>
+			<li>Make trading decisions normally</li>
+			<li>Check the fork meter occasionally to stay informed</li>
+			<li>Consider how you'd respond if a dispute suddenly arises</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Low Risk (0-10%)</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT'S HAPPENING</h3>
+		<p class="mb-6">Early-stage disputes are active, but fork risk remains minimal.</p>
+
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT TO DO</h3>
+		<ul class="space-y-2">
+			<li>
+				<strong>Identify disputed markets:</strong> Check which markets have active disputes
+			</li>
+			<li>
+				<strong>Review outcomes:</strong> Understand the alternative outcomes being disputed
+			</li>
+			<li>
+				<strong>Assess positions:</strong> Evaluate your exposure to disputed markets
+			</li>
+			<li>
+				<strong>Stay informed:</strong> Check the fork meter more regularly
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Moderate Risk (10-25%)</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT'S HAPPENING</h3>
+		<p class="mb-6">Disputes are escalating. The largest bond is now significant, and fork conditions are becoming possible.</p>
+
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT TO DO</h3>
+		<ul class="space-y-2">
+			<li>
+				<strong>Review disputed markets closely:</strong> Understand the arguments for each outcome
+			</li>
+			<li>
+				<strong>Check exposure:</strong> Calculate how much REP/capital is at risk in disputed markets
+			</li>
+			<li>
+				<strong>Consider exit strategies:</strong> Think about when you might exit disputed positions
+			</li>
+			<li>
+				<strong>Follow dispute progress:</strong> Track each new dispute round
+			</li>
+			<li>
+				<strong>Prepare for fork:</strong> Understand what a fork would mean for your positions
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>High Risk (25-75%)</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT'S HAPPENING</h3>
+		<p class="mb-6">
+			Large dispute bonds are active. The gap to fork threshold is narrowing. Fork is increasingly likely
+			with continued escalation.
+		</p>
+
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT TO DO</h3>
+		<ul class="space-y-2">
+			<li>
+				<strong>Act on disputed market exposure:</strong> Consider reducing positions if you're uncomfortable
+				with fork risk
+			</li>
+			<li>
+				<strong>Prepare for fork participation:</strong> If a fork occurs, be ready to vote with your REP
+			</li>
+			<li>
+				<strong>Watch the meter closely:</strong> Check daily or more often
+			</li>
+			<li>
+				<strong>Understand fork mechanics:</strong> Review how your positions would be affected by a fork
+			</li>
+			<li>
+				<strong>Engage with community:</strong> Discuss outcomes with other participants
+			</li>
+			<li>
+				<strong>Avoid new large bets:</strong> Think carefully before entering high-risk markets
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>Elevated Risk (75-100%+)</h2>
+
+	<ProseCard>
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT'S HAPPENING</h3>
+		<p class="mb-6">
+			Fork threshold is at or nearly at capacity. A fork is imminent or has been triggered. This is
+			the highest-stakes scenario.
+		</p>
+
+		<h3 class="text-loud-foreground font-bold mb-3">WHAT TO DO</h3>
+		<ul class="space-y-2">
+			<li>
+				<strong>Prepare for fork governance:</strong> A fork period is likely about to begin
+			</li>
+			<li>
+				<strong>Understand your position:</strong> Know exactly what you're betting on
+			</li>
+			<li>
+				<strong>Plan your fork choice:</strong> Which outcome do you believe is correct?
+			</li>
+			<li>
+				<strong>Prepare to migrate REP:</strong> During a fork, you'll need to choose which version to
+				support
+			</li>
+			<li>
+				<strong>Monitor governance channels:</strong> Engage with the community on the disputed outcomes
+			</li>
+			<li>
+				<strong>Be ready to act during fork:</strong> The 60-day fork period requires active participation
+			</li>
+			<li>
+				<strong>Prepare for market impact:</strong> Many markets will be frozen until fork resolves
+			</li>
+		</ul>
+	</ProseCard>
+
+	<h2>During a Fork Event</h2>
+
+	<h3>The 60-Day Fork Period</h3>
+
+	<ul>
+		<li>
+			<strong>Markets freeze:</strong> No new trades on disputed markets
+		</li>
+		<li>
+			<strong>You must migrate REP:</strong> Choose which fork version you support
+		</li>
+		<li>
+			<strong>Voting occurs:</strong> Your REP choice determines your vote on the disputed outcome
+		</li>
+		<li>
+			<strong>Communicate:</strong> Engage in governance discussions about the right outcome
+		</li>
+		<li>
+			<strong>Wait for resolution:</strong> The fork window is 60 days
+		</li>
+	</ul>
+
+	<h3>After Fork Resolution</h3>
+
+	<ul>
+		<li>
+			<strong>Check your REP:</strong> You now have REP on the winning fork
+		</li>
+		<li>
+			<strong>Markets settle:</strong> Markets settle according to the winning fork's outcomes
+		</li>
+		<li>
+			<strong>Resume trading:</strong> Normal Augur operations resume
+		</li>
+		<li>
+			<strong>Evaluate impact:</strong> Assess how the fork affected your positions
+		</li>
+	</ul>
+
+	<h2>General Best Practices</h2>
+
+	<ul>
+		<li>
+			<strong>Check the meter regularly:</strong> Make fork risk checking part of your routine
+		</li>
+		<li>
+			<strong>Understand disputed outcomes:</strong> Know what you're betting on before a dispute arises
+		</li>
+		<li>
+			<strong>Size positions appropriately:</strong> Don't over-commit to markets that could fork
+		</li>
+		<li>
+			<strong>Stay informed:</strong> Follow Augur discussions and governance
+		</li>
+		<li>
+			<strong>Plan ahead:</strong> Think through fork scenarios before they happen
+		</li>
+		<li>
+			<strong>Engage with the community:</strong> Forks are community decisions
+		</li>
+	</ul>
+
+	<p>
+		<a href="/learn/fork/mitigation">Next: Risk Mitigation Strategies →</a>
+	</p>
+</LearnLayout>
