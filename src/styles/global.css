@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @theme {
   --color-primary: #2AE7A8;
@@ -7,7 +9,6 @@
   --color-loud-foreground: var(--color-green-400);
   --color-background: #111111;
 
-  --font-console: "Press Start 2P", monospace;
   --font-console-narrow: "Handjet", sans-serif;
 
   --default-font-family: "Handjet", sans-serif;
@@ -19,7 +20,8 @@
   --font-weight-bold: 400;
   --tracking-normal: 0.05em;
 
-  --font-display: "Press Start 2P", monospace;
+  --font-display: "Handjet", sans-serif;
+  --tw-prose-p-font-family: "Oxanium", sans-serif;
 
   --glow-size-xs: 0.1375rem;
   --glow-size-sm: 0.25rem;
