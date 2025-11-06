@@ -50,3 +50,4 @@ public/data/fork-risk.json
 
 # TypeScript build cache
 .tscache/
+*.tsbuildinfo
