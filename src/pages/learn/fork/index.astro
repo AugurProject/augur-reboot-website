@@ -5,7 +5,7 @@ import ProseCard from '../../../components/ProseCard.astro'
 
 <LearnLayout
 	title="What is a Fork?"
-	description="Learn about Augur protocol forks, how they work, and why fork pressure matters."
+	description="Learn about Augur protocol forks, how they work, and why fork risk matters."
 >
 	<h1>What is a Fork?</h1>
 
@@ -28,27 +28,27 @@ import ProseCard from '../../../components/ProseCard.astro'
 		<li><strong>Bad actors face consequences</strong> - Invalid outcomes get rejected by the network</li>
 	</ul>
 
-	<h2>How Fork pressure is Measured</h2>
+	<h2>How Fork Risk is Measured</h2>
 
 	<p>
 		The fork meter visualizes how close Augur is to a fork event. It tracks the largest active
 		dispute bond and measures it against the fork threshold (275,000 REP). The closer we get to
-		this threshold, the higher the fork pressure.
+		this threshold, the higher the fork risk.
 	</p>
 
 	<ProseCard>
 		<p class="text-center mb-2">
-			<strong class="text-loud-foreground uppercase">Fork Pressure Formula</strong>
+			<strong class="text-loud-foreground uppercase">Fork Risk Formula</strong>
 		</p>
 		<p class="text-center text-loud-foreground font-mono text-lg">
-			(Largest Dispute Bond ÷ 275,000 REP) × 100 = Pressure %
+			(Largest Dispute Bond ÷ 275,000 REP) × 100 = Risk %
 		</p>
 	</ProseCard>
 
-	<h2>Understanding Pressure Levels</h2>
+	<h2>Understanding Risk Levels</h2>
 
 	<p>
-		The fork meter displays five pressure levels, each indicating how likely a fork is:
+		The fork meter displays five risk levels, each indicating how likely a fork is:
 	</p>
 
 	<ProseCard>
@@ -69,7 +69,7 @@ import ProseCard from '../../../components/ProseCard.astro'
 				<tr class="border-b border-foreground/20">
 					<td class="py-2 px-3 font-bold">LOW</td>
 					<td class="py-2 px-3">0-10%</td>
-					<td class="py-2 px-3">Small disputes exist. Fork pressure is minimal.</td>
+					<td class="py-2 px-3">Small disputes exist. Fork risk is minimal.</td>
 				</tr>
 				<tr class="border-b border-foreground/20">
 					<td class="py-2 px-3 font-bold">MODERATE</td>
@@ -79,7 +79,7 @@ import ProseCard from '../../../components/ProseCard.astro'
 				<tr class="border-b border-foreground/20">
 					<td class="py-2 px-3 font-bold">HIGH</td>
 					<td class="py-2 px-3">25-75%</td>
-					<td class="py-2 px-3">Large dispute bonds. Serious fork pressure.</td>
+					<td class="py-2 px-3">Large dispute bonds. Serious fork risk.</td>
 				</tr>
 				<tr>
 					<td class="py-2 px-3 font-bold">ELEVATED</td>
@@ -105,7 +105,7 @@ import ProseCard from '../../../components/ProseCard.astro'
 	</ol>
 
 	<p>
-		This is why monitoring fork pressure is crucial—a fork event affects all open markets and requires
+		This is why monitoring fork risk is crucial—a fork event affects all open markets and requires
 		active participation from REP holders.
 	</p>
 
@@ -123,13 +123,13 @@ import ProseCard from '../../../components/ProseCard.astro'
 			<a href="/learn/fork/bonds">Dispute Process & Bonds</a> - How disputes work and bond mechanisms
 		</li>
 		<li>
-			<a href="/learn/fork/calculation">Pressure Calculation</a> - How fork pressure is calculated
+			<a href="/learn/fork/calculation">Risk Calculation</a> - How fork risk is calculated
 		</li>
 		<li>
-			<a href="/learn/fork/what-to-do">What To Do</a> - Actions to take at different pressure levels
+			<a href="/learn/fork/what-to-do">What To Do</a> - Actions to take at different risk levels
 		</li>
 		<li>
-			<a href="/learn/fork/mitigation">Pressure Mitigation</a> - Strategies to manage fork pressure
+			<a href="/learn/fork/mitigation">Risk Mitigation</a> - Strategies to manage fork risk
 		</li>
 	</ul>
 </LearnLayout>

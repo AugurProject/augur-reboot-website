@@ -196,7 +196,7 @@ export const ForkGauge = ({
 			</svg>
 
 			<div className="text-sm uppercase tracking-[0.5em] font-light text-muted-foreground">
-				FORK PRESSURE
+				FORK RISK
 			</div>
 		</div>
 	)
