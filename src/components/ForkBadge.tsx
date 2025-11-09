@@ -1,7 +1,7 @@
 import type React from 'react'
 
 interface ForkBadgeProps {
-	level: 'Low' | 'Medium' | 'High' | 'Critical'
+	level: 'Low' | 'Medium' | 'High' | 'Extreme'
 }
 
 export const ForkBadge = ({ level }: ForkBadgeProps): React.JSX.Element => {
@@ -13,7 +13,7 @@ export const ForkBadge = ({ level }: ForkBadgeProps): React.JSX.Element => {
 				return 'text-yellow-400 fx-glow'
 			case 'High':
 				return 'text-orange-400 fx-glow'
-			case 'Critical':
+			case 'Extreme':
 				return 'text-red-400 fx-pulse-glow animate-pulse'
 			default:
 				return 'text-foreground'
