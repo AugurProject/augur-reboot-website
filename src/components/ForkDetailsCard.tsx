@@ -1,23 +1,16 @@
-'use client'
-
-import type React from 'react'
-import { useState } from 'react'
+import { useState, type HTMLAttributes } from 'react'
 import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import { ForkAsciiArt } from './ForkAsciiArt'
 import Button from './Button'
-import {
-	Dialog,
-	DialogContent,
-    DialogTrigger,
-} from './ui/dialog'
 
 interface ForkDetailsCardProps {
 	gauge: React.ReactNode
 }
 
-export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Element => {
-	const { gaugeData, riskLevel, rawData, isLoading, error } =
-		useForkData()
+export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
+	const { rawData } = useForkData()
 	const [isOpen, setIsOpen] = useState(false)
 
 	// Format large numbers with commas
@@ -40,63 +33,12 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 		}
 	}
 
-	const getRiskColor = (): string => {
-		const percentage = gaugeData.percentage
-		if (percentage < 10) return 'var(--color-green-400)'
-		if (percentage < 25) return 'var(--color-yellow-400)'
-		if (percentage < 75) return 'var(--color-orange-400)'
-		return 'var(--color-red-500)'
-	}
-
-	if (isLoading || error) {
-		return <div />
-	}
-
-	const asciiArt = `
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-----------------------------------------------------------+++++-----------------
--------------------------------------------------------+++++-++++---------------
------------------------------------------------------+#+++-++####---------------
----------------------------------------------------+#+++++#######---------------
-----------------------------------+++++++++------++++++########++---------------
--------------------------------+++++++++++++++++++++########++------------------
------------------------------++++++######++++++++++#####++----------------------
---------------------------+++++++###########++++++++----------------------------
------------------------++++++#######----+#####+++++++--+++++--------------------
--------------------+++++++#######----------+###+++++++++++++++------------------
-----------------+++++++#######+-------------+++++++##++++++++-------------------
----------------+##+++#####++------------++++++++#####+++++----------------------
----------------+#######++----++++++++++++++++#####++++--------------------------
------------------+##++-----+++++++++++++++#####++++-----------------------------
-------------------------+++++++++++++++######+++++------------------------------
----------------------++++++++-##++++#####++++++++++-----------------------------
-------------------++++++++----+#######++-++++++++++-----------------------------
----------------+++++++++-------+###+----+++++++++++-----------------------------
----------------+++++++-----------------+++++++++++------------------------------
--------------------------------------++++++++++---------------------------------
----------------------------------+++++++++++------------------------------------
-------------------------------+++++++++++---------------------------------------
-----------------------------+++++++++++-----------------------------------------
-----------------------------++++++++--------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-`
-
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			{/* Entire Gauge as DialogTrigger */}
 			<DialogTrigger asChild>
-				<button
-					className={cn(
-						'relative inline-block group cursor-pointer',
-						'focus:outline-hidden',
-						'transition-all duration-200'
-					)}
+				<button 
+					className="relative inline-block group cursor-pointer focus:outline-hidden transition-all duration-200"
 					aria-label="View fork meter details"
 					title="Click for more information"
 				>
@@ -106,42 +48,12 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 					</div>
 
 					{/* Info Icon - Top Right */}
-					<div
-						className={cn(
-							'absolute -top-2 -right-2 p-2 rounded-full',
-							'group-hover:fx-glow group-focus-within:fx-glow',
-							'transition-all duration-200',
-							'text-muted-foreground group-focus-within:text-loud-foreground group-hover:text-loud-foreground',
-							'pointer-events-none'
-						)}
-					>
-						{/* Info Icon SVG */}
-						<svg
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<circle cx="12" cy="12" r="10" />
-							<line x1="12" y1="16" x2="12" y2="12" />
-							<line x1="12" y1="8" x2="12.01" y2="8" />
-						</svg>
-					</div>
+					<InfoIcon className="absolute -top-2 -right-2 p-2 rounded-full" />
 				</button>
 			</DialogTrigger>
 
 			{/* Modal Dialog */}
-			<DialogContent
-				className={cn(
-					'bg-background border border-foreground/30',
-					'backdrop-blur-sm',
-					'overflow-y-auto'
-				)}
-			>
+			<DialogContent className="bg-background border border-foreground/30 backdrop-blur-sm overflow-y-auto">
 				{/* Header with Accent and Close Button */}
 				<div className="mb-4">
 					<div className="flex items-center justify-between mb-2">
@@ -200,9 +112,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 				{/* Ascii Art + Description */}
 				<div className="grid items-center sm:grid-cols-2 gap-4 py-4">
 					<div className="flex justify-center">
-						<pre className='text-[size:clamp(0.2rem,_100%,_0.25rem)] tracking-[-0.025em]'>
-							{asciiArt}
-						</pre>
+						<ForkAsciiArt />
 					</div>
 					<div className="text-left uppercase">
 						<div className="pb-2 mb-2 border-b text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
@@ -228,23 +138,49 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps): React.JSX.Elem
 	)
 }
 
-type CTAButtonProps = {
-	href: string
-	children: React.ReactNode
-	target?: '_blank'
-	rel?: string
+const CTAButton = ({ href, children, target, rel }: { href: string; children: React.ReactNode; target?: '_blank'; rel?: string }) => (
+	<Button
+		variant="outline"
+		href={href}
+		target={target}
+		rel={rel}
+		className={cn(
+			'w-full',
+			'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
+			'hover:bg-foreground/5 focus:bg-foreground/5',
+			'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+		)}
+	>{ children }
+	</Button>
+)
+
+const DocumentIcon = () => (
+	<svg width="16" height="16" className="mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+		<path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+		<path d="M10 9H8"/>
+		<path d="M16 13H8"/>
+		<path d="M16 17H8"/>
+	</svg>
+) 
+
+const InfoIcon = ({ className }: HTMLAttributes<HTMLDivElement>) => {
+	return (
+		<div
+			className={cn(
+				'pointer-events-none transition-all duration-200',
+				'group-hover:fx-glow group-focus-within:fx-glow',
+				'group-hover:scale-125 group-focus-within:scale-125',
+				'text-muted-foreground group-focus-within:text-loud-foreground group-hover:text-loud-foreground',
+				className
+			)}
+		>
+			{/* Info Icon SVG */}
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
+				<circle cx="12" cy="12" r="10" />
+				<line x1="12" y1="16" x2="12" y2="12" />
+				<line x1="12" y1="8" x2="12.01" y2="8" />
+			</svg>
+		</div>
+	)
 }
-
-const CTAButton = ({ href, children }: CTAButtonProps) => <Button
-	variant="outline"
-	href={href}
-	className={cn(
-		'w-full',
-		'font-normal uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
-		'hover:bg-foreground/5 focus:bg-foreground/5',
-		'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
-	)}
->{ children }
-</Button>
-
-const DocumentIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
