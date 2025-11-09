@@ -9,19 +9,6 @@ import sitemap from '@astrojs/sitemap';
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
 const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1]; // Extract repo name from "owner/repo"
 
-// Base configuration shared by both environments
-const baseConfig = {
-  vite: {
-    plugins: [tailwindcss()],
-    resolve: {
-      alias: process.env.NODE_ENV === 'production' ? {
-        "react-dom/server": "react-dom/server.edge"
-      } : undefined
-    }
-  },
-  integrations: [react(), sitemap()]
-};
-
 // GitHub Pages specific configuration
 const gitHubPagesConfig = {
   site: 'https://augur.net',
@@ -42,6 +29,14 @@ const cloudflareConfig = {
 
 // https://astro.build/config
 export default defineConfig({
-  ...baseConfig,
+  vite: {
+    plugins: [tailwindcss()],
+    resolve: {
+      alias: process.env.NODE_ENV === 'production' ? {
+        "react-dom/server": "react-dom/server.edge"
+      } : undefined
+    }
+  },
+  integrations: [react(), sitemap()],
   ...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig)
 });
