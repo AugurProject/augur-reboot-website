@@ -5,13 +5,13 @@ export interface GaugeData {
 }
 
 export interface RiskLevel {
-	level: 'None' | 'Low' | 'Medium' | 'High' | 'Extreme'
+	level: 'Normal' | 'Low' | 'Medium' | 'High' | 'Extreme'
 }
 
 export interface ForkRiskData {
 	timestamp: string
 	blockNumber?: number
-	riskLevel: 'none' | 'low' | 'medium' | 'high' | 'extreme' | 'unknown'
+	riskLevel: 'normal' | 'low' | 'medium' | 'high' | 'extreme' | 'unknown'
 	riskPercentage: number
 	metrics: {
 		largestDisputeBond: number

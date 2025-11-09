@@ -110,7 +110,7 @@ export const ForkDataProvider = ({
 
 		switch (data.riskLevel) {
 			case 'none':
-				level = 'None'
+				level = 'Normal'
 				break
 			case 'low':
 				level = 'Low'
@@ -125,7 +125,7 @@ export const ForkDataProvider = ({
 				level = 'Extreme'
 				break
 			default:
-				level = 'None'
+				level = 'Normal'
 		}
 
 		return { level }

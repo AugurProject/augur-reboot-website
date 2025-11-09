@@ -87,7 +87,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	
 	// Determine risk level based on actual fork threshold percentage
 	if (forkThresholdPercent === 0) {
-		riskLevel = 'none'
+		riskLevel = 'normal'
 	} else if (forkThresholdPercent < 10) {
 		riskLevel = 'low'
 	} else if (forkThresholdPercent < 25) {

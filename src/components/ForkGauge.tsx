@@ -52,7 +52,7 @@ export const ForkGauge = ({
 	}
 
 	const getRiskLevel = (forkThresholdPercent: number): string => {
-		if (forkThresholdPercent === 0) return 'NONE'
+		if (forkThresholdPercent === 0) return 'NORMAL'
 		if (forkThresholdPercent < 10) return 'LOW'
 		if (forkThresholdPercent < 25) return 'MEDIUM'
 		if (forkThresholdPercent < 75) return 'HIGH'
