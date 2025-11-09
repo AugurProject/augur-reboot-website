@@ -5,7 +5,7 @@ export interface GaugeData {
 }
 
 export interface RiskLevel {
-	level: 'Normal' | 'Low' | 'Medium' | 'High' | 'Extreme'
+	level: 'No Risk' | 'Low' | 'Medium' | 'High' | 'Extreme'
 }
 
 export interface ForkRiskData {
