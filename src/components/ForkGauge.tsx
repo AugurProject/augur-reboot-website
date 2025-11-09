@@ -21,13 +21,13 @@ export const ForkGauge = ({
 			// Linear scaling from 0% to 25%
 			return MIN_VISUAL_FILL + ((forkThresholdPercent / 10) * (25 - MIN_VISUAL_FILL))
 		} else if (forkThresholdPercent <= 25) {
-			// 10-25% fork threshold = 25-50% gauge (Moderate risk zone)
+			// 10-25% fork threshold = 25-50% gauge (Medium risk zone)
 			return 25 + ((forkThresholdPercent - 10) / 15) * 25
 		} else if (forkThresholdPercent <= 75) {
 			// 25-75% fork threshold = 50-90% gauge (High risk zone)
 			return 50 + ((forkThresholdPercent - 25) / 50) * 40
 		} else {
-			// 75%+ fork threshold = 90-100% gauge (Critical risk zone)
+			// 75%+ fork threshold = 90-100% gauge (Extreme risk zone)
 			return Math.min(100, 90 + ((forkThresholdPercent - 75) / 25) * 10)
 		}
 	}
@@ -52,11 +52,11 @@ export const ForkGauge = ({
 	}
 
 	const getRiskLevel = (forkThresholdPercent: number): string => {
-		if (forkThresholdPercent === 0) return 'NORMAL'
+		if (forkThresholdPercent === 0) return 'NONE'
 		if (forkThresholdPercent < 10) return 'LOW'
-		if (forkThresholdPercent < 25) return 'MODERATE'
+		if (forkThresholdPercent < 25) return 'MEDIUM'
 		if (forkThresholdPercent < 75) return 'HIGH'
-		return 'ELEVATED'
+		return 'EXTREME'
 	}
 
 	const getRiskColor = (forkThresholdPercent: number): string => {

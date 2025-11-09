@@ -26,7 +26,6 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 
 	let largestDisputeBond: number
 	let riskLevel: ForkRiskLevel
-	let riskPercentage: number
 	let activeDisputes: number
 	
 	// Generate dispute bond scenarios aligned with risk levels
@@ -43,7 +42,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			break
 			
 		case DisputeBondScenario.MODERATE_RISK:
-			// Moderate risk bonds: 10-25% of threshold (27500-68750 REP)
+			// Medium risk bonds: 10-25% of threshold (27500-68750 REP)
 			largestDisputeBond = 27500 + Math.floor(Math.random() * 41250)
 			activeDisputes = Math.floor(Math.random() * 4) + 2 // 2-5 disputes
 			break
@@ -55,7 +54,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			break
 			
 		case DisputeBondScenario.ELEVATED_RISK:
-			// Elevated risk bonds: 75-98% of threshold (206250-269500 REP)
+			// Extreme risk bonds: 75-98% of threshold (206250-269500 REP)
 			largestDisputeBond = 206250 + Math.floor(Math.random() * 63250)
 			activeDisputes = Math.floor(Math.random() * 8) + 4 // 4-11 disputes
 			break
@@ -88,20 +87,20 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	
 	// Determine risk level based on actual fork threshold percentage
 	if (forkThresholdPercent === 0) {
-		riskLevel = 'normal'
+		riskLevel = 'none'
 	} else if (forkThresholdPercent < 10) {
 		riskLevel = 'low'
 	} else if (forkThresholdPercent < 25) {
-		riskLevel = 'moderate'
+		riskLevel = 'medium'
 	} else if (forkThresholdPercent < 75) {
 		riskLevel = 'high'
 	} else {
-		riskLevel = 'elevated'
+		riskLevel = 'extreme'
 	}
 	
 	// Use the actual calculated percentage
-	riskPercentage = forkThresholdPercent
-	
+	const riskPercentage = forkThresholdPercent
+
 	return {
 		timestamp: now.toISOString(),
 		blockNumber: Math.floor(Math.random() * 1000000) + 20000000,

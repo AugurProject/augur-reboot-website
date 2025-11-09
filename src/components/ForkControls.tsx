@@ -61,40 +61,40 @@ export const ForkControls = (): React.JSX.Element | null => {
 			
 			<div className="space-y-2">
 				<div className="text-xs text-muted-foreground mb-2">Generate Scenarios:</div>
-				
+
 				<button
 					onClick={() => generateScenario(DisputeBondScenario.NO_DISPUTES)}
 					className="block w-full text-left text-xs bg-green-900/20 hover:bg-green-900/30 px-2 py-1 rounded"
 				>
-					No Disputes (Steady)
+					None (0%)
 				</button>
-				
+
 				<button
 					onClick={() => generateScenario(DisputeBondScenario.LOW_RISK)}
 					className="block w-full text-left text-xs bg-yellow-900/20 hover:bg-yellow-900/30 px-2 py-1 rounded"
 				>
 					Low Risk (1-10%)
 				</button>
-				
+
 				<button
 					onClick={() => generateScenario(DisputeBondScenario.MODERATE_RISK)}
 					className="block w-full text-left text-xs bg-orange-900/20 hover:bg-orange-900/30 px-2 py-1 rounded"
 				>
-					Moderate Risk (10-25%)
+					Medium Risk (10-25%)
 				</button>
-				
+
 				<button
 					onClick={() => generateScenario(DisputeBondScenario.HIGH_RISK)}
 					className="block w-full text-left text-xs bg-red-900/20 hover:bg-red-900/30 px-2 py-1 rounded"
 				>
 					High Risk (25-75%)
 				</button>
-				
+
 				<button
 					onClick={() => generateScenario(DisputeBondScenario.ELEVATED_RISK)}
 					className="block w-full text-left text-xs bg-red-800/30 hover:bg-red-800/40 px-2 py-1 rounded animate-pulse"
 				>
-					Elevated Risk (75%+)
+					Extreme Risk (75%+)
 				</button>
 			</div>
 			
