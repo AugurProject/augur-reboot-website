@@ -1,0 +1,22 @@
+---
+/**
+ * ProseCard Component
+ *
+ * A styled card component for prose content with border and padding.
+ * Used in learning/documentation pages to highlight important content sections.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div class={`border border-foreground/30 px-6 mb-6 ${className}`}>
+  <slot />
+</div>
+
+<style>
+  /* ProseCard specific styling can be added here if needed */
+</style>

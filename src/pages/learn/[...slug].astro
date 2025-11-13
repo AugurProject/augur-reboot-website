@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import LearnLayout from '../../layouts/LearnLayout.astro';
+
+export const prerender = true;
+
+interface Props {
+  entry: any;
+}
+
+export async function getStaticPaths() {
+  const learnCollection = await getCollection('learn');
+
+  return learnCollection.map((entry) => {
+    // Create slug from the entry's file path
+    const slug = entry.slug;
+
+    return {
+      params: { slug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { title, description } = entry.data;
+---
+
+<LearnLayout title={title} description={description}>
+  <Content />
+</LearnLayout>
