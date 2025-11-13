@@ -52,7 +52,7 @@ export default function LearnNavigation({
 					{/* Left: Jump to Topic */}
 					<button
 						onClick={() => setIsExpanded(!isExpanded)}
-						className={`text-xs font-light tracking-widest uppercase transition-colors cursor-pointer ${
+						className={`text-sm font-light tracking-widest uppercase transition-colors cursor-pointer ${
 							isExpanded
 								? 'text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow'
 								: 'text-muted-foreground hover:text-primary'
@@ -65,12 +65,12 @@ export default function LearnNavigation({
 					{nextTopic ? (
 						<a
 							href={nextTopic.path}
-							className="text-xs font-light tracking-widest text-muted-foreground hover:text-primary transition-colors"
+							className="text-sm font-light tracking-widest text-muted-foreground hover:text-primary transition-colors"
 						>
 							UP NEXT: {nextTopic.title}
 						</a>
 					) : (
-						<span className="text-xs font-light tracking-widest text-muted-foreground">
+						<span className="text-sm font-light tracking-widest text-muted-foreground">
 							END OF TOPICS
 						</span>
 					)}

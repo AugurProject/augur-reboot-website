@@ -4,6 +4,7 @@ import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import mdx from '@astrojs/mdx';
 
 // Check if building in GitHub Actions (for GitHub Pages)
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
@@ -36,6 +37,6 @@ export default defineConfig({
       } : undefined
     }
   },
-  integrations: [react(), sitemap()],
+  integrations: [react(), sitemap(), mdx()],
   ...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig)
 });
