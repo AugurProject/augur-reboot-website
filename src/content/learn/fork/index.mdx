@@ -1,0 +1,76 @@
+---
+title: "What is a Fork?"
+description: "Learn about Augur protocol forks, how they work, and why fork risk matters."
+---
+
+import ProseCard from '../../../components/ProseCard.astro'
+
+> **New to Augur?** This guide assumes some familiarity with prediction markets. If you're completely new, start with [Augur basics](/) first.
+
+# What is a Fork?
+
+**TL;DR** — A fork is Augur's emergency mechanism when the community can't agree on a market outcome. It's rare, but important to monitor.
+
+A fork happens when a severe disagreement about a market outcome escalates through the dispute system. When disputes get expensive and serious enough (bond reaches 275,000 REP), the protocol splits into two branches and REP holders vote on which version is correct.
+
+## Key Terms
+
+<ProseCard>
+**REP** — Augur's governance token. Used to report market outcomes and settle disputes.
+
+**Dispute** — A challenge to a market outcome. When someone disagrees with the current outcome, they post a bond to dispute it.
+
+**Bond** — REP locked up to challenge a market outcome. Bonds grow larger with each dispute round.
+
+**Fork Threshold** — 275,000 REP. When the largest active dispute bond hits this amount, a fork is triggered.
+</ProseCard>
+
+## Why Forks Matter
+
+Forks are Augur's ultimate security mechanism. They ensure that:
+
+- **No single entity controls outcomes** — Disputes can always be escalated to the community
+- **REP holders govern** — When serious disagreements arise, the community votes on what's correct
+- **Bad actors face consequences** — Invalid outcomes get rejected by the network
+
+## How to Monitor Fork Risk
+
+The fork meter shows **how close we are to a fork** by tracking the largest dispute bond:
+
+<ProseCard>
+<p class="text-center mb-3">
+  <strong class="text-loud-foreground uppercase">The Formula</strong>
+</p>
+<p class="text-center text-loud-foreground font-mono text-lg">
+  (Largest Dispute Bond ÷ 275,000 REP) × 100 = Risk %
+</p>
+</ProseCard>
+
+The percentage tells you how much of the way to fork we are:
+
+<ProseCard>
+| LEVEL | RANGE | WHAT IT MEANS |
+|-------|-------|--------------|
+| NO RISK | 0% | No disputes. Normal trading. |
+| LOW | 0-10% | Early disputes. Fork unlikely. |
+| MEDIUM | 10-25% | Serious disputes. Monitor closely. |
+| HIGH | 25-75% | Large bonds active. Fork possible. |
+| EXTREME | 75-100%+ | Fork imminent or triggered. |
+</ProseCard>
+
+## What Happens If a Fork Occurs
+
+When a fork is triggered:
+
+1. **Fork period starts** — 60 days for REP holders to vote
+2. **Markets freeze** — No new trades on disputed markets
+3. **You choose a fork** — Migrate your REP to the branch you believe is correct
+4. **Community votes** — Most REP wins; that fork becomes the new Augur
+5. **Markets settle** — According to the winning fork's outcomes
+
+## Learn More
+
+Ready to dive deeper? Here's what you should know:
+
+- **[How Disputes & Bonds Work](/learn/fork/disputes-and-bonds)** — Understand dispute escalation and why bonds matter
+- **[What To Do at Different Risk Levels](/learn/fork/what-to-do)** — Practical actions for each risk level
