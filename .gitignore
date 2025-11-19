@@ -49,5 +49,8 @@ public/data/fork-risk.json
 # TypeScript build cache
 .tscache/
 
-# LLM
+# git worktrees
+.worktree/
+
+# LLM settings
 .claude/settings.local.json
