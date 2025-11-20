@@ -54,3 +54,4 @@ public/data/fork-risk.json
 
 # LLM settings
 .claude/settings.local.json
+*.tsbuildinfo

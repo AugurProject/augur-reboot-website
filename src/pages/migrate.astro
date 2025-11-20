@@ -1,0 +1,78 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import PageHeading from "../components/PageHeading.astro";
+import CEXExchangeList from "../components/CEXExchangeList.tsx";
+import { withBase } from "../lib/utils";
+---
+
+<Layout
+  title="REPv2 Migration - CEX Support & Status"
+  description="Track REPv2 support across centralized exchanges. Find which CEXs have confirmed support, are in progress, or have acknowledged migration plans."
+  ogType="website"
+  keywords={[
+    "REPv2",
+    "migration",
+    "CEX support",
+    "exchanges",
+    "trading pairs",
+    "augur",
+    "REP token"
+  ]}
+>
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen uppercase">
+    <!-- Top Section: Navigation -->
+    <div class="flex justify-between items-start p-8">
+      <!-- Back Button -->
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autofocus>
+        <Pointer direction="left" animated="auto" />
+        BACK TO HOME
+      </Button>
+
+      <!-- Social Links -->
+      <SocialLinks />
+    </div>
+
+    <!-- Middle Section: Scrollable Content -->
+    <main class="overflow-y-auto px-4 md:px-8 mb-12">
+      <div class="max-w-screen-xl mx-auto">
+        <PageHeading text="REPv2 Migration Status" />
+
+        <div class="max-w-4xl mx-auto">
+          <p class="text-center text-foreground mb-8 mx-auto max-w-2xl">
+            Track centralized exchange support for <span class="text-loud-foreground">REPv2 token migration</span>. Use the search and filter tools below to find exchange support status and available trading pairs.
+          </p>
+
+          <div class="mb-8">
+            <CEXExchangeList client:load />
+          </div>
+
+          <div class="mt-12 p-6 border border-primary/30 bg-green-900/10">
+            <h3 class="text-loud-foreground font-bold mb-3 uppercase">Status Legend</h3>
+            <div class="space-y-2 text-sm text-foreground">
+              <div>
+                <span class="text-loud-foreground font-bold">Confirmed & Active:</span> Exchange has confirmed support and active REPv2 trading pairs
+              </div>
+              <div>
+                <span class="text-loud-foreground font-bold">Announced:</span> Exchange has announced support for REPv2 migration
+              </div>
+              <div>
+                <span class="text-loud-foreground font-bold">Acknowledged:</span> Exchange has acknowledged migration and is evaluating integration
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 text-center text-muted-foreground text-sm">
+            <p>For questions or updates about exchange support, join the <a href="https://discord.gg/augur" target="_blank" rel="noopener noreferrer" class="text-loud-foreground hover:fx-glow">Augur Discord</a></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Section: Footer -->
+    <Footer />
+  </div>
+</Layout>

@@ -1,0 +1,226 @@
+{
+  "exchanges": [
+    {
+      "id": "kraken",
+      "name": "Kraken",
+      "domain": "kraken.com",
+      "tradingPairs": [
+        { "pair": "REPV2/USD", "url": "https://www.kraken.com/prices/augur-v2" },
+        { "pair": "REPV2/EUR", "url": "https://www.kraken.com/prices/augur-v2" },
+        { "pair": "REPV2/BTC", "url": "https://www.kraken.com/prices/augur-v2" },
+        { "pair": "REPV2/ETH", "url": "https://www.kraken.com/prices/augur-v2" }
+      ],
+      "status": "confirmed",
+      "notes": "One of the few major tier-1 exchanges still supporting active REP trading"
+    },
+    {
+      "id": "gate-io",
+      "name": "Gate.io",
+      "domain": "gate.io",
+      "tradingPairs": [
+        { "pair": "REP/USDT", "url": "https://www.gate.io/trade/REP_USDT" }
+      ],
+      "status": "confirmed",
+      "notes": "Primary market for REP trading globally with $20k+ daily volume"
+    },
+    {
+      "id": "hitbtc",
+      "name": "HitBTC",
+      "domain": "hitbtc.com",
+      "tradingPairs": [
+        { "pair": "REP/USDT", "url": "https://hitbtc.com/rep-to-usdt" },
+        { "pair": "REP/BTC", "url": "https://hitbtc.com/rep-to-btc" },
+        { "pair": "REP/ETH", "url": "https://hitbtc.com/rep-to-eth" }
+      ],
+      "status": "confirmed",
+      "notes": "Active REP trading with multiple trading pairs"
+    },
+    {
+      "id": "indodax",
+      "name": "Indodax",
+      "domain": "indodax.com",
+      "tradingPairs": [
+        { "pair": "REP/IDR", "url": "https://indodax.com/market/REPIDR" }
+      ],
+      "status": "confirmed",
+      "notes": "Indonesian exchange supporting REP in local currency"
+    },
+    {
+      "id": "coinfield",
+      "name": "CoinField",
+      "domain": "coinfield.com",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed August 2023 (exit scam). Users unable to access funds. August 2024: tribunal found securities violations, issued $2.4M penalty and permanent ban. WARNING: Do not attempt to use this exchange",
+      "closureDate": "2023-08-01"
+    },
+    {
+      "id": "uniswap-v2",
+      "name": "Uniswap v2",
+      "domain": "uniswap.org",
+      "tradingPairs": [
+        { "pair": "REPv2/DAI", "url": "https://app.uniswap.org/#/swap?inputCurrency=0x221657776846890989a759ba2973e427dff5c9bb&outputCurrency=0x6b175474e89094c44da98b954eedeac495271d0f" },
+        { "pair": "REPv2/ETH", "url": "https://app.uniswap.org/#/swap?inputCurrency=0x221657776846890989a759ba2973e427dff5c9bb&outputCurrency=0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2" }
+      ],
+      "status": "confirmed",
+      "notes": "Decentralized exchange with liquidity pools seeded by Augur Foundation (July 2025)"
+    },
+    {
+      "id": "binance",
+      "name": "Binance",
+      "domain": "binance.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - REP trading ceased December 22, 2022. Binance delisted REP due to not meeting 'high level of standard'",
+      "delistingDate": "2022-12-22",
+      "links": [
+        { "text": "Delisting Announcement", "url": "https://www.binance.com/en/support/announcement/binance-will-delist-mith-tribe-rep-and-btcst-on-2022-12-22-35a4169422154c838f012331f5f4b425" }
+      ]
+    },
+    {
+      "id": "binance-us",
+      "name": "Binance US",
+      "domain": "binance.us",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - REP trading ceased November 15, 2022 on Binance US (before main Binance)",
+      "delistingDate": "2022-11-15",
+      "links": [
+        { "text": "Delisting Notice", "url": "https://support.binance.us/en/articles/9843612-binance-us-will-delist-augur-rep-on-november-15-2022" }
+      ]
+    },
+    {
+      "id": "bitfinex",
+      "name": "BitFinex",
+      "domain": "bitfinex.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - REP2 trading ceased November 7, 2023",
+      "delistingDate": "2023-11-07",
+      "links": [
+        { "text": "Delisting Information", "url": "https://support.bitfinex.com/hc/en-us/articles/360000251313-Augur-REP2-Delisted" }
+      ]
+    },
+    {
+      "id": "bithumb",
+      "name": "Bithumb",
+      "domain": "bithumb.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - Part of coordinated Korean exchange delisting on July 13, 2023. Reason cited: project's abnormal operation",
+      "delistingDate": "2023-07-13"
+    },
+    {
+      "id": "upbit",
+      "name": "Upbit",
+      "domain": "upbit.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - South Korea's largest exchange by volume delisted REP on July 13, 2023 (coordinated DAXA delisting)",
+      "delistingDate": "2023-07-13"
+    },
+    {
+      "id": "coinbase",
+      "name": "Coinbase",
+      "domain": "coinbase.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Delisted** - Trading suspended March 29, 2023 after routine inspection. REP failed to meet Coinbase listing standards",
+      "delistingDate": "2023-03-29",
+      "links": [
+        { "text": "Delisting Announcement", "url": "https://x.com/CoinbaseAssets/status/1636083451693613060" }
+      ]
+    },
+    {
+      "id": "poloniex",
+      "name": "Poloniex",
+      "domain": "poloniex.com",
+      "tradingPairs": [],
+      "links": [
+        { "text": "REP Trading (Non-US)", "url": "https://www.poloniex.com/price/Augur-REP" }
+      ],
+      "status": "announced",
+      "notes": "⚠️ **Restricted** - REP trading available for international customers only. US customers have been restricted from REP trading since May 29, 2019 due to regulatory uncertainty"
+    },
+    {
+      "id": "exrates",
+      "name": "Exrates",
+      "domain": "exrates.me",
+      "tradingPairs": [],
+      "links": [
+        { "text": "Exchange Review & Risk Assessment", "url": "https://www.cryptowisser.com/exchange/exrates/" }
+      ],
+      "status": "announced",
+      "notes": "⚠️ **High Risk** - Exchange is operating with serious concerns: $0 24h volume, 'D' rating (Poor), user complaints about frozen accounts, non-responsive support, and scam allegations. Not recommended for trading"
+    },
+    {
+      "id": "bitmart",
+      "name": "BitMart",
+      "domain": "bitmart.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Needs Verification** - Status of REP trading uncertain. Exchange lists 1,700+ cryptocurrencies but REP availability not confirmed in current data"
+    },
+    {
+      "id": "coinex",
+      "name": "CoinEx",
+      "domain": "coinex.com",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Needs Verification** - Supported REP to REPv2 token swap in July 2020, but current REP trading status needs manual confirmation"
+    },
+    {
+      "id": "binance-kr",
+      "name": "Binance KR",
+      "domain": "binance.kr",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed January 2021 (8 months after launch in April 2020) due to low trading volume and tight liquidity. South Korean regulatory changes requiring independent order books contributed to closure",
+      "closureDate": "2021-01-29"
+    },
+    {
+      "id": "bittrex",
+      "name": "Bittrex",
+      "domain": "bittrex.com",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed December 4, 2023. Bittrex US closed April 30, 2023. Filed for Chapter 11 bankruptcy after SEC charges. SEC reached $24M settlement in August 2023",
+      "closureDate": "2023-12-04"
+    },
+    {
+      "id": "crex24",
+      "name": "Crex24",
+      "domain": "crex24.com",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed May 29, 2025. Website went offline and all trading ceased",
+      "closureDate": "2025-05-29"
+    },
+    {
+      "id": "coinbene",
+      "name": "CoinBene",
+      "domain": "coinbene.com",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed. Initially shut down Chinese operations on October 26, 2021, then closed all services in response to global regulatory requirements",
+      "closureDate": "2021-10-26"
+    },
+    {
+      "id": "folgory",
+      "name": "Folgory",
+      "domain": "folgory.com",
+      "tradingPairs": [],
+      "status": "closed",
+      "notes": "Exchange permanently closed April 18, 2025. Historical issues: withdrawal processing failures, frozen accounts, user scam allegations. WARNING: If you have funds on this exchange, seek regulatory assistance",
+      "closureDate": "2025-04-18"
+    },
+    {
+      "id": "balancer",
+      "name": "Balancer",
+      "domain": "balancer.fi",
+      "tradingPairs": [],
+      "status": "acknowledged",
+      "notes": "⚠️ **Needs Verification** - Decentralized exchange. Historical REP pools existed (2021+), but current pool status and liquidity are unclear. Check balancer.fi directly for active pools"
+    }
+  ]
+}
