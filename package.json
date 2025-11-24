@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.0",
+    "@astrojs/mdx": "^4.3.10",
     "@astrojs/react": "^4.3.0",
     "@astrojs/sitemap": "^3.6.0",
     "@nanostores/persistent": "^1.1.0",
