@@ -61,7 +61,7 @@ Examples:
   ./scripts/worktree/main.sh feature/update-impl               # Create new branch from main
   ./scripts/worktree/main.sh feature/auth --base develop       # Create new branch from develop
   ./scripts/worktree/main.sh origin/main                       # Create from remote branch
-  ./scripts/worktree/main.sh review/pr-abc123                  # Auto-strips namespace prefixes
+  ./scripts/worktree/main.sh claude/review-abc123              # Auto-strips 'claude/' prefix
   ./scripts/worktree/main.sh feature/ui --skip-init            # Create without initialization (faster)
   ./scripts/worktree/main.sh review-docs                       # Re-run init on existing worktree
   ./scripts/worktree/main.sh list                              # Show all worktrees
@@ -69,7 +69,7 @@ Examples:
 
 Notes:
   - Worktrees are created in .worktree/ directory
-  - Directory names automatically strip 'origin/' and namespace prefixes
+  - Directory names automatically strip 'origin/', 'claude/', and other prefixes
   - Forward slashes in branch names are converted to hyphens
   - The script ensures .worktree/ is in .gitignore
   - Initialization includes: npm install, database migrations (if applicable)
@@ -118,14 +118,17 @@ ensure_worktree_dir() {
 }
 
 # Normalize branch name to directory name
-# Strips: origin/, remotes/origin/, and other namespace prefixes
+# Strips: origin/, remotes/origin/, claude/, remotes/claude/
 # Converts slashes to hyphens
 normalize_branch_name() {
     local branch="$1"
 
-    # Strip remote prefixes (e.g., origin/, remotes/origin/)
+    # Strip remote prefixes
     branch="${branch#remotes/}"
     branch="${branch#origin/}"
+    branch="${branch#claude/}"
+    branch="${branch#remotes/origin/}"
+    branch="${branch#remotes/claude/}"
 
     # Convert slashes to hyphens for directory name
     branch="${branch//\//-}"
@@ -136,48 +139,13 @@ normalize_branch_name() {
 # Check if branch exists (local or remote)
 branch_exists() {
     local branch="$1"
-
-    # Check if it's a local branch
-    if git show-ref --verify --quiet "refs/heads/$branch"; then
-        return 0
-    fi
-
-    # Check if it's a remote branch
-    if git show-ref --verify --quiet "refs/remotes/$branch"; then
-        return 0
-    fi
-
-    # Try with origin/ prefix
-    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-        return 0
-    fi
-
-    return 1
+    git rev-parse --verify "$branch" >/dev/null 2>&1
 }
 
 # Get the full branch reference
 get_branch_ref() {
     local branch="$1"
-
-    # Check local first
-    if git show-ref --verify --quiet "refs/heads/$branch"; then
-        echo "$branch"
-        return 0
-    fi
-
-    # Check remote
-    if git show-ref --verify --quiet "refs/remotes/$branch"; then
-        echo "$branch"
-        return 0
-    fi
-
-    # Try with origin/ prefix
-    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-        echo "origin/$branch"
-        return 0
-    fi
-
-    echo "$branch"
+    git rev-parse --verify "$branch" >/dev/null 2>&1 && echo "$branch" || echo ""
 }
 
 # Initialize worktree (npm install, database setup)
@@ -257,15 +225,107 @@ create_worktree() {
         ensure_gitignore
         ensure_worktree_dir
 
-        # Check if branch exists
-        if branch_exists "$branch"; then
-            # Branch exists - use it
-            branch_ref=$(get_branch_ref "$branch")
-            info "Using existing branch: $branch"
+        # Fetch latest remote branches to ensure we have up-to-date refs
+        info "Fetching latest remote branches..."
+        git fetch --quiet origin || warning "Failed to fetch remote branches (continuing anyway)"
+
+        # Strategy: Check remote first, then local, then create new
+        # This ensures we always prefer remote branches over local ones
+        local local_branch_name="$dir_name"
+        local found_branch=""
+        local branch_type=""
+
+        # Step 1: Check if branch exists on remote (origin)
+        # Handle different input formats:
+        # - "claude/foo" -> check "origin/claude/foo"
+        # - "origin/foo" -> check "origin/foo"
+        # - "features/bar" -> check "origin/features/bar"
+        local remote_candidate=""
+        local clean_branch_name="$branch"
+
+        # Build remote candidate first (before stripping prefixes)
+        if [[ "$branch" == origin/* ]]; then
+            remote_candidate="$branch"
+            clean_branch_name="${branch#origin/}"
+        elif [[ "$branch" == remotes/origin/* ]]; then
+            remote_candidate="${branch#remotes/}"
+            clean_branch_name="${branch#remotes/origin/}"
+        else
+            # For anything else (claude/foo, feature/bar, etc.), prepend origin/
+            remote_candidate="origin/$branch"
+            clean_branch_name="$branch"
+        fi
+
+        if branch_exists "$remote_candidate"; then
+            found_branch="$remote_candidate"
+            branch_type="remote"
+            info "Found remote branch: $remote_candidate"
+        # Step 2: Check if local branch exists
+        elif branch_exists "$clean_branch_name"; then
+            found_branch="$clean_branch_name"
+            branch_type="local"
+            info "Found local branch: $clean_branch_name"
+        # Step 3: Branch doesn't exist - will create new from base
+        else
+            branch_type="new"
+            info "Branch '$clean_branch_name' not found on remote or locally"
+            info "Will create new branch from base"
+        fi
+
+        # Handle based on what we found
+        if [ "$branch_type" = "remote" ]; then
+            # Remote branch exists - create local tracking branch
+            # Use clean branch name for local branch (strips origin/ prefix)
+            local tracking_branch_name="${found_branch#origin/}"
+
+            # Check if local tracking branch already exists
+            if git rev-parse --verify "$tracking_branch_name" >/dev/null 2>&1; then
+                info "Using existing local branch: $tracking_branch_name"
+                # Just checkout the existing local branch
+                if git worktree add "$worktree_path" "$tracking_branch_name"; then
+                    # Check if tracking is already configured
+                    local upstream=$(cd "$worktree_path" && git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo "")
+                    if [ -z "$upstream" ]; then
+                        info "Setting up tracking: $tracking_branch_name -> $found_branch"
+                        (cd "$worktree_path" && git branch --set-upstream-to="$found_branch")
+                    fi
+                    success "Worktree created successfully!"
+                    echo ""
+                    info "Branch: $tracking_branch_name (tracking $found_branch)"
+                    info "Location: $worktree_path"
+                else
+                    error "Failed to create worktree"
+                    exit 1
+                fi
+            else
+                # Create new local tracking branch
+                info "Creating local tracking branch: $tracking_branch_name -> $found_branch"
+                if git worktree add -b "$tracking_branch_name" "$worktree_path" "$found_branch"; then
+                    # Set up tracking relationship
+                    (cd "$worktree_path" && git branch --set-upstream-to="$found_branch")
+                    success "Worktree created successfully!"
+                    echo ""
+                    info "Branch: $tracking_branch_name (tracking $found_branch)"
+                    info "Location: $worktree_path"
+                else
+                    error "Failed to create worktree"
+                    exit 1
+                fi
+            fi
+        elif [ "$branch_type" = "local" ]; then
+            # Local branch exists - just check it out
+            info "Using existing local branch: $found_branch"
+            if git worktree add "$worktree_path" "$found_branch"; then
+                success "Worktree created successfully!"
+                echo ""
+                info "Branch: $found_branch"
+                info "Location: $worktree_path"
+            else
+                error "Failed to create worktree"
+                exit 1
+            fi
         else
             # Branch doesn't exist - create new from base branch
-            is_new_branch=true
-
             # Use provided base branch or default to main
             if [ -z "$base_branch" ]; then
                 base_branch="$DEFAULT_BASE_BRANCH"
@@ -280,25 +340,19 @@ create_worktree() {
             fi
 
             branch_ref=$(get_branch_ref "$base_branch")
-            info "Creating new branch from: $base_branch"
-        fi
+            info "Creating new branch '$clean_branch_name' from: $base_branch"
 
-        # Create the worktree with a local tracking branch
-        info "Creating worktree at: $WORKTREE_DIR/$dir_name"
-        # Use -b to create local tracking branch with the normalized name
-        # This prevents detached HEAD state and creates a proper branch
-        if git worktree add -b "$dir_name" "$worktree_path" "$branch_ref"; then
-            success "Worktree created successfully!"
-            echo ""
-            if [ "$is_new_branch" = true ]; then
-                info "Branch: $dir_name (new branch from $base_branch)"
+            # Create the worktree with a new local branch using clean name
+            info "Creating worktree at: $WORKTREE_DIR/$dir_name"
+            if git worktree add -b "$clean_branch_name" "$worktree_path" "$branch_ref"; then
+                success "Worktree created successfully!"
+                echo ""
+                info "Branch: $clean_branch_name (new branch from $base_branch)"
+                info "Location: $worktree_path"
             else
-                info "Branch: $dir_name (tracking $branch_ref)"
+                error "Failed to create worktree"
+                exit 1
             fi
-            info "Location: $worktree_path"
-        else
-            error "Failed to create worktree"
-            exit 1
         fi
     fi
 
@@ -313,7 +367,6 @@ create_worktree() {
     info "  cd $WORKTREE_DIR/$dir_name"
     info "  npm run dev"
     echo ""
-    list_worktrees
 }
 
 # List all worktrees
@@ -336,10 +389,25 @@ remove_worktree() {
         exit 1
     fi
 
+    # Get the branch name for this worktree
+    local branch_name
+    branch_name=$(cd "$worktree_path" && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
     info "Removing worktree: $WORKTREE_DIR/$name"
 
     if git worktree remove "$worktree_path" --force; then
         success "Worktree removed successfully!"
+
+        # Delete the local branch if it exists
+        if [ -n "$branch_name" ] && [ "$branch_name" != "HEAD" ]; then
+            info "Deleting local branch: $branch_name"
+            if git branch -D "$branch_name" 2>/dev/null; then
+                success "Local branch '$branch_name' deleted"
+            else
+                warning "Could not delete branch '$branch_name' (may not exist or already deleted)"
+            fi
+        fi
+
         echo ""
         list_worktrees
     else
