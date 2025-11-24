@@ -1,7 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
+import { useStore } from '@nanostores/react';
 import cexData from '../data/cex-support.json';
 import { ClippedCardGradient as ClippedCard } from './card-clipped';
 import { BookIcon, TokenIcon, ExternalLinkIcon } from './ui/icons';
+import { $cexFilterStore, cexFilterActions, type CEXFilterType } from '../stores/cexFilterStore';
+import { CEXDataSchema } from '../schemas/cexData';
 
 export type Status = 'confirmed' | 'announced' | 'acknowledged' | 'closed';
 
@@ -140,24 +143,30 @@ function ExchangeCard({ exchange }: ExchangeCardProps) {
 }
 
 export default function CEXExchangeList() {
-  const [inputValue, setInputValue] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [exitingCards, setExitingCards] = useState<Set<string>>(new Set());
+  const filterState = useStore($cexFilterStore);
+  const [inputValue, setInputValue] = React.useState('');
   const prevFilteredRef = useRef<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSearchQuery(inputValue);
+      cexFilterActions.setSearchQuery(inputValue);
     }, 300);
 
     return () => clearTimeout(timer);
   }, [inputValue]);
 
-  const exchanges: Exchange[] = (cexData.exchanges as unknown as Array<{ id: string; name: string; domain?: string; tradingPairs: TradingPair[]; links?: Link[]; status: string; notes?: string; delistingDate?: string; closureDate?: string }>).map((ex): Exchange => {
-    const status = ex.status as Status;
-    if (status === 'closed') {
+  // Validate and parse the CEX data with Zod at runtime
+  let validatedExchanges: typeof cexData.exchanges = [];
+  try {
+    const validatedData = CEXDataSchema.parse(cexData);
+    validatedExchanges = validatedData.exchanges as typeof cexData.exchanges;
+  } catch (error) {
+    console.error('Invalid CEX data format:', error);
+  }
+
+  const exchanges: Exchange[] = validatedExchanges.map((ex): Exchange => {
+    if (ex.status === 'closed') {
       return {
         id: ex.id,
         name: ex.name,
@@ -167,7 +176,7 @@ export default function CEXExchangeList() {
         notes: ex.notes,
         closureDate: ex.closureDate,
       };
-    } else if (status === 'acknowledged') {
+    } else if (ex.status === 'acknowledged') {
       return {
         id: ex.id,
         name: ex.name,
@@ -177,7 +186,7 @@ export default function CEXExchangeList() {
         notes: ex.notes,
         delistingDate: ex.delistingDate,
       };
-    } else if (status === 'announced') {
+    } else if (ex.status === 'announced') {
       return {
         id: ex.id,
         name: ex.name,
@@ -188,30 +197,31 @@ export default function CEXExchangeList() {
         notes: ex.notes,
       };
     }
+    // confirmed
     return {
       id: ex.id,
       name: ex.name,
       domain: ex.domain,
       status: 'confirmed',
-      tradingPairs: ex.tradingPairs || [],
+      tradingPairs: ex.tradingPairs,
       notes: ex.notes,
     };
   });
 
-  const statusOrder = { confirmed: 0, announced: 1, acknowledged: 2 };
+  const statusOrder: Record<Exclude<Status, 'closed'>, number> = { confirmed: 0, announced: 1, acknowledged: 2 };
 
   const filtered = useMemo(() => {
-    const results = exchanges.filter((exchange) => {
+    const results: Exclude<Exchange, ClosedExchange>[] = exchanges.filter((exchange) => {
       // Always hide closed exchanges from UI display
       if (exchange.status === 'closed') return false;
-      const matchesSearch = exchange.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesFilter = activeFilter === 'all' || exchange.status === activeFilter;
+      const matchesSearch = exchange.name.toLowerCase().includes(filterState.searchQuery.toLowerCase());
+      const matchesFilter = filterState.activeFilter === 'all' || exchange.status === filterState.activeFilter;
       return matchesSearch && matchesFilter;
-    });
+    }) as Exclude<Exchange, ClosedExchange>[];
 
     // Sort by status order (confirmed first, then announced, then acknowledged)
     return results.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
-  }, [searchQuery, activeFilter]);
+  }, [filterState.searchQuery, filterState.activeFilter]);
 
   // Track exiting cards and clear after animation
   useEffect(() => {
@@ -221,9 +231,9 @@ export default function CEXExchangeList() {
     const leaving = previousIds.filter(id => !currentIds.includes(id));
 
     if (leaving.length > 0) {
-      setExitingCards(new Set(leaving));
+      cexFilterActions.setExitingCards(new Set(leaving));
       const timer = setTimeout(() => {
-        setExitingCards(new Set());
+        cexFilterActions.setExitingCards(new Set());
       }, 300); // Match animation duration
       return () => clearTimeout(timer);
     }
@@ -232,7 +242,7 @@ export default function CEXExchangeList() {
   }, [filtered]);
 
   const visibleExchanges = exchanges.filter((e) => e.status !== 'closed');
-  const countByStatus = {
+  const countByStatus: Record<Exclude<Status, 'closed'>, number> = {
     confirmed: visibleExchanges.filter((e) => e.status === 'confirmed').length,
     announced: visibleExchanges.filter((e) => e.status === 'announced').length,
     acknowledged: visibleExchanges.filter((e) => e.status === 'acknowledged').length,
@@ -262,18 +272,18 @@ export default function CEXExchangeList() {
               type="radio"
               name="status-filter"
               value="all"
-              checked={activeFilter === 'all'}
-              onChange={() => setActiveFilter('all')}
+              checked={filterState.activeFilter === 'all'}
+              onChange={() => cexFilterActions.setActiveFilter('all')}
               className="sr-only"
             />
             <span
               className={`px-4 py-2 border uppercase text-sm transition-all flex items-center gap-1 ${
-                activeFilter === 'all'
+                filterState.activeFilter === 'all'
                   ? 'border-primary text-foreground'
                   : 'border-muted-foreground/50 text-muted-foreground hover:border-muted-foreground'
               }`}
             >
-              <div className={`w-2 h-2 bg-muted-foreground flex-shrink-0 transition-opacity ${activeFilter === 'all' ? 'opacity-100' : 'opacity-50'}`} />
+              <div className={`w-2 h-2 bg-muted-foreground flex-shrink-0 transition-opacity ${filterState.activeFilter === 'all' ? 'opacity-100' : 'opacity-50'}`} />
               All ({visibleExchanges.length})
             </span>
             <style>{`
@@ -290,22 +300,22 @@ export default function CEXExchangeList() {
                 type="radio"
                 name="status-filter"
                 value={status}
-                checked={activeFilter === status}
-                onChange={() => setActiveFilter(status as Status)}
+                checked={filterState.activeFilter === status}
+                onChange={() => cexFilterActions.setActiveFilter(status as CEXFilterType)}
                 className="sr-only"
               />
               <span
                 className={`px-4 py-2 border uppercase text-sm transition-all flex items-center gap-1 ${
-                  activeFilter === status
+                  filterState.activeFilter === status
                     ? 'border-primary text-foreground'
                     : 'border-muted-foreground/50 text-muted-foreground hover:border-muted-foreground'
                 }`}
               >
                 <div
-                  className={`w-2 h-2 flex-shrink-0 transition-opacity ${activeFilter === status ? 'opacity-100' : 'opacity-50'}`}
-                  style={{ backgroundColor: activeFilter === status && status === 'confirmed' ? 'var(--color-loud-foreground)' : config.color }}
+                  className={`w-2 h-2 flex-shrink-0 transition-opacity ${filterState.activeFilter === status ? 'opacity-100' : 'opacity-50'}`}
+                  style={{ backgroundColor: filterState.activeFilter === status && status === 'confirmed' ? 'var(--color-loud-foreground)' : config.color }}
                 />
-                {config.label} ({countByStatus[status as Status]})
+                {config.label} ({countByStatus[status as Exclude<Status, 'closed'>]})
               </span>
               <style>{`
                 label:has(input[value="${status}"]:checked):focus-within span {
@@ -324,7 +334,7 @@ export default function CEXExchangeList() {
 
       {/* Exchange Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.length > 0 || exitingCards.size > 0 ? (
+        {filtered.length > 0 || filterState.exitingCards.size > 0 ? (
           <>
             {filtered.map((exchange, idx) => (
               <div
@@ -337,18 +347,17 @@ export default function CEXExchangeList() {
                 />
               </div>
             ))}
-            {Array.from(exitingCards).map((cardId) => {
+            {Array.from(filterState.exitingCards).map((cardId) => {
               const exchange = exchanges.find(e => e.id === cardId);
               return exchange ? (
                 <div
                   key={`exit-${cardId}`}
                   className="animate-out fade-out zoom-out-95 animation-duration-300"
                   onAnimationEnd={() => {
-                    setExitingCards(prev => {
-                      const next = new Set(prev);
-                      next.delete(cardId);
-                      return next;
-                    });
+                    const prev = filterState.exitingCards;
+                    const next = new Set(prev);
+                    next.delete(cardId);
+                    cexFilterActions.setExitingCards(next);
                   }}
                 >
                   <ExchangeCard
@@ -369,7 +378,8 @@ export default function CEXExchangeList() {
                 <button
                   onClick={() => {
                     setInputValue('');
-                    setActiveFilter('all');
+                    cexFilterActions.setActiveFilter('all');
+                    cexFilterActions.setSearchQuery('');
                     searchInputRef.current?.focus();
                   }}
                   className="px-4 py-2 border border-primary/50 text-foreground hover:border-primary hover:fx-glow focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 uppercase text-sm transition-all"
