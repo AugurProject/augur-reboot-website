@@ -1,4 +1,4 @@
-import{j as w}from"./jsx-runtime.D_zvdyIk.js";import{r as A}from"./index.Cd_vQiNd.js";const I=`
+import{j as w}from"./jsx-runtime.D_zvdyIk.js";import{r as A}from"./index.DhRyc5x2.js";const I=`
 attribute vec2 a_position;
 attribute float a_alpha;
 uniform vec2 u_resolution;

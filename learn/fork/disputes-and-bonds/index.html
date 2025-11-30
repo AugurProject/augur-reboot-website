@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="en"> <head><!-- Basic meta tags --><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.15.4"><!-- SEO meta tags --><title>How Disputes &amp; Bonds Work - Augur Fork Mechanics</title><meta name="description" content="Understand dispute escalation, bond mechanics, and how fork risk is calculated."><meta name="author" content="Augur Project"><meta name="keywords" content="prediction markets, blockchain, oracles, decentralized finance, forecasting, augur, REP token, cryptocurrency, defi, web3"><link rel="canonical" href="https://augur.net/learn/fork/disputes-and-bonds/"><!-- Open Graph meta tags --><meta property="og:type" content="article"><meta property="og:title" content="How Disputes &#38; Bonds Work - Augur Fork Mechanics"><meta property="og:description" content="Understand dispute escalation, bond mechanics, and how fork risk is calculated."><meta property="og:image" content="https://augur.net/og-image.png"><meta property="og:url" content="https://augur.net/learn/fork/disputes-and-bonds/"><meta property="og:site_name" content="Augur"><meta property="og:locale" content="en_US"><!-- Twitter Card meta tags --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@AugurProject"><meta name="twitter:creator" content="@AugurProject"><meta name="twitter:title" content="How Disputes &#38; Bonds Work - Augur Fork Mechanics"><meta name="twitter:description" content="Understand dispute escalation, bond mechanics, and how fork risk is calculated."><meta name="twitter:image" content="https://augur.net/og-image.png"><!-- Additional meta tags --><meta name="theme-color" content="#2AE7A8"><meta name="msapplication-TileColor" content="#000000"><meta name="application-name" content="Augur"><!-- Icons and manifest --><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" href="/favicon.svg"><!-- DNS prefetch for external resources --><link rel="dns-prefetch" href="//fonts.googleapis.com"><link rel="dns-prefetch" href="//github.com"><link rel="dns-prefetch" href="//etherscan.io"><!-- Fonts --><link href="https://fonts.googleapis.com/css2?family=Handjet:wght@300;400&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400&display=swap" rel="stylesheet"><!-- Structured data --><script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				"name": "Augur",
+				"url": {JSON.stringify(siteUrl.href)},
+				"logo": {JSON.stringify(new URL('/favicon.svg', siteUrl).href)},
+				"description": "Decentralized prediction market platform and oracle technology",
+				"sameAs": [
+					"https://github.com/AugurProject/",
+					"https://x.com/AugurProject",
+					"https://discord.gg/Y3tCZsSmz3",
+					"https://t.me/augurlituus"
+				],
+				"foundingDate": "2014",
+				"industry": "Blockchain Technology",
+				"keywords": "prediction markets, blockchain, oracles, decentralized finance"
+			}
+		</script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.elfUsALL.js"></script><!-- Google Analytics --><!-- Google Analytics Script --><script async src="https://www.googletagmanager.com/gtag/js?id=G-4VLMY3QMC9"></script><script>(function(){const gaId = "G-4VLMY3QMC9";
+
+      // Initialize GA data layer
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', gaId, {
+        // Allow tracking of View Transitions (soft navigations)
+        'allow_google_signals': true,
+        'allow_ad_personalization_signals': true,
+      });
+
+      // Track pageviews on View Transitions (soft navigation)
+      document.addEventListener('astro:page-load', () => {
+        // Fire pageview event when page transitions complete
+        gtag('event', 'page_view', {
+          'page_path': window.location.pathname + window.location.search,
+          'page_title': document.title,
+        });
+      });
+
+      // Fallback: Also track on visibility change to catch edge cases
+      // This ensures GA knows the current page if the user returns to tab
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          gtag('event', 'page_view', {
+            'page_path': window.location.pathname + window.location.search,
+            'page_title': document.title,
+          });
+        }
+      });
+    })();</script><link rel="stylesheet" href="/_astro/_slug_.65xzAmes.css">
+<style>.title-icon[data-astro-cid-ml7tirrz]{display:block;width:20px;height:20px;background-color:#00ff9b;-webkit-mask:url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A") no-repeat center;mask:url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0H7V7H0V0Z' fill='black'/%3E%3Cpath d='M0 13H7V20H0V13Z' fill='black'/%3E%3Cpath d='M13 0H20V7H13V0Z' fill='black'/%3E%3Cpath d='M13 13H20V20H13V13Z' fill='black'/%3E%3C/svg%3E%0A") no-repeat center}
+.prose{--tw-prose-headings: var(--color-loud-foreground);--tw-prose-links: var(--color-primary);--tw-prose-body: var(--color-foreground);--tw-prose-bold: var(--color-foreground);--tw-prose-code: var(--color-green-400);--tw-prose-borders: var(--color-primary);--tw-prose-td-borders: var(--color-muted-foreground);--tw-prose-th-borders: var(--color-muted-foreground);--tw-prose-bg-hover: var(--color-primary);--tw-prose-line-height: 1.2;--tw-prose-pre-bg: transparent;--tw-prose-pre-code: var(--color-foreground)}.prose-sm{line-height:1.325em;letter-spacing:.025em}.prose :is(h1,h2,h3,h4,h5,h6){text-transform:uppercase}.prose h1{font-size:1.5rem}.prose p,.prose li{font-family:var(--tw-prose-p-font-family)}.prose ol>li::marker{color:var(--color-muted-foreground)}.prose table td{font-family:var(--tw-prose-p-font-family)}.prose pre.astro-code{background-color:transparent!important;border:none;padding:0}.prose pre.astro-code code{color:var(--color-foreground)}.prose blockquote{border-left-color:var(--color-muted-foreground)}.prose blockquote p{color:var(--color-foreground)}
+</style><style>[data-astro-transition-scope="astro-2zn3ncaw-1"] { view-transition-name: grid-tunnel; }@layer astro { ::view-transition-old(grid-tunnel) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(grid-tunnel) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(grid-tunnel) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(grid-tunnel) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-2zn3ncaw-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-2zn3ncaw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-2zn3ncaw-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-2zn3ncaw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-2zn3ncaw-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-2zn3ncaw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-2zn3ncaw-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-2zn3ncaw-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="ZMSVhh" prefix="r5" component-url="/_astro/PerspectiveGridTunnel.CpwTB0zT.js" component-export="default" renderer-url="/_astro/client.DOqkTiXo.js" props="{&quot;data-astro-transition-persist&quot;:[0,&quot;grid-tunnel&quot;],&quot;data-astro-transition-persist-props&quot;:[0,true],&quot;numLines&quot;:[0,12],&quot;animationSpeed&quot;:[0,0.1],&quot;maxOpacity&quot;:[0,0.2],&quot;lineColor&quot;:[0,&quot;#2AE7A8&quot;],&quot;vanishingPoint&quot;:[0,0.75],&quot;data-astro-transition-scope&quot;:[0,&quot;astro-2zn3ncaw-1&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;PerspectiveGridTunnel&quot;,&quot;value&quot;:true}" data-astro-transition-scope="astro-2zn3ncaw-1" data-astro-transition-persist="grid-tunnel" data-astro-transition-persist-props="true" await-children><canvas class="fixed inset-0 w-screen h-screen bg-transparent -z-10" style="opacity:0.2"></canvas><!--astro:end--></astro-island>  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">  <div class="flex justify-between items-start p-8">  <a href="/?intro=false" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 hover:cursor-pointer text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow" id="back-button"> <span class="pointer pointer-left pointer-animated"></span>
+BACK TO HOME
+</a>  <div id="social-links" class="flex gap-x-8"> <a id="twitter-link" href="https://x.com/AugurProject" class="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"> <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M13 16.001v2h1v1l1-.004V20h1v1h5v-1h-1v-1h-1v-2h-1v-.999h-1v-1h-1v-.999h-1v-1h-1v-1.997l1-.01V10h1V9h1V7h1V6h1V5h1V4h1v-.989L19 3v1h-1v1h-1v1.005L16 6v2h-1v1h-1v1h-1v1.005L12 11V8.999h-1.053v-1H10V6H9V5l-1 .003V4H7V3H2v1h1v1h1v2h1v1h1v.999h1v1h1v.999h1V13l-1 .011v.995H7v1H6v2H5v1H4v1H3v1H2v.989l2 .01v-1h1v-1h1V18l1 .006v-2h1v-1h1v-1h1V13l1 .006v1.996h1.053v1zm1-1.999h-1V12h-1v2.006l1-.004v1h1V17l1-.003v1L16 18v1h1v1h1v-2h-1v-1h-1v-.999h-1v-1h-1zm-3-4.004h-1v-1H9V7l-1 .003v-1L7 6V5H6V4H5v2h1v1h1v1h1v.999h1v1h1v1.993l1 .014z" fill="currentColor" /></svg> </a> <a id="discord-link" href="https://discord.gg/Y3tCZsSmz3" class="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"> <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9 5h6V4h4v1h1v1h1v1h1v3h1v8h-1v1h-1v1h-6v-1h3v-1h1v-1h-2v1H7v-1H5v1h1v1h3v1H3v-1H2v-1H1v-8h1V7h1V6h1V5h1V4h4zm-1 6H7v3h1v1h1v-1h1v-3H9v-1H8zm7-1v1h-1v3h1v1h1v-1h1v-3h-1v-1z" fill="currentColor" /></svg> </a> <a id="github-link" href="https://github.com/AugurProject/" class="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"> <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"><path d="M10 2v1H7v1H6v1H4v1H3v2H2l-.083 2.217H1V16h1v2h1v2h1v1h1v1h2v1h2v-2H7v-1H6v-1H5v-1H4v-1h2v1h1v1h1v1h1v-1h1v-1H8v-1H7v-1H6v-1H5v-4.783h1V6h2v2h8V6h2v4h1v5h-1v1h-1v1h-1v1h-2v1h1v4h2v-1h2v-1h1v-1h1v-2h1v-2h1v-6h-1V8h-1V6h-1V5h-2V4h-1V3h-3V2z" fill="currentColor" /></svg> </a> </div> </div>  <main class="overflow-y-auto px-4 md:px-8 mb-12"> <div class="max-w-xl mx-auto"> <h1 class="flex justify-center items-center gap-3 text-loud-foreground font-bold text-2xl tracking-[4px] uppercase mt-16 mb-8 " data-astro-cid-ml7tirrz>  <span class="text-muted-foreground" data-astro-cid-ml7tirrz>[[</span> How Disputes &amp; Bonds Work <span class="text-muted-foreground" data-astro-cid-ml7tirrz>]]</span> </h1>   <article class="prose prose-sm prose-invert max-w-none">  <h1 id="how-disputes--bonds-work">How Disputes &amp; Bonds Work</h1>
+<p>Disputes are the core mechanism that makes Augur work. When people disagree about an outcome, they challenge each other using bonds—financial commitments that keep everyone honest.</p>
+<h2 id="a-real-world-example">A Real-World Example</h2>
+<p>Imagine a market asks: <strong>“Will BTC reach $100,000 in 2025?”</strong></p>
+<ol>
+<li><strong>Reporter A</strong> says YES and locks up REP as their report bond</li>
+<li><strong>Reporter B</strong> disagrees and says NO—they lock up 2x the initial bond amount to dispute</li>
+<li><strong>Reporter C</strong> thinks B is wrong and says YES again—they lock up 2x B’s bond (4x initial)</li>
+<li>This continues escalating until everyone agrees… or the bond reaches 275,000 REP and a fork is triggered</li>
+</ol>
+<h2 id="what-is-a-dispute-bond">What is a Dispute Bond?</h2>
+<p>A dispute bond is REP (Augur’s governance token) that you must lock up to challenge an outcome. It serves three purposes:</p>
+<ol>
+<li><strong>Skin in the game:</strong> Disputers must risk their own capital to challenge outcomes</li>
+<li><strong>Spam prevention:</strong> High bond amounts deter frivolous disputes</li>
+<li><strong>Fair resolution:</strong> If your dispute is correct, you get your bond back plus a fee</li>
+</ol>
+<h2 id="the-dispute-process-step-by-step">The Dispute Process Step-by-Step</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>┌─────────────────────────────┐         ┌─────────────────────────────┐</span></span>
+<span class="line"><span>│  STEP 1: Initial Report     │         │  STEP 2: First Dispute      │</span></span>
+<span class="line"><span>│                             │         │                             │</span></span>
+<span class="line"><span>│  Reporter submits outcome   │────────▶│  Someone disagrees          │</span></span>
+<span class="line"><span>│  Example: &quot;YES&quot;             │         │  Posts 2x initial bond      │</span></span>
+<span class="line"><span>│  Locks up initial bond      │         │  Submits: &quot;NO&quot;              │</span></span>
+<span class="line"><span>└─────────────────────────────┘         │  If no further dispute →    │</span></span>
+<span class="line"><span>                                        │  Market settles             │</span></span>
+<span class="line"><span>                                        └────────────┬────────────────┘</span></span>
+<span class="line"><span>                                                     ↓</span></span>
+<span class="line"><span>┌─────────────────────────────┐         ┌─────────────────────────────┐</span></span>
+<span class="line"><span>│  STEP 4: Fork Trigger       │         │  STEP 3: Escalation         │</span></span>
+<span class="line"><span>│                             │         │                             │</span></span>
+<span class="line"><span>│  Bond reaches 275,000 REP   │◀────────│  Another disputes back      │</span></span>
+<span class="line"><span>│  Instead of continuing,     │         │  Posts 2x previous bond     │</span></span>
+<span class="line"><span>│  FORK IS TRIGGERED          │         │  Submits: &quot;YES&quot;             │</span></span>
+<span class="line"><span>│                             │         │  Process repeats...         │</span></span>
+<span class="line"><span>│  → 60-day fork period       │         │  Bonds keep doubling        │</span></span>
+<span class="line"><span>│  → REP holders govern       │         └─────────────────────────────┘</span></span>
+<span class="line"><span>└─────────────────────────────┘</span></span></code></pre>
+<h2 id="bond-escalation-example">Bond Escalation Example</h2>
+<p>Here’s how bonds grow with each dispute round:</p>
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Round</th><th>Bond Size</th><th>Risk Level</th></tr></thead><tbody><tr><td>1st Dispute</td><td>1,000 REP</td><td>Low</td></tr><tr><td>2nd Dispute</td><td>2,000 REP</td><td>Low</td></tr><tr><td>3rd Dispute</td><td>4,000 REP</td><td>Medium</td></tr><tr><td>4th Dispute</td><td>8,000 REP</td><td>High</td></tr><tr><td>5th+ Disputes</td><td>16,000+ REP</td><td>Extreme</td></tr></tbody></table><p><em>Actual bond amounts vary based on protocol parameters, but the doubling pattern is consistent.</em></p> </div> 
+<h2 id="why-275000-rep">Why 275,000 REP?</h2>
+<p>The 275,000 REP threshold was chosen as a balance:</p>
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> <ul>
+<li><strong>ACCESSIBILITY:</strong> Low enough that disputes can escalate naturally</li>
+<li><strong>SAFETY:</strong> High enough that only serious, well-funded disputes trigger forks</li>
+<li><strong>GOVERNANCE:</strong> Ensures protocol-level disagreements go to REP holders to choose</li>
+</ul> </div> 
+<h2 id="bond-economics-winning-and-losing">Bond Economics: Winning and Losing</h2>
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>OUTCOME</th><th>WHAT HAPPENS TO YOUR BOND</th></tr></thead><tbody><tr><td><strong>Your Dispute Is Correct</strong></td><td><strong>You get your bond back + a fee</strong><br/>The fee is additional REP awarded for being right</td></tr><tr><td><strong>Your Dispute Is Incorrect</strong></td><td><strong>You lose your bond</strong><br/>It gets redistributed to winning disputers or the protocol</td></tr></tbody></table> </div> 
+<h2 id="how-fork-risk-is-calculated">How Fork Risk is Calculated</h2>
+<p>The fork meter shows a simple calculation:</p>
+<div class="border border-foreground/30 px-6 mb-6 text-center" data-astro-cid-26ymv64g> <p>(Largest Dispute Bond ÷ 275,000 REP) × 100 = Fork Risk %</p> </div> 
+<h3 id="understanding-the-formula">Understanding the Formula</h3>
+<p><strong>Largest Dispute Bond</strong>: This is the single largest bond currently active across all markets. Why track the largest? Because it determines how close we are to the fork threshold.</p>
+<p><strong>Example</strong>: If the largest active dispute is 150,000 REP, the next challenger would need to post ~300,000 REP to dispute it—which exceeds 275,000 and triggers a fork immediately.</p>
+<h3 id="two-calculation-examples">Two Calculation Examples</h3>
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> <p><strong>EXAMPLE 1: LOW RISK</strong></p><p>Current largest dispute bond: <strong>15,000 REP</strong></p><p>(15,000 ÷ 275,000) × 100 = <strong>5.5% risk</strong></p><p><em>Interpretation: Disputes are active but still far from fork. The next dispute would need ~30,000 REP.</em></p> </div> 
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> <p><strong>EXAMPLE 2: HIGH RISK</strong></p><p>Current largest dispute bond: <strong>200,000 REP</strong></p><p>(200,000 ÷ 275,000) × 100 = <strong>73% risk</strong></p><p><em>Interpretation: Close to fork. The next dispute would need ~400,000 REP, exceeding the threshold. Fork is likely with one more escalation.</em></p> </div> 
+<h2 id="what-happens-when-fork-conditions-are-met">What Happens When Fork Conditions Are Met?</h2>
+<p>Once a dispute bond reaches or exceeds 275,000 REP:</p>
+<div class="border border-foreground/30 px-6 mb-6 " data-astro-cid-26ymv64g> <ul>
+<li><strong>FORK PERIOD:</strong> A 60-day window begins for REP holders to migrate their REP</li>
+<li><strong>MARKETS FREEZE:</strong> No new trades on disputed markets</li>
+<li><strong>REP MIGRATION:</strong> You choose which fork version you support</li>
+<li><strong>WINNING FORK:</strong> The fork with the most REP support becomes canonical</li>
+<li><strong>RESOLUTION:</strong> Markets settle according to the winning fork’s outcomes</li>
+</ul> </div> 
+<h2 id="strategic-considerations">Strategic Considerations</h2>
+<h3 id="for-dispute-participants">For Dispute Participants</h3>
+<ul>
+<li>High-conviction disputes are only worth posting if you’re confident you’ll win</li>
+<li>Later dispute rounds become prohibitively expensive for casual participants</li>
+<li>High-stakes disputes push the system toward fork, affecting all markets</li>
+</ul>
+<h3 id="for-market-users">For Market Users</h3>
+<ul>
+<li>Monitor disputes if your outcome is challenged</li>
+<li>Disputed markets settle slower than undisputed ones</li>
+<li>High-risk markets might not settle until after a fork resolves</li>
+</ul>
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ul>
+<li><strong>Disputes escalate:</strong> Each new dispute doubles the bond size (approximately)</li>
+<li><strong>Forks are triggered mechanically:</strong> When the largest bond hits 275,000 REP</li>
+<li><strong>Risk is measurable:</strong> The fork formula lets you calculate exactly how close we are</li>
+<li><strong>Escalation is expensive:</strong> High-stakes disputes require serious financial commitment</li>
+<li><strong>Fork is ultimate resolution:</strong> When community disagreement is severe, REP holders decide</li>
+</ul>
+<p><a href="/learn/fork/what-to-do">Next: What To Do at Different Risk Levels →</a></p>  </article> </div> </main>  <astro-island uid="Z1otk5G" prefix="r4" component-url="/_astro/LearnNavigation.wIzEfWvm.js" component-export="default" renderer-url="/_astro/client.DOqkTiXo.js" props="{&quot;currentPath&quot;:[0,&quot;/learn/fork/disputes-and-bonds/&quot;],&quot;currentTitle&quot;:[0,&quot;How Disputes &amp; Bonds Work&quot;],&quot;topics&quot;:[1,[[0,{&quot;title&quot;:[0,&quot;WHAT IS A FORK?&quot;],&quot;slug&quot;:[0,&quot;fork/index&quot;],&quot;path&quot;:[0,&quot;/learn/fork/&quot;]}],[0,{&quot;title&quot;:[0,&quot;HOW DISPUTES &amp; BONDS WORK&quot;],&quot;slug&quot;:[0,&quot;fork/disputes-and-bonds&quot;],&quot;path&quot;:[0,&quot;/learn/fork/disputes-and-bonds/&quot;]}],[0,{&quot;title&quot;:[0,&quot;WHAT TO DO&quot;],&quot;slug&quot;:[0,&quot;fork/what-to-do&quot;],&quot;path&quot;:[0,&quot;/learn/fork/what-to-do/&quot;]}]]]}" ssr client="load" opts="{&quot;name&quot;:&quot;LearnNavigation&quot;,&quot;value&quot;:true}" await-children><aside class="sticky bottom-0 border-t border-foreground/30 bg-background uppercase transition-all duration-300" style="z-index:10"><div class="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6 w-full"><div class="flex items-center justify-between"><button class="text-sm font-light tracking-widest uppercase transition-colors cursor-pointer text-muted-foreground hover:text-primary">JUMP TO TOPIC →</button><a href="/learn/fork/what-to-do/" class="text-sm font-light tracking-widest text-muted-foreground hover:text-primary transition-colors">UP NEXT: <!-- -->WHAT TO DO</a></div></div></aside><!--astro:end--></astro-island> <footer class="relative px-4 md:px-8 mt-4"> <div class="max-w-screen-xl mx-auto"> <div class="border border-primary/10 bg-background/70 p-8 md:p-12 mb-8"> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_max-content_max-content_max-content] gap-12"> <!-- Column 1: Logo & Tagline --> <div class="md:col-span-2 lg:col-span-1 place-content-end"> <a href="/?intro=false" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow text-7xl">  <svg width="1em" height="1em" viewBox="0 0 224 224" fill="none"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M31.845 157.128c3.064 1.405 5.425 3.328 7.073 5.785 1.647 2.456 2.471 5.237 2.471 8.362v31.824c0 1.021-.512 1.527-1.517 1.527h-7.976c-1.015 0-1.517-.506-1.517-1.527v-2.386c0-.253-.06-.394-.191-.435-.13-.031-.281.02-.472.141-3.416 3.317-7.977 4.966-13.673 4.966-4.681 0-8.529-1.214-11.532-3.631S0 195.738 0 190.954c0-4.965 1.728-8.838 5.174-11.609 3.445-2.77 8.308-4.156 14.576-4.156h10.066q.573 0 .573-.577v-2.194c0-2.488-.744-4.409-2.23-5.784-1.487-1.365-3.687-2.053-6.6-2.053-2.22 0-4.05.394-5.506 1.193s-2.44 1.901-2.943 3.297c-.251.889-.824 1.304-1.708 1.244l-8.539-1.052c-.512-.06-.884-.203-1.135-.435-.251-.223-.352-.495-.281-.809.572-3.822 2.672-6.947 6.308-9.363q5.456-3.629 13.532-3.631c3.958 0 7.494.707 10.558 2.103m-4.791 36.981c2.21-1.659 3.325-3.761 3.325-6.31V183.4q0-.576-.573-.577H21.93c-3.355 0-6.017.638-7.976 1.912-1.96 1.274-2.944 3.094-2.944 5.451 0 2.042.764 3.619 2.28 4.732q2.276 1.668 5.787 1.668c3.104.011 5.756-.818 7.976-2.477m53.313-38.316h7.876c1.015 0 1.517.516 1.517 1.528v45.778c0 1.021-.512 1.527-1.517 1.527h-7.876c-1.014 0-1.517-.506-1.517-1.527v-2.488c0-.252-.08-.415-.24-.475-.162-.061-.302.03-.433.283-2.531 3.246-6.389 4.875-11.583 4.875-4.812 0-8.84-1.407-12.105-4.208s-4.892-6.785-4.892-11.942v-31.823c0-1.022.502-1.528 1.517-1.528h7.976c1.015 0 1.517.516 1.517 1.528v28.668c0 2.993.773 5.38 2.33 7.17 1.548 1.78 3.718 2.68 6.5 2.68 2.843 0 5.124-.89 6.831-2.68 1.708-1.78 2.562-4.177 2.562-7.17v-28.668c.02-1.022.523-1.528 1.537-1.528m56.98 0h-7.976c-1.015 0-1.517.506-1.537 1.548v1.718c0 .253-.061.415-.191.475-.121.062-.281 0-.472-.191-2.853-2.862-6.711-4.298-11.583-4.298-4.179 0-7.816 1.163-10.92 3.488s-5.284 5.431-6.55 9.315q-1.519 4.202-1.517 12.134 0 7.068 1.236 11.558c1.336 4.329 3.707 7.545 7.122 9.647 3.426 2.104 7.183 3.155 11.302 3.155 4.681 0 8.328-1.365 10.92-4.105.191-.192.341-.252.472-.192.131.061.191.222.191.475v.576c0 4.46-1.115 7.626-3.366 9.506-2.25 1.881-5.776 2.822-10.588 2.822-.824 0-2.31-.061-4.46-.192-.513-.071-.924.03-1.236.282-.311.254-.472.608-.472 1.053l-.281 7.068c0 1.083.442 1.659 1.326 1.719 1.838.192 3.646.284 5.414.284 7.344 0 13.301-1.71 17.852-5.158s6.831-9.152 6.831-17.11v-44.049c0-1.012-.502-1.528-1.517-1.528m-9.493 24.078c0 2.487-.05 4.287-.141 5.4a19 19 0 0 1-.522 3.115c-.502 2.032-1.517 3.691-3.034 4.964-1.517 1.275-3.506 1.912-5.977 1.912-2.341 0-4.35-.657-6.028-1.962a9.93 9.93 0 0 1-3.466-5.016c-.633-1.587-.944-4.358-.944-8.312 0-3.822.372-6.633 1.135-8.413.693-2.104 1.829-3.793 3.416-5.066q2.366-1.913 5.786-1.913 3.616 0 5.937 1.913c1.547 1.273 2.572 2.962 3.084 5.066.312 1.021.523 2.052.613 3.104.091 1.052.141 2.791.141 5.208m49.988-24.078h7.876c1.014 0 1.517.516 1.517 1.528v45.778c0 1.021-.513 1.527-1.517 1.527h-7.876c-1.015 0-1.517-.506-1.517-1.527v-2.488c0-.252-.081-.415-.241-.475-.161-.061-.302.03-.432.283-2.532 3.246-6.389 4.875-11.583 4.875-4.812 0-8.84-1.407-12.105-4.208s-4.893-6.785-4.893-11.942v-31.823c0-1.022.503-1.528 1.517-1.528h7.977c1.014 0 1.517.516 1.517 1.528v28.668c0 2.993.773 5.38 2.33 7.17 1.547 1.78 3.717 2.68 6.5 2.68 2.843 0 5.123-.89 6.831-2.68 1.708-1.78 2.562-4.177 2.562-7.17v-28.668c.02-1.022.532-1.528 1.537-1.528m46.1 2.386c.191-.89-.09-1.526-.854-1.911-1.517-.698-3.194-1.051-5.033-1.041-4.681 0-8.348 2.002-11.01 6.017-.131.252-.251.344-.382.282-.13-.06-.191-.222-.191-.475v-3.731c0-1.011-.502-1.527-1.516-1.527h-7.977c-1.015 0-1.517.506-1.517 1.527v45.768c0 1.021.502 1.528 1.517 1.528h7.977c1.004 0 1.516-.507 1.516-1.528v-26.666c0-2.801.895-5.086 2.663-6.836s3.978-2.69 6.64-2.821q.663-.091 1.808-.091c1.266 0 2.271.131 3.034.384.573.132 1.005.132 1.286 0 .281-.122.462-.434.522-.951z" fill="#fff" /><path d="m77.86 52.61 7.438 4.874a1.45 1.45 0 0 0 2.051-.495l24.018-41.086a.73.73 0 0 1 1.263 0l24.017 41.086a1.454 1.454 0 0 0 2.052.495l7.437-4.874c.671-.434.878-1.342.473-2.038L117.906 1.464A2.93 2.93 0 0 0 115.381 0h-6.766a2.93 2.93 0 0 0-2.525 1.464L77.387 50.572c-.404.696-.197 1.604.474 2.038" fill="#2AE7A8" /><path d="m165.587 83.052-11.422-19.545a1.454 1.454 0 0 0-2.052-.494l-7.437 4.874c-.671.433-.878 1.341-.473 2.038l6.529 11.17a.76.76 0 0 1-.237 1.019l-38.102 24.972a.7.7 0 0 1-.789 0L73.511 82.114a.77.77 0 0 1-.237-1.02l6.53-11.17c.404-.696.197-1.604-.474-2.038l-7.437-4.873a1.45 1.45 0 0 0-2.051.494L58.42 83.052c-.819 1.392-.405 3.198.937 4.076l51.063 33.479a2.88 2.88 0 0 0 3.176 0l51.063-33.479c1.322-.877 1.736-2.684.928-4.076" fill="#fff" /></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h224v224H0z" /></clipPath></defs></svg> </a> <p class="text-foreground mt-4 text-sm">
+THE FRONTIER OF PREDICTION MARKETS
+</p> </div> <!-- Column 2: Social --> <div> <h4 class="text-muted-foreground mb-4">&gt;_ SOCIAL</h4> <ul class="space-y-2 text-sm"> <li> <a href="https://github.com/AugurProject/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+GITHUB
+</a> </li> <li> <a href="https://x.com/AugurProject" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+X.COM (TWITTER)
+</a> </li> <li> <a href="https://discord.gg/Y3tCZsSmz3" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+DISCORD
+</a> </li> <li> <a href="https://t.me/augurlituus" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+TELEGRAM
+</a> </li> </ul> </div> <!-- Column 3: REP --> <div> <h4 class="text-muted-foreground mb-4">&gt;_ REP</h4> <ul class="space-y-2 text-sm"> <li> <a href="https://etherscan.io/token/0x221657776846890989a759ba2973e427dff5c9bb" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV2 (ETHERSCAN)
+</a> </li> <li> <a href="https://etherscan.io/token/0x1985365e9f78359a9B6AD760e32412f4a445E862" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV1 (ETHERSCAN)
+</a> </li> <li> <a href="https://pro.kraken.com/app/trade/rep-usd" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV1/USD (KRAKEN)
+</a> </li> <li> <a href="https://pro.kraken.com/app/trade/repv2-usd" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV2/USD (KRAKEN)
+</a> </li> <li> <a href="https://pro.kraken.com/app/trade/repv2-eur" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV2/EUR (KRAKEN)
+</a> </li> <li> <a href="https://app.uniswap.org/tokens/ethereum/0x221657776846890989a759ba2973e427dff5c9bb" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV2 UNISWAP
+</a> </li> <li> <a href="https://www.geckoterminal.com/eth/tokens/0x221657776846890989a759ba2973e427dff5c9bb" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+REPV2 UNISWAP GECKO UI
+</a> </li> </ul> </div> <!-- Column 4: Companies & KB --> <div> <h4 class="text-muted-foreground mb-4">&gt;_ COMPANIES</h4> <ul class="space-y-2 text-sm mb-6"> <li> <a href="https://dark.florist" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+THE DARK FLORIST
+</a> </li> <li> <a href="https://lituus.io" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+LITUUS LABS
+</a> </li> <li> <a href="https://x.com/AugurLituus" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+@AUGURLITUUS
+</a> </li> </ul> <h4 class="text-muted-foreground mb-4">&gt;_ KB</h4> <ul class="space-y-2 text-sm"> <li> <a href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+AUGUR WHITEPAPER
+</a> </li> <!-- <li> --> <!--   <Button variant="link" href="https://augur.guide"> --> <!--     AUGUR.GUIDE --> <!--   </Button> --> <!-- </li> --> </ul> </div> </div> </div> <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs pb-8"> <p class="text-foreground">© 2025 AUGUR. ALL RIGHTS RESERVED.</p> <nav class="flex gap-8"> <a href="/terms" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">
+TERMS OF SERVICE
+</a> <a href="/privacy" class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow">PRIVACY POLICY</a> </nav> </div> </div> </footer> </div>   <script type="module" src="/_astro/Layout.astro_astro_type_script_index_0_lang.CLkVSrN2.js"></script> </body></html>
