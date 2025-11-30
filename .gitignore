@@ -48,6 +48,7 @@ public/data/fork-risk.json
 
 # TypeScript build cache
 .tscache/
+*.tsbuildinfo
 
 # git worktrees
 .worktree/
