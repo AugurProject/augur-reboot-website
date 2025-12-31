@@ -8,7 +8,7 @@ on:
     # Allow manual trigger with deployment control
     inputs:
       deploy_to_production:
-        description: 'Deploy to gh-pages? (only works on main branch)'
+        description: 'Deploy to GitHub Pages? (only works on main branch)'
         type: boolean
         default: false
       custom_rpc_url:
@@ -22,19 +22,21 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -51,13 +53,28 @@ jobs:
           # Optional: Custom RPC can be provided via secrets or manual dispatch input
           # If not provided, will use public RPCs (no API key needed!)
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || github.event.inputs.custom_rpc_url }}
-          
+
+      - name: Check SITE_URL variable
+        run: |
+          if [ -z "${{ vars.SITE_URL }}" ]; then
+            echo "::warning::SITE_URL variable is not set. Astro will not generate sitemaps or canonical URLs. Set it in Settings → Secrets and variables → Actions → Variables"
+          else
+            echo "SITE_URL is set to: ${{ vars.SITE_URL }}"
+          fi
+
       - name: Build site
         run: npm run build
         env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          BASE_PATH: ${{ vars.BASE_PATH }}
           PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
 
-      - name: Upload build artifact
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Upload build artifact for summary
         uses: actions/upload-artifact@v4
         with:
           name: augur-site-build-${{ github.run_number }}
@@ -68,71 +85,26 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' && 
-      (github.event_name == 'push' || 
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' ||
        github.event_name == 'schedule' ||
-       (github.event_name == 'workflow_dispatch' && 
+       (github.event_name == 'workflow_dispatch' &&
         github.event.inputs.deploy_to_production == 'true'))
-    
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: augur-site-build-${{ github.run_number }}
-          path: dist/
-
-      - name: Deploy to gh-pages
-        run: |
-          # Checkout gh-pages branch
-          git checkout gh-pages
-          git pull origin gh-pages
-          
-          # Clear everything except .git and dist
-          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'dist' -exec rm -rf {} +
-          
-          # Move built files to root
-          mv dist/* .
-          rm -rf dist
-          
-          # Add .nojekyll to prevent Jekyll processing
-          touch .nojekyll
-
-      - name: Check for changes
-        id: changes
-        run: |
-          if git diff --quiet HEAD; then
-            echo "No changes to commit"
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes detected"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            git status --porcelain
-          fi
-
-      - name: Commit and push changes
-        if: steps.changes.outputs.has_changes == 'true'
-        run: |
-          git add .
-          git commit -m "Deploy from main: $(git log main -1 --pretty=format:'%h %s')"
-          git push origin gh-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   summary:
     needs: build
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
@@ -147,7 +119,7 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Extract key metrics from JSON using jq (more reliable than grep)
           if [ -f dist/data/fork-risk.json ]; then
             if command -v jq >/dev/null 2>&1; then
@@ -158,7 +130,7 @@ jobs:
               ACTIVE_DISPUTES=$(jq -r '.metrics.activeDisputes' dist/data/fork-risk.json)
               RPC_ENDPOINT=$(jq -r '.rpcInfo.endpoint' dist/data/fork-risk.json)
               RPC_LATENCY=$(jq -r '.rpcInfo.latency' dist/data/fork-risk.json)
-              
+
               echo "### 🚨 Fork Risk Data" >> $GITHUB_STEP_SUMMARY
               echo "**Risk Level:** ${RISK_LEVEL}" >> $GITHUB_STEP_SUMMARY
               echo "**Risk Percentage:** ${RISK_PERCENT}%" >> $GITHUB_STEP_SUMMARY
@@ -172,7 +144,7 @@ jobs:
           else
             echo "⚠️ **Warning:** Fork risk data file not found" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🧪 Testing Instructions" >> $GITHUB_STEP_SUMMARY
           echo "1. **Download:** Click on the artifact \`augur-site-build-${{ github.run_number }}\` above" >> $GITHUB_STEP_SUMMARY
@@ -186,12 +158,12 @@ jobs:
           echo "   python -m http.server 8000" >> $GITHUB_STEP_SUMMARY
           echo "   \`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Deployment status
           if [[ "${{ github.ref }}" == "refs/heads/main" && ("${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "schedule" || ("${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.deploy_to_production }}" == "true")) ]]; then
             echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **Production Deployment:** Deployed to gh-pages branch" >> $GITHUB_STEP_SUMMARY
-            echo "**Site URL:** https://${{ github.repository_owner }}.github.io/$(basename ${{ github.repository }})/" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Production Deployment:** Deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+            echo "**Site URL:** ${{ vars.SITE_URL || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}" >> $GITHUB_STEP_SUMMARY
           else
             echo "### 📦 Artifact Only" >> $GITHUB_STEP_SUMMARY
             echo "**Status:** Build completed, artifact created (no production deployment)" >> $GITHUB_STEP_SUMMARY
