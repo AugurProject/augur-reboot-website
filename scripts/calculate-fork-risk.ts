@@ -303,6 +303,20 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 	}
 }
 
+/**
+ * Detect if error is due to rate limiting
+ */
+function isRateLimitError(error: unknown): boolean {
+	const errorMessage = error instanceof Error ? error.message : String(error)
+	return (
+		errorMessage.includes('429') ||
+		errorMessage.includes('Too Many Requests') ||
+		errorMessage.includes('error code: 1015') ||
+		errorMessage.includes('rate limit') ||
+		errorMessage.includes('exceeded maximum retry limit')
+	)
+}
+
 async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
@@ -318,11 +332,21 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		const allCompletedEvents: ethers.EventLog[] = []
 		const chunkSize = 1000 // Max blocks per query for most RPC providers
 
+		let consecutiveFailures = 0
+		let totalChunks = 0
+		let successfulChunks = 0
+
 		// Query all relevant events in chunks
 		for (let start = fromBlock; start < currentBlock; start += chunkSize) {
 			const end = Math.min(start + chunkSize - 1, currentBlock)
+			totalChunks++
 
 			try {
+				// Add small delay between chunks to avoid rate limiting (100ms)
+				if (totalChunks > 1) {
+					await new Promise(resolve => setTimeout(resolve, 100))
+				}
+
 				// Query Created events (for dispute initialization)
 				const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
 				const createdEvents = await contracts.augur.queryFilter(createdFilter, start, end)
@@ -342,15 +366,34 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 				if (totalEvents > 0) {
 					console.log(`Found ${totalEvents} dispute events in blocks ${start}-${end} (${createdEvents.length} created, ${contributionEvents.length} contributions, ${completedEvents.length} completed)`)
 				}
+
+				consecutiveFailures = 0
+				successfulChunks++
 			} catch (chunkError) {
-				console.warn(
-					`Failed to query blocks ${start}-${end}:`,
-					chunkError instanceof Error
-						? chunkError.message
-						: String(chunkError),
-				)
+				consecutiveFailures++
+				const errorMessage = chunkError instanceof Error ? chunkError.message : String(chunkError)
+
+				// Detect rate limiting
+				if (isRateLimitError(chunkError)) {
+					console.warn(`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`)
+					// Exponential backoff for rate limits (2s, 4s, 8s)
+					const backoffDelay = Math.min(Math.pow(2, consecutiveFailures) * 1000, 10000)
+					console.log(`Waiting ${backoffDelay}ms before continuing...`)
+					await new Promise(resolve => setTimeout(resolve, backoffDelay))
+				} else {
+					console.warn(`Failed to query blocks ${start}-${end}: ${errorMessage}`)
+				}
+
+				// If we've had too many consecutive failures, stop to avoid wasting time
+				if (consecutiveFailures >= 5) {
+					console.warn(`⚠️ Too many consecutive failures (${consecutiveFailures}), stopping chunk queries early`)
+					console.log(`Successfully queried ${successfulChunks}/${totalChunks} chunks so far, using partial data`)
+					break
+				}
 			}
 		}
+
+		console.log(`Chunk query complete: ${successfulChunks}/${totalChunks} successful`)
 
 		console.log(`Total events found: ${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed`)
 
