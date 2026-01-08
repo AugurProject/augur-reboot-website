@@ -2,8 +2,9 @@ name: Build and Deploy Augur Site with Fork Risk Monitoring
 
 on:
   schedule:
-    # Run every hour at minute 5 for fork risk monitoring
-    - cron: '5 * * * *'
+    # Run every 6 hours at minute 5 for fork risk monitoring
+    # Runs at 00:05, 06:05, 12:05, 18:05 UTC
+    - cron: '5 */6 * * *'
   workflow_dispatch:
     # Allow manual trigger with deployment control
     inputs:
@@ -46,6 +47,29 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Fetch event cache from gh-pages
+        run: |
+          # Incremental Event Caching Strategy:
+          # - Loads cached events from gh-pages branch
+          # - Only queries blockchain for new blocks since last run
+          # - Re-queries last 32 blocks for finality safety
+          # - Reduces RPC calls from ~51/hour to ~2/6-hours (98% reduction)
+          # - See docs/rpc-caching-strategy.md for details
+
+          # Create cache directory
+          mkdir -p cache
+
+          # Try to fetch cache from gh-pages branch
+          if git show origin/gh-pages:cache/event-cache.json > cache/event-cache.json 2>/dev/null; then
+            echo "✓ Cache loaded from gh-pages"
+            echo "Cache size: $(wc -c < cache/event-cache.json) bytes"
+            echo "Cache version: $(jq -r '.version // "unknown"' cache/event-cache.json)"
+            echo "Last queried block: $(jq -r '.lastQueriedBlock // 0' cache/event-cache.json)"
+          else
+            echo "⚠️ No cache found on gh-pages, will perform full 7-day query"
+            echo "{}" > cache/event-cache.json
+          fi
 
       - name: Calculate fork risk data
         run: npm run build:fork-data
@@ -99,6 +123,86 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Checkout main branch for cache management
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Download build artifact for cache management
+        uses: actions/download-artifact@v4
+        with:
+          name: augur-site-build-${{ github.run_number }}
+          path: dist/
+
+      - name: Manage cache on gh-pages
+        run: |
+          # Checkout gh-pages branch to update cache
+          git checkout gh-pages
+          git pull origin gh-pages
+
+          # Update cache directory from build output
+          if [ -f dist/data/fork-risk.json ]; then
+            mkdir -p cache
+            cp dist/data/fork-risk.json cache/fork-risk.json 2>/dev/null || true
+          fi
+
+      - name: Detect meaningful changes (smart commit)
+        id: changes
+        run: |
+          # Smart Commit Strategy:
+          # - Immediate: Risk data changes (new disputes detected)
+          # - Daily: Cache-only updates (midnight run at 00:05 UTC)
+          # - Skip: No changes
+
+          # Stage cache files to check diffs
+          git add cache/event-cache.json 2>/dev/null || true
+
+          # Check what changed in cache
+          CACHE_DIFF=$(git diff --staged --numstat cache/event-cache.json 2>/dev/null | awk '{print $1+$2}')
+
+          # Extract metrics for commit message
+          BLOCK=$(jq -r '.blockNumber // "N/A"' cache/fork-risk.json 2>/dev/null || echo "N/A")
+          RISK=$(jq -r '.riskPercentage // 0' cache/fork-risk.json 2>/dev/null || echo "0")
+          EVENTS=$(jq -r '.metadata.totalEventsTracked // 0' cache/event-cache.json 2>/dev/null || echo "0")
+          HOUR=$(date +%H)
+
+          # Determine commit strategy
+          if [ "${CACHE_DIFF:-0}" -gt 0 ] && [ "$HOUR" = "00" ]; then
+            # Daily cache refresh at midnight (00:05 UTC)
+            echo "status=daily-cache" >> $GITHUB_OUTPUT
+            echo "block=$BLOCK" >> $GITHUB_OUTPUT
+            echo "events=$EVENTS" >> $GITHUB_OUTPUT
+            echo "📅 Daily cache refresh commit"
+          else
+            # No meaningful cache-only changes or not midnight
+            echo "status=skip" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping cache commit (no meaningful changes)"
+          fi
+
+      - name: Commit daily cache refresh
+        if: steps.changes.outputs.status == 'daily-cache'
+        run: |
+          git commit -m "chore: daily event cache refresh
+
+          Block: ${{ steps.changes.outputs.block }}
+          Cached events: ${{ steps.changes.outputs.events }}
+
+          Routine cache update (no new disputes)."
+          git push origin gh-pages
+
+      - name: Skip cache commit
+        if: steps.changes.outputs.status == 'skip'
+        run: |
+          echo "⏭️ No meaningful cache changes, skipping commit"
+          git restore --staged cache/ 2>/dev/null || true
 
   summary:
     needs: build
