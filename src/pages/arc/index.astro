@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SocialLinks from '../../components/SocialLinks.astro';
+import Footer from '../../components/Footer.astro';
+import Button from '../../components/Button.tsx';
+import Pointer from '../../components/Pointer.tsx';
+import PageHeading from '../../components/PageHeading.astro';
+import ArcPostCard from '../../components/ArcPostCard.astro';
+import { withBase } from '../../lib/utils';
+
+const arcPosts = await getCollection('arc');
+
+// Sort posts by publish date (newest first)
+const sortedPosts = arcPosts.sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+);
+---
+
+<Layout
+  title="The Augur Arc - Blog"
+  description="News, updates, and progress from the Augur reboot"
+  ogType="website"
+>
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    {/* Top Section: Navigation */}
+    <div class="flex justify-between items-start p-8">
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autofocus>
+        <Pointer direction="left" animated="auto" />
+        BACK TO HOME
+      </Button>
+      <SocialLinks />
+    </div>
+
+    {/* Middle Section: Scrollable Content */}
+    <main class="overflow-y-auto px-4 md:px-8 mb-12">
+      <div class="max-w-screen-lg mx-auto">
+        <PageHeading text="The Augur Arc" />
+
+        <p class="text-center mb-12 max-w-2xl mx-auto text-foreground">
+          News, updates, and progress from the Augur reboot. Follow our journey as we rebuild decentralized prediction markets.
+        </p>
+
+        {/* Blog Posts Grid */}
+        <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
+          {sortedPosts.map((post) => (
+            <ArcPostCard
+              title={post.data.title}
+              description={post.data.description}
+              author={post.data.author}
+              publishDate={post.data.publishDate}
+              slug={post.slug}
+              tags={post.data.tags}
+            />
+          ))}
+        </div>
+
+        {sortedPosts.length === 0 && (
+          <div class="text-center text-muted-foreground mt-12">
+            <p>No posts yet. Check back soon!</p>
+          </div>
+        )}
+      </div>
+    </main>
+
+    {/* Bottom Section: Footer */}
+    <Footer />
+  </div>
+</Layout>

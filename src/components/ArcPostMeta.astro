@@ -1,0 +1,42 @@
+---
+interface Props {
+  author: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  tags?: string[];
+}
+
+const { author, publishDate, updatedDate, tags } = Astro.props;
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+}
+---
+
+<div class="flex flex-col gap-2 mb-8 text-sm text-muted-foreground uppercase tracking-wider border-b border-foreground/20 pb-4">
+  <div class="flex flex-wrap gap-4 justify-center">
+    <span>BY <span class="text-loud-foreground">{author}</span></span>
+    <span>•</span>
+    <span>{formatDate(publishDate)}</span>
+    {updatedDate && (
+      <>
+        <span>•</span>
+        <span>UPDATED {formatDate(updatedDate)}</span>
+      </>
+    )}
+  </div>
+
+  {tags && tags.length > 0 && (
+    <div class="flex gap-2 justify-center flex-wrap">
+      {tags.map(tag => (
+        <span class="px-2 py-1 border border-foreground/20 text-xs">
+          #{tag}
+        </span>
+      ))}
+    </div>
+  )}
+</div>
