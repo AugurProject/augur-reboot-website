@@ -1,0 +1,138 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import ArcNavigation from "../components/ArcNavigation.tsx";
+import ArcPostMeta from "../components/ArcPostMeta.astro";
+import Button from "../components/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import PageHeading from "../components/PageHeading.astro";
+import { withBase } from "../lib/utils";
+
+interface Post {
+  title: string;
+  path: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  author: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  prevPost?: Post;
+  nextPost?: Post;
+}
+
+const { title, description, author, publishDate, updatedDate, tags, prevPost, nextPost } = Astro.props;
+---
+
+<Layout
+  title={`${title} - The Augur Arc`}
+  description={description}
+  ogType="article"
+>
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    {/* Top Section: Navigation */}
+    <div class="flex justify-between items-start p-8">
+      {/* Back Button */}
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autofocus>
+        <Pointer direction="left" animated="auto" />
+        BACK TO HOME
+      </Button>
+
+      {/* Social Links */}
+      <SocialLinks />
+    </div>
+
+    {/* Middle Section: Scrollable Content */}
+    <main class="overflow-y-auto px-4 md:px-8 mb-12">
+      <div class="max-w-xl mx-auto">
+        <PageHeading text={title} />
+        <ArcPostMeta
+          author={author}
+          publishDate={publishDate}
+          updatedDate={updatedDate}
+          tags={tags}
+        />
+
+        {/* Main Content */}
+        <article class="prose prose-sm prose-invert max-w-none">
+          <slot />
+        </article>
+      </div>
+    </main>
+
+    {/* Bottom Section: Navigation + Footer */}
+    <ArcNavigation client:load prevPost={prevPost} nextPost={nextPost} />
+    <Footer />
+  </div>
+
+  <style is:global>
+    /* Custom prose styles for dark mode - Tailwind v4 CSS-first approach */
+    .prose {
+      --tw-prose-headings: var(--color-loud-foreground);
+      --tw-prose-links: var(--color-primary);
+      --tw-prose-body: var(--color-foreground);
+      --tw-prose-bold: var(--color-foreground);
+      --tw-prose-code: var(--color-green-400);
+      --tw-prose-borders: var(--color-primary);
+      --tw-prose-td-borders: var(--color-muted-foreground);
+      --tw-prose-th-borders: var(--color-muted-foreground);
+      --tw-prose-bg-hover: var(--color-primary);
+      --tw-prose-line-height: 1.2;
+      --tw-prose-pre-bg: transparent;
+      --tw-prose-pre-code: var(--color-foreground);
+    }
+
+    .prose-sm {
+      line-height: 1.325em;
+      letter-spacing: 0.025em;
+    }
+
+    .prose :is(h1, h2, h3, h4, h5, h6) {
+      text-transform: uppercase;
+    }
+
+    .prose h1 {
+      font-size: 1.5rem;
+    }
+
+    .prose p {
+      font-family: var(--tw-prose-p-font-family);
+    }
+
+    .prose li {
+      font-family: var(--tw-prose-p-font-family);
+    }
+
+    .prose ol > li::marker {
+      color: var(--color-muted-foreground);
+    }
+
+    .prose table td {
+      font-family: var(--tw-prose-p-font-family);
+    }
+
+    /* Override Shiki syntax highlighting theme for code blocks */
+    .prose pre.astro-code {
+      background-color: transparent !important;
+      border: none;
+      padding: 0;
+    }
+
+    .prose pre.astro-code code {
+      color: var(--color-foreground);
+    }
+
+    /* Blockquote styling */
+    .prose blockquote {
+      border-left-color: var(--color-muted-foreground);
+    }
+
+    .prose blockquote p {
+      color: var(--color-foreground);
+    }
+  </style>
+</Layout>

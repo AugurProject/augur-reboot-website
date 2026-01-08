@@ -1,0 +1,61 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  author: string;
+  publishDate: Date;
+  slug: string;
+  tags?: string[];
+}
+
+const { title, description, author, publishDate, slug, tags } = Astro.props;
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+---
+
+<article class="arc-post-card border border-foreground/20 bg-background/70 p-6 hover:border-primary/50 transition-colors">
+  <a href={`/arc/${slug}`} class="block">
+    <div class="flex flex-col gap-3">
+      {/* Post Title */}
+      <h3 class="text-xl font-bold text-loud-foreground tracking-[0.125em] uppercase hover:fx-glow transition-all duration-200">
+        {title}
+      </h3>
+
+      {/* Metadata */}
+      <div class="flex gap-3 text-xs text-muted-foreground uppercase tracking-wider">
+        <span>{formatDate(publishDate)}</span>
+        <span>•</span>
+        <span>BY {author}</span>
+      </div>
+
+      {/* Description */}
+      {description && (
+        <p class="text-foreground">
+          {description}
+        </p>
+      )}
+
+      {/* Tags */}
+      {tags && tags.length > 0 && (
+        <div class="flex gap-2 flex-wrap mt-2">
+          {tags.map(tag => (
+            <span class="px-2 py-1 border border-foreground/20 text-xs text-muted-foreground">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Read More */}
+      <div class="text-primary text-sm font-bold uppercase tracking-wider mt-2">
+        READ MORE →
+      </div>
+    </div>
+  </a>
+</article>
