@@ -59,14 +59,17 @@ interface SerializedEventLog {
 
 ### Storage Location
 
-**Cache file**: `cache/event-cache.json` (stored in `gh-pages` branch)
+**During build**: `public/cache/event-cache.json` (automatically copied by Astro to `dist/cache/`)
+
+**On gh-pages**: `cache/event-cache.json` (deployed site serves cache for transparency)
 
 **Public URL**: `https://augur.net/cache/event-cache.json`
 
 The cache is committed to the `gh-pages` branch for maximum transparency. Anyone can:
-- View the current cache contents
-- Audit the git history to see cache evolution
+- View the current cache contents at the public URL
+- Audit the git history with `git log gh-pages -- cache/event-cache.json`
 - Verify that cached data matches blockchain events
+- Download and inspect locally
 
 ### Sliding Window Strategy
 
@@ -145,22 +148,27 @@ To maintain clean git history, the system uses intelligent commit logic:
 ### Detection Logic
 
 ```bash
-# Check what changed
-RISK_DIFF=$(git diff --staged --numstat data/fork-risk.json | awk '{print $1+$2}')
-CACHE_DIFF=$(git diff --staged --numstat cache/event-cache.json | awk '{print $1+$2}')
+# Get current risk from deployed site
+CURRENT_RISK=$(jq -r '.riskPercentage' data/fork-risk.json)
+
+# Get previous risk from git history
+PREVIOUS_RISK=$(git show HEAD:data/fork-risk.json | jq -r '.riskPercentage')
 
 # Commit strategy
-if [ "$RISK_DIFF" -gt 10 ]; then
-  # Immediate: Meaningful risk change (not just timestamp)
+if [ "$CURRENT_RISK" != "$PREVIOUS_RISK" ]; then
+  # Immediate: Risk percentage changed (meaningful change detected)
   COMMIT_TYPE="immediate"
-elif [ "$CACHE_DIFF" -gt 0 ] && [ "$(date +%H)" = "00" ]; then
-  # Daily: Cache refresh at midnight
+  echo "Risk changed: $PREVIOUS_RISK% → $CURRENT_RISK%"
+elif [ "$(date +%H)" = "00" ]; then
+  # Daily: Cache refresh at midnight (00:05 UTC)
   COMMIT_TYPE="daily"
 else
   # Skip: No meaningful changes
   COMMIT_TYPE="skip"
 fi
 ```
+
+**Key improvement**: Compares risk percentage directly from git history instead of checking file diffs. This ensures we detect actual risk changes (e.g., 2.1% → 2.7%) regardless of other metadata changes like timestamps.
 
 ### Expected Git History
 
@@ -360,26 +368,31 @@ The system assumes Ethereum finalizes blocks within 32 blocks (~6.4 minutes). Th
 ### Execution Flow
 
 ```
-GitHub Actions (every 6 hours)
+GitHub Actions Workflow (every 6 hours at 00:05, 06:05, 12:05, 18:05 UTC)
   ↓
-Fetch cache from gh-pages
+[Build Job]
+  ├─ Fetch cache from gh-pages: origin/gh-pages:cache/event-cache.json
+  ├─ Create public/cache/event-cache.json (or valid empty cache if missing)
+  ├─ npm run build:fork-data
+  │   └─ calculate-fork-risk.ts
+  │      ├─ loadEventCache() from public/cache/
+  │      ├─ Determine query range (incremental or full)
+  │      ├─ Query blockchain (with finality protection)
+  │      ├─ Merge cached + new events
+  │      ├─ pruneOldEvents()
+  │      └─ saveEventCache() to public/cache/
+  ├─ npm run build (Astro copies public/ → dist/)
+  └─ Upload artifact (dist/)
   ↓
-npm run build:fork-data
-  ↓
-calculate-fork-risk.ts
-  ├─ loadEventCache()
-  ├─ Determine query range (incremental or full)
-  ├─ Query blockchain (with finality protection)
-  ├─ Merge cached + new events
-  ├─ pruneOldEvents()
-  └─ saveEventCache()
-  ↓
-Smart commit detection
-  ├─ Immediate: Risk data changed → commit + push
-  ├─ Daily: Midnight cache refresh → commit + push
-  └─ Skip: No meaningful changes → no commit
-  ↓
-Deploy to gh-pages (if committed)
+[Deploy Job]
+  ├─ Deploy artifact to gh-pages (actions/deploy-pages@v4)
+  ├─ Checkout gh-pages (cache now available at cache/event-cache.json)
+  ├─ Smart commit detection
+  │   ├─ Compare current vs previous risk from git history
+  │   ├─ Immediate: Risk % changed → commit both data/ and cache/
+  │   ├─ Daily: Midnight UTC + events tracked → commit cache only
+  │   └─ Skip: No meaningful changes → no commit
+  └─ Optionally commit + push to gh-pages
 ```
 
 ### Configuration
