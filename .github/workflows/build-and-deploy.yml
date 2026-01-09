@@ -69,24 +69,11 @@ jobs:
           else
             echo "⚠️ No cache found on gh-pages, will perform full 7-day query"
             # Create valid empty cache structure (matches EventCache interface)
-            cat > public/cache/event-cache.json << 'EOF'
-{
-  "version": "1.0.0",
-  "lastQueriedBlock": 0,
-  "lastQueriedTimestamp": "2024-01-01T00:00:00Z",
-  "oldestEventBlock": 0,
-  "events": {
-    "created": [],
-    "contributions": [],
-    "completed": []
-  },
-  "metadata": {
-    "totalEventsTracked": 0,
-    "cacheGeneratedAt": "2024-01-01T00:00:00Z",
-    "blockchainSyncStatus": "stale"
-  }
-}
-EOF
+            NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            jq -n \
+              --arg now "$NOW" \
+              '{version: "1.0.0", lastQueriedBlock: 0, lastQueriedTimestamp: $now, oldestEventBlock: 0, events: {created: [], contributions: [], completed: []}, metadata: {totalEventsTracked: 0, cacheGeneratedAt: $now, blockchainSyncStatus: "stale"}}' \
+              > public/cache/event-cache.json
           fi
 
       - name: Calculate fork risk data
