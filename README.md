@@ -166,10 +166,14 @@ Changes to the main branch trigger an automated workflow that:
 6. Ensures consistency across both hosting platforms
 
 **Fork Risk Data Collection:**
-- Runs automatically every hour via GitHub Actions
+- Runs automatically every 6 hours via GitHub Actions (00:05, 06:05, 12:05, 18:05 UTC)
+- Uses incremental event caching to minimize RPC calls (98% reduction)
+- Event cache stored publicly on gh-pages branch for transparency
+- Smart commit strategy: only updates when risk changes or daily at midnight
 - Uses public Ethereum RPC endpoints with failover
-- Monitors Augur v2 dispute events for accurate stake tracking and fork risk calculation
+- Monitors Augur v2 dispute events for accurate stake tracking
 - Zero infrastructure costs - completely serverless data pipeline
+- See [RPC Caching Strategy](docs/rpc-caching-strategy.md) for technical details
 
 ### Manual Deployment
 

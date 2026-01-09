@@ -59,8 +59,37 @@ interface ForkRiskData {
 
 type RiskLevel = 'low' | 'moderate' | 'high' | 'critical'
 
+// Cache interfaces for incremental event caching
+interface SerializedEventLog {
+	blockNumber: number
+	transactionHash: string
+	disputeCrowdsourcerAddress: string
+	marketAddress: string
+	args: Array<string | number>
+	eventType: 'created' | 'contribution' | 'completed'
+}
+
+interface EventCache {
+	version: string
+	lastQueriedBlock: number
+	lastQueriedTimestamp: string
+	oldestEventBlock: number
+	events: {
+		created: SerializedEventLog[]
+		contributions: SerializedEventLog[]
+		completed: SerializedEventLog[]
+	}
+	metadata: {
+		totalEventsTracked: number
+		cacheGeneratedAt: string
+		blockchainSyncStatus: 'complete' | 'partial' | 'stale'
+	}
+}
+
 // Configuration
 const FORK_THRESHOLD_REP = 275000 // 2.5% of 11 million REP
+const CACHE_VERSION = '1.0.0'
+const FINALITY_DEPTH = 32 // Ethereum finality depth (~6.4 minutes)
 
 // Public RPC endpoints (no API keys required!)
 const PUBLIC_RPC_ENDPOINTS = [
@@ -303,26 +332,241 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 	}
 }
 
+/**
+ * Detect if error is due to rate limiting
+ */
+function isRateLimitError(error: unknown): boolean {
+	const errorMessage = error instanceof Error ? error.message : String(error)
+	return (
+		errorMessage.includes('429') ||
+		errorMessage.includes('Too Many Requests') ||
+		errorMessage.includes('error code: 1015') ||
+		errorMessage.includes('rate limit') ||
+		errorMessage.includes('exceeded maximum retry limit')
+	)
+}
+
+/**
+ * Cache Management Functions
+ * These functions handle incremental event caching to reduce RPC calls
+ */
+
+/**
+ * Load event cache from disk or create empty cache
+ */
+async function loadEventCache(): Promise<EventCache> {
+	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
+
+	try {
+		const cacheData = await fs.readFile(cachePath, 'utf8')
+		const cache: EventCache = JSON.parse(cacheData)
+
+		if (!validateCache(cache)) {
+			console.warn('Cache validation failed, creating new cache')
+			return createEmptyCache()
+		}
+
+		console.log(`✓ Cache loaded: ${cache.metadata.totalEventsTracked} events tracked`)
+		return cache
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+			console.log('No cache found, will perform full query')
+		} else {
+			console.warn(`Cache load error: ${error instanceof Error ? error.message : String(error)}`)
+		}
+		return createEmptyCache()
+	}
+}
+
+/**
+ * Create empty cache structure
+ */
+function createEmptyCache(): EventCache {
+	return {
+		version: CACHE_VERSION,
+		lastQueriedBlock: 0,
+		lastQueriedTimestamp: new Date().toISOString(),
+		oldestEventBlock: 0,
+		events: {
+			created: [],
+			contributions: [],
+			completed: []
+		},
+		metadata: {
+			totalEventsTracked: 0,
+			cacheGeneratedAt: new Date().toISOString(),
+			blockchainSyncStatus: 'stale'
+		}
+	}
+}
+
+/**
+ * Save event cache to disk
+ */
+async function saveEventCache(cache: EventCache): Promise<void> {
+	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
+
+	try {
+		// Ensure cache directory exists
+		await fs.mkdir(path.dirname(cachePath), { recursive: true })
+
+		// Update metadata
+		cache.metadata.cacheGeneratedAt = new Date().toISOString()
+		cache.metadata.totalEventsTracked =
+			cache.events.created.length +
+			cache.events.contributions.length +
+			cache.events.completed.length
+
+		// Write cache with pretty formatting for readability
+		await fs.writeFile(cachePath, JSON.stringify(cache, null, 2))
+
+		console.log(`✓ Cache saved: ${cache.metadata.totalEventsTracked} events`)
+	} catch (error) {
+		console.error(`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`)
+		// Non-fatal error - script can continue without cache
+	}
+}
+
+/**
+ * Validate cache integrity and version compatibility
+ */
+function validateCache(cache: EventCache): boolean {
+	// Check version compatibility
+	if (cache.version !== CACHE_VERSION) {
+		console.warn(`Cache version mismatch: ${cache.version} (expected ${CACHE_VERSION})`)
+		return false
+	}
+
+	// Check required fields
+	if (!cache.lastQueriedBlock || !cache.events) {
+		console.warn('Cache missing required fields')
+		return false
+	}
+
+	// Check block number sanity
+	if (cache.lastQueriedBlock < 0 || cache.lastQueriedBlock > 999999999) {
+		console.warn('Cache has invalid block number')
+		return false
+	}
+
+	// Check event array integrity
+	const totalEvents =
+		cache.events.created.length +
+		cache.events.contributions.length +
+		cache.events.completed.length
+
+	if (totalEvents !== cache.metadata.totalEventsTracked) {
+		console.warn('Cache event count mismatch')
+		return false
+	}
+
+	return true
+}
+
+/**
+ * Serialize ethers.EventLog to plain JSON
+ */
+function serializeEvent(
+	event: ethers.EventLog,
+	eventType: 'created' | 'contribution' | 'completed'
+): SerializedEventLog {
+	return {
+		blockNumber: event.blockNumber,
+		transactionHash: event.transactionHash,
+		disputeCrowdsourcerAddress: event.args?.[2] || '',
+		marketAddress: event.args?.[1] || '',
+		args: event.args ? event.args.map(arg => String(arg)) : [],
+		eventType
+	}
+}
+
+/**
+ * Prune events older than 7 days from cache
+ */
+function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
+	const blocksPerDay = 7200
+	const searchPeriod = 7 * blocksPerDay
+	const cutoffBlock = currentBlock - searchPeriod
+
+	const prunedCache: EventCache = {
+		...cache,
+		events: {
+			created: cache.events.created.filter(e => e.blockNumber >= cutoffBlock),
+			contributions: cache.events.contributions.filter(e => e.blockNumber >= cutoffBlock),
+			completed: cache.events.completed.filter(e => e.blockNumber >= cutoffBlock)
+		},
+		oldestEventBlock: cutoffBlock
+	}
+
+	const eventsRemoved = cache.metadata.totalEventsTracked -
+		(prunedCache.events.created.length +
+		 prunedCache.events.contributions.length +
+		 prunedCache.events.completed.length)
+
+	if (eventsRemoved > 0) {
+		console.log(`Pruned ${eventsRemoved} old events (older than block ${cutoffBlock})`)
+	}
+
+	return prunedCache
+}
+
 async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
+
+		// Load event cache for incremental queries
+		const cache = await loadEventCache()
 
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
 		const currentBlock = await provider.getBlockNumber()
 		const blocksPerDay = 7200 // Approximate blocks per day (12 second blocks)
 		const searchPeriod = 7 * blocksPerDay // Last 7 days
-		const fromBlock = currentBlock - searchPeriod
+		const fullSearchStartBlock = currentBlock - searchPeriod
 
+		// Determine query range based on cache
+		let fromBlock: number
+		let newEventsOnly = false
+
+		if (cache.lastQueriedBlock > 0 && cache.lastQueriedBlock < currentBlock) {
+			// Incremental query: start from last queried block + 1
+			// But also re-query last FINALITY_DEPTH blocks for safety
+			fromBlock = Math.max(
+				cache.lastQueriedBlock - FINALITY_DEPTH,
+				fullSearchStartBlock
+			)
+			newEventsOnly = true
+			const blocksToQuery = currentBlock - fromBlock
+			console.log(`📦 Incremental query: blocks ${fromBlock} → ${currentBlock} (~${blocksToQuery} blocks)`)
+			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events`)
+		} else {
+			// Full query: no valid cache or cache is stale
+			fromBlock = fullSearchStartBlock
+			console.log(`🔄 Full query: last 7 days (${searchPeriod} blocks)`)
+		}
+
+		// Initialize event arrays
+		// For incremental queries, start with cached events
 		const allCreatedEvents: ethers.EventLog[] = []
 		const allContributionEvents: ethers.EventLog[] = []
 		const allCompletedEvents: ethers.EventLog[] = []
 		const chunkSize = 1000 // Max blocks per query for most RPC providers
 
+		let consecutiveFailures = 0
+		let totalChunks = 0
+		let successfulChunks = 0
+		let newEventsFound = 0
+
 		// Query all relevant events in chunks
 		for (let start = fromBlock; start < currentBlock; start += chunkSize) {
 			const end = Math.min(start + chunkSize - 1, currentBlock)
+			totalChunks++
 
 			try {
+				// Add small delay between chunks to avoid rate limiting (100ms)
+				if (totalChunks > 1) {
+					await new Promise(resolve => setTimeout(resolve, 100))
+				}
+
 				// Query Created events (for dispute initialization)
 				const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
 				const createdEvents = await contracts.augur.queryFilter(createdFilter, start, end)
@@ -339,20 +583,116 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 				allCompletedEvents.push(...(completedEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
 
 				const totalEvents = createdEvents.length + contributionEvents.length + completedEvents.length
+				newEventsFound += totalEvents
 				if (totalEvents > 0) {
 					console.log(`Found ${totalEvents} dispute events in blocks ${start}-${end} (${createdEvents.length} created, ${contributionEvents.length} contributions, ${completedEvents.length} completed)`)
 				}
+
+				consecutiveFailures = 0
+				successfulChunks++
 			} catch (chunkError) {
-				console.warn(
-					`Failed to query blocks ${start}-${end}:`,
-					chunkError instanceof Error
-						? chunkError.message
-						: String(chunkError),
-				)
+				consecutiveFailures++
+				const errorMessage = chunkError instanceof Error ? chunkError.message : String(chunkError)
+
+				// Detect rate limiting
+				if (isRateLimitError(chunkError)) {
+					console.warn(`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`)
+					// Exponential backoff for rate limits (2s, 4s, 8s)
+					const backoffDelay = Math.min(Math.pow(2, consecutiveFailures) * 1000, 10000)
+					console.log(`Waiting ${backoffDelay}ms before continuing...`)
+					await new Promise(resolve => setTimeout(resolve, backoffDelay))
+				} else {
+					console.warn(`Failed to query blocks ${start}-${end}: ${errorMessage}`)
+				}
+
+				// If we've had too many consecutive failures, stop to avoid wasting time
+				if (consecutiveFailures >= 5) {
+					console.warn(`⚠️ Too many consecutive failures (${consecutiveFailures}), stopping chunk queries early`)
+					console.log(`Successfully queried ${successfulChunks}/${totalChunks} chunks so far, using partial data`)
+					break
+				}
 			}
 		}
 
-		console.log(`Total events found: ${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed`)
+		console.log(`Chunk query complete: ${successfulChunks}/${totalChunks} successful`)
+
+		console.log(`New events found: ${newEventsFound} (${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed)`)
+
+		// Merge with cached events if this was an incremental query
+		if (newEventsOnly && cache.lastQueriedBlock > 0) {
+			// Load cached events (but filter out events from the re-queried finality window to avoid duplicates)
+			const finalityStartBlock = cache.lastQueriedBlock - FINALITY_DEPTH
+
+			for (const cachedEvent of cache.events.created) {
+				if (cachedEvent.blockNumber < finalityStartBlock) {
+					// Reconstruct minimal EventLog for processing
+					const reconstructed = {
+						blockNumber: cachedEvent.blockNumber,
+						transactionHash: cachedEvent.transactionHash,
+						args: cachedEvent.args
+					} as ethers.EventLog
+					allCreatedEvents.push(reconstructed)
+				}
+			}
+
+			for (const cachedEvent of cache.events.contributions) {
+				if (cachedEvent.blockNumber < finalityStartBlock) {
+					const reconstructed = {
+						blockNumber: cachedEvent.blockNumber,
+						transactionHash: cachedEvent.transactionHash,
+						args: cachedEvent.args
+					} as ethers.EventLog
+					allContributionEvents.push(reconstructed)
+				}
+			}
+
+			for (const cachedEvent of cache.events.completed) {
+				if (cachedEvent.blockNumber < finalityStartBlock) {
+					const reconstructed = {
+						blockNumber: cachedEvent.blockNumber,
+						transactionHash: cachedEvent.transactionHash,
+						args: cachedEvent.args
+					} as ethers.EventLog
+					allCompletedEvents.push(reconstructed)
+				}
+			}
+
+			console.log(`📦 Merged with cached events: total ${allCreatedEvents.length + allContributionEvents.length + allCompletedEvents.length} events`)
+		}
+
+		// Update cache with newly queried events
+		const updatedCache: EventCache = {
+			version: CACHE_VERSION,
+			lastQueriedBlock: currentBlock,
+			lastQueriedTimestamp: new Date().toISOString(),
+			oldestEventBlock: fullSearchStartBlock,
+			events: {
+				created: allCreatedEvents.map(e => serializeEvent(e, 'created')),
+				contributions: allContributionEvents.map(e => serializeEvent(e, 'contribution')),
+				completed: allCompletedEvents.map(e => serializeEvent(e, 'completed'))
+			},
+			metadata: {
+				totalEventsTracked: allCreatedEvents.length + allContributionEvents.length + allCompletedEvents.length,
+				cacheGeneratedAt: new Date().toISOString(),
+				blockchainSyncStatus: successfulChunks === totalChunks ? 'complete' : 'partial'
+			}
+		}
+
+		// Prune old events (older than 7 days)
+		const prunedCache = pruneOldEvents(updatedCache, currentBlock)
+
+		// Save cache for next run
+		await saveEventCache(prunedCache)
+
+		// Log cache efficiency metrics
+		if (newEventsOnly) {
+			const blocksQueried = currentBlock - fromBlock
+			const fullQueryBlocks = searchPeriod
+			const queriesSaved = Math.floor(fullQueryBlocks / 1000) - Math.floor(blocksQueried / 1000)
+			console.log(`💰 RPC queries saved: ~${queriesSaved} queries (queried ${blocksQueried} blocks instead of ${fullQueryBlocks})`)
+		}
+
+		console.log(`Total events after pruning: ${prunedCache.metadata.totalEventsTracked}`)
 
 		// Create a map to track dispute crowdsourcer states
 		const disputeStates = new Map<string, {
