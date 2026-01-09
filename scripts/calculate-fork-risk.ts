@@ -355,7 +355,7 @@ function isRateLimitError(error: unknown): boolean {
  * Load event cache from disk or create empty cache
  */
 async function loadEventCache(): Promise<EventCache> {
-	const cachePath = path.join(__dirname, '../cache/event-cache.json')
+	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
 
 	try {
 		const cacheData = await fs.readFile(cachePath, 'utf8')
@@ -404,7 +404,7 @@ function createEmptyCache(): EventCache {
  * Save event cache to disk
  */
 async function saveEventCache(cache: EventCache): Promise<void> {
-	const cachePath = path.join(__dirname, '../cache/event-cache.json')
+	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
 
 	try {
 		// Ensure cache directory exists

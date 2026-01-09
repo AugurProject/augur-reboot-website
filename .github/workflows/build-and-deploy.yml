@@ -57,18 +57,36 @@ jobs:
           # - Reduces RPC calls from ~51/hour to ~2/6-hours (98% reduction)
           # - See docs/rpc-caching-strategy.md for details
 
-          # Create cache directory
-          mkdir -p cache
+          # Create cache directory in public/ (will be copied to dist/ by Astro build)
+          mkdir -p public/cache
 
           # Try to fetch cache from gh-pages branch
-          if git show origin/gh-pages:cache/event-cache.json > cache/event-cache.json 2>/dev/null; then
+          if git show origin/gh-pages:cache/event-cache.json > public/cache/event-cache.json 2>/dev/null; then
             echo "✓ Cache loaded from gh-pages"
-            echo "Cache size: $(wc -c < cache/event-cache.json) bytes"
-            echo "Cache version: $(jq -r '.version // "unknown"' cache/event-cache.json)"
-            echo "Last queried block: $(jq -r '.lastQueriedBlock // 0' cache/event-cache.json)"
+            echo "Cache size: $(wc -c < public/cache/event-cache.json) bytes"
+            echo "Cache version: $(jq -r '.version // "unknown"' public/cache/event-cache.json)"
+            echo "Last queried block: $(jq -r '.lastQueriedBlock // 0' public/cache/event-cache.json)"
           else
             echo "⚠️ No cache found on gh-pages, will perform full 7-day query"
-            echo "{}" > cache/event-cache.json
+            # Create valid empty cache structure (matches EventCache interface)
+            cat > public/cache/event-cache.json << 'EOF'
+{
+  "version": "1.0.0",
+  "lastQueriedBlock": 0,
+  "lastQueriedTimestamp": "2024-01-01T00:00:00Z",
+  "oldestEventBlock": 0,
+  "events": {
+    "created": [],
+    "contributions": [],
+    "completed": []
+  },
+  "metadata": {
+    "totalEventsTracked": 0,
+    "cacheGeneratedAt": "2024-01-01T00:00:00Z",
+    "blockchainSyncStatus": "stale"
+  }
+}
+EOF
           fi
 
       - name: Calculate fork risk data
@@ -124,10 +142,10 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Checkout main branch for cache management
+      - name: Checkout gh-pages for cache management
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: gh-pages
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -135,24 +153,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Download build artifact for cache management
-        uses: actions/download-artifact@v4
-        with:
-          name: augur-site-build-${{ github.run_number }}
-          path: dist/
-
-      - name: Manage cache on gh-pages
-        run: |
-          # Checkout gh-pages branch to update cache
-          git checkout gh-pages
-          git pull origin gh-pages
-
-          # Update cache directory from build output
-          if [ -f dist/data/fork-risk.json ]; then
-            mkdir -p cache
-            cp dist/data/fork-risk.json cache/fork-risk.json 2>/dev/null || true
-          fi
 
       - name: Detect meaningful changes (smart commit)
         id: changes
@@ -162,47 +162,71 @@ jobs:
           # - Daily: Cache-only updates (midnight run at 00:05 UTC)
           # - Skip: No changes
 
-          # Stage cache files to check diffs
-          git add cache/event-cache.json 2>/dev/null || true
+          # Get current risk from deployed site
+          CURRENT_RISK=$(jq -r '.riskPercentage // 0' data/fork-risk.json 2>/dev/null || echo "0")
+          CURRENT_BLOCK=$(jq -r '.blockNumber // "N/A"' data/fork-risk.json 2>/dev/null || echo "N/A")
 
-          # Check what changed in cache
-          CACHE_DIFF=$(git diff --staged --numstat cache/event-cache.json 2>/dev/null | awk '{print $1+$2}')
+          # Get previous risk from git history
+          PREVIOUS_RISK=$(git show HEAD:data/fork-risk.json 2>/dev/null | jq -r '.riskPercentage // 0' 2>/dev/null || echo "0")
 
-          # Extract metrics for commit message
-          BLOCK=$(jq -r '.blockNumber // "N/A"' cache/fork-risk.json 2>/dev/null || echo "N/A")
-          RISK=$(jq -r '.riskPercentage // 0' cache/fork-risk.json 2>/dev/null || echo "0")
+          # Check if risk changed meaningfully
+          RISK_CHANGED=$([ "$CURRENT_RISK" != "$PREVIOUS_RISK" ] && echo "true" || echo "false")
+
+          # Get cache stats for commit message
           EVENTS=$(jq -r '.metadata.totalEventsTracked // 0' cache/event-cache.json 2>/dev/null || echo "0")
           HOUR=$(date +%H)
 
           # Determine commit strategy
-          if [ "${CACHE_DIFF:-0}" -gt 0 ] && [ "$HOUR" = "00" ]; then
-            # Daily cache refresh at midnight (00:05 UTC)
+          if [ "$RISK_CHANGED" = "true" ]; then
+            # Meaningful risk change - immediate commit
+            echo "status=immediate" >> $GITHUB_OUTPUT
+            echo "block=$CURRENT_BLOCK" >> $GITHUB_OUTPUT
+            echo "risk=$CURRENT_RISK" >> $GITHUB_OUTPUT
+            echo "events=$EVENTS" >> $GITHUB_OUTPUT
+            echo "✅ Immediate commit: Risk changed from $PREVIOUS_RISK% to $CURRENT_RISK%"
+          elif [ "${EVENTS:-0}" -gt 0 ] && [ "$HOUR" = "00" ]; then
+            # Daily cache refresh at midnight (00:05 UTC) - only if events tracked
             echo "status=daily-cache" >> $GITHUB_OUTPUT
-            echo "block=$BLOCK" >> $GITHUB_OUTPUT
+            echo "block=$CURRENT_BLOCK" >> $GITHUB_OUTPUT
             echo "events=$EVENTS" >> $GITHUB_OUTPUT
             echo "📅 Daily cache refresh commit"
           else
-            # No meaningful cache-only changes or not midnight
+            # No meaningful changes
             echo "status=skip" >> $GITHUB_OUTPUT
-            echo "⏭️ Skipping cache commit (no meaningful changes)"
+            echo "⏭️ Skipping commit (no meaningful changes)"
           fi
+
+      - name: Commit risk changes
+        if: steps.changes.outputs.status == 'immediate'
+        run: |
+          git add data/fork-risk.json cache/event-cache.json 2>/dev/null || true
+          git commit -m "chore: update fork risk data
+
+          Block: ${{ steps.changes.outputs.block }}
+          Risk: ${{ steps.changes.outputs.risk }}%
+          Cached events: ${{ steps.changes.outputs.events }}
+
+          New dispute activity detected. Risk changed due to active disputes."
+          git push origin gh-pages
 
       - name: Commit daily cache refresh
         if: steps.changes.outputs.status == 'daily-cache'
         run: |
+          git add cache/event-cache.json 2>/dev/null || true
           git commit -m "chore: daily event cache refresh
 
           Block: ${{ steps.changes.outputs.block }}
+          Risk: ${{ steps.changes.outputs.risk }}%
           Cached events: ${{ steps.changes.outputs.events }}
 
           Routine cache update (no new disputes)."
           git push origin gh-pages
 
-      - name: Skip cache commit
+      - name: Skip commit
         if: steps.changes.outputs.status == 'skip'
         run: |
-          echo "⏭️ No meaningful cache changes, skipping commit"
-          git restore --staged cache/ 2>/dev/null || true
+          echo "⏭️ No meaningful changes, skipping commit"
+          git restore --staged data/ cache/ 2>/dev/null || true
 
   summary:
     needs: build
