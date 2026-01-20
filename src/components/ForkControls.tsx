@@ -7,12 +7,7 @@ import { DisputeBondScenario } from '../utils/demoDataGenerator'
 export const ForkControls = (): React.JSX.Element | null => {
 	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useForkMock()
 	const [isVisible, setIsVisible] = useState(false)
-	
-	// Only show in development mode
-	if (!isDemoAvailable) {
-		return null
-	}
-	
+
 	// Keyboard shortcut to toggle demo overlay (F2)
 	useEffect(() => {
 		const handleKeydown = (e: KeyboardEvent) => {
@@ -21,10 +16,15 @@ export const ForkControls = (): React.JSX.Element | null => {
 				setIsVisible(prev => !prev)
 			}
 		}
-		
+
 		window.addEventListener('keydown', handleKeydown)
 		return () => window.removeEventListener('keydown', handleKeydown)
 	}, [])
+
+	// Only show in development mode
+	if (!isDemoAvailable) {
+		return null
+	}
 	
 	if (!isVisible) {
 		return ReactDOM.createPortal(

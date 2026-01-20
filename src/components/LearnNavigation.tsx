@@ -14,7 +14,7 @@ interface LearnNavigationProps {
 
 export default function LearnNavigation({
 	currentPath,
-	currentTitle,
+	_currentTitle,
 	topics,
 }: LearnNavigationProps) {
 	const [isExpanded, setIsExpanded] = useState(false)

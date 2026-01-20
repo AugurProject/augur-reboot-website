@@ -203,6 +203,7 @@ class WebGLGridRenderer {
     // Set WebGL state for proper rendering
     this.gl.clearColor(0, 0, 0, 0); // Transparent background
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    // biome-ignore lint/correctness/useHookAtTopLevel: this.gl.useProgram is a WebGL API, not a React hook
     this.gl.useProgram(this.program);
 
     // Set uniforms
@@ -250,7 +251,7 @@ class WebGLGridRenderer {
   }
 
   private updateGridVertices(frameCount: number, animationSpeed: number, width: number, height: number) {
-    const horizonWidth = width * 0.1;
+    const _horizonWidth = width * 0.1;
     const horizonHeight = height * 0.15;
     const zOffset = frameCount * animationSpeed;
     const segmentLength = 40;
@@ -410,7 +411,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         rendererRef.current = null;
       }
     };
-  }, [numLines, lineColor, animationSpeed, maxOpacity, vanishingPoint]);
+  }, [numLines, lineColor, animationSpeed, vanishingPoint]);
 
   return (
     <canvas

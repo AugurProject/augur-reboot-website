@@ -97,7 +97,7 @@ export const ForkDataProvider = ({
 			const interval = setInterval(loadForkRiskData, updateInterval)
 			return () => clearInterval(interval)
 		}
-	}, [loadForkRiskData, updateInterval, hasHydrated, defaultData])
+	}, [loadForkRiskData, updateInterval, hasHydrated])
 
 	const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
 		percentage: data.riskPercentage, // Pass actual percentage, let GaugeDisplay handle visual scaling

@@ -1,8 +1,10 @@
 ---
+import type React from 'react'
+
 interface Props {
   name: string;
   description: string;
-  SvgLogo?: any;
+  SvgLogo?: React.ComponentType<{ class?: string }>;
   url?: string;
 }
 

@@ -145,7 +145,7 @@ async function retryContractCall<T>(
 	throw new Error(`Unexpected retry flow for ${methodName}`)
 }
 
-async function getWorkingProvider(): Promise<RpcConnection> {
+async function _getWorkingProvider(): Promise<RpcConnection> {
 	let fallbacksAttempted = 0
 
 	// Try public RPC endpoints
@@ -273,7 +273,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					() => contracts.universe.isForking(),
 					'universe.isForking()'
 				)
-			} catch (error) {
+			} catch (_error) {
 				console.warn('⚠️ Failed to check forking status, continuing with dispute calculation')
 				// Continue with graceful degradation
 			}
@@ -765,7 +765,7 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			try {
 				if (!event.args || !Array.isArray(event.args) || event.args.length < 11) continue
 
-				const [_universe, marketAddress, disputeCrowdsourcerAddress] = event.args
+				const [_universe, _marketAddress, disputeCrowdsourcerAddress] = event.args
 				const existing = disputeStates.get(disputeCrowdsourcerAddress)
 				if (existing) {
 					existing.isCompleted = true
@@ -777,7 +777,7 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 
 		// Convert to DisputeDetails array, filtering out completed disputes
 		const disputes: DisputeDetails[] = []
-		for (const [disputeCrowdsourcerAddress, state] of disputeStates.entries()) {
+		for (const [_disputeCrowdsourcerAddress, state] of disputeStates.entries()) {
 			// Only include active (non-completed) disputes
 			if (state.isCompleted) continue
 
