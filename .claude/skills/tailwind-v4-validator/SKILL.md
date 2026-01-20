@@ -27,7 +27,8 @@ Replace separate opacity utilities with slash notation:
 - `border-opacity-25 border-red-500` → `border-red-500/25`
 
 ### Scale Updates (Priority 1)
-- `shadow-sm` → `shadow-xs` (shadow scale updated)
+- `shadow` (bare) → `shadow-sm` (default shadow changed)
+- `shadow-sm` → `shadow-xs` (shadow scale shifted)
 - `drop-shadow-sm` → `drop-shadow-xs`
 - `rounded-sm` → `rounded-xs`
 - `blur-sm` → `blur-xs`

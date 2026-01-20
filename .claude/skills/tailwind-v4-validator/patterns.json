@@ -36,6 +36,18 @@
       "priority": 1
     },
     {
+      "id": "shadow-default",
+      "category": "shadow",
+      "deprecated": "\\bshadow\\b(?!-)",
+      "canonical": "shadow-sm",
+      "explanation": "Tailwind v4 changed default shadow (bare 'shadow') from shadow-sm to shadow-xs; use shadow-sm explicitly for v3 appearance",
+      "examples": [
+        { "old": "shadow", "new": "shadow-sm" }
+      ],
+      "priority": 1,
+      "isRegex": true
+    },
+    {
       "id": "drop-shadow-scale",
       "category": "shadow",
       "deprecated": "drop-shadow-sm",
@@ -65,6 +77,17 @@
       "explanation": "Tailwind v4 adjusted blur scale for consistency",
       "examples": [
         { "old": "blur-sm", "new": "blur-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "backdrop-blur-scale",
+      "category": "blur",
+      "deprecated": "backdrop-blur-sm",
+      "canonical": "backdrop-blur-xs",
+      "explanation": "Tailwind v4 adjusted backdrop-blur scale for consistency with blur utilities",
+      "examples": [
+        { "old": "backdrop-blur-sm", "new": "backdrop-blur-xs" }
       ],
       "priority": 1
     },
@@ -102,7 +125,9 @@
       "explanation": "Tailwind v4 added radial and conic gradients, renamed linear gradients for clarity",
       "examples": [
         { "old": "bg-gradient-to-r", "new": "bg-linear-to-r" },
-        { "old": "bg-gradient-to-b", "new": "bg-linear-to-b" }
+        { "old": "bg-gradient-to-b", "new": "bg-linear-to-b" },
+        { "old": "bg-gradient-to-t", "new": "bg-linear-to-t" },
+        { "old": "bg-gradient-to-l", "new": "bg-linear-to-l" }
       ],
       "priority": 2
     },
@@ -168,9 +193,20 @@
       "category": "semantic",
       "deprecated": "decoration-slice",
       "canonical": "box-decoration-slice",
-      "explanation": "Tailwind v4 used more specific naming",
+      "explanation": "Tailwind v4 used more specific naming for box-decoration property",
       "examples": [
         { "old": "decoration-slice", "new": "box-decoration-slice" }
+      ],
+      "priority": 3
+    },
+    {
+      "id": "box-decoration-clone",
+      "category": "semantic",
+      "deprecated": "decoration-clone",
+      "canonical": "box-decoration-clone",
+      "explanation": "Tailwind v4 used more specific naming for box-decoration property",
+      "examples": [
+        { "old": "decoration-clone", "new": "box-decoration-clone" }
       ],
       "priority": 3
     }
