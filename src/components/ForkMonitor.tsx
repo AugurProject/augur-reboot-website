@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 import { ForkDataProvider } from '../providers/ForkDataProvider'
 import { ForkMockProvider } from '../providers/ForkMockProvider'
 import ForkDisplay from './ForkDisplay'

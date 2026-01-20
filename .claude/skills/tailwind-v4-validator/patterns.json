@@ -1,0 +1,214 @@
+{
+  "patterns": [
+    {
+      "id": "flex-shrink",
+      "category": "flex",
+      "deprecated": "flex-shrink-0",
+      "canonical": "shrink-0",
+      "explanation": "Tailwind v4 simplified flex utilities by removing 'flex-' prefix",
+      "examples": [
+        { "old": "flex-shrink-0", "new": "shrink-0" },
+        { "old": "flex-shrink-1", "new": "shrink-1" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "flex-grow",
+      "category": "flex",
+      "deprecated": "flex-grow",
+      "canonical": "grow",
+      "explanation": "Tailwind v4 simplified flex utilities by removing 'flex-' prefix",
+      "examples": [
+        { "old": "flex-grow", "new": "grow" },
+        { "old": "flex-grow-0", "new": "grow-0" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "shadow-scale",
+      "category": "shadow",
+      "deprecated": "shadow-sm",
+      "canonical": "shadow-xs",
+      "explanation": "Tailwind v4 adjusted shadow scale: shadow-sm → shadow-xs, shadow → shadow-sm",
+      "examples": [
+        { "old": "shadow-sm", "new": "shadow-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "shadow-default",
+      "category": "shadow",
+      "deprecated": "\\bshadow\\b(?!-)",
+      "canonical": "shadow-sm",
+      "explanation": "Tailwind v4 changed default shadow (bare 'shadow') from shadow-sm to shadow-xs; use shadow-sm explicitly for v3 appearance",
+      "examples": [
+        { "old": "shadow", "new": "shadow-sm" }
+      ],
+      "priority": 1,
+      "isRegex": true
+    },
+    {
+      "id": "drop-shadow-scale",
+      "category": "shadow",
+      "deprecated": "drop-shadow-sm",
+      "canonical": "drop-shadow-xs",
+      "explanation": "Tailwind v4 adjusted drop-shadow scale consistency",
+      "examples": [
+        { "old": "drop-shadow-sm", "new": "drop-shadow-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "rounded-scale",
+      "category": "radius",
+      "deprecated": "rounded-sm",
+      "canonical": "rounded-xs",
+      "explanation": "Tailwind v4 adjusted border-radius scale",
+      "examples": [
+        { "old": "rounded-sm", "new": "rounded-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "blur-scale",
+      "category": "blur",
+      "deprecated": "blur-sm",
+      "canonical": "blur-xs",
+      "explanation": "Tailwind v4 adjusted blur scale for consistency",
+      "examples": [
+        { "old": "blur-sm", "new": "blur-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "backdrop-blur-scale",
+      "category": "blur",
+      "deprecated": "backdrop-blur-sm",
+      "canonical": "backdrop-blur-xs",
+      "explanation": "Tailwind v4 adjusted backdrop-blur scale for consistency with blur utilities",
+      "examples": [
+        { "old": "backdrop-blur-sm", "new": "backdrop-blur-xs" }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "css-var-arbitrary",
+      "category": "arbitrary",
+      "deprecated": "bg-\\[--",
+      "canonical": "bg-\\(--",
+      "explanation": "Tailwind v4 uses parenthesis notation for CSS variables in arbitrary values",
+      "examples": [
+        { "old": "bg-[--brand-color]", "new": "bg-(--brand-color)" }
+      ],
+      "priority": 1,
+      "isRegex": true
+    },
+    {
+      "id": "opacity-modifier",
+      "category": "opacity",
+      "deprecated": "(bg|text|border|divide|ring|placeholder)-opacity-(\\d+)\\s+(bg|text|border|divide|ring|placeholder)-",
+      "canonical": null,
+      "explanation": "Tailwind v4 replaced separate opacity utilities with slash notation (e.g., bg-red-500/50)",
+      "examples": [
+        { "old": "bg-opacity-50 bg-red-500", "new": "bg-red-500/50" },
+        { "old": "text-opacity-75 text-blue-500", "new": "text-blue-500/75" }
+      ],
+      "priority": 2,
+      "isRegex": true,
+      "transform": "custom"
+    },
+    {
+      "id": "gradient-linear",
+      "category": "gradient",
+      "deprecated": "bg-gradient-to-r",
+      "canonical": "bg-linear-to-r",
+      "explanation": "Tailwind v4 added radial and conic gradients, renamed linear gradients for clarity",
+      "examples": [
+        { "old": "bg-gradient-to-r", "new": "bg-linear-to-r" },
+        { "old": "bg-gradient-to-b", "new": "bg-linear-to-b" },
+        { "old": "bg-gradient-to-t", "new": "bg-linear-to-t" },
+        { "old": "bg-gradient-to-l", "new": "bg-linear-to-l" }
+      ],
+      "priority": 2
+    },
+    {
+      "id": "outline-prefix",
+      "category": "outline",
+      "deprecated": "outline outline-",
+      "canonical": "outline-",
+      "explanation": "Tailwind v4 removed redundant 'outline' prefix; specify width directly with outline-2, etc.",
+      "examples": [
+        { "old": "outline outline-2 outline-blue-500", "new": "outline-2 outline-blue-500" }
+      ],
+      "priority": 2,
+      "isRegex": true
+    },
+    {
+      "id": "outline-none",
+      "category": "outline",
+      "deprecated": "outline-none",
+      "canonical": "outline-hidden",
+      "explanation": "Tailwind v4 uses outline-hidden for accessibility (sets outline-style: none)",
+      "examples": [
+        { "old": "outline-none", "new": "outline-hidden" }
+      ],
+      "priority": 2
+    },
+    {
+      "id": "ring-default",
+      "category": "ring",
+      "deprecated": "ring ",
+      "canonical": "ring-3",
+      "explanation": "Tailwind v4 changed default ring width from 3px to 1px; use ring-3 to match v3 appearance",
+      "examples": [
+        { "old": "ring ring-blue-500", "new": "ring-3 ring-blue-500" }
+      ],
+      "priority": 2
+    },
+    {
+      "id": "important-position",
+      "category": "important",
+      "deprecated": "!",
+      "canonical": "!",
+      "explanation": "Tailwind v4 moved ! important flag from start to end of class (e.g., flex! instead of !flex)",
+      "examples": [
+        { "old": "!flex !bg-red-500", "new": "flex! bg-red-500!" }
+      ],
+      "priority": 2,
+      "isRegex": true
+    },
+    {
+      "id": "text-ellipsis",
+      "category": "semantic",
+      "deprecated": "overflow-ellipsis",
+      "canonical": "text-ellipsis",
+      "explanation": "Tailwind v4 used more semantic naming",
+      "examples": [
+        { "old": "overflow-ellipsis", "new": "text-ellipsis" }
+      ],
+      "priority": 3
+    },
+    {
+      "id": "box-decoration-slice",
+      "category": "semantic",
+      "deprecated": "decoration-slice",
+      "canonical": "box-decoration-slice",
+      "explanation": "Tailwind v4 used more specific naming for box-decoration property",
+      "examples": [
+        { "old": "decoration-slice", "new": "box-decoration-slice" }
+      ],
+      "priority": 3
+    },
+    {
+      "id": "box-decoration-clone",
+      "category": "semantic",
+      "deprecated": "decoration-clone",
+      "canonical": "box-decoration-clone",
+      "explanation": "Tailwind v4 used more specific naming for box-decoration property",
+      "examples": [
+        { "old": "decoration-clone", "new": "box-decoration-clone" }
+      ],
+      "priority": 3
+    }
+  ]
+}

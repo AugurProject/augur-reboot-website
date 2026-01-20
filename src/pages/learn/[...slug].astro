@@ -1,11 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import LearnLayout from '../../layouts/LearnLayout.astro';
 
 export const prerender = true;
 
 interface Props {
-  entry: any;
+  entry: CollectionEntry<'learn'>;
 }
 
 export async function getStaticPaths() {

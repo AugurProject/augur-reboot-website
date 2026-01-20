@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import type React from 'react';
+import { useRef, useEffect } from 'react';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
@@ -202,6 +203,7 @@ class WebGLGridRenderer {
     // Set WebGL state for proper rendering
     this.gl.clearColor(0, 0, 0, 0); // Transparent background
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    // biome-ignore lint/correctness/useHookAtTopLevel: this.gl.useProgram is a WebGL API, not a React hook
     this.gl.useProgram(this.program);
 
     // Set uniforms
@@ -249,7 +251,7 @@ class WebGLGridRenderer {
   }
 
   private updateGridVertices(frameCount: number, animationSpeed: number, width: number, height: number) {
-    const horizonWidth = width * 0.1;
+    const _horizonWidth = width * 0.1;
     const horizonHeight = height * 0.15;
     const zOffset = frameCount * animationSpeed;
     const segmentLength = 40;
@@ -265,8 +267,8 @@ class WebGLGridRenderer {
 
       if (linearScale > 1 || linearScale < 0) continue;
 
-      const scale = Math.pow(linearScale, 2.5);
-      const alpha = Math.pow(linearScale, 5);
+      const scale = linearScale ** 2.5;
+      const alpha = linearScale ** 5;
 
       // Adjust grid scaling to align with vanishing point
       // At linearScale=0: grid should be at vanishing point size
@@ -409,7 +411,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
         rendererRef.current = null;
       }
     };
-  }, [numLines, lineColor, animationSpeed, maxOpacity, vanishingPoint]);
+  }, [numLines, lineColor, animationSpeed, vanishingPoint]);
 
   return (
     <canvas

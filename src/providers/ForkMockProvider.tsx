@@ -31,28 +31,28 @@ export const ForkMockProvider = ({ children }: ForkMockProviderProps): React.JSX
 	// Demo is only available in development mode
 	const isDemoAvailable = !import.meta.env.PROD
 
-	const generateRisk = useCallback((percentage: number) => {
+	const generateRisk = useCallback((_percentage: number) => {
 		if (!isDemoAvailable) return
-		
+
 		const generatedData = generateDemoForkRiskData(DisputeBondScenario.LOW_RISK) // Legacy fallback
 		setData(generatedData)
 		setIsDemo(true)
-	}, [setData, isDemoAvailable])
+	}, [setData])
 	
 	const generateScenario = useCallback((scenario: DisputeBondScenario) => {
 		if (!isDemoAvailable) return
-		
+
 		const generatedData = generateDemoForkRiskData(scenario)
 		setData(generatedData)
 		setIsDemo(true)
-	}, [setData, isDemoAvailable])
+	}, [setData])
 	
 	const setDemoData = useCallback((data: ForkRiskData) => {
 		if (!isDemoAvailable) return
-		
+
 		setData(data)
 		setIsDemo(true)
-	}, [setData, isDemoAvailable])
+	}, [setData])
 
 	const resetToLive = useCallback(async () => {
 		try {

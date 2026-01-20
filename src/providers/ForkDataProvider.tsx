@@ -36,7 +36,7 @@ export const ForkDataProvider = ({
 	const [defaultData] = useState<ForkRiskData>(() => ({
 		timestamp: new Date().toISOString(),
 		blockNumber: 0,
-		riskLevel: 'unknown',
+		riskLevel: 'none',
 		riskPercentage: 0,
 		metrics: {
 			largestDisputeBond: 0,
@@ -97,7 +97,7 @@ export const ForkDataProvider = ({
 			const interval = setInterval(loadForkRiskData, updateInterval)
 			return () => clearInterval(interval)
 		}
-	}, [loadForkRiskData, updateInterval, hasHydrated, defaultData])
+	}, [loadForkRiskData, updateInterval, hasHydrated])
 
 	const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
 		percentage: data.riskPercentage, // Pass actual percentage, let GaugeDisplay handle visual scaling
@@ -115,15 +115,16 @@ export const ForkDataProvider = ({
 			case 'low':
 				level = 'Low'
 				break
-			case 'medium':
-				level = 'Medium'
+			case 'moderate':
+				level = 'Moderate'
 				break
 			case 'high':
 				level = 'High'
 				break
-			case 'extreme':
-				level = 'Extreme'
+			case 'critical':
+				level = 'Critical'
 				break
+			case 'unknown':
 			default:
 				level = 'No Risk'
 		}

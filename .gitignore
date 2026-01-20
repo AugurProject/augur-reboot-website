@@ -43,8 +43,9 @@ dev-debug.log
 *.sw?
 # OS specific
 
-# Generated fork risk data
+# Generated fork risk data and cache
 public/data/fork-risk.json
+public/cache/
 
 # TypeScript build cache
 .tscache/

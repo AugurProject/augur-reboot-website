@@ -86,7 +86,7 @@ export const ForkGauge = ({
 
 	return (
 		<div className={cn('relative mb-2 flex flex-col items-center')}>
-			<svg className="max-w-[180px] w-full" viewBox="60 60 280 160">
+			<svg className="max-w-[180px] w-full" viewBox="60 60 280 160" role="img" aria-label="Fork risk gauge">
 				<defs>
 					<linearGradient
 						id="forkMeterGradient"

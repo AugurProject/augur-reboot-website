@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { $appStore, UIState, appActions } from '../stores/animationStore';
 import CrtDisplay from './CrtDisplay';
@@ -30,9 +30,9 @@ const Intro: React.FC = () => {
     }, 1000);
   };
 
-  const handleSkipClick = () => {
+  const handleSkipClick = useCallback(() => {
     appActions.skipToMainContent();
-  };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -46,7 +46,7 @@ const Intro: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handleSkipClick]);
 
   // Only render when in boot sequence state
   if (appState.uiState !== UIState.BOOT_SEQUENCE) {

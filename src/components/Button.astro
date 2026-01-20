@@ -60,7 +60,7 @@ const buttonClasses = buttonVariants({ variant, size });
 const allClasses = clsx(buttonClasses, className);
 
 // Element-specific props
-const elementProps = element === 'a' 
+const elementProps = element === 'a'
   ? { href, ...externalProps, class: allClasses, ...rest }
   : { type: 'button', class: allClasses, ...rest };
 ---

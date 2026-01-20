@@ -20,16 +20,16 @@ import { withBase } from '../lib/utils';
       </p>
 
       <h2 class="grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4 title">
-        <span id="line-left" class="h-[1px] bg-foreground"></span>
-        <pre id="is-rebooting-text" class="title leading-none tracking-tight text-[size:clamp(0.285rem,_1vw,_0.5rem)]">
-██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗ 
-██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝ 
+        <span id="line-left" class="h-px bg-foreground"></span>
+        <pre id="is-rebooting-text" class="title leading-none tracking-tight text-[clamp(0.285rem,1vw,0.5rem)]">
+██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
+██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝
 ██║ ███████╗     ██████╔╝ █████╗   ██████╔╝ ██║   ██║ ██║   ██║    ██║    ██║ ██╔██╗ ██║ ██║  ███╗
 ██║ ╚════██║     ██╔══██╗ ██╔══╝   ██╔══██╗ ██║   ██║ ██║   ██║    ██║    ██║ ██║╚██╗██║ ██║   ██║
 ██║ ███████║     ██║  ██║ ███████╗ ██████╔╝ ╚██████╔╝ ╚██████╔╝    ██║    ██║ ██║ ╚████║ ╚██████╔╝
-╚═╝ ╚══════╝     ╚═╝  ╚═╝ ╚══════╝ ╚═════╝   ╚═════╝   ╚═════╝     ╚═╝    ╚═╝ ╚═╝  ╚═══╝  ╚═════╝ 
+╚═╝ ╚══════╝     ╚═╝  ╚═╝ ╚══════╝ ╚═════╝   ╚═════╝   ╚═════╝     ╚═╝    ╚═╝ ╚═╝  ╚═══╝  ╚═════╝
         </pre>
-        <span id="line-right" class="h-[1px] bg-foreground"></span>
+        <span id="line-right" class="h-px bg-foreground"></span>
       </h2>
 
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
@@ -166,7 +166,7 @@ import { withBase } from '../lib/utils';
   /* --- Animation Trigger --- */
 
   #hero-banner-container.animations-started #augur-logo {
-    animation: 
+    animation:
       logo-fade-in 0.5s ease-in 0s forwards,
       logo-scale-down 1s ease-out 0.5s forwards;
   }
@@ -219,7 +219,7 @@ import { withBase } from '../lib/utils';
 
   function updateHeroBanner(state: typeof $appStore.value) {
     if (!heroBanner) return;
-    
+
     // Prevent redundant updates - only update if state actually changed
     if (lastAppliedState === state.uiState) {
       return;
@@ -247,13 +247,13 @@ import { withBase } from '../lib/utils';
         } else {
           heroBanner.classList.add('animations-started');
           // Focus after animations complete (3.6s total)
-          focusTimeout = setTimeout(() => {
+          focusTimeout = window.setTimeout(() => {
             firstMenuItem?.focus();
             focusTimeout = null;
           }, 3600);
         }
         break;
-      
+
       case UIState.BOOT_SEQUENCE:
         // Keep elements hidden until boot sequence completes
         break;
@@ -280,13 +280,13 @@ import { withBase } from '../lib/utils';
 
     initializeElements();
     setupStoreSubscription();
-    
+
     // Initialize store state based on current URL
     appActions.initializeFromURL();
-    
+
     // Update UI immediately with current state
     updateHeroBanner($appStore.get());
-    
+
     isInitialized = true;
   }
 
@@ -294,10 +294,10 @@ import { withBase } from '../lib/utils';
   function handleViewTransition() {
     // Re-initialize elements after DOM swap but don't re-setup subscription
     initializeElements();
-    
+
     // Reset tracking variable to allow updates for new page context
     lastAppliedState = null;
-    
+
     // Handle navigation in store
     appActions.handleNavigation();
   }

@@ -7,12 +7,12 @@ interface Props {
   hoverable?: boolean;
 }
 
-const { 
-  title, 
-  description, 
-  image, 
-  href, 
-  hoverable = true 
+const {
+  title,
+  description,
+  image,
+  href,
+  hoverable = true
 } = Astro.props;
 
 const Component = href ? 'a' : 'div';

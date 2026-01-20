@@ -191,7 +191,6 @@ html {
 
 .crt {
   background: linear-gradient(to top, #000000, #000000, #222222, #222222);
-  background-size: cover;
   background-size: 100% 3px;
   filter: blur(0.75px);
 

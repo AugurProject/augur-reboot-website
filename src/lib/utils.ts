@@ -14,7 +14,7 @@ export function withBase(path: string): string {
   
   // Ensure base ends with slash for proper concatenation
   if (base !== '/' && !base.endsWith('/')) {
-    base = base + '/';
+    base = `${base}/`;
   }
   
   // Handle empty path
