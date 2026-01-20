@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 interface EditToolUse {
   tool: "Edit";
@@ -24,17 +24,26 @@ export async function validateAndFixTailwindClasses(toolUse: EditToolUse): Promi
 
   try {
     // Load validation module
-    let loadPatterns: any;
-    let validateClassString: any;
-    let fixViolations: any;
+    type LoadPatterns = () => unknown[];
+    type ValidateClassString = (content: string, patterns: unknown[]) => unknown[];
+    type FixViolations = (content: string, violations: unknown[]) => string;
+
+    let loadPatterns: LoadPatterns | undefined;
+    let validateClassString: ValidateClassString | undefined;
+    let fixViolations: FixViolations | undefined;
 
     try {
       const module = await import("../skills/tailwind-v4-validator/validate.ts");
       loadPatterns = module.loadPatterns;
       validateClassString = module.validateClassString;
       fixViolations = module.fixViolations;
-    } catch (importError) {
+    } catch (_importError) {
       console.error("Tailwind v4 Validator: Failed to load validation module. Ensure skill is installed at .claude/skills/tailwind-v4-validator/");
+      return;
+    }
+
+    if (!loadPatterns || !validateClassString || !fixViolations) {
+      console.error("Tailwind v4 Validator: Validation functions not found in module");
       return;
     }
 
@@ -52,8 +61,8 @@ export async function validateAndFixTailwindClasses(toolUse: EditToolUse): Promi
     }
 
     // Validate and get violations
-    let patterns: any;
-    let violations: any;
+    let patterns: unknown[];
+    let violations: unknown[];
     try {
       patterns = loadPatterns();
       violations = validateClassString(content, patterns);
@@ -69,9 +78,12 @@ export async function validateAndFixTailwindClasses(toolUse: EditToolUse): Promi
         fs.writeFileSync(filePath, fixed, "utf-8");
 
         console.log(`\n✅ Tailwind v4 Validator: Fixed ${violations.length} deprecated patterns in ${path.basename(filePath)}`);
-        violations.forEach((v: any) => {
-          if (v.rule && v.rule.category && v.original && v.suggested) {
-            console.log(`  ${v.rule.category}: "${v.original}" → "${v.suggested}"`);
+        violations.forEach((v: unknown) => {
+          if (typeof v === 'object' && v !== null && 'rule' in v && 'original' in v && 'suggested' in v) {
+            const violation = v as { rule?: { category?: string }; original?: string; suggested?: string };
+            if (violation.rule?.category && violation.original && violation.suggested) {
+              console.log(`  ${violation.rule.category}: "${violation.original}" → "${violation.suggested}"`);
+            }
           }
         });
       } catch (writeError) {

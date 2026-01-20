@@ -51,6 +51,7 @@ export default function LearnNavigation({
 				<div className="flex items-center justify-between">
 					{/* Left: Jump to Topic */}
 					<button
+						type="button"
 						onClick={() => setIsExpanded(!isExpanded)}
 						className={`text-sm font-light tracking-widest uppercase transition-colors cursor-pointer ${
 							isExpanded

@@ -134,7 +134,7 @@ async function retryContractCall<T>(
 				throw error
 			}
 			
-			const delay = Math.pow(2, attempt - 1) * 1000 // 1s, 2s, 4s
+			const delay = 2 ** (attempt - 1) * 1000 // 1s, 2s, 4s
 			console.warn(`⚠️ ${methodName} failed (attempt ${attempt}/${maxRetries}): ${errorMessage}`)
 			console.log(`Retrying in ${delay}ms...`)
 			
@@ -598,7 +598,7 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 				if (isRateLimitError(chunkError)) {
 					console.warn(`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`)
 					// Exponential backoff for rate limits (2s, 4s, 8s)
-					const backoffDelay = Math.min(Math.pow(2, consecutiveFailures) * 1000, 10000)
+					const backoffDelay = Math.min(2 ** consecutiveFailures * 1000, 10000)
 					console.log(`Waiting ${backoffDelay}ms before continuing...`)
 					await new Promise(resolve => setTimeout(resolve, backoffDelay))
 				} else {

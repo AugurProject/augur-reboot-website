@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import type React from 'react'
+import { useState, useEffect } from 'react'
 import { ForkGauge } from './ForkGauge'
 import { ForkStats } from './ForkStats'
 import { ForkControls } from './ForkControls'
@@ -12,7 +13,7 @@ interface ForkDisplayProps {
 }
 
 const ForkDisplay: React.FC<ForkDisplayProps> = ({
-  animated = true,
+  animated: _animated = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   

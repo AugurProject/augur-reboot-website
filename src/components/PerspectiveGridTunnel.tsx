@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import type React from 'react';
+import { useRef, useEffect } from 'react';
 
 interface PerspectiveGridTunnelProps {
   numLines?: number;
@@ -265,8 +266,8 @@ class WebGLGridRenderer {
 
       if (linearScale > 1 || linearScale < 0) continue;
 
-      const scale = Math.pow(linearScale, 2.5);
-      const alpha = Math.pow(linearScale, 5);
+      const scale = linearScale ** 2.5;
+      const alpha = linearScale ** 5;
 
       // Adjust grid scaling to align with vanishing point
       // At linearScale=0: grid should be at vanishing point size

@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 
 interface PatternRule {
   id: string;
@@ -52,14 +52,15 @@ export function validateClassString(classString: string, patterns: PatternRule[]
 
       if (rule.isRegex) {
         const regex = new RegExp(rule.deprecated, "g");
-        let match;
-        while ((match = regex.exec(line)) !== null) {
+        let match: RegExpExecArray | null = regex.exec(line);
+        while (match !== null) {
           violations.push({
             line: index + 1,
             original: match[0],
             suggested: handleSpecialTransforms(match[0], rule),
             rule,
           });
+          match = regex.exec(line);
         }
       } else {
         if (line.includes(rule.deprecated)) {
@@ -84,7 +85,7 @@ function handleSpecialTransforms(original: string, rule: PatternRule): string {
       // Match: bg-opacity-50 bg-red-500 -> bg-red-500/50
       const opacityMatch = original.match(/(bg|text|border|divide|ring|placeholder)-opacity-(\d+)\s+(bg|text|border|divide|ring|placeholder)-/);
       if (opacityMatch) {
-        const [, prefix, opacity, colorPrefix] = opacityMatch;
+        const [, _prefix, _opacity, colorPrefix] = opacityMatch;
         return `${colorPrefix}-`;
       }
     }
@@ -113,10 +114,13 @@ export function fixViolations(content: string, violations: ValidationResult["vio
     if (!violationsByLine.has(violation.line)) {
       violationsByLine.set(violation.line, []);
     }
-    violationsByLine.get(violation.line)!.push({
-      original: violation.original,
-      suggested: violation.suggested,
-    });
+    const lineViolations = violationsByLine.get(violation.line);
+    if (lineViolations) {
+      lineViolations.push({
+        original: violation.original,
+        suggested: violation.suggested,
+      });
+    }
   });
 
   const lines = content.split("\n");

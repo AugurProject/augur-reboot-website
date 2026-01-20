@@ -37,7 +37,8 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			{/* Entire Gauge as DialogTrigger */}
 			<DialogTrigger asChild>
-				<button 
+				<button
+					type="button"
 					className="relative inline-block group cursor-pointer focus:outline-hidden transition-all duration-200"
 					aria-label="View fork meter details"
 					title="Click for more information"
