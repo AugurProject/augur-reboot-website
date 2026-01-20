@@ -1,4 +1,4 @@
-# Risk Level 'unknown' Handling Decision
+# Fork Risk System Architecture Decisions
 
 ## Problem Context
 
@@ -70,3 +70,81 @@ From `.github/workflows/build-and-deploy.yml`:
 ## Timeline
 
 Defer implementation pending user feedback on acceptable staleness thresholds.
+
+---
+
+## Cache Persistence Architecture
+
+### Problem
+
+The event caching strategy is designed to achieve 98% RPC reduction by:
+- Querying only new blocks since last run (+ 32 blocks back for finality)
+- Maintaining a rolling 7-day event cache
+- Re-using cached events across multiple deployments
+
+**However, cache persistence was broken:**
+- Cache lives in `public/cache/event-cache.json` locally
+- Must be committed to `gh-pages` branch for persistence across runs
+- Current workflow only commits cache if:
+  - Risk changed (immediate)
+  - Daily at midnight AND events > 0
+- Result: If first deployment found no events, cache never persisted
+- On next run: Cache missing from gh-pages → falls back to full 7-day query
+- Effect: 98% RPC reduction never materialized
+
+### Current Workflow Issues
+
+Single `build-and-deploy.yml` job tries to handle:
+1. Scheduled runs (every 6 hours)
+2. Manual triggers
+3. Push/PR events
+4. Cache management
+5. Risk change detection
+
+Result: Complex conditional logic that loses cache in edge cases.
+
+### Proposed Solution: Dual-Job Architecture
+
+**Job 1: Daily Cache Guardian** (new)
+- Trigger: Scheduled daily at 00:05 UTC only
+- Purpose: Guarantee cache persistence every 24 hours
+- Action: Always commits `cache/event-cache.json` to gh-pages
+- Benefits:
+  - Cache always available for next run
+  - Incremental querying always works
+  - No spam (once per day)
+
+**Job 2: Risk Monitor** (modified existing)
+- Trigger: Scheduled at 06:05, 12:05, 18:05 UTC + push/PR/manual
+- Purpose: Alert on meaningful changes
+- Action: Only commits if risk changed OR events found
+- Skips trivial runs with no changes
+- Benefits:
+  - Immediate alerts on new disputes
+  - No commit spam on empty runs
+  - Clear separation from cache management
+
+### Implementation
+
+1. Create new `cache-persistence.yml` workflow (daily midnight commitment)
+2. Update `build-and-deploy.yml`:
+   - Remove 00:05 UTC from cron schedule
+   - Simplify logic (no need to handle daily case)
+   - Focus on risk monitoring only
+3. Bootstrap initial cache:
+   - Manually run workflow once
+   - Commit resulting cache to gh-pages
+   - Subsequent runs inherit persistent cache
+
+### Benefits
+
+✅ Cache always persists (daily backup)
+✅ Incremental querying works reliably (98% RPC reduction achieved)
+✅ No commit spam on runs with no changes
+✅ Risk changes get immediate alerts
+✅ Clear responsibility separation
+✅ Simpler conditional logic in each job
+
+### Timeline
+
+Implement dual-job architecture and bootstrap cache in this branch.
