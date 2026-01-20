@@ -45,10 +45,12 @@ interface Calculation {
 	forkThreshold: number
 }
 
+type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical'
+
 interface ForkRiskData {
 	timestamp: string
 	blockNumber?: number
-	riskLevel: 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
+	riskLevel: RiskLevel
 	riskPercentage: number
 	metrics: Metrics
 	nextUpdate: string
@@ -56,8 +58,6 @@ interface ForkRiskData {
 	calculation: Calculation
 	error?: string
 }
-
-type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical'
 
 // Cache interfaces for incremental event caching
 interface SerializedEventLog {
@@ -128,53 +128,21 @@ async function retryContractCall<T>(
 		} catch (error) {
 			const isLastAttempt = attempt === maxRetries
 			const errorMessage = error instanceof Error ? error.message : String(error)
-			
+
 			if (isLastAttempt) {
 				console.error(`✗ ${methodName} failed after ${maxRetries} attempts: ${errorMessage}`)
 				throw error
 			}
-			
+
 			const delay = 2 ** (attempt - 1) * 1000 // 1s, 2s, 4s
 			console.warn(`⚠️ ${methodName} failed (attempt ${attempt}/${maxRetries}): ${errorMessage}`)
 			console.log(`Retrying in ${delay}ms...`)
-			
+
 			await new Promise(resolve => setTimeout(resolve, delay))
 		}
 	}
-	
+
 	throw new Error(`Unexpected retry flow for ${methodName}`)
-}
-
-async function _getWorkingProvider(): Promise<RpcConnection> {
-	let fallbacksAttempted = 0
-
-	// Try public RPC endpoints
-	for (const rpc of PUBLIC_RPC_ENDPOINTS) {
-		try {
-			console.log(`Trying public RPC: ${rpc}`)
-			const startTime = Date.now()
-			const provider = new ethers.JsonRpcProvider(rpc, 'mainnet')
-			await provider.getBlockNumber() // Test connection
-			const latency = Date.now() - startTime
-			console.log(`✓ Connected to: ${rpc} (${latency}ms)`)
-			
-			return {
-				provider,
-				endpoint: rpc,
-				latency,
-				fallbacksAttempted,
-			}
-		} catch (error) {
-			console.log(
-				`✗ Failed to connect to ${rpc}: ${error instanceof Error ? error.message : String(error)}`,
-			)
-			fallbacksAttempted++
-		}
-	}
-
-	throw new Error(
-		`All RPC endpoints failed (attempted ${fallbacksAttempted})`,
-	)
 }
 
 async function loadContracts(provider: ethers.JsonRpcProvider): Promise<Record<string, ethers.Contract>> {
@@ -211,7 +179,7 @@ async function loadContracts(provider: ethers.JsonRpcProvider): Promise<Record<s
 	console.log(`  Augur: ${abis.augur.address}`)
 	console.log(`  REPv2: ${abis.repV2Token.address}`)
 	console.log(`  Cash: ${abis.cash.address}`)
-	
+
 	return contracts
 }
 
@@ -223,36 +191,36 @@ async function executeWithRpcFallback<T>(
 ): Promise<T> {
 	let lastError: Error | null = null
 	let fallbacksAttempted = 0
-	
+
 	// Try each RPC endpoint
 	for (const rpc of PUBLIC_RPC_ENDPOINTS) {
 		try {
 			console.log(`Attempting operation with RPC: ${rpc}`)
 			const startTime = Date.now()
 			const provider = new ethers.JsonRpcProvider(rpc, 'mainnet')
-			
+
 			// Test connection
 			await provider.getBlockNumber()
 			const latency = Date.now() - startTime
 			console.log(`✓ Connected to: ${rpc} (${latency}ms)`)
-			
+
 			const connection: RpcConnection = {
 				provider,
 				endpoint: rpc,
 				latency,
 				fallbacksAttempted
 			}
-			
+
 			const contracts = await loadContracts(connection.provider)
 			return await operation(connection, contracts)
-			
+
 		} catch (error) {
 			lastError = error instanceof Error ? error : new Error(String(error))
 			console.log(`✗ Operation failed with ${rpc}: ${lastError.message}`)
 			fallbacksAttempted++
 		}
 	}
-	
+
 	throw lastError || new Error(`All RPC endpoints failed (attempted ${fallbacksAttempted})`)
 }
 
@@ -273,11 +241,11 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					() => contracts.universe.isForking(),
 					'universe.isForking()'
 				)
-			} catch (_error) {
+			} catch {
 				console.warn('⚠️ Failed to check forking status, continuing with dispute calculation')
 				// Continue with graceful degradation
 			}
-			
+
 			if (isForking) {
 				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
 				return getForkingResult(timestamp, blockNumber, connection)
@@ -815,7 +783,7 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		const sortedDisputes = disputes.sort(
 			(a, b) => b.disputeBondSize - a.disputeBondSize,
 		)
-		
+
 		console.log(`Processed ${sortedDisputes.length} active disputes from ${disputeStates.size} total dispute crowdsourcers`)
 		if (sortedDisputes.length > 0) {
 			console.log(`Largest dispute bond: ${sortedDisputes[0].disputeBondSize.toLocaleString()} REP`)
