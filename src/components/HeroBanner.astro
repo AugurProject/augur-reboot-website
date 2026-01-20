@@ -247,7 +247,7 @@ import { withBase } from '../lib/utils';
         } else {
           heroBanner.classList.add('animations-started');
           // Focus after animations complete (3.6s total)
-          focusTimeout = setTimeout(() => {
+          focusTimeout = window.setTimeout(() => {
             firstMenuItem?.focus();
             focusTimeout = null;
           }, 3600);
