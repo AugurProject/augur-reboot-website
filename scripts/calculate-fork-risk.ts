@@ -45,7 +45,7 @@ interface Calculation {
 	forkThreshold: number
 }
 
-type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical'
+type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 
 interface ForkRiskData {
 	timestamp: string

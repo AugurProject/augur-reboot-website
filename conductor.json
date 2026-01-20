@@ -1,6 +1,0 @@
-{
-  "scripts": {
-    "setup": "./scripts/worktree-setup.sh",
-    "run": "npm run dev"
-  }
-}
