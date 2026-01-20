@@ -1,10 +1,5 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.scripts.json" }
-  ],
-  "files": [],
   "compilerOptions": {
     "types": [
       "./worker-configuration.d.ts",
