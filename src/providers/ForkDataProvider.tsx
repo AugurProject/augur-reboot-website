@@ -36,7 +36,7 @@ export const ForkDataProvider = ({
 	const [defaultData] = useState<ForkRiskData>(() => ({
 		timestamp: new Date().toISOString(),
 		blockNumber: 0,
-		riskLevel: 'unknown',
+		riskLevel: 'none',
 		riskPercentage: 0,
 		metrics: {
 			largestDisputeBond: 0,
@@ -115,15 +115,16 @@ export const ForkDataProvider = ({
 			case 'low':
 				level = 'Low'
 				break
-			case 'medium':
-				level = 'Medium'
+			case 'moderate':
+				level = 'Moderate'
 				break
 			case 'high':
 				level = 'High'
 				break
-			case 'extreme':
-				level = 'Extreme'
+			case 'critical':
+				level = 'Critical'
 				break
+			case 'unknown':
 			default:
 				level = 'No Risk'
 		}

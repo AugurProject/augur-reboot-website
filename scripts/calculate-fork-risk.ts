@@ -57,7 +57,7 @@ interface ForkRiskData {
 	error?: string
 }
 
-type RiskLevel = 'low' | 'moderate' | 'high' | 'critical'
+type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical'
 
 // Cache interfaces for incremental event caching
 interface SerializedEventLog {
@@ -839,6 +839,7 @@ function getLargestDisputeBond(disputes: DisputeDetails[]): number {
 
 
 function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
+	if (forkThresholdPercent === 0) return 'none'
 	if (forkThresholdPercent > RISK_LEVELS.CRITICAL) return 'critical'
 	if (forkThresholdPercent >= RISK_LEVELS.HIGH) return 'high'
 	if (forkThresholdPercent >= RISK_LEVELS.MODERATE) return 'moderate'
