@@ -4,7 +4,7 @@ import { useStore } from '@nanostores/react';
 import { $appStore, UIState, appActions } from '../stores/animationStore';
 import CrtDisplay from './CrtDisplay';
 import TypewriterSequence from './TypewriterSequence';
-import Button from './Button';
+import Button from './ui/Button';
 import Pointer from './Pointer';
 
 const bootSentences: string[] = [

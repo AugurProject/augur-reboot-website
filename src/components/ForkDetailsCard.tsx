@@ -3,7 +3,7 @@ import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { ForkAsciiArt } from './ForkAsciiArt'
-import Button from './Button'
+import Button from './ui/Button'
 
 interface ForkDetailsCardProps {
 	gauge: React.ReactNode
@@ -163,7 +163,7 @@ const DocumentIcon = () => (
 		<path d="M16 13H8"/>
 		<path d="M16 17H8"/>
 	</svg>
-) 
+)
 
 const InfoIcon = ({ className }: HTMLAttributes<HTMLDivElement>) => {
 	return (
