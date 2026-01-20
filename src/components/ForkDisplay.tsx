@@ -7,14 +7,7 @@ import { ForkDetailsCard } from './ForkDetailsCard'
 import { useForkData } from '../providers/ForkDataProvider'
 import { $appStore, UIState } from '../stores/animationStore'
 
-interface ForkDisplayProps {
-  // Keep props for compatibility, but will use real data
-  animated?: boolean
-}
-
-const ForkDisplay: React.FC<ForkDisplayProps> = ({
-  animated: _animated = true,
-}) => {
+const ForkDisplay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
   
   // Use the fork risk hook to get real data
