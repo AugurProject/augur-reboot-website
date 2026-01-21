@@ -49,6 +49,7 @@ type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 
 interface ForkRiskData {
 	timestamp: string
+	lastUpdated: string
 	blockNumber?: number
 	riskLevel: RiskLevel
 	riskPercentage: number
@@ -287,6 +288,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// Prepare results
 			const results: ForkRiskData = {
 				timestamp,
+				lastUpdated: new Date().toISOString(),
 				blockNumber,
 				riskLevel,
 				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
@@ -837,6 +839,7 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 function getForkingResult(timestamp: string, blockNumber: number, connection: RpcConnection): ForkRiskData {
 		return {
 			timestamp,
+			lastUpdated: new Date().toISOString(),
 			blockNumber,
 			riskLevel: 'critical',
 			riskPercentage: 100,
@@ -870,6 +873,7 @@ function getForkingResult(timestamp: string, blockNumber: number, connection: Rp
 function getErrorResult(errorMessage: string): ForkRiskData {
 		return {
 			timestamp: new Date().toISOString(),
+			lastUpdated: new Date().toISOString(),
 			riskLevel: 'unknown',
 			riskPercentage: 0,
 			error: errorMessage,
