@@ -236,6 +236,10 @@ async function executeWithRpcFallback<T>(
 
 async function calculateForkRisk(): Promise<ForkRiskData> {
 	try {
+		// Detect calculation mode from environment
+		const mode = process.env.CALCULATION_MODE || 'incremental'
+		console.log(`[Mode] ${mode === 'full-rebuild' ? 'FULL REBUILD' : 'INCREMENTAL'} mode`)
+
 		console.log('Starting fork risk calculation...')
 
 		return await executeWithRpcFallback(async (connection, contracts) => {
@@ -262,7 +266,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			}
 
 			// Calculate key metrics
-			const activeDisputes = await getActiveDisputes(connection.provider, contracts)
+			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode)
 			const largestDisputeBond = getLargestDisputeBond(activeDisputes)
 
 			// Validate cache health
@@ -498,7 +502,7 @@ function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
 	return prunedCache
 }
 
-async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>): Promise<DisputeDetails[]> {
+async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental'): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
 
@@ -508,28 +512,24 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
 		const currentBlock = await provider.getBlockNumber()
 		const blocksPerDay = 7200 // Approximate blocks per day (12 second blocks)
-		const searchPeriod = 7 * blocksPerDay // Last 7 days
+		const searchPeriod = 7 * blocksPerDay // Last 7 days (~50,400 blocks)
 		const fullSearchStartBlock = currentBlock - searchPeriod
 
-		// Determine query range based on cache
+		// Determine query range based on mode and cache
 		let fromBlock: number
 		let newEventsOnly = false
 
-		if (cache.lastQueriedBlock > 0 && cache.lastQueriedBlock < currentBlock) {
-			// Incremental query: start from last queried block + 1
-			// But also re-query last FINALITY_DEPTH blocks for safety
-			fromBlock = Math.max(
-				cache.lastQueriedBlock - FINALITY_DEPTH,
-				fullSearchStartBlock
-			)
+		if (mode === 'full-rebuild' || !cache.lastQueriedBlock || cache.lastQueriedBlock === 0) {
+			// Full 7-day rescan
+			fromBlock = Math.max(currentBlock - searchPeriod, 0)
+			console.log(`[Query] Full 7-day rescan: blocks ${fromBlock} to ${currentBlock}`)
+		} else {
+			// Incremental: only new blocks since last query
+			fromBlock = Math.max(cache.lastQueriedBlock - FINALITY_DEPTH, 0)
 			newEventsOnly = true
 			const blocksToQuery = currentBlock - fromBlock
-			console.log(`📦 Incremental query: blocks ${fromBlock} → ${currentBlock} (~${blocksToQuery} blocks)`)
+			console.log(`[Query] Incremental: blocks ${fromBlock} to ${currentBlock} (~${blocksToQuery} blocks)`)
 			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events`)
-		} else {
-			// Full query: no valid cache or cache is stale
-			fromBlock = fullSearchStartBlock
-			console.log(`🔄 Full query: last 7 days (${searchPeriod} blocks)`)
 		}
 
 		// Initialize event arrays
