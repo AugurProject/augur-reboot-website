@@ -1,8 +1,8 @@
-# Cache Architecture: GitHub Actions + Event-Driven Validation
+# Fork Risk Monitoring System
 
 **Status**: ✅ IMPLEMENTED & TESTED
 **Date**: January 21, 2026
-**Context**: Hourly fork risk monitoring with GitHub Actions cache storage, lightweight validation (8-block re-query), and event-driven cache rebuilds
+**Scope**: Complete hourly fork risk monitoring system for Augur built on GitHub Actions, with intelligent caching, lightweight validation, event-driven rebuilds, and community-facing UI messaging
 
 ---
 
@@ -463,27 +463,129 @@ Track these metrics weekly:
 
 ---
 
-## References
+---
 
-- **Reorg data**: [Etherscan Forked Blocks](https://etherscan.io/blocks_forked)
-- **Current caching**: `docs/rpc-caching-strategy.md`
-- **Related decisions**: `docs/pending-fork-risk-decisions.md`
-- **GitHub Actions cache**: [docs.github.com/actions/using-workflows/caching-dependencies-and-artifacts](https://docs.github.com/en/actions/using-workflows/caching-dependencies-and-artifacts/about-caching-dependencies)
+## Implementation Status
+
+**✅ FULLY IMPLEMENTED & TESTED** - January 21, 2026
+
+### Files Modified
+
+**Workflow** (`.github/workflows/build-and-deploy.yml`)
+- Restructured from single job to 4-job architecture (risk-monitor, cache-rebuild, build, deploy)
+- Risk Monitor: Hourly schedule `0 * * * *`, incremental mode, 8-block validation, concurrency-locked
+- Cache Rebuild: Event-driven trigger on validation failure, full 7-day rescan, manual trigger available
+- Added 3-tier cache restoration (GH Actions → gh-pages fallback → full query fallback)
+- Both jobs use `concurrency: { group: fork-risk-cache, cancel-in-progress: false }`
+
+**Backend Script** (`scripts/calculate-fork-risk.ts`)
+- Added `CALCULATION_MODE` environment variable (`incremental` for Risk Monitor, `full-rebuild` for Cache Rebuild)
+- Added `validateCacheHealth()` function (lines ~900-1020): re-queries last 8 blocks fresh to detect cache mismatch
+- Ensures `lastUpdated` timestamp in all result paths (main calculation, forking state, error cases)
+- Validation triggers Cache Rebuild job if mismatch detected
+
+**Frontend Components** (`src/components/ForkDisplay.tsx`)
+- Replaced timestamp display with monitoring cadence message: "Levels monitored hourly"
+- Added info icon button with hover tooltip
+- Tooltip displays: "Last changed: {relative time}" (e.g., "2 hours ago", "just now")
+- Fixed SVG attribute casing (strokeWidth, strokeLinecap, strokeLinejoin, className)
+
+**Data Layer**
+- `src/providers/ForkDataProvider.tsx`: Added `lastUpdated` to default fork data and context
+- `src/types/gauge.ts`: Added `lastUpdated: string` to ForkRiskData interface
+- `src/utils/demoDataGenerator.ts`: Added `lastUpdated` to all generated demo scenarios
+
+### Testing Results
+
+**Automated Workflow Execution** (4 consecutive runs - all successful):
+- ✅ Risk Monitor: All 10 steps executed successfully on each run
+- ✅ Cache Restoration: 3-tier fallback chain functioning (GH Actions → gh-pages → full query)
+- ✅ Incremental Query: Running at ~2-3 RPC calls per execution
+- ✅ Cache Validation: Validation function completed without errors, no corruption detected
+- ✅ Cache Rebuild: Properly skipped when cache is healthy (correct behavior)
+- ✅ Concurrency Locking: No race conditions observed, sequential execution as designed
+- ✅ UI Display: "Levels monitored hourly" displaying correctly
+- ✅ Relative Time: Last changed timestamp formatting working as specified
+- ✅ TypeScript: All types compile without errors or validation warnings
+
+### Deployment Metrics
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Check Frequency | Every 6 hours | Every 1 hour | +6x more frequent |
+| RPC Calls/Run | ~51 calls | ~2-3 calls | -96% per run |
+| Total RPC/Day | ~8 calls/day | ~50-60 calls/day | More frequent, still negligible |
+| Git Commits/Month | ~120 (4/day) | ~0-3 (only on changes) | -97% noise reduction |
+| Cache Storage | gh-pages (git) | GitHub Actions | Cleaner separation |
+| Validation | None | 8-block re-query | Corruption detection in <1 hour |
+| Recovery | Manual | Automatic rebuild | Event-driven healing |
+
+### Operational Characteristics
+
+**Normal Operation** (~50 RPC calls/day):
+- 24 hourly Risk Monitor runs
+- Each run: ~2.5 RPC calls average
+- Cache validation: ~1 call per run
+- Cache Rebuild: ~0 events/week (only on detected corruption)
+
+**Abnormal Case** (1 cache rebuild/week):
+- Risk Monitor: 24 × 7 × 2.5 = 420 calls/week
+- Cache Rebuild: 1 × 150 = 150 calls/week
+- Total: ~570 calls/week (~81/day average) - still <1% of public RPC limit
+
+**Git History Impact**:
+- Before: ~120 commits/month (noisy, hard to track changes)
+- After: ~0-3 commits/month (signal-only, commits = real fork risk events)
+
+### Why This Architecture Works
+
+**Efficiency**:
+- Incremental queries (~300 blocks) require only 2-3 RPC calls vs 51 calls for full query
+- Cache persists in GitHub Actions, no git history pollution
+- Hourly frequency provides up-to-the-hour monitoring without breaking RPC budget
+
+**Safety**:
+- 8-block validation (lightweight re-query) detects blockchain reorgs within the hour
+- Event-driven rebuilds heal cache corruption automatically
+- Concurrency locking prevents simultaneous cache writes
+- 3-tier fallback ensures graceful degradation if cache expires
+
+**Transparency**:
+- UI clearly states "Levels monitored hourly" (community confidence signal)
+- Tooltip shows when risk actually changed (auditable, not stale)
+- Git history is signal-only (commits = meaningful events)
+- No heartbeat commits needed to prove "proof of life"
+
+**Scalability**:
+- Works as activity increases (still negligible RPC cost)
+- Same architecture supports 10x activity increase
+- Event-driven validation means no schedule changes needed
+
+### Failure Handling
+
+| Scenario | Detection | Recovery |
+|----------|-----------|----------|
+| Cache expiration (>7 days) | Missing cache file | Falls back to full 7-day query (one slow run) |
+| GH Actions cache miss | No restore hit | Falls back to gh-pages or full query |
+| Blockchain reorg (1-8 blocks) | 8-block validation mismatch | Cache Rebuild triggered automatically |
+| Risk Monitor failure | Job fails | Cache persists, next run retries automatically |
+| Cache Rebuild failure | Job fails | Cache unchanged, validation re-triggers next hour |
+| Concurrency conflict | Queue management | Cache Rebuild waits in queue until Monitor completes |
+
+### Monitoring & Maintenance
+
+Track weekly:
+1. **Commit frequency**: Should be 0-1 commits/week (signal of real fork risk events)
+2. **RPC budget**: Should be 50-60 calls/day (confirm no spikes)
+3. **Cache hit rate**: Should be 100% (all runs incremental, no full queries)
+4. **Validation health**: 0 mismatch detections = healthy cache
+5. **Rebuild frequency**: Typically 0 times/week (event-driven = rare)
+6. **UI accuracy**: "Levels monitored hourly" displaying + tooltip working correctly
 
 ---
 
-**Status**: ✅ FULLY IMPLEMENTED
-**Deployed Architecture**:
-- **Risk Monitor**: ✅ Hourly scheduled job (0 * * * *) + manual trigger, lightweight 8-block validation, 2-3 RPC calls/run
-- **Cache Rebuild**: ✅ Event-driven on validation failure, full 7-day rescan, ~150 RPC calls per event (rare)
-- **UI**: ✅ Shows "Levels monitored hourly" + tooltip "Last changed: X ago"
-- **Concurrency**: ✅ Both jobs share `fork-risk-cache` lock group to prevent simultaneous cache writes
-- **Result**: ✅ Clean git history (silence = no changes) + hourly monitoring + ~50 RPC calls/day
+## References
 
-**Implementation Complete**:
-1. ✅ Phase 1: Workflow restructured with hourly schedule, concurrency locking, event-driven trigger
-2. ✅ Phase 2: calculate-fork-risk.ts updated with CALCULATION_MODE and 8-block validation
-3. ✅ Phase 3: UI updated with monitoring cadence display + relative time tooltip
-4. ✅ Phase 4: Automated workflow tests passing (4 consecutive successful runs)
-
-**For Implementation Details**: See `IMPLEMENTATION_SUMMARY.md`
+- **Reorg data**: [Etherscan Forked Blocks](https://etherscan.io/blocks_forked)
+- **GitHub Actions cache**: [docs.github.com/actions/using-workflows/caching-dependencies-and-artifacts](https://docs.github.com/en/actions/using-workflows/caching-dependencies-and-artifacts/about-caching-dependencies)
+- **Ethereum Finality**: [ethereum.org/developers/docs/consensus-mechanisms/pos](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/)

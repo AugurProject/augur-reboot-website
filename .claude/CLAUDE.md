@@ -2,9 +2,7 @@
 
 ## Key Documentation References
 
-**Cache Architecture Implementation**
-- `docs/IMPLEMENTATION_SUMMARY.md`: What was built, testing results, deployment notes. Start here.
-- `docs/proposed-cache-architecture-gh-actions.md`: Design rationale, trade-offs, failure scenarios. Reference for why decisions were made.
+**Fork Risk Monitoring System** (`docs/fork-risk-monitoring-system.md`): Complete documentation of the hourly fork risk monitoring system. Covers: why the system was built (problem statement), design approach (GitHub Actions + event-driven validation), architecture details (two-job workflow with concurrency locking), implementation (all code changes), testing results, RPC budget analysis, failure scenarios, and operational monitoring. Start here for complete understanding of how fork monitoring works.
 
 **Fork Risk Assessment** (`docs/fork-risk-assessment.md`): Methodology for calculating fork risk, risk thresholds, blockchain data sources, RPC failover strategy, and transparency/auditability approach. Read when implementing or debugging fork risk features.
 
@@ -42,12 +40,14 @@
 
 ## Documentation Maintenance
 
-**Removed (outdated strategies, replaced by current implementation)**:
-- `docs/rpc-caching-strategy.md` - Old 6-hourly approach (superseded by hourly monitoring)
-- `docs/pending-fork-risk-decisions.md` - Provisional decisions (now implemented)
-- `docs/plans/cache-architecture-implementation.md` - Implementation plan (work completed)
+**Current State**: Documentation consolidate and cleaned of exploratory/provisional docs.
 
-Keep documentation focused on **current implemented state**, not historical exploration paths.
+**Removed (replaced by finalized fork-risk-monitoring-system.md)**:
+- `docs/rpc-caching-strategy.md` - Old 6-hourly caching strategy (superseded)
+- `docs/pending-fork-risk-decisions.md` - Provisional architecture decisions (now implemented)
+- `docs/plans/` directory - Implementation task plans (work completed, not needed for reference)
+
+Keep documentation focused on **current implemented state** and **why decisions were made**, not historical exploration or task tracking.
 
 ## Tools & Workflow
 
