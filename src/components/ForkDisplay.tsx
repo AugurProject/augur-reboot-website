@@ -28,7 +28,7 @@ function formatRelativeTime(isoTimestamp: string): string {
 
 const ForkDisplay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
-  
+
   // Use the fork risk hook to get real data
   const { gaugeData, riskLevel, lastUpdated, isLoading, error } = useForkData()
 
@@ -62,16 +62,14 @@ const ForkDisplay: React.FC = () => {
 
         <ForkStats riskLevel={riskLevel} repStaked={gaugeData.repStaked} activeDisputes={gaugeData.activeDisputes} />
 
-        <div className="text-center text-sm text-gray-400">
-          <span>Monitored: Every hour</span>
-          <button
-            type="button"
-            className="ml-2 inline-block cursor-help text-xs underline hover:text-gray-300"
-            title={`Last changed: ${formatRelativeTime(lastUpdated)}`}
-          >
-            ℹ️
-          </button>
-        </div>
+        <button
+          type="button"
+          className="cursor-help text-center text-xs text-muted-foreground hover:underline hover:text-foreground focus:underline focus:text-foreground"
+          title={`Last changed: ${formatRelativeTime(lastUpdated)}`}
+        >
+          <span>Levels monitored hourly</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </button>
       </div>
 
       {/* Demo overlay - only visible in development */}
