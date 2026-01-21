@@ -48,5 +48,3 @@
 
 - **DO NOT auto-commit changes** unless explicitly instructed
 - Stage all changes and wait for direction before committing
-- Plan complete sets of changes before creating commits to avoid history pollution
-- Only commit when user explicitly says "push", "commit", or "/commit"
