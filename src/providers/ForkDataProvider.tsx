@@ -35,6 +35,7 @@ export const ForkDataProvider = ({
 	// Create stable default data that doesn't change between renders
 	const [defaultData] = useState<ForkRiskData>(() => ({
 		timestamp: new Date().toISOString(),
+		lastUpdated: new Date().toISOString(),
 		blockNumber: 0,
 		riskLevel: 'none',
 		riskPercentage: 0,

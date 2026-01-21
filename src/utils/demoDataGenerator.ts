@@ -103,6 +103,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 
 	return {
 		timestamp: now.toISOString(),
+		lastUpdated: now.toISOString(),
 		blockNumber: Math.floor(Math.random() * 1000000) + 20000000,
 		riskLevel,
 		riskPercentage: Math.round(riskPercentage * 100) / 100,
