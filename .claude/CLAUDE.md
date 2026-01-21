@@ -38,17 +38,6 @@
 - **Fork Risk Formula**: (Largest Dispute Bond / 275,000 REP) × 100 = Risk %. Smaller denominator would severely underestimate risk.
 - **RPC Endpoint Failover**: Uses 4 public endpoints (LlamaRPC, LinkPool, PublicNode, 1RPC) with auto-fallback. No API keys needed.
 
-## Documentation Maintenance
-
-**Current State**: Documentation consolidate and cleaned of exploratory/provisional docs.
-
-**Removed (replaced by finalized fork-risk-monitoring-system.md)**:
-- `docs/rpc-caching-strategy.md` - Old 6-hourly caching strategy (superseded)
-- `docs/pending-fork-risk-decisions.md` - Provisional architecture decisions (now implemented)
-- `docs/plans/` directory - Implementation task plans (work completed, not needed for reference)
-
-Keep documentation focused on **current implemented state** and **why decisions were made**, not historical exploration or task tracking.
-
 ## Tools & Workflow
 
 - **Workspace Management**: Use `jubalm/workspace` for worktree management (`ws` alias if installed locally—check `ws --help`)
