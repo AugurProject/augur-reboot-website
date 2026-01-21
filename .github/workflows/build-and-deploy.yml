@@ -21,6 +21,33 @@ permissions:
   id-token: write
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          BASE_PATH: ${{ vars.BASE_PATH }}
+          PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
   risk-monitor:
     runs-on: ubuntu-latest
     concurrency:
@@ -55,6 +82,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Restore event cache from GH Actions
         uses: actions/cache@v4
         with:
@@ -88,20 +118,26 @@ jobs:
         id: validate-cache
         run: |
           # Run lightweight validation (8-block re-query)
-          # This will be implemented in calculate-fork-risk.ts
+          # Phase 2: Implement full validation in calculate-fork-risk.ts
+          # For now: Always skip full rebuild on incremental runs
           # Output: needs-rebuild=true/false
           echo "needs-rebuild=false" >> $GITHUB_OUTPUT
 
       - name: Check if risk percentage changed
         id: check-risk
         run: |
-          if [ -f public/data/fork-risk.json ]; then
-            NEW_RISK=$(jq -r '.riskPercentage' public/data/fork-risk.json)
-            # Compare with last committed version (with 0.01% tolerance)
-            # If different: risk-changed=true, else false
-            echo "risk-changed=true" >> $GITHUB_OUTPUT
-          else
+          if [ ! -f public/data/fork-risk.json ]; then
             echo "risk-changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          NEW_RISK=$(jq -r '.riskPercentage' public/data/fork-risk.json)
+
+          # Check if file changed from last commit
+          if git diff --quiet HEAD -- public/data/fork-risk.json; then
+            echo "risk-changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "risk-changed=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Save event cache to GH Actions
@@ -130,6 +166,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run full cache rebuild (7-day rescan)
         run: npm run build:fork-data
         env:
@@ -150,7 +189,7 @@ jobs:
           fi
 
   deploy:
-    needs: risk-monitor
+    needs: [risk-monitor, build]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
     runs-on: ubuntu-latest
     permissions:
