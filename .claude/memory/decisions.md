@@ -9,10 +9,10 @@ Astro 5.10+ with React 19 islands architecture. Always specify hydration directi
 Nanostores for global state + React Context for providers. NEVER add state logic to components—keep them purely reactive. Initialization logic belongs in stores, not component effects.
 
 ## Styling Architecture
-Tailwind v4 CSS-first via @theme/@utility directives in src/styles/global.css. NEVER create or edit tailwind.config.js—it doesn't exist.
+Tailwind v4 CSS-first via @theme/@utility directives in src/styles/global.css. See conventions.md for styling standards.
 
 ## Deployment Architecture
-GitHub Pages static deployment (not Cloudflare Workers for production). NEVER add site URL to wrangler.toml. Must verify sitemap generation in GitHub Actions.
+GitHub Pages static deployment for production. Must verify sitemap generation in GitHub Actions.
 
 ## Dual TypeScript Runtimes
 Frontend and backend scripts in same repo with separate tsconfig files. Enables code sharing (types, utils) while maintaining runtime clarity.
