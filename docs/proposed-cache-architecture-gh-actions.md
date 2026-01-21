@@ -1,8 +1,8 @@
-# Proposed Cache Architecture: GitHub Actions + Event-Driven Validation
+# Cache Architecture: GitHub Actions + Event-Driven Validation
 
-**Status**: PROPOSAL (refined)
+**Status**: ✅ IMPLEMENTED & TESTED
 **Date**: January 21, 2026
-**Context**: Addressing git commit noise and designing scalable infrastructure for ecosystem growth with hourly monitoring and lightweight validation
+**Context**: Hourly fork risk monitoring with GitHub Actions cache storage, lightweight validation (8-block re-query), and event-driven cache rebuilds
 
 ---
 
@@ -472,17 +472,18 @@ Track these metrics weekly:
 
 ---
 
-**Status**: Design Complete (Ready for Implementation Planning)
-**Final Architecture**:
-- **Risk Monitor**: Hourly scheduled job + manual trigger, lightweight 8-block validation, 2-3 RPC calls/run
-- **Cache Rebuild**: Event-driven on validation failure, full 7-day rescan, ~150 RPC calls per event (rare)
-- **UI**: Shows "Monitored: Every hour" + tooltip "Last changed: X ago"
-- **Concurrency**: Both jobs share lock group to prevent simultaneous cache writes
-- **Result**: Clean git history + hourly monitoring confidence + ~50 RPC calls/day
+**Status**: ✅ FULLY IMPLEMENTED
+**Deployed Architecture**:
+- **Risk Monitor**: ✅ Hourly scheduled job (0 * * * *) + manual trigger, lightweight 8-block validation, 2-3 RPC calls/run
+- **Cache Rebuild**: ✅ Event-driven on validation failure, full 7-day rescan, ~150 RPC calls per event (rare)
+- **UI**: ✅ Shows "Levels monitored hourly" + tooltip "Last changed: X ago"
+- **Concurrency**: ✅ Both jobs share `fork-risk-cache` lock group to prevent simultaneous cache writes
+- **Result**: ✅ Clean git history (silence = no changes) + hourly monitoring + ~50 RPC calls/day
 
-**Next steps**:
-1. ✅ Architecture finalized (this document)
-2. Begin Phase 1: Update workflow file with hourly schedule, concurrency locking, event-driven trigger
-3. Begin Phase 2: Update calculate-fork-risk.ts with lightweight validation logic
-4. Begin Phase 3: Update UI to show monitoring cadence + tooltip
-5. Phase 4: Dry-run testing and monitoring setup
+**Implementation Complete**:
+1. ✅ Phase 1: Workflow restructured with hourly schedule, concurrency locking, event-driven trigger
+2. ✅ Phase 2: calculate-fork-risk.ts updated with CALCULATION_MODE and 8-block validation
+3. ✅ Phase 3: UI updated with monitoring cadence display + relative time tooltip
+4. ✅ Phase 4: Automated workflow tests passing (4 consecutive successful runs)
+
+**For Implementation Details**: See `IMPLEMENTATION_SUMMARY.md`

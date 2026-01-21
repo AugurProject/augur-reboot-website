@@ -2,7 +2,9 @@
 
 ## Key Documentation References
 
-**Cache Architecture** (`docs/proposed-cache-architecture-gh-actions.md`): Hourly fork risk monitoring with lightweight validation, event-driven cache rebuild, concurrency locking, and UI messaging. Read FIRST when implementing cache infrastructure changes.
+**Cache Architecture Implementation**
+- `docs/IMPLEMENTATION_SUMMARY.md`: What was built, testing results, deployment notes. Start here.
+- `docs/proposed-cache-architecture-gh-actions.md`: Design rationale, trade-offs, failure scenarios. Reference for why decisions were made.
 
 **Fork Risk Assessment** (`docs/fork-risk-assessment.md`): Methodology for calculating fork risk, risk thresholds, blockchain data sources, RPC failover strategy, and transparency/auditability approach. Read when implementing or debugging fork risk features.
 
@@ -37,6 +39,15 @@
 - **Astro Scoped Styles**: Component <style> blocks auto-scoped with data-astro-cid-* attributes. Use is:global for truly global styles.
 - **Fork Risk Formula**: (Largest Dispute Bond / 275,000 REP) × 100 = Risk %. Smaller denominator would severely underestimate risk.
 - **RPC Endpoint Failover**: Uses 4 public endpoints (LlamaRPC, LinkPool, PublicNode, 1RPC) with auto-fallback. No API keys needed.
+
+## Documentation Maintenance
+
+**Removed (outdated strategies, replaced by current implementation)**:
+- `docs/rpc-caching-strategy.md` - Old 6-hourly approach (superseded by hourly monitoring)
+- `docs/pending-fork-risk-decisions.md` - Provisional decisions (now implemented)
+- `docs/plans/cache-architecture-implementation.md` - Implementation plan (work completed)
+
+Keep documentation focused on **current implemented state**, not historical exploration paths.
 
 ## Tools & Workflow
 
