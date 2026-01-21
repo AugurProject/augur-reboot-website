@@ -74,7 +74,7 @@ jobs:
           ref: gh-pages
           path: gh-pages-cache
           sparse-checkout: cache
-          sparse-checkout-cone: false
+          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -216,7 +216,7 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
-          name: pages
+          name: github-pages
 
       - name: Deploy to GitHub Pages
         id: deployment
