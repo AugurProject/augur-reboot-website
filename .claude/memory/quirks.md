@@ -2,9 +2,6 @@
 
 Non-standard behaviors and workarounds.
 
-## Tailwind v4 CSS-First
-No tailwind.config.js file. All customization via @theme/@utility directives in src/styles/global.css.
-
 ## Astro Scoped Styles Default
 Component <style> blocks auto-scoped with data-astro-cid-* attributes. Use is:global for truly global styles.
 
