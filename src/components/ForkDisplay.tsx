@@ -6,6 +6,7 @@ import { ForkControls } from './ForkControls'
 import { ForkDetailsCard } from './ForkDetailsCard'
 import { useForkData } from '../providers/ForkDataProvider'
 import { $appStore, UIState } from '../stores/animationStore'
+import { cn } from '@/lib/utils'
 
 // Helper function to format timestamps as relative time
 function formatRelativeTime(isoTimestamp: string): string {
@@ -64,11 +65,10 @@ const ForkDisplay: React.FC = () => {
 
         <button
           type="button"
-          className="cursor-help text-center text-xs text-muted-foreground hover:underline hover:text-foreground focus:underline focus:text-foreground"
+          className="cursor-help italic text-center text-xs text-muted-foreground hover:underline hover:text-foreground focus:underline focus:text-foreground underline-offset-2 outline-none"
           title={`Last changed: ${formatRelativeTime(lastUpdated)}`}
         >
-          <span>Levels monitored hourly</span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span>* levels are monitored hourly</span>
         </button>
       </div>
 
