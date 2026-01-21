@@ -1,6 +1,6 @@
 ---
 import AugurLogo from "../assets/augur.svg";
-import Button from "./Button.astro";
+import Button from "./ui/Button.tsx";
 import { withBase } from "../lib/utils";
 ---
 
@@ -12,7 +12,7 @@ import { withBase } from "../lib/utils";
       >
         <!-- Column 1: Logo & Tagline -->
         <div class="md:col-span-2 lg:col-span-1 place-content-end">
-          <Button variant="link" href={withBase('/?intro=false')} class="text-7xl">
+          <Button variant="link" href={withBase('/?intro=false')} className="text-7xl">
             <!-- Footer Logo (White) -->
             <AugurLogo />
           </Button>

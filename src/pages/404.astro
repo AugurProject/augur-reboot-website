@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks.astro";
 import Footer from "../components/Footer.astro";
-import Button from "../components/Button.tsx";
+import Button from "../components/ui/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
 import { withBase } from "../lib/utils";
 ---
@@ -33,7 +33,7 @@ import { withBase } from "../lib/utils";
         <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
           <h1 class="uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
           <!-- ASCII Art 404 -->
-          <pre class="title leading-none tracking-tight text-[size:clamp(0.8rem,_1vw,_0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" aria-label="404 - Page Not Found">
+          <pre class="title leading-none tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" aria-label="404 - Page Not Found">
 ██╗  ██╗ ██████╗ ██╗  ██╗
 ██║  ██║██╔═████╗██║  ██║
 ███████║██║██╔██║███████║
