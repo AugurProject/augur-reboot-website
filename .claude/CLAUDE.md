@@ -43,3 +43,10 @@
 - **Workspace Management**: Use `jubalm/workspace` for worktree management (`ws` alias if installed locally—check `ws --help`)
 - **Skills**: Use astro-dev skill for modern Astro framework patterns and best practices with React islands
 - **Code Review**: Use superpowers skill for brainstorming, debugging, planning, and code review workflows
+
+## Git Workflow
+
+- **DO NOT auto-commit changes** unless explicitly instructed
+- Stage all changes and wait for direction before committing
+- Plan complete sets of changes before creating commits to avoid history pollution
+- Only commit when user explicitly says "push", "commit", or "/commit"
