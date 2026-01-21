@@ -2,41 +2,29 @@ name: Build and Deploy Augur Site with Fork Risk Monitoring
 
 on:
   schedule:
-    # Run every 6 hours at minute 5 for fork risk monitoring
-    # Runs at 00:05, 06:05, 12:05, 18:05 UTC
-    - cron: '5 */6 * * *'
+    - cron: '0 * * * *'  # Every hour on the hour (was: 0 */6 * * *)
   workflow_dispatch:
-    # Allow manual trigger with deployment control
     inputs:
-      deploy_to_production:
-        description: 'Deploy to GitHub Pages? (only works on main branch)'
-        type: boolean
-        default: false
-      custom_rpc_url:
-        description: 'Custom Ethereum RPC URL for testing'
+      eth_rpc_url:
+        description: 'Custom Ethereum RPC URL (optional)'
         required: false
-        type: string
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main]
+    branches:
+      - main
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -47,49 +35,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Fetch event cache from gh-pages
-        run: |
-          # Incremental Event Caching Strategy:
-          # - Loads cached events from gh-pages branch
-          # - Only queries blockchain for new blocks since last run
-          # - Re-queries last 32 blocks for finality safety
-          # - Reduces RPC calls from ~51/hour to ~2/6-hours (98% reduction)
-          # - See docs/rpc-caching-strategy.md for details
-
-          # Create cache directory in public/ (will be copied to dist/ by Astro build)
-          mkdir -p public/cache
-
-          # Try to fetch cache from gh-pages branch
-          if git show origin/gh-pages:cache/event-cache.json > public/cache/event-cache.json 2>/dev/null; then
-            echo "✓ Cache loaded from gh-pages"
-            echo "Cache size: $(wc -c < public/cache/event-cache.json) bytes"
-            echo "Cache version: $(jq -r '.version // "unknown"' public/cache/event-cache.json)"
-            echo "Last queried block: $(jq -r '.lastQueriedBlock // 0' public/cache/event-cache.json)"
-          else
-            echo "⚠️ No cache found on gh-pages, will perform full 7-day query"
-            # Create valid empty cache structure (matches EventCache interface)
-            NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-            jq -n \
-              --arg now "$NOW" \
-              '{version: "1.0.0", lastQueriedBlock: 0, lastQueriedTimestamp: $now, oldestEventBlock: 0, events: {created: [], contributions: [], completed: []}, metadata: {totalEventsTracked: 0, cacheGeneratedAt: $now, blockchainSyncStatus: "stale"}}' \
-              > public/cache/event-cache.json
-          fi
-
-      - name: Calculate fork risk data
-        run: npm run build:fork-data
-        env:
-          # Optional: Custom RPC can be provided via secrets or manual dispatch input
-          # If not provided, will use public RPCs (no API key needed!)
-          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || github.event.inputs.custom_rpc_url }}
-
-      - name: Check SITE_URL variable
-        run: |
-          if [ -z "${{ vars.SITE_URL }}" ]; then
-            echo "::warning::SITE_URL variable is not set. Astro will not generate sitemaps or canonical URLs. Set it in Settings → Secrets and variables → Actions → Variables"
-          else
-            echo "SITE_URL is set to: ${{ vars.SITE_URL }}"
-          fi
 
       - name: Build site
         run: npm run build
@@ -103,134 +48,204 @@ jobs:
         with:
           path: dist/
 
-      - name: Upload build artifact for summary
-        uses: actions/upload-artifact@v4
+  risk-monitor:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: fork-risk-cache
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    outputs:
+      risk-changed: ${{ steps.check-risk.outputs.risk-changed }}
+      needs-rebuild: ${{ steps.validate-cache.outputs.needs-rebuild }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          name: augur-site-build-${{ github.run_number }}
-          path: dist/
-          retention-days: 7
+          fetch-depth: 0
+
+      - name: Checkout gh-pages for cache
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-cache
+          sparse-checkout: cache
+          sparse-checkout-cone: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cache restoration strategy (three-tier fallback):
+      # 1. GH Actions cache (fastest, persists between runs within 5 days)
+      #    - Restores the most recent event-cache.json from GitHub Actions cache
+      #    - Used for incremental queries (lightweight, only recent events)
+      # 2. gh-pages branch fallback (slower, but persistent across cache clears)
+      #    - If GH Actions cache is unavailable (cleared by GitHub after 5 days)
+      #    - Pulls cached event-cache.json from gh-pages deployment history
+      # 3. Full 7-day cold start (slowest, complete blockchain rescan)
+      #    - If neither cache is available (initial setup, both cleared)
+      #    - Creates minimal cache file and runs complete 7-day query
+      #    - Triggers full-rebuild mode to populate cache for future runs
+
+      - name: Restore event cache from GH Actions
+        uses: actions/cache@v4
+        with:
+          path: public/cache/event-cache.json
+          key: event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}
+          restore-keys: |
+            event-cache-${{ runner.os }}-
+
+      - name: Fallback to cache from gh-pages if GH Actions cache miss
+        run: |
+          if [ ! -f public/cache/event-cache.json ]; then
+            mkdir -p public/cache
+            if [ -f gh-pages-cache/cache/event-cache.json ]; then
+              cp gh-pages-cache/cache/event-cache.json public/cache/event-cache.json
+              echo "✓ Cache loaded from gh-pages"
+            else
+              echo "⚠️ No cache found, will perform full 7-day query"
+              NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+              jq -n '{version: "1.0.0", lastQueriedBlock: 0, lastQueriedTimestamp: "'$NOW'", oldestEventBlock: 0, events: {created: [], contributions: [], completed: []}, metadata: {totalEventsTracked: 0, cacheGeneratedAt: "'$NOW'", blockchainSyncStatus: "complete"}}' > public/cache/event-cache.json
+            fi
+          fi
+
+      - name: Run incremental fork risk calculation
+        id: calc-risk
+        run: npm run build:fork-data
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
+          CALCULATION_MODE: 'incremental'
+
+      - name: Validate cache health
+        id: validate-cache
+        run: |
+          # Run lightweight validation (8-block re-query)
+          # Phase 2: Implement full validation in calculate-fork-risk.ts
+          # For now: Always skip full rebuild on incremental runs
+          # Output: needs-rebuild=true/false
+          echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+
+      - name: Check if risk percentage changed
+        id: check-risk
+        run: |
+          if [ ! -f public/data/fork-risk.json ]; then
+            echo "risk-changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          NEW_RISK=$(jq -r '.riskPercentage' public/data/fork-risk.json)
+
+          # Check if file changed from last commit
+          if git diff --quiet HEAD -- public/data/fork-risk.json; then
+            echo "risk-changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "risk-changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Save event cache to GH Actions
+        uses: actions/cache@v4
+        with:
+          path: public/cache/event-cache.json
+          key: event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}
+
+  cache-rebuild:
+    runs-on: ubuntu-latest
+    needs: risk-monitor
+    if: needs.risk-monitor.outputs.needs-rebuild == 'true'
+    concurrency:
+      group: fork-risk-cache
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full cache rebuild (7-day rescan)
+        run: npm run build:fork-data
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
+          CALCULATION_MODE: 'full-rebuild'
+
+      - name: Commit rebuilt cache to gh-pages if risk changed
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+
+          if git diff --quiet public/data/fork-risk.json; then
+            echo "No risk change after rebuild, skipping commit"
+          else
+            git add public/data/fork-risk.json
+            git commit -m "cache: rebuild event cache from full 7-day rescan"
+            git push
+          fi
 
   deploy:
-    needs: build
+    needs: [risk-monitor, build]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
     runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' ||
-       github.event_name == 'schedule' ||
-       (github.event_name == 'workflow_dispatch' &&
-        github.event.inputs.deploy_to_production == 'true'))
-
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pages
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Checkout gh-pages for cache management
+      - name: Checkout for cache commit
         uses: actions/checkout@v4
         with:
           ref: gh-pages
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Git
+      - name: Commit cache to gh-pages only if risk changed
+        if: needs.risk-monitor.outputs.risk-changed == 'true'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
 
-      - name: Detect meaningful changes (smart commit)
-        id: changes
-        run: |
-          # Smart Commit Strategy:
-          # - Immediate: Risk data changes (new disputes detected)
-          # - Daily: Cache-only updates (midnight run at 00:05 UTC)
-          # - Skip: No changes
-
-          # Get current risk from deployed site
-          CURRENT_RISK=$(jq -r '.riskPercentage // 0' data/fork-risk.json 2>/dev/null || echo "0")
-          CURRENT_BLOCK=$(jq -r '.blockNumber // "Unknown"' data/fork-risk.json 2>/dev/null || echo "Unknown")
-
-          # Get previous risk from git history
-          PREVIOUS_RISK=$(git show HEAD:data/fork-risk.json 2>/dev/null | jq -r '.riskPercentage // 0' 2>/dev/null || echo "0")
-
-          # Check if risk changed meaningfully (numeric comparison with rounding tolerance)
-          RISK_CHANGED=$(awk -v curr="$CURRENT_RISK" -v prev="$PREVIOUS_RISK" \
-            'BEGIN {if (int(curr*100) != int(prev*100)) print "true"; else print "false"}')
-
-          # Get cache stats for commit message (verify file exists)
-          EVENTS="0"
+          # Cache update logic - only commit if risk % changed
           if [ -f cache/event-cache.json ]; then
-            EVENTS=$(jq -r '.metadata.totalEventsTracked // 0' cache/event-cache.json 2>/dev/null || echo "0")
+            git add cache/event-cache.json
+            git commit -m "cache: update event cache (risk change detected)"
+            git push
           fi
-          HOUR=$(date -u +%H)
-
-          # Determine commit strategy
-          if [ "$RISK_CHANGED" = "true" ]; then
-            # Meaningful risk change - immediate commit
-            echo "status=immediate" >> $GITHUB_OUTPUT
-            echo "block=$CURRENT_BLOCK" >> $GITHUB_OUTPUT
-            echo "risk=$CURRENT_RISK" >> $GITHUB_OUTPUT
-            echo "events=$EVENTS" >> $GITHUB_OUTPUT
-            echo "✅ Immediate commit: Risk changed from $PREVIOUS_RISK% to $CURRENT_RISK%"
-          elif [ "${EVENTS:-0}" -gt 0 ] && [ "$HOUR" = "00" ]; then
-            # Daily cache refresh at midnight (00:05 UTC) - only if events tracked
-            echo "status=daily-cache" >> $GITHUB_OUTPUT
-            echo "block=$CURRENT_BLOCK" >> $GITHUB_OUTPUT
-            echo "events=$EVENTS" >> $GITHUB_OUTPUT
-            echo "📅 Daily cache refresh commit"
-          else
-            # No meaningful changes
-            echo "status=skip" >> $GITHUB_OUTPUT
-            echo "⏭️ Skipping commit (no meaningful changes)"
-          fi
-
-      - name: Commit risk changes
-        if: steps.changes.outputs.status == 'immediate'
-        run: |
-          git add data/fork-risk.json cache/event-cache.json 2>/dev/null || true
-          git commit -m "chore: update fork risk data
-
-          Block: ${{ steps.changes.outputs.block }}
-          Risk: ${{ steps.changes.outputs.risk }}%
-          Cached events: ${{ steps.changes.outputs.events }}
-
-          New dispute activity detected. Risk changed due to active disputes."
-          git push origin gh-pages
-
-      - name: Commit daily cache refresh
-        if: steps.changes.outputs.status == 'daily-cache'
-        run: |
-          git add cache/event-cache.json 2>/dev/null || true
-          git commit -m "chore: daily event cache refresh
-
-          Block: ${{ steps.changes.outputs.block }}
-          Risk: ${{ steps.changes.outputs.risk }}%
-          Cached events: ${{ steps.changes.outputs.events }}
-
-          Routine cache update (no new disputes)."
-          git push origin gh-pages
-
-      - name: Skip commit
-        if: steps.changes.outputs.status == 'skip'
-        run: |
-          echo "⏭️ No meaningful changes, skipping commit"
-          git restore --staged data/ cache/ 2>/dev/null || true
 
   summary:
-    needs: build
+    needs: risk-monitor
     runs-on: ubuntu-latest
     if: always()
 
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: augur-site-build-${{ github.run_number }}
-          path: dist/
-
       - name: Create build summary
         run: |
           echo "## 📦 Build Summary" >> $GITHUB_STEP_SUMMARY
@@ -238,57 +253,6 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Extract key metrics from JSON using jq (more reliable than grep)
-          if [ -f dist/data/fork-risk.json ]; then
-            if command -v jq >/dev/null 2>&1; then
-              RISK_LEVEL=$(jq -r '.riskLevel' dist/data/fork-risk.json)
-              RISK_PERCENT=$(jq -r '.riskPercentage' dist/data/fork-risk.json)
-              LARGEST_BOND=$(jq -r '.metrics.largestDisputeBond' dist/data/fork-risk.json)
-              THRESHOLD_PERCENT=$(jq -r '.metrics.forkThresholdPercent' dist/data/fork-risk.json)
-              ACTIVE_DISPUTES=$(jq -r '.metrics.activeDisputes' dist/data/fork-risk.json)
-              RPC_ENDPOINT=$(jq -r '.rpcInfo.endpoint' dist/data/fork-risk.json)
-              RPC_LATENCY=$(jq -r '.rpcInfo.latency' dist/data/fork-risk.json)
-
-              echo "### 🚨 Fork Risk Data" >> $GITHUB_STEP_SUMMARY
-              echo "**Risk Level:** ${RISK_LEVEL}" >> $GITHUB_STEP_SUMMARY
-              echo "**Risk Percentage:** ${RISK_PERCENT}%" >> $GITHUB_STEP_SUMMARY
-              echo "**Largest Dispute Bond:** ${LARGEST_BOND} REP" >> $GITHUB_STEP_SUMMARY
-              echo "**Fork Threshold Progress:** ${THRESHOLD_PERCENT}% of 275,000 REP" >> $GITHUB_STEP_SUMMARY
-              echo "**Active Disputes:** ${ACTIVE_DISPUTES}" >> $GITHUB_STEP_SUMMARY
-              echo "**RPC Used:** ${RPC_ENDPOINT} (${RPC_LATENCY}ms)" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "**Status:** Fork risk data calculated" >> $GITHUB_STEP_SUMMARY
-            fi
-          else
-            echo "⚠️ **Warning:** Fork risk data file not found" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🧪 Testing Instructions" >> $GITHUB_STEP_SUMMARY
-          echo "1. **Download:** Click on the artifact \`augur-site-build-${{ github.run_number }}\` above" >> $GITHUB_STEP_SUMMARY
-          echo "2. **Extract:** Unzip the downloaded file to a local folder" >> $GITHUB_STEP_SUMMARY
-          echo "3. **Test locally:** Run one of these commands in the extracted folder:" >> $GITHUB_STEP_SUMMARY
-          echo "   \`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "   # Option 1: Node.js" >> $GITHUB_STEP_SUMMARY
-          echo "   npx serve" >> $GITHUB_STEP_SUMMARY
-          echo "   " >> $GITHUB_STEP_SUMMARY
-          echo "   # Option 2: Python" >> $GITHUB_STEP_SUMMARY
-          echo "   python -m http.server 8000" >> $GITHUB_STEP_SUMMARY
-          echo "   \`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Deployment status
-          if [[ "${{ github.ref }}" == "refs/heads/main" && ("${{ github.event_name }}" == "push" || "${{ github.event_name }}" == "schedule" || ("${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.deploy_to_production }}" == "true")) ]]; then
-            echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **Production Deployment:** Deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-            echo "**Site URL:** ${{ vars.SITE_URL || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### 📦 Artifact Only" >> $GITHUB_STEP_SUMMARY
-            echo "**Status:** Build completed, artifact created (no production deployment)" >> $GITHUB_STEP_SUMMARY
-            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-              echo "**Reason:** Not on main branch (current: ${{ github.ref_name }})" >> $GITHUB_STEP_SUMMARY
-            elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.deploy_to_production }}" != "true" ]]; then
-              echo "**Reason:** Manual trigger with deploy_to_production = false" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
+          echo "### 🔍 Risk Monitor Status" >> $GITHUB_STEP_SUMMARY
+          echo "**Risk Changed:** ${{ needs.risk-monitor.outputs.risk-changed }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Needs Cache Rebuild:** ${{ needs.risk-monitor.outputs.needs-rebuild }}" >> $GITHUB_STEP_SUMMARY

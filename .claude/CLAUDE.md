@@ -2,7 +2,7 @@
 
 ## Key Documentation References
 
-**Cache Architecture** (`docs/proposed-cache-architecture-gh-actions.md`): Hourly fork risk monitoring with lightweight validation, event-driven cache rebuild, concurrency locking, and UI messaging. Read FIRST when implementing cache infrastructure changes.
+**Fork Risk Monitoring System** (`docs/fork-risk-monitoring-system.md`): Complete documentation of the hourly fork risk monitoring system. Covers: why the system was built (problem statement), design approach (GitHub Actions + event-driven validation), architecture details (two-job workflow with concurrency locking), implementation (all code changes), testing results, RPC budget analysis, failure scenarios, and operational monitoring. Start here for complete understanding of how fork monitoring works.
 
 **Fork Risk Assessment** (`docs/fork-risk-assessment.md`): Methodology for calculating fork risk, risk thresholds, blockchain data sources, RPC failover strategy, and transparency/auditability approach. Read when implementing or debugging fork risk features.
 
@@ -43,3 +43,8 @@
 - **Workspace Management**: Use `jubalm/workspace` for worktree management (`ws` alias if installed locally—check `ws --help`)
 - **Skills**: Use astro-dev skill for modern Astro framework patterns and best practices with React islands
 - **Code Review**: Use superpowers skill for brainstorming, debugging, planning, and code review workflows
+
+## Git Workflow
+
+- **DO NOT auto-commit changes** unless explicitly instructed
+- Stage all changes and wait for direction before committing

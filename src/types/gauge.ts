@@ -10,6 +10,7 @@ export interface RiskLevel {
 
 export interface ForkRiskData {
 	timestamp: string
+	lastUpdated: string
 	blockNumber?: number
 	riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 	riskPercentage: number

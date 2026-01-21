@@ -49,6 +49,7 @@ type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 
 interface ForkRiskData {
 	timestamp: string
+	lastUpdated: string
 	blockNumber?: number
 	riskLevel: RiskLevel
 	riskPercentage: number
@@ -57,6 +58,10 @@ interface ForkRiskData {
 	rpcInfo: RpcInfo
 	calculation: Calculation
 	error?: string
+	cacheValidation?: {
+		isHealthy: boolean
+		discrepancy?: string
+	}
 }
 
 // Cache interfaces for incremental event caching
@@ -86,10 +91,16 @@ interface EventCache {
 	}
 }
 
+interface CacheValidationResult {
+	isHealthy: boolean
+	discrepancy?: string
+}
+
 // Configuration
 const FORK_THRESHOLD_REP = 275000 // 2.5% of 11 million REP
 const CACHE_VERSION = '1.0.0'
 const FINALITY_DEPTH = 32 // Ethereum finality depth (~6.4 minutes)
+const VALIDATION_DEPTH = 8 // blocks (detects corruption within ~2 minutes)
 
 // Public RPC endpoints (no API keys required!)
 const PUBLIC_RPC_ENDPOINTS = [
@@ -226,6 +237,10 @@ async function executeWithRpcFallback<T>(
 
 async function calculateForkRisk(): Promise<ForkRiskData> {
 	try {
+		// Detect calculation mode from environment
+		const mode = process.env.CALCULATION_MODE || 'incremental'
+		console.log(`[Mode] ${mode === 'full-rebuild' ? 'FULL REBUILD' : 'INCREMENTAL'} mode`)
+
 		console.log('Starting fork risk calculation...')
 
 		return await executeWithRpcFallback(async (connection, contracts) => {
@@ -252,8 +267,17 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			}
 
 			// Calculate key metrics
-			const activeDisputes = await getActiveDisputes(connection.provider, contracts)
+			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode)
 			const largestDisputeBond = getLargestDisputeBond(activeDisputes)
+
+			// Validate cache health
+			const cache = await loadEventCache()
+			const cacheValidation = await validateCacheHealth(connection.provider, contracts, cache)
+
+			if (!cacheValidation.isHealthy) {
+				console.error(`❌ Cache validation failed: ${cacheValidation.discrepancy}`)
+				console.error('⚠️  Consider triggering Cache Rebuild job to repair the cache')
+			}
 
 			// Calculate risk level
 			const forkThresholdPercent =
@@ -264,6 +288,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// Prepare results
 			const results: ForkRiskData = {
 				timestamp,
+				lastUpdated: new Date().toISOString(),
 				blockNumber,
 				riskLevel,
 				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
@@ -283,6 +308,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					method: 'GitHub Actions + Public RPC',
 					forkThreshold: FORK_THRESHOLD_REP,
 				},
+				cacheValidation,
 			}
 
 			console.log('Calculation completed successfully')
@@ -478,7 +504,7 @@ function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
 	return prunedCache
 }
 
-async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>): Promise<DisputeDetails[]> {
+async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental'): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
 
@@ -488,28 +514,24 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
 		const currentBlock = await provider.getBlockNumber()
 		const blocksPerDay = 7200 // Approximate blocks per day (12 second blocks)
-		const searchPeriod = 7 * blocksPerDay // Last 7 days
+		const searchPeriod = 7 * blocksPerDay // Last 7 days (~50,400 blocks)
 		const fullSearchStartBlock = currentBlock - searchPeriod
 
-		// Determine query range based on cache
+		// Determine query range based on mode and cache
 		let fromBlock: number
 		let newEventsOnly = false
 
-		if (cache.lastQueriedBlock > 0 && cache.lastQueriedBlock < currentBlock) {
-			// Incremental query: start from last queried block + 1
-			// But also re-query last FINALITY_DEPTH blocks for safety
-			fromBlock = Math.max(
-				cache.lastQueriedBlock - FINALITY_DEPTH,
-				fullSearchStartBlock
-			)
+		if (mode === 'full-rebuild' || !cache.lastQueriedBlock || cache.lastQueriedBlock === 0) {
+			// Full 7-day rescan
+			fromBlock = Math.max(currentBlock - searchPeriod, 0)
+			console.log(`[Query] Full 7-day rescan: blocks ${fromBlock} to ${currentBlock}`)
+		} else {
+			// Incremental: only new blocks since last query
+			fromBlock = Math.max(cache.lastQueriedBlock - FINALITY_DEPTH, 0)
 			newEventsOnly = true
 			const blocksToQuery = currentBlock - fromBlock
-			console.log(`📦 Incremental query: blocks ${fromBlock} → ${currentBlock} (~${blocksToQuery} blocks)`)
+			console.log(`[Query] Incremental: blocks ${fromBlock} to ${currentBlock} (~${blocksToQuery} blocks)`)
 			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events`)
-		} else {
-			// Full query: no valid cache or cache is stale
-			fromBlock = fullSearchStartBlock
-			console.log(`🔄 Full query: last 7 days (${searchPeriod} blocks)`)
 		}
 
 		// Initialize event arrays
@@ -817,6 +839,7 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 function getForkingResult(timestamp: string, blockNumber: number, connection: RpcConnection): ForkRiskData {
 		return {
 			timestamp,
+			lastUpdated: new Date().toISOString(),
 			blockNumber,
 			riskLevel: 'critical',
 			riskPercentage: 100,
@@ -850,6 +873,7 @@ function getForkingResult(timestamp: string, blockNumber: number, connection: Rp
 function getErrorResult(errorMessage: string): ForkRiskData {
 		return {
 			timestamp: new Date().toISOString(),
+			lastUpdated: new Date().toISOString(),
 			riskLevel: 'unknown',
 			riskPercentage: 0,
 			error: errorMessage,
@@ -882,6 +906,121 @@ async function saveResults(results: ForkRiskData): Promise<void> {
 		await fs.writeFile(outputPath, JSON.stringify(results, null, 2))
 
 		console.log(`Results saved to ${outputPath}`)
+}
+
+/**
+ * Validate cache health by re-querying last N blocks fresh and comparing against cached data
+ * This detects cache corruption from blockchain reorganizations
+ */
+async function validateCacheHealth(
+	provider: ethers.JsonRpcProvider,
+	contracts: Record<string, ethers.Contract>,
+	cache: EventCache
+): Promise<CacheValidationResult> {
+	try {
+		// Return early if no cached data
+		if (cache.lastQueriedBlock === 0 || cache.metadata.totalEventsTracked === 0) {
+			console.log('ℹ️  Cache validation skipped: no cached data to validate')
+			return { isHealthy: true }
+		}
+
+		const currentBlock = await provider.getBlockNumber()
+		const validationStartBlock = Math.max(
+			currentBlock - VALIDATION_DEPTH,
+			cache.oldestEventBlock
+		)
+
+		console.log(`🔍 Validating cache health: re-querying blocks ${validationStartBlock}-${currentBlock}`)
+
+		// Re-query last N blocks fresh (without cache)
+		const freshCreatedEvents: ethers.EventLog[] = []
+		const freshContributionEvents: ethers.EventLog[] = []
+		const freshCompletedEvents: ethers.EventLog[] = []
+
+		try {
+			// Query Created events fresh
+			const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
+			const createdEvents = await contracts.augur.queryFilter(createdFilter, validationStartBlock, currentBlock)
+			freshCreatedEvents.push(...(createdEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+
+			// Query Contribution events fresh
+			const contributionFilter = contracts.augur.filters.DisputeCrowdsourcerContribution()
+			const contributionEvents = await contracts.augur.queryFilter(contributionFilter, validationStartBlock, currentBlock)
+			freshContributionEvents.push(...(contributionEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+
+			// Query Completed events fresh
+			const completedFilter = contracts.augur.filters.DisputeCrowdsourcerCompleted()
+			const completedEvents = await contracts.augur.queryFilter(completedFilter, validationStartBlock, currentBlock)
+			freshCompletedEvents.push(...(completedEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+
+			console.log(`Found ${freshCreatedEvents.length + freshContributionEvents.length + freshCompletedEvents.length} fresh events in validation window`)
+		} catch (queryError) {
+			const errorMessage = queryError instanceof Error ? queryError.message : String(queryError)
+			console.warn(`⚠️  Validation query failed: ${errorMessage}`)
+			return { isHealthy: false, discrepancy: `Query failed: ${errorMessage}` }
+		}
+
+		// Extract dispute IDs from fresh events
+		const freshDisputeIds = new Set<string>()
+
+		for (const event of freshCreatedEvents) {
+			if (event.args?.[2]) {
+				freshDisputeIds.add(String(event.args[2]))
+			}
+		}
+
+		for (const event of freshContributionEvents) {
+			if (event.args?.[3]) {
+				freshDisputeIds.add(String(event.args[3]))
+			}
+		}
+
+		for (const event of freshCompletedEvents) {
+			if (event.args?.[2]) {
+				freshDisputeIds.add(String(event.args[2]))
+			}
+		}
+
+		// Extract dispute IDs from cached events in validation window
+		const cachedDisputeIds = new Set<string>()
+
+		for (const event of cache.events.created) {
+			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			}
+		}
+
+		for (const event of cache.events.contributions) {
+			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			}
+		}
+
+		for (const event of cache.events.completed) {
+			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			}
+		}
+
+		// Compare fresh vs cached dispute sets
+		const freshOnly = Array.from(freshDisputeIds).filter(id => !cachedDisputeIds.has(id))
+		const cachedOnly = Array.from(cachedDisputeIds).filter(id => !freshDisputeIds.has(id))
+
+		if (freshOnly.length > 0 || cachedOnly.length > 0) {
+			const discrepancy = `Fresh: ${freshOnly.length} missing from cache, Cached: ${cachedOnly.length} not in fresh data`
+			console.warn(`⚠️  Cache discrepancy detected: ${discrepancy}`)
+			console.warn(`   Fresh disputes: ${freshDisputeIds.size}, Cached disputes: ${cachedDisputeIds.size}`)
+			return { isHealthy: false, discrepancy }
+		}
+
+		console.log(`✓ Cache validation passed: fresh and cached disputes match in blocks ${validationStartBlock}-${currentBlock}`)
+		return { isHealthy: true }
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : String(error)
+		console.warn(`⚠️  Unexpected error during cache validation: ${errorMessage}`)
+		// Return unhealthy but don't crash - validation errors shouldn't block the script
+		return { isHealthy: false, discrepancy: `Validation error: ${errorMessage}` }
+	}
 }
 
 // Main execution
