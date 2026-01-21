@@ -85,6 +85,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Cache restoration strategy (three-tier fallback):
+      # 1. GH Actions cache (fastest, persists between runs within 5 days)
+      #    - Restores the most recent event-cache.json from GitHub Actions cache
+      #    - Used for incremental queries (lightweight, only recent events)
+      # 2. gh-pages branch fallback (slower, but persistent across cache clears)
+      #    - If GH Actions cache is unavailable (cleared by GitHub after 5 days)
+      #    - Pulls cached event-cache.json from gh-pages deployment history
+      # 3. Full 7-day cold start (slowest, complete blockchain rescan)
+      #    - If neither cache is available (initial setup, both cleared)
+      #    - Creates minimal cache file and runs complete 7-day query
+      #    - Triggers full-rebuild mode to populate cache for future runs
+
       - name: Restore event cache from GH Actions
         uses: actions/cache@v4
         with:
