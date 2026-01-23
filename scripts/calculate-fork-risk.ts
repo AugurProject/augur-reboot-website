@@ -868,8 +868,7 @@ function getForkingResult(blockNumber: number, connection: RpcConnection): ForkR
 
 function getErrorResult(errorMessage: string): ForkRiskData {
 		return {
-			timestamp: new Date().toISOString(),
-			lastUpdated: new Date().toISOString(),
+			lastRiskChange: new Date().toISOString(),
 			riskLevel: 'unknown',
 			riskPercentage: 0,
 			error: errorMessage,
@@ -879,16 +878,15 @@ function getErrorResult(errorMessage: string): ForkRiskData {
 				activeDisputes: 0,
 				disputeDetails: [],
 			},
-			nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-			rpcInfo: {
+				rpcInfo: {
 				endpoint: null,
 				latency: null,
 				fallbacksAttempted: 0,
 			},
 			calculation: {
-				method: 'Error',
-				forkThreshold: FORK_THRESHOLD_REP,
+					forkThreshold: FORK_THRESHOLD_REP,
 			},
+		cacheValidation: { isHealthy: false, discrepancy: errorMessage },
 		}
 	}
 
