@@ -9,8 +9,7 @@ export interface RiskLevel {
 }
 
 export interface ForkRiskData {
-	timestamp: string
-	lastUpdated: string
+	lastRiskChange: string
 	blockNumber?: number
 	riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 	riskPercentage: number
@@ -26,16 +25,17 @@ export interface ForkRiskData {
 			daysRemaining: number
 		}>
 	}
-	nextUpdate: string
 	rpcInfo?: {
 		endpoint: string | null
 		latency: number | null
 		fallbacksAttempted: number
-		isPublicRpc?: boolean
 	}
 	calculation: {
-		method: string
 		forkThreshold: number
+	}
+	cacheValidation?: {
+		isHealthy: boolean
+		discrepancy?: string
 	}
 	error?: string
 }
