@@ -102,8 +102,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	const riskPercentage = forkThresholdPercent
 
 	return {
-		timestamp: now.toISOString(),
-		lastUpdated: now.toISOString(),
+		lastRiskChange: now.toISOString(),
 		blockNumber: Math.floor(Math.random() * 1000000) + 20000000,
 		riskLevel,
 		riskPercentage: Math.round(riskPercentage * 100) / 100,
@@ -113,15 +112,12 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			activeDisputes,
 			disputeDetails,
 		},
-		nextUpdate: new Date(now.getTime() + 60 * 60 * 1000).toISOString(),
 		rpcInfo: {
 			endpoint: 'Demo Mode - Dispute Bond Simulation',
 			latency: Math.floor(Math.random() * 200) + 100,
 			fallbacksAttempted: 0,
-			isPublicRpc: true,
 		},
 		calculation: {
-			method: 'Demo Mode - Focus on Dispute Bond Scenarios',
 			forkThreshold: FORK_THRESHOLD_REP,
 		},
 	}
