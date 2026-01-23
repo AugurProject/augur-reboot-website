@@ -263,7 +263,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			if (isForking) {
 				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
-				return getForkingResult(timestamp, blockNumber, connection)
+				return getForkingResult(blockNumber, connection)
 			}
 
 			// Calculate key metrics
@@ -834,7 +834,7 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 	return 'low'
 }
 
-function getForkingResult(timestamp: string, blockNumber: number, connection: RpcConnection): ForkRiskData {
+function getForkingResult(blockNumber: number, connection: RpcConnection): ForkRiskData {
 		return {
 			lastRiskChange: new Date().toISOString(),
 			blockNumber,
@@ -854,16 +854,15 @@ function getForkingResult(timestamp: string, blockNumber: number, connection: Rp
 					},
 				],
 			},
-			nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 			rpcInfo: {
 				endpoint: connection.endpoint,
 				latency: connection.latency,
 				fallbacksAttempted: connection.fallbacksAttempted,
 			},
 			calculation: {
-				method: 'Fork Detected',
 				forkThreshold: FORK_THRESHOLD_REP,
 			},
+			cacheValidation: { isHealthy: true },
 		}
 	}
 
