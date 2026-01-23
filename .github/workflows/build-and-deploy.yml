@@ -42,15 +42,13 @@ jobs:
           if [ ! -f public/data/fork-risk.json ]; then
             NOW=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
             jq -n '{
-              timestamp: "'$NOW'",
-              lastUpdated: "'$NOW'",
+              lastRiskChange: "'$NOW'",
               blockNumber: 0,
               riskLevel: "none",
               riskPercentage: 0,
               metrics: {largestDisputeBond: 0, forkThresholdPercent: 0, activeDisputes: 0, disputeDetails: []},
-              nextUpdate: "'$(date -d '+1 hour' -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
               rpcInfo: {endpoint: "pending", latency: 0, fallbacksAttempted: 0},
-              calculation: {method: "GitHub Actions + Public RPC", forkThreshold: 275000},
+              calculation: {forkThreshold: 275000},
               cacheValidation: {isHealthy: true}
             }' > public/data/fork-risk.json
             echo "✓ Created initial fork-risk.json"
@@ -88,14 +86,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout gh-pages for cache
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-cache
-          sparse-checkout: cache
-          sparse-checkout-cone-mode: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -105,17 +95,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Cache restoration strategy (three-tier fallback):
-      # 1. GH Actions cache (fastest, persists between runs within 5 days)
-      #    - Restores the most recent event-cache.json from GitHub Actions cache
-      #    - Used for incremental queries (lightweight, only recent events)
-      # 2. gh-pages branch fallback (slower, but persistent across cache clears)
-      #    - If GH Actions cache is unavailable (cleared by GitHub after 5 days)
-      #    - Pulls cached event-cache.json from gh-pages deployment history
-      # 3. Full 7-day cold start (slowest, complete blockchain rescan)
-      #    - If neither cache is available (initial setup, both cleared)
-      #    - Creates minimal cache file and runs complete 7-day query
-      #    - Triggers full-rebuild mode to populate cache for future runs
+      # Cache restoration: GH Actions cache only
+      # - Restores event-cache.json from GitHub Actions cache (persists ~7 days)
+      # - On cache miss, creates empty cache and performs full 7-day query
+      # - No git commits for cache - ephemeral by design
 
       - name: Restore event cache from GH Actions
         uses: actions/cache@v4
@@ -125,18 +108,13 @@ jobs:
           restore-keys: |
             event-cache-${{ runner.os }}-
 
-      - name: Fallback to cache from gh-pages if GH Actions cache miss
+      - name: Bootstrap empty cache if GH Actions cache miss
         run: |
           if [ ! -f public/cache/event-cache.json ]; then
             mkdir -p public/cache
-            if [ -f gh-pages-cache/cache/event-cache.json ]; then
-              cp gh-pages-cache/cache/event-cache.json public/cache/event-cache.json
-              echo "✓ Cache loaded from gh-pages"
-            else
-              echo "⚠️ No cache found, will perform full 7-day query"
-              NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-              jq -n '{version: "1.0.0", lastQueriedBlock: 0, lastQueriedTimestamp: "'$NOW'", oldestEventBlock: 0, events: {created: [], contributions: [], completed: []}, metadata: {totalEventsTracked: 0, cacheGeneratedAt: "'$NOW'", blockchainSyncStatus: "complete"}}' > public/cache/event-cache.json
-            fi
+            echo "⚠️ No cache found, will perform full 7-day query"
+            NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            jq -n '{version: "1.0.0", lastQueriedBlock: 0, lastQueriedTimestamp: "'$NOW'", oldestEventBlock: 0, events: {created: [], contributions: [], completed: []}, metadata: {totalEventsTracked: 0, cacheGeneratedAt: "'$NOW'", blockchainSyncStatus: "complete"}}' > public/cache/event-cache.json
           fi
 
       - name: Run incremental fork risk calculation
@@ -149,11 +127,21 @@ jobs:
       - name: Validate cache health
         id: validate-cache
         run: |
-          # Run lightweight validation (8-block re-query)
-          # Phase 2: Implement full validation in calculate-fork-risk.ts
-          # For now: Always skip full rebuild on incremental runs
-          # Output: needs-rebuild=true/false
-          echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+          if [ ! -f public/data/fork-risk.json ]; then
+            echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          HEALTH=$(jq -r '.cacheValidation.isHealthy' public/data/fork-risk.json)
+
+          if [ "$HEALTH" = "false" ]; then
+            echo "needs-rebuild=true" >> $GITHUB_OUTPUT
+            DISCREPANCY=$(jq -r '.cacheValidation.discrepancy // "Unknown validation failure"' public/data/fork-risk.json)
+            echo "::warning::Cache validation failed: $DISCREPANCY - triggering full cache rebuild"
+            echo "⚠️ Cache validation failed - rebuilding cache" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Check if risk percentage changed
         id: check-risk
@@ -202,23 +190,12 @@ jobs:
         run: npm ci
 
       - name: Run full cache rebuild (7-day rescan)
-        run: npm run build:fork-data
+        run: |
+          echo "::warning::Full cache rebuild triggered - rescanning 7-day history from blockchain"
+          npm run build:fork-data
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
           CALCULATION_MODE: 'full-rebuild'
-
-      - name: Commit rebuilt cache to gh-pages if risk changed
-        run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-
-          if git diff --quiet public/data/fork-risk.json; then
-            echo "No risk change after rebuild, skipping commit"
-          else
-            git add public/data/fork-risk.json
-            git commit -m "cache: rebuild event cache from full 7-day rescan"
-            git push
-          fi
 
   deploy:
     needs: [risk-monitor, build]
@@ -241,24 +218,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Checkout for cache commit
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      - name: Commit cache to gh-pages only if risk changed
-        if: needs.risk-monitor.outputs.risk-changed == 'true'
-        run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-
-          # Cache update logic - only commit if risk % changed
-          if [ -f cache/event-cache.json ]; then
-            git add cache/event-cache.json
-            git commit -m "cache: update event cache (risk change detected)"
-            git push
-          fi
 
   summary:
     needs: risk-monitor

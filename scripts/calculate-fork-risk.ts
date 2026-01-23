@@ -41,20 +41,17 @@ interface Metrics {
 }
 
 interface Calculation {
-	method: string
 	forkThreshold: number
 }
 
 type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 
 interface ForkRiskData {
-	timestamp: string
-	lastUpdated: string
+	lastRiskChange: string
 	blockNumber?: number
 	riskLevel: RiskLevel
 	riskPercentage: number
 	metrics: Metrics
-	nextUpdate: string
 	rpcInfo: RpcInfo
 	calculation: Calculation
 	error?: string
@@ -215,6 +212,11 @@ async function executeWithRpcFallback<T>(
 			const latency = Date.now() - startTime
 			console.log(`✓ Connected to: ${rpc} (${latency}ms)`)
 
+			// Warn if using fallback endpoint
+			if (fallbacksAttempted > 0) {
+				console.log(`::warning::Using RPC fallback endpoint (${fallbacksAttempted} previous failures)`)
+			}
+
 			const connection: RpcConnection = {
 				provider,
 				endpoint: rpc,
@@ -232,7 +234,9 @@ async function executeWithRpcFallback<T>(
 		}
 	}
 
-	throw lastError || new Error(`All RPC endpoints failed (attempted ${fallbacksAttempted})`)
+	const errorMsg = `All RPC endpoints failed (attempted ${fallbacksAttempted})`
+	console.log(`::error::${errorMsg}`)
+	throw lastError || new Error(errorMsg)
 }
 
 async function calculateForkRisk(): Promise<ForkRiskData> {
@@ -247,8 +251,6 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// Get current blockchain state
 			const blockNumber = await connection.provider.getBlockNumber()
 			console.log(`Block Number: ${blockNumber}`)
-			const timestamp = new Date().toISOString()
-
 			// Check if universe is already forking with retry logic
 			let isForking = false
 			try {
@@ -263,7 +265,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			if (isForking) {
 				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
-				return getForkingResult(timestamp, blockNumber, connection)
+				return getForkingResult(blockNumber, connection)
 			}
 
 			// Calculate key metrics
@@ -287,28 +289,25 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			// Prepare results
 			const results: ForkRiskData = {
-				timestamp,
-				lastUpdated: new Date().toISOString(),
-				blockNumber,
-				riskLevel,
-				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
-				metrics: {
-					largestDisputeBond,
-					forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
-					activeDisputes: activeDisputes.length,
-					disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
-				},
-				nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
-				rpcInfo: {
-					endpoint: connection.endpoint,
-					latency: connection.latency,
-					fallbacksAttempted: connection.fallbacksAttempted,
-				},
-				calculation: {
-					method: 'GitHub Actions + Public RPC',
-					forkThreshold: FORK_THRESHOLD_REP,
-				},
-				cacheValidation,
+			lastRiskChange: new Date().toISOString(),
+			blockNumber,
+			riskLevel,
+			riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
+			metrics: {
+				largestDisputeBond,
+				forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
+				activeDisputes: activeDisputes.length,
+				disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
+			},
+			rpcInfo: {
+				endpoint: connection.endpoint,
+				latency: connection.latency,
+				fallbacksAttempted: connection.fallbacksAttempted,
+			},
+			calculation: {
+				forkThreshold: FORK_THRESHOLD_REP,
+			},
+			cacheValidation,
 			}
 
 			console.log('Calculation completed successfully')
@@ -836,10 +835,9 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 	return 'low'
 }
 
-function getForkingResult(timestamp: string, blockNumber: number, connection: RpcConnection): ForkRiskData {
+function getForkingResult(blockNumber: number, connection: RpcConnection): ForkRiskData {
 		return {
-			timestamp,
-			lastUpdated: new Date().toISOString(),
+			lastRiskChange: new Date().toISOString(),
 			blockNumber,
 			riskLevel: 'critical',
 			riskPercentage: 100,
@@ -857,23 +855,21 @@ function getForkingResult(timestamp: string, blockNumber: number, connection: Rp
 					},
 				],
 			},
-			nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 			rpcInfo: {
 				endpoint: connection.endpoint,
 				latency: connection.latency,
 				fallbacksAttempted: connection.fallbacksAttempted,
 			},
 			calculation: {
-				method: 'Fork Detected',
 				forkThreshold: FORK_THRESHOLD_REP,
 			},
+			cacheValidation: { isHealthy: true },
 		}
 	}
 
 function getErrorResult(errorMessage: string): ForkRiskData {
 		return {
-			timestamp: new Date().toISOString(),
-			lastUpdated: new Date().toISOString(),
+			lastRiskChange: new Date().toISOString(),
 			riskLevel: 'unknown',
 			riskPercentage: 0,
 			error: errorMessage,
@@ -883,16 +879,15 @@ function getErrorResult(errorMessage: string): ForkRiskData {
 				activeDisputes: 0,
 				disputeDetails: [],
 			},
-			nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-			rpcInfo: {
+				rpcInfo: {
 				endpoint: null,
 				latency: null,
 				fallbacksAttempted: 0,
 			},
 			calculation: {
-				method: 'Error',
-				forkThreshold: FORK_THRESHOLD_REP,
+					forkThreshold: FORK_THRESHOLD_REP,
 			},
+		cacheValidation: { isHealthy: false, discrepancy: errorMessage },
 		}
 	}
 

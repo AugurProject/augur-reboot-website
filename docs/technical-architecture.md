@@ -120,7 +120,7 @@ Slide-out panel with data inspection and demo controls.
 - Fork Threshold Percentage
 - RPC Endpoint & Latency
 - Block Number
-- Last Updated timestamp
+- Last Risk Change timestamp
 
 **Demo Controls:**
 - Risk scenario buttons:
@@ -158,7 +158,8 @@ React Context providing simplified fork risk data.
 **Provides:**
 - `gaugeData`: Processed data containing percentage for gauge
 - `riskLevel`: Current risk level (for compatibility)
-- `lastUpdated`: Formatted timestamp
+- `lastRiskChange`: Formatted timestamp (when risk percentage last changed)
+- `cacheValidation`: Object with `isHealthy` flag (indicates if cache passed validation)
 - `isLoading`: Loading state
 - `error`: Error message if data fetch fails
 - `rawData`: Complete JSON data with dispute metrics
@@ -168,6 +169,8 @@ React Context providing simplified fork risk data.
 2. Single metric calculation: largest active dispute bond / 275,000 REP
 3. Auto-refresh every 5 minutes
 4. Fallback to demo data if fetch fails
+
+**Data Source:** The `fork-risk.json` file is generated hourly by GitHub Actions. See `docs/fork-risk-monitoring-system.md` for details on the monitoring workflow, cache validation, and data generation strategy.
 
 **Risk Calculation Backend (scripts/calculate-fork-risk.ts):**
 1. Monitors `DisputeCrowdsourcerCreated` events (dispute initialization)

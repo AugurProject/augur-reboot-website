@@ -27,7 +27,7 @@
 ## Team Conventions
 
 - **Component State**: State in stores/context ONLY, never in components. Components are purely reactive. Initialization logic belongs in stores, not useEffect.
-- **Development Workflow**: Check dev server before starting: `lsof -ti:4321`. Only run `npm run dev` if port is free. Always run: typecheck, lint, build before merging.
+- **Development Workflow**: Check dev server before starting: `lsof -ti:4321`. Only run `npm run dev` if port is free. **Pre-commit checks (required before every commit)**: typecheck, lint. **Pre-merge checks (required before merging)**: typecheck, lint, build.
 - **GPU Resources**: WebGL components MUST implement dispose() and call it in useEffect cleanup. Guard with isDisposed flag. Never render after disposal.
 - **Styling Standards**: ALWAYS edit `src/styles/global.css` ONLY. Use @theme and @utility directives. Custom utils: fx-glow, fx-glow-sm/lg, fx-box-glow.
 - **Demo Mode**: Press F2 in dev to toggle fork risk scenarios (None, Low, Moderate, High, Critical). Dev-only feature with production guards—safe to leave in code.
@@ -35,8 +35,7 @@
 ## Implementation Quirks
 
 - **Astro Scoped Styles**: Component <style> blocks auto-scoped with data-astro-cid-* attributes. Use is:global for truly global styles.
-- **Fork Risk Formula**: (Largest Dispute Bond / 275,000 REP) × 100 = Risk %. Smaller denominator would severely underestimate risk.
-- **RPC Endpoint Failover**: Uses 4 public endpoints (LlamaRPC, LinkPool, PublicNode, 1RPC) with auto-fallback. No API keys needed.
+- **Fork Risk Details**: See `docs/fork-risk-assessment.md` (calculation) and `docs/fork-risk-monitoring-system.md` (operations).
 
 ## Tools & Workflow
 
