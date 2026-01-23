@@ -298,15 +298,13 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					activeDisputes: activeDisputes.length,
 					disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
 				},
-				nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
-				rpcInfo: {
+					rpcInfo: {
 					endpoint: connection.endpoint,
 					latency: connection.latency,
 					fallbacksAttempted: connection.fallbacksAttempted,
 				},
 				calculation: {
-					method: 'GitHub Actions + Public RPC',
-					forkThreshold: FORK_THRESHOLD_REP,
+						forkThreshold: FORK_THRESHOLD_REP,
 				},
 				cacheValidation,
 			}
@@ -838,8 +836,7 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 
 function getForkingResult(timestamp: string, blockNumber: number, connection: RpcConnection): ForkRiskData {
 		return {
-			timestamp,
-			lastUpdated: new Date().toISOString(),
+			lastRiskChange: new Date().toISOString(),
 			blockNumber,
 			riskLevel: 'critical',
 			riskPercentage: 100,
