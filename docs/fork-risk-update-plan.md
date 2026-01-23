@@ -70,6 +70,12 @@ Run: `npm run typecheck`
 
 Expected: No errors in src/types/gauge.ts
 
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
 **Step 4: Commit**
 
 ```bash
@@ -124,6 +130,12 @@ Replace lines 289-312 with:
 Run: `npm run build:scripts 2>&1 | head -20`
 
 Expected: Should compile without errors in this section
+
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
 
 **Step 4: Commit**
 
@@ -189,6 +201,12 @@ Run: `npm run build:scripts 2>&1 | head -20`
 
 Expected: Should compile without errors
 
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
 **Step 4: Commit**
 
 ```bash
@@ -245,6 +263,12 @@ Run: `npm run build:scripts 2>&1 | head -20`
 
 Expected: Should compile without errors
 
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
 **Step 4: Commit**
 
 ```bash
@@ -287,6 +311,12 @@ Replace lines 44-54 with:
 Run: `yamllint .github/workflows/build-and-deploy.yml 2>&1 | grep -A2 "line 4[4-9]" || echo "✓ No syntax errors in bootstrap section"`
 
 Expected: No syntax errors
+
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
 
 **Step 4: Commit**
 
@@ -343,7 +373,13 @@ Run: `sed -n '181,185p' .github/workflows/build-and-deploy.yml`
 
 Expected: Shows `if: needs.risk-monitor.outputs.needs-rebuild == 'true'` - this is correct
 
-**Step 5: Commit**
+**Step 5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
+**Step 6: Commit**
 
 ```bash
 git add .github/workflows/build-and-deploy.yml
@@ -382,6 +418,12 @@ To:
 Run: `npm run typecheck 2>&1 | grep -i forkdetails || echo "✓ ForkDetailsCard typecheck passed"`
 
 Expected: No errors
+
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
 
 **Step 4: Commit**
 
@@ -431,6 +473,12 @@ Run: `npm run typecheck 2>&1 | grep -i provider || echo "✓ ForkDataProvider ty
 
 Expected: No errors
 
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
 **Step 4: Commit**
 
 ```bash
@@ -470,6 +518,12 @@ Replace lines 136-142 with:
 Run: `npm run typecheck 2>&1 | grep -i provider || echo "✓ ForkDataProvider typecheck passed"`
 
 Expected: No errors
+
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
 
 **Step 4: Commit**
 
@@ -525,6 +579,12 @@ Run: `npm run typecheck 2>&1 | grep -i demo || echo "✓ Demo data generator typ
 
 Expected: No errors
 
+**Step 3.5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors for modified files
+
 **Step 4: Commit**
 
 ```bash
@@ -547,7 +607,7 @@ Expected: "✓ tsc success" or similar success message, 0 errors
 
 **Step 2: Run linter**
 
-Run: `npm run lint 2>&1 | head -30`
+Run: `npm run lint`
 
 Expected: No critical errors (warnings ok)
 
@@ -605,7 +665,13 @@ Expected: Page loads successfully
 
 Run: `kill %1` (kill background job)
 
-**Step 5: Commit**
+**Step 5: Run linter**
+
+Run: `npm run lint`
+
+Expected: No critical errors
+
+**Step 6: Commit**
 
 ```bash
 git add .
