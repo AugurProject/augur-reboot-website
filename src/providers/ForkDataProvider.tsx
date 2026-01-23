@@ -34,8 +34,7 @@ export const ForkDataProvider = ({
 }: ForkDataProviderProps): React.JSX.Element => {
 	// Create stable default data that doesn't change between renders
 	const [defaultData] = useState<ForkRiskData>(() => ({
-		timestamp: new Date().toISOString(),
-		lastUpdated: new Date().toISOString(),
+		lastRiskChange: new Date().toISOString(),
 		blockNumber: 0,
 		riskLevel: 'none',
 		riskPercentage: 0,
@@ -45,9 +44,7 @@ export const ForkDataProvider = ({
 			activeDisputes: 0,
 			disputeDetails: [],
 		},
-		nextUpdate: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
 		calculation: {
-			method: 'Static fallback',
 			forkThreshold: 275000,
 		},
 	}))
@@ -135,7 +132,7 @@ export const ForkDataProvider = ({
 
 	const formatLastUpdated = (data: ForkRiskData): string => {
 		try {
-			return new Date(data.timestamp).toLocaleString()
+			return new Date(data.lastRiskChange).toLocaleString()
 		} catch {
 			return 'Unknown'
 		}
