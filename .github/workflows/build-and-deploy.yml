@@ -147,11 +147,19 @@ jobs:
       - name: Validate cache health
         id: validate-cache
         run: |
-          # Run lightweight validation (8-block re-query)
-          # Phase 2: Implement full validation in calculate-fork-risk.ts
-          # For now: Always skip full rebuild on incremental runs
-          # Output: needs-rebuild=true/false
-          echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+          if [ ! -f public/data/fork-risk.json ]; then
+            echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          HEALTH=$(jq -r '.cacheValidation.isHealthy' public/data/fork-risk.json)
+
+          if [ "$HEALTH" = "false" ]; then
+            echo "needs-rebuild=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Cache validation failed - rebuilding cache" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "needs-rebuild=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Check if risk percentage changed
         id: check-risk
