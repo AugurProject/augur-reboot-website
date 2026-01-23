@@ -463,6 +463,33 @@ Track weekly:
 5. **Rebuild frequency**: Typically 0 times/week (event-driven = rare)
 6. **UI accuracy**: "Levels monitored hourly" displaying + tooltip working correctly
 
+### GitHub Actions Warning Logging
+
+The fork risk monitoring system emits structured GitHub Actions warnings (`::warning::` and `::error::`) to provide operational visibility:
+
+**Warnings by Event:**
+
+| Event | Condition | Message | Action |
+|-------|-----------|---------|--------|
+| Cache validation failure | `cacheValidation.isHealthy = false` | `::warning::Cache validation failed: {discrepancy} - triggering full cache rebuild` | Auto-triggers cache-rebuild job |
+| Cache rebuild execution | Cache-rebuild job starts | `::warning::Full cache rebuild triggered - rescanning 7-day history from blockchain` | Alerts team of expensive operation |
+| RPC fallback in use | Primary endpoints fail | `::warning::Using RPC fallback endpoint ({n} previous failures)` | Indicates RPC reliability issue |
+| All RPC endpoints fail | All four endpoints exhausted | `::error::All RPC endpoints failed (attempted {n})` | Blocks calculation, returns error result |
+
+**Where to Monitor Warnings:**
+
+1. **GitHub Actions UI**: Workflow run summary shows warnings prominently
+2. **Pull Requests**: Warnings appear in PR deployment logs
+3. **Notifications**: Integrate with Slack/Discord via GitHub Actions apps
+4. **Logs**: All warnings logged to GitHub Actions step logs for debugging
+
+**Operational Interpretation:**
+
+- `::warning::` messages indicate degraded operation or automatic recovery
+- Multiple cache validation warnings in 24 hours = investigate RPC health
+- RPC fallback warnings = consider adding custom RPC endpoint
+- `::error::` = system cannot complete calculation (check RPC endpoints)
+
 ---
 
 ## References

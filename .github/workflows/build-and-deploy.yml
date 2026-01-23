@@ -156,6 +156,8 @@ jobs:
 
           if [ "$HEALTH" = "false" ]; then
             echo "needs-rebuild=true" >> $GITHUB_OUTPUT
+            DISCREPANCY=$(jq -r '.cacheValidation.discrepancy // "Unknown validation failure"' public/data/fork-risk.json)
+            echo "::warning::Cache validation failed: $DISCREPANCY - triggering full cache rebuild"
             echo "⚠️ Cache validation failed - rebuilding cache" >> $GITHUB_STEP_SUMMARY
           else
             echo "needs-rebuild=false" >> $GITHUB_OUTPUT
@@ -208,7 +210,9 @@ jobs:
         run: npm ci
 
       - name: Run full cache rebuild (7-day rescan)
-        run: npm run build:fork-data
+        run: |
+          echo "::warning::Full cache rebuild triggered - rescanning 7-day history from blockchain"
+          npm run build:fork-data
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
           CALCULATION_MODE: 'full-rebuild'

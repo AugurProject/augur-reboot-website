@@ -212,6 +212,11 @@ async function executeWithRpcFallback<T>(
 			const latency = Date.now() - startTime
 			console.log(`✓ Connected to: ${rpc} (${latency}ms)`)
 
+			// Warn if using fallback endpoint
+			if (fallbacksAttempted > 0) {
+				console.log(`::warning::Using RPC fallback endpoint (${fallbacksAttempted} previous failures)`)
+			}
+
 			const connection: RpcConnection = {
 				provider,
 				endpoint: rpc,
@@ -229,7 +234,9 @@ async function executeWithRpcFallback<T>(
 		}
 	}
 
-	throw lastError || new Error(`All RPC endpoints failed (attempted ${fallbacksAttempted})`)
+	const errorMsg = `All RPC endpoints failed (attempted ${fallbacksAttempted})`
+	console.log(`::error::${errorMsg}`)
+	throw lastError || new Error(errorMsg)
 }
 
 async function calculateForkRisk(): Promise<ForkRiskData> {
@@ -244,8 +251,6 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// Get current blockchain state
 			const blockNumber = await connection.provider.getBlockNumber()
 			console.log(`Block Number: ${blockNumber}`)
-			const timestamp = new Date().toISOString()
-
 			// Check if universe is already forking with retry logic
 			let isForking = false
 			try {

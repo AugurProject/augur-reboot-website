@@ -9,6 +9,7 @@
 - Workflow reads cacheValidation.isHealthy from JSON and decides whether to trigger cache rebuild
 - Redundant hourly fields (timestamp, nextUpdate, calculation.method) removed so git diff detects only real risk changes
 - lastUpdated renamed to lastRiskChange for semantic clarity ("when did risk actually move?")
+- GitHub Actions warnings emit structured logs for operational visibility: cache validation failures, RPC fallback usage, and cache rebuild triggers
 
 **Tech Stack:**
 - TypeScript (frontend + backend), Astro build system, GitHub Actions workflow, jq JSON parsing
@@ -685,11 +686,53 @@ git commit -m "test: verify Phase 2 implementation with mock scenario"
 | File | Changes |
 |------|---------|
 | `src/types/gauge.ts` | Remove timestamp/nextUpdate/method, rename lastUpdated→lastRiskChange, add cacheValidation |
-| `scripts/calculate-fork-risk.ts` | 3 updates (main calc, fork result, error result) - consistent field structure |
-| `.github/workflows/build-and-deploy.yml` | 2 updates (bootstrap data, Phase 2 validation step) |
+| `scripts/calculate-fork-risk.ts` | 3 updates (main calc, fork result, error result) - consistent field structure, add RPC warning logs |
+| `.github/workflows/build-and-deploy.yml` | 3 updates (bootstrap data, Phase 2 validation step, cache-rebuild warnings) |
 | `src/components/ForkDetailsCard.tsx` | Reference lastRiskChange instead of timestamp |
 | `src/providers/ForkDataProvider.tsx` | Update defaultData and formatLastUpdated function |
 | `src/utils/demoDataGenerator.ts` | Update demo data structure |
+
+---
+
+## GitHub Actions Warning Logging
+
+**Purpose:** Provide operational visibility into fork risk monitoring system health and decision points through structured GitHub Actions warnings.
+
+**Implementation Details:**
+
+### Workflow Warnings (`.github/workflows/build-and-deploy.yml`)
+
+1. **Cache Validation Failure Warning (lines 157-160)**
+   - Triggered when: `cacheValidation.isHealthy == 'false'`
+   - Message format: `::warning::Cache validation failed: {discrepancy} - triggering full cache rebuild`
+   - Extracts discrepancy details from fork-risk.json using jq
+   - Helps operators identify why cache rebuild was triggered
+
+2. **Cache Rebuild Execution Warning (lines 212-216)**
+   - Triggered when: cache-rebuild job runs (Phase 2 detected isHealthy=false)
+   - Message: `::warning::Full cache rebuild triggered - rescanning 7-day history from blockchain`
+   - Alerts team that expensive full blockchain rescan is in progress
+   - Useful for monitoring GitHub Actions logs and cost implications
+
+### Script Warnings (`scripts/calculate-fork-risk.ts`)
+
+1. **RPC Fallback Warning (after line 213)**
+   - Triggered when: All primary RPC endpoints failed, using fallback endpoint
+   - Message format: `::warning::Using RPC fallback endpoint ({n} previous failures)`
+   - Indicates degraded RPC reliability
+   - Helps identify when primary endpoints are experiencing issues
+
+2. **All RPC Endpoints Failed (lines 237-239)**
+   - Triggered when: All four RPC endpoints fail
+   - Message: `::error::All RPC endpoints failed (attempted {n})`
+   - Critical error condition indicating complete RPC unavailability
+   - Blocks calculation and returns error result with isHealthy=false
+
+**Warning Visibility:**
+- GitHub Actions interface shows warnings in the workflow run summary
+- Warnings are visible in pull requests and deployment logs
+- Structured format (`::warning::` and `::error::`) enables GitHub to parse and display them prominently
+- Can be integrated into Slack/Discord notifications via GitHub Actions apps
 
 ---
 
@@ -706,3 +749,7 @@ git commit -m "test: verify Phase 2 implementation with mock scenario"
 - [ ] Full build passes (npm run build)
 - [ ] fork-risk.json has correct structure (verified with jq)
 - [ ] Workflow condition `needs.risk-monitor.outputs.needs-rebuild == 'true'` is wired to cache-rebuild job
+- [ ] Cache validation failure emits `::warning::` with discrepancy details
+- [ ] Cache rebuild execution emits `::warning::` to alert team
+- [ ] RPC fallback usage emits `::warning::` with failure count
+- [ ] All RPC endpoints failure emits `::error::` message
