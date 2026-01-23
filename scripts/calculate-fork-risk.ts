@@ -41,20 +41,17 @@ interface Metrics {
 }
 
 interface Calculation {
-	method: string
 	forkThreshold: number
 }
 
 type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
 
 interface ForkRiskData {
-	timestamp: string
-	lastUpdated: string
+	lastRiskChange: string
 	blockNumber?: number
 	riskLevel: RiskLevel
 	riskPercentage: number
 	metrics: Metrics
-	nextUpdate: string
 	rpcInfo: RpcInfo
 	calculation: Calculation
 	error?: string
@@ -287,26 +284,25 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			// Prepare results
 			const results: ForkRiskData = {
-				timestamp,
-				lastUpdated: new Date().toISOString(),
-				blockNumber,
-				riskLevel,
-				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
-				metrics: {
-					largestDisputeBond,
-					forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
-					activeDisputes: activeDisputes.length,
-					disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
-				},
-					rpcInfo: {
-					endpoint: connection.endpoint,
-					latency: connection.latency,
-					fallbacksAttempted: connection.fallbacksAttempted,
-				},
-				calculation: {
-						forkThreshold: FORK_THRESHOLD_REP,
-				},
-				cacheValidation,
+			lastRiskChange: new Date().toISOString(),
+			blockNumber,
+			riskLevel,
+			riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
+			metrics: {
+				largestDisputeBond,
+				forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
+				activeDisputes: activeDisputes.length,
+				disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
+			},
+			rpcInfo: {
+				endpoint: connection.endpoint,
+				latency: connection.latency,
+				fallbacksAttempted: connection.fallbacksAttempted,
+			},
+			calculation: {
+				forkThreshold: FORK_THRESHOLD_REP,
+			},
+			cacheValidation,
 			}
 
 			console.log('Calculation completed successfully')
