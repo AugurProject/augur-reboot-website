@@ -104,7 +104,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 								Last Updated
 							</span>
 							<span className="text-foreground text-xs">
-								{formatTime(rawData.timestamp)}
+								{formatTime(rawData.lastRiskChange)}
 							</span>
 						</div>
 					</div>
