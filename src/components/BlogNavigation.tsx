@@ -5,12 +5,12 @@ interface Post {
   path: string;
 }
 
-interface ArcNavigationProps {
+interface BlogNavigationProps {
   prevPost?: Post;
   nextPost?: Post;
 }
 
-export default function ArcNavigation({ prevPost, nextPost }: ArcNavigationProps) {
+export default function BlogNavigation({ prevPost, nextPost }: BlogNavigationProps) {
   return (
     <aside className="sticky bottom-0 border-t border-foreground/30 bg-background uppercase">
       <div className="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6 w-full">
