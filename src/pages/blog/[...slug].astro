@@ -45,6 +45,9 @@ const { title, description, author, publishDate, updatedDate, tags } = entry.dat
 
 // Auto-assign OG image from slug
 const ogImage = `/og-images/${entry.slug}.png`;
+
+// Construct full post URL
+const postUrl = new URL(`/blog/${entry.slug}`, Astro.site).href;
 ---
 
 <BlogLayout
@@ -55,6 +58,7 @@ const ogImage = `/og-images/${entry.slug}.png`;
   updatedDate={updatedDate}
   tags={tags}
   ogImage={ogImage}
+  postUrl={postUrl}
   prevPost={prevPost}
   nextPost={nextPost}
 >
