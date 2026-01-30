@@ -4,6 +4,7 @@ import SocialLinks from "../components/SocialLinks.astro";
 import Footer from "../components/Footer.astro";
 import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
+import SocialShareButtons from "../components/SocialShareButtons.astro";
 import Button from "../components/ui/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
 import PageHeading from "../components/PageHeading.astro";
@@ -22,11 +23,12 @@ interface Props {
   updatedDate?: Date;
   tags?: string[];
   ogImage?: string;
+  postUrl?: string;
   prevPost?: Post;
   nextPost?: Post;
 }
 
-const { title, description, author, publishDate, updatedDate, tags, ogImage, prevPost, nextPost } = Astro.props;
+const { title, description, author, publishDate, updatedDate, tags, ogImage, postUrl, prevPost, nextPost } = Astro.props;
 ---
 
 <Layout
@@ -58,6 +60,14 @@ const { title, description, author, publishDate, updatedDate, tags, ogImage, pre
           updatedDate={updatedDate}
           tags={tags}
         />
+
+        {postUrl && (
+          <SocialShareButtons
+            title={title}
+            url={postUrl}
+            description={description}
+          />
+        )}
 
         {/* Main Content */}
         <article class="prose prose-sm prose-invert max-w-none">
