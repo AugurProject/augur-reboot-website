@@ -21,16 +21,18 @@ interface Props {
   publishDate: Date;
   updatedDate?: Date;
   tags?: string[];
+  ogImage?: string;
   prevPost?: Post;
   nextPost?: Post;
 }
 
-const { title, description, author, publishDate, updatedDate, tags, prevPost, nextPost } = Astro.props;
+const { title, description, author, publishDate, updatedDate, tags, ogImage, prevPost, nextPost } = Astro.props;
 ---
 
 <Layout
   title={`${title} - The Augur Blog`}
   description={description}
+  ogImage={ogImage}
   ogType="article"
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
