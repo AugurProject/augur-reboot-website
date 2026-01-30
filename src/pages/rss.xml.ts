@@ -1,7 +1,8 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
+import type { APIContext } from 'astro';
 
-export async function GET(context) {
+export async function GET(context: APIContext) {
   const blog = await getCollection('blog');
 
   // Sort by publish date, newest first
@@ -12,7 +13,7 @@ export async function GET(context) {
   return rss({
     title: 'Augur Blog',
     description: 'Latest insights and updates from the Augur Project',
-    site: context.site,
+    site: context.site ?? new URL('https://augur.reboot'),
     items: sortedBlog.map((post) => ({
       title: post.data.title,
       pubDate: post.data.publishDate,

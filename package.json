@@ -16,6 +16,7 @@
     "lint": "npx @biomejs/biome lint"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.15",
     "@nanostores/persistent": "^1.1.0",
     "@nanostores/react": "^1.0.0",
     "@radix-ui/react-dialog": "^1.1.15",
