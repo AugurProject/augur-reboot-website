@@ -20,8 +20,7 @@ const cloudflareConfig = {
   adapter: cloudflare({
     platformProxy: {
       enabled: true
-    },
-    imageService: "cloudflare"
+    }
   }),
   output: /** @type {'server'} */ ('server')
 };
