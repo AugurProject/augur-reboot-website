@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import ArcLayout from '../../layouts/ArcLayout.astro';
+import BlogLayout from '../../layouts/BlogLayout.astro';
 
 export const prerender = true;
 
@@ -11,10 +11,10 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const arcPosts = await getCollection('arc');
+  const blogPosts = await getCollection('blog');
 
   // Sort posts by publish date (oldest first for navigation purposes)
-  const sortedPosts = arcPosts.sort(
+  const sortedPosts = blogPosts.sort(
     (a, b) => a.data.publishDate.valueOf() - b.data.publishDate.valueOf()
   );
 
@@ -24,12 +24,12 @@ export async function getStaticPaths() {
     // Get previous and next posts for navigation
     const prevPost = index > 0 ? {
       title: sortedPosts[index - 1].data.title,
-      path: `/arc/${sortedPosts[index - 1].slug}`
+      path: `/blog/${sortedPosts[index - 1].slug}`
     } : undefined;
 
     const nextPost = index < sortedPosts.length - 1 ? {
       title: sortedPosts[index + 1].data.title,
-      path: `/arc/${sortedPosts[index + 1].slug}`
+      path: `/blog/${sortedPosts[index + 1].slug}`
     } : undefined;
 
     return {
@@ -44,7 +44,7 @@ const { Content } = await entry.render();
 const { title, description, author, publishDate, updatedDate, tags } = entry.data;
 ---
 
-<ArcLayout
+<BlogLayout
   title={title}
   description={description}
   author={author}
@@ -55,4 +55,4 @@ const { title, description, author, publishDate, updatedDate, tags } = entry.dat
   nextPost={nextPost}
 >
   <Content />
-</ArcLayout>
+</BlogLayout>

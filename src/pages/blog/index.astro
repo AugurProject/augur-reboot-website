@@ -6,13 +6,13 @@ import Footer from '../../components/Footer.astro';
 import Button from '../../components/ui/Button.tsx';
 import Pointer from '../../components/Pointer.tsx';
 import PageHeading from '../../components/PageHeading.astro';
-import ArcPostCard from '../../components/ArcPostCard.astro';
+import BlogPostCard from '../../components/BlogPostCard.astro';
 import { withBase } from '../../lib/utils';
 
-const arcPosts = await getCollection('arc');
+const blogPosts = await getCollection('blog');
 
 // Sort posts by publish date (newest first)
-const sortedPosts = arcPosts.sort(
+const sortedPosts = blogPosts.sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
 );
 ---
@@ -44,7 +44,7 @@ const sortedPosts = arcPosts.sort(
         {/* Blog Posts Grid */}
         <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
           {sortedPosts.map((post) => (
-            <ArcPostCard
+            <BlogPostCard
               title={post.data.title}
               description={post.data.description}
               author={post.data.author}
