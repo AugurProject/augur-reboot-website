@@ -1,0 +1,119 @@
+---
+title: "The Augur Lituus Whitepaper"
+description: "A proposed modular oracle for outsourced resolution, and a comparative analysis of oracle security"
+author: "Lituus Foundation"
+publishDate: 2026-01-02
+updatedDate: 2026-01-02
+tags: ["augur", "whitepaper", "oracle", "lituus", "research"]
+---
+
+*A proposed modular oracle for outsourced resolution, and a comparative analysis of oracle security*
+
+![Augur Lituus Whitepaper](/blog/the-augur-lituus-whitepaper-1.webp)
+
+## Pre-Word: Principles
+
+In 2016, Augur launched as one of Ethereum's first major decentralized applications. For many, Augur represented what crypto was meant to be about: decentralizing power away from corporations and institutions and giving it back to everyone else. It embodied a simple but ambitious idea: that anyone, anywhere, could create a prediction market about anything, and those markets would resolve without relying on any centralized authority.
+
+For the first time ever, the world would have an uncensored "Weather Report About Everything" — a massive dashboard of event probabilities powered and regulated primarily by market forces, rather than the discretion of executives, custodians, or committees.
+
+A decade later, the industry looks very different. Many of the systems that were supposed to remove trust have quietly reintroduced it in new forms.
+
+Augur's revival, carried forward by the Lituus Foundation, is meant to signal a return to first principles: building open-source, trustless systems that do not serve insider interests, do not depend on central operators, and do not require permission to participate, but instead are designed to continue functioning correctly even if their creators walk away or attempt to shut them down.
+
+We are bringing the project back and taking it to a whole new level on at least two simultaneous fronts led by two separate teams:
+
+- A new open oracle "Augur Lituus" which is the subject of this announcement
+- A new prediction market platform to be announced later
+
+## The Problem: Truth Under Pressure
+
+Prediction markets require truth to actually work. They are anchored by the expectation that speculation about an election, a sports contest, or any other major event will ultimately be settled by an honest reporting of what actually happened.
+
+As more money becomes involved, the incentive to influence that outcome grows. In high-stakes systems, the challenge is not computation or settlement, but keeping everyone aligned on a shared state of reality as incentives to undermine that consensus increase.
+
+When power over outcomes is centralized — within a company, a committee, a development team, or even a single individual — that pressure becomes easier to apply, lowering the cost of attack and increasing the risk of capture and failure. The more centralized the decisionmaking, the more likely an eventual failure of the system's integrity.
+
+With billions at stake, who or what arbiter can these systems consistently rely upon to determine what actually happened?
+
+What's needed is an oracle: a decentralized mechanism for translating real-world outcomes into on-chain truth, enforced by economic incentives rather than trust in governance, discretion, or authority.
+
+## Augur Lituus: Resolution as Infrastructure
+
+Enter **Augur Lituus,** an Ethereum-native truth-telling protocol that generalizes oracle function into infrastructure.
+
+![Augur Lituus Architecture](/blog/the-augur-lituus-whitepaper-2.webp)
+
+Rather than competing with existing prediction markets, Augur Lituus will be designed as infrastructure to support them. It provides a shared, manipulation-resistant resolution layer that prediction markets, DeFi protocols, and cross-chain systems can rely on.
+
+By outsourcing resolution, protocols avoid the cost and complexity of building their own dispute systems. They eliminate a major operational burden and remove themselves as the focal point of high-stakes, contentious outcomes that can trigger community backlash or external pressure. At the same time, their users benefit from stronger guarantees, as outcomes are enforced by an onchain mechanism designed to make manipulation expensive rather than by trust in the market operator or a simple token vote.
+
+## How It Works: Making Truth Profitable
+
+Any third party can submit a question to the oracle. An outcome is proposed and participants must commit their own capital in support of an answer or a dispute. Those who back the honest outcome are rewarded, while those who back a dishonest one lose their entire bond, making truth the most profitable strategy. Disputes escalate by requiring progressively larger commitments, and if disagreement persists, the system allows the market to separate and follow the outcome it believes to be true. Resolution is determined by the market's expectation of which outcome will retain value, rather than by token-holder voting or governance decisions.
+
+Unlike token-vote-based resolution systems, where losses can often be recovered or hedged, Augur's dispute process ties participation to unrecoverable economic loss, making dishonest resolution expensive by design.
+
+## The Augur Lituus Whitepaper
+
+This post accompanies the release of the Augur Lituus whitepaper, which presents a proposed oracle design and a comparative analysis of the security of existing decentralized oracle mechanisms. The paper is centered on a practical question faced by prediction markets and other high-stakes protocols: *what does it actually cost to manipulate resolution, and how can that cost be pushed as high as possible?*
+
+The whitepaper makes two core contributions. First, it introduces a modular oracle design intended to serve as a shared resolution layer for other protocols. Second, it evaluates widely used oracle mechanisms and, through a comparative analysis of attack costs under realistic economic assumptions, shows why this approach offers the strongest security margin. Augur Lituus is one of two products currently being developed under the Lituus Foundation, and the whitepaper marks the transition from research to development. Its role is to define the mechanism, surface assumptions and tradeoffs, and serve as the foundation for the next phase: building, auditing, and testing the system.
+
+[Read the whitepaper here](https://github.com/AugurProject/whitepaper/blob/master/Lituus/English/Augur_Lituus_Whitepaper.pdf)
+
+## A Brief History of Oracles
+
+This concept of securing a reliable arbiter of truth is not new. Augurs were ancient Roman priests who used a Lituus, a curved staff, to section off the sky and count birds in flight, appealing to divine will to settle disputes that humans could not resolve on their own.
+
+![Augurs and the Lituus](/blog/the-augur-lituus-whitepaper-3.webp)
+
+Oracles have always existed for the same reason: when incentives become too strong for people or institutions to stay neutral, truth ideally comes from an external, immutable process rather than the conferred authority of any one person or group.
+
+Blockchain technology finally makes this possible without requiring trust in any one person, group, institution or authority. By combining open economic participation with an immutable, decentralized enforcement layer, it allows neutral outcomes to be produced, enforced, and persisted without centralized control.
+
+## Augur (2016): The First Crypto-Native Prediction Market & Oracle Platform
+
+Augur launched in 2016 to bring this idea on-chain, becoming the first major crypto-native prediction market and oracle platform. It secured hundreds of community-created markets and millions in trading volume, later reaching record open interest and volume during the 2020 U.S. election.
+
+While prediction markets brought early visibility, Augur's core innovation was always the oracle itself. Markets are deterministic once an outcome is known; the real challenge is deciding what that outcome should be when large financial incentives push participants toward bias or manipulation.
+
+Augur addressed this by treating truth as an economic equilibrium, where dishonesty results in financial loss within the protocol and honesty is defended by open market forces.
+
+## Augur's Recent Revival
+
+In 2025, stewardship of the original Augur treasury was transferred to the Lituus Foundation for the purpose of furthering Augur oracle experimentation. These funds originate from the original Augur ICO, and the foundation is fully funded, currently supporting two independent development teams building two complementary products. Augur Lituus is the first of these to be publicly introduced, with more information about the second to be released when it is ready.
+
+This revival is proceeding deliberately. Augur Lituus is not accompanied by a public fundraising round or promotional roadmap, and development will progress openly with releases driven by readiness. The effort also coincides with a long-anticipated protocol fork, providing a clean foundation to move forward.
+
+![Lituus Revival Timeline](/blog/the-augur-lituus-whitepaper-4.webp)
+
+## 2026 Algorithmic Fork
+
+Augur's oracle relies on an algorithmic fork as its final backstop. When disputes escalate beyond a certain threshold, the protocol splits into parallel universes for each outcome, and every REP holder must actively choose which outcome they believe reflects reality by migrating their tokens to that universe. Universes built on false outcomes are expected to lose all economic value, leaving truth as the only stable equilibrium.
+
+**This makes REP not a passive asset. All REP holders must participate in this fork or be left behind.**
+
+In 2026, this mechanism is being exercised through a planned test fork initiated independently by long-time Augur contributor Micah Zoltu. This fork will test the coordination mechanism and demonstrate the power of algorithmic forking to the space. It will be an important onchain event.
+
+[Learn more here](/@lituusfoundation/augur-cryptos-first-algorithmic-fork-4ae74926ca73)
+
+## Post-Word: Great Again
+
+Too many have lost sight of the original mission: the decentralization of power.
+
+Augur, and the larger crypto industry, once held a genuine promise: democratizing access to a more open world, and offering greater visibility into the future. Over time, that promise has been diluted by underdeliveries, grifts, and systems that quietly optimized for insiders rather than the public they claimed to serve.
+
+Augur was the first dapp launched on Ethereum when the industry's promise seemed great.
+
+**It was great. And it could be great again.**
+
+**— Lituus Foundation**
+
+**Whitepaper:** [https://github.com/AugurProject/whitepaper/blob/master/Lituus/English/Augur_Lituus_Whitepaper.pdf](https://github.com/AugurProject/whitepaper/blob/master/Lituus/English/Augur_Lituus_Whitepaper.pdf)
+
+**Join the Discord:** [https://discord.com/invite/CdCSYk9GwH](https://discord.com/invite/CdCSYk9GwH)
+**Follow on X:** [https://x.com/AugurProject](https://x.com/AugurProject)
+
+**Visit Augur:** [https://Augur.net](https://Augur.net)
+**Learn about Lituus:** [https://lituus.foundation](https://lituus.foundation)
