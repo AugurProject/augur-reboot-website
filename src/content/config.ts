@@ -8,7 +8,7 @@ const learnCollection = defineCollection({
   }),
 });
 
-const arcCollection = defineCollection({
+const blogCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
@@ -22,5 +22,5 @@ const arcCollection = defineCollection({
 
 export const collections = {
   learn: learnCollection,
-  arc: arcCollection,
+  blog: blogCollection,
 };
