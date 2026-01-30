@@ -6,7 +6,7 @@ export const prerender = true;
 
 export async function GET(context: APIContext) {
   if (!context.site) {
-    return new Response('RSS feed requires site URL to be configured', { status: 500 });
+    return new Response('RSS feed requires SITE_URL environment variable', { status: 500 });
   }
 
   const blog = await getCollection('blog');

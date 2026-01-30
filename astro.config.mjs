@@ -29,6 +29,8 @@ const cloudflareConfig = {
     },
     imageService: "cloudflare"
   }),
+  // Site URL for RSS feeds and canonical URLs (local development fallback)
+  ...(process.env.SITE_URL && { site: process.env.SITE_URL }),
   output: /** @type {'server'} */ ('server')
 };
 
