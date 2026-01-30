@@ -41,7 +41,7 @@ export async function getStaticPaths() {
 
 const { entry, prevPost, nextPost } = Astro.props;
 const { Content } = await entry.render();
-const { title, description, author, publishDate, updatedDate, tags } = entry.data;
+const { title, description, author, publishDate, updatedDate } = entry.data;
 
 // Auto-assign OG image from slug
 const ogImage = `/og-images/${entry.slug}.png`;
@@ -56,7 +56,6 @@ const postUrl = Astro.site ? new URL(`/blog/${entry.slug}`, Astro.site).href : u
   author={author}
   publishDate={publishDate}
   updatedDate={updatedDate}
-  tags={tags}
   ogImage={ogImage}
   postUrl={postUrl}
   prevPost={prevPost}

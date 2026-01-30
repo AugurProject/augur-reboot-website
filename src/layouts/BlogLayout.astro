@@ -21,14 +21,13 @@ interface Props {
   author: string;
   publishDate: Date;
   updatedDate?: Date;
-  tags?: string[];
   ogImage?: string;
   postUrl?: string;
   prevPost?: Post;
   nextPost?: Post;
 }
 
-const { title, description, author, publishDate, updatedDate, tags, ogImage, postUrl, prevPost, nextPost } = Astro.props;
+const { title, description, author, publishDate, updatedDate, ogImage, postUrl, prevPost, nextPost } = Astro.props;
 ---
 
 <Layout
@@ -58,7 +57,6 @@ const { title, description, author, publishDate, updatedDate, tags, ogImage, pos
           author={author}
           publishDate={publishDate}
           updatedDate={updatedDate}
-          tags={tags}
         />
 
         {postUrl && (
