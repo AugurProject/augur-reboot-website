@@ -25,12 +25,12 @@ function formatDate(date: Date): string {
 <article class="blog-post-card border border-foreground/20 bg-background/70 hover:border-primary/50 transition-colors flex flex-col md:flex-row gap-0 md:gap-6">
   {/* Featured Image - OG ratio (1.91:1 = 1200×630) */}
   {featuredImage && (
-    <div class="w-full md:w-64 aspect-[191/100] flex-shrink-0">
+    <div class="w-full md:w-64 aspect-191/100">
       <Image
         src={featuredImage}
         alt={title}
-        width={191}
-        height={100}
+        width={384}
+        height={202}
         loading="lazy"
         class="w-full h-full object-cover"
       />
