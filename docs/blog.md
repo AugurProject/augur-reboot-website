@@ -2,14 +2,14 @@
 
 ## Overview
 
-The blog is built on Astro's content collections, allowing you to write posts as Markdown/MDX files with YAML frontmatter. Posts are automatically routed to `/blog/[slug]` with social sharing, RSS feed support, and automatic thumbnail generation.
+The blog is built on Astro's content collections, allowing you to write posts as Markdown/MDX files with YAML frontmatter. Posts are automatically routed to `/blog/[slug]` with featured images, social sharing, and RSS feed support.
 
 ## Architecture
 
-- **Content Storage**: `src/content/blog/` directory
+- **Content Storage**: `src/content/blog/[slug]/index.mdx` (per-directory structure)
 - **Content Schema**: Defined in `src/content/config.ts`
-- **Routes**: Generated at build time from files in `src/content/blog/`
-- **Thumbnails**: Auto-loaded from `public/og-images/[slug].png`
+- **Routes**: Generated at build time from directories in `src/content/blog/`
+- **Featured Images**: Stored inline as `featured-image.webp` in each post directory
 - **RSS Feed**: Generated at `/rss.xml`
 
 ## Directory Structure
@@ -18,8 +18,12 @@ The blog is built on Astro's content collections, allowing you to write posts as
 src/
 ├── content/
 │   └── blog/
-│       ├── generalizing-augur.mdx
-│       └── [new-post-name].mdx
+│       ├── generalizing-augur/
+│       │   ├── index.mdx
+│       │   └── featured-image.webp
+│       └── [new-post-name]/
+│           ├── index.mdx
+│           └── featured-image.webp
 ├── layouts/
 │   └── BlogLayout.astro
 ├── components/
@@ -32,26 +36,21 @@ src/
 │       ├── index.astro (blog listing)
 │       ├── [...slug].astro (individual post)
 │       └── rss.xml.ts (RSS feed)
-└──
-public/
-└── og-images/
-    ├── generalizing-augur.png
-    └── [new-post-name].png
 ```
 
 ## Creating a Blog Post
 
-### Step 1: Create the MDX file
+### Step 1: Create the post directory
 
-Create a new `.mdx` file in `src/content/blog/`:
+Create a new directory in `src/content/blog/`:
 
 ```bash
-touch src/content/blog/my-new-post.mdx
+mkdir src/content/blog/my-new-post
 ```
 
 ### Step 2: Add frontmatter
 
-Start the file with YAML frontmatter:
+Create `index.mdx` in the directory with YAML frontmatter:
 
 ```yaml
 ---
@@ -70,7 +69,7 @@ tags: ["tag1", "tag2", "tag3"]
 - `author` (required): Author name, displayed in post metadata
 - `publishDate` (required): Publication date in YYYY-MM-DD format
 - `updatedDate` (optional): Last update date, shows when post was modified
-- `tags` (optional): Array of topic tags for categorization
+- `tags` (optional): Array of topic tags for RSS categorization (not displayed on page)
 
 ### Step 3: Write content
 
@@ -92,48 +91,59 @@ After the frontmatter, write your post in Markdown/MDX:
 
 1. Numbered lists
 2. Multiple items
+
+![Image alt text](./featured-image.webp)
 ```
 
 **MDX Features:**
 - Import React components: `import MyComponent from '@/components/MyComponent'`
 - Use JSX: `<MyComponent prop="value" />`
 - Code blocks with syntax highlighting
+- Relative image paths for inline images
 
-### Step 4: Add thumbnail image
+### Step 4: Add featured image
 
-Create a social media thumbnail image for your post:
+Create a featured image for your post:
 
 **Image Requirements:**
-- **Size**: 1200 × 627 pixels (1.91:1 aspect ratio)
-- **Format**: PNG, JPG, WebP, or AVIF
-- **File size**: Less than 1MB
+- **Size**: 1200 × 630 pixels (1.91:1 aspect ratio - standard OG image size)
+- **Format**: WebP (preferred), PNG, or JPG
+- **File size**: Less than 1MB recommended
 
 **Save the image:**
 
-Place the image in `public/og-images/` with a name matching your post slug:
+Place the image in your post directory as `featured-image.webp`:
 
 ```
-public/og-images/[your-post-slug].png
+src/content/blog/[your-post-slug]/featured-image.webp
 ```
 
 **Example:**
-- Post file: `src/content/blog/introducing-augur-reboot.mdx`
-- Image file: `public/og-images/introducing-augur-reboot.png`
+- Post directory: `src/content/blog/introducing-augur-reboot/`
+- MDX file: `src/content/blog/introducing-augur-reboot/index.mdx`
+- Image file: `src/content/blog/introducing-augur-reboot/featured-image.webp`
 
-The image filename **must match your MDX filename** (without the `.mdx` extension).
+**Additional inline images:**
 
-**What if I don't add an image?**
-The site will use the default Augur thumbnail. Social shares will still work—just won't have a custom image.
+You can add more images to the post directory with descriptive names:
+- `architecture.webp`
+- `timeline.webp`
+- `content-image.webp`
 
-### Step 5: File naming
+Reference them in your MDX with relative paths:
+```markdown
+![Architecture diagram](./architecture.webp)
+```
 
-Use kebab-case for filenames and images:
-- ✓ `my-post-title.mdx` with `my-post-title.png`
-- ✓ `augur-update-2026.mdx` with `augur-update-2026.png`
-- ✗ `MyPostTitle.mdx` or `my post title.mdx`
+### Step 5: Directory naming
 
-The filename becomes the URL slug (without `.mdx`):
-- `generalizing-augur.mdx` → `/blog/generalizing-augur`
+Use kebab-case for directory names:
+- ✓ `my-post-title/`
+- ✓ `augur-update-2026/`
+- ✗ `MyPostTitle/` or `my post title/`
+
+The directory name becomes the URL slug:
+- `generalizing-augur/index.mdx` → `/blog/generalizing-augur`
 
 ## Post Metadata Display
 
@@ -142,9 +152,11 @@ Posts automatically display:
 - **Author**: From frontmatter
 - **Publish Date**: From `publishDate` frontmatter
 - **Updated Date**: From `updatedDate` (if present)
-- **Tags**: From frontmatter array
+- **Featured Image**: On blog listing cards (desktop: left sidebar, mobile: top)
 - **Social Sharing**: Buttons to share on Twitter, LinkedIn, and via email
 - **Navigation**: Links to next/previous posts
+
+**Note:** Tags are included in frontmatter for RSS categorization but are not displayed on the page.
 
 ## Social Sharing
 
@@ -153,7 +165,7 @@ Posts automatically display:
 When you share a blog post on social media (Twitter, LinkedIn, Facebook), the platform automatically:
 1. Pulls the post title from the page
 2. Pulls the description
-3. Pulls your custom thumbnail image from `public/og-images/[slug].png`
+3. Pulls the featured image from the post directory
 4. Displays a preview card
 
 ### Share Buttons
@@ -166,6 +178,12 @@ Each blog post has three share buttons:
 ## RSS Feed
 
 Your blog is automatically syndicated via RSS at: `/rss.xml`
+
+The RSS feed includes:
+- Post title, description, and link
+- Publication date
+- Author
+- Categories (from tags)
 
 Readers can subscribe to get notifications when new posts are published.
 
@@ -232,6 +250,8 @@ tags: ["augur", "announcement"]
 
 We're excited to announce the next phase of Augur development...
 
+![Featured image](./featured-image.webp)
+
 ## Key improvements
 
 - Faster predictions
@@ -239,9 +259,14 @@ We're excited to announce the next phase of Augur development...
 - Stronger protocols
 ```
 
-**Image:** `public/og-images/introducing-augur-reboot.png` (1200×627)
+**Directory structure:**
+```
+src/content/blog/introducing-augur-reboot/
+├── index.mdx
+└── featured-image.webp (1200×630)
+```
 
-### Example 2: Post with JSX
+### Example 2: Post with JSX and multiple images
 
 ```mdx
 ---
@@ -258,6 +283,8 @@ import { CodeBlock } from '@/components/CodeBlock'
 
 Here's how the system works:
 
+![Architecture](./architecture.webp)
+
 <CodeBlock language="solidity">
 {`contract Augur {
   // Implementation
@@ -265,9 +292,18 @@ Here's how the system works:
 </CodeBlock>
 
 Regular markdown text continues here.
+
+![Timeline](./timeline.webp)
 ```
 
-**Image:** `public/og-images/technical-deep-dive.png` (1200×627)
+**Directory structure:**
+```
+src/content/blog/technical-deep-dive/
+├── index.mdx
+├── featured-image.webp (1200×630)
+├── architecture.webp
+└── timeline.webp
+```
 
 ## Troubleshooting
 
@@ -277,14 +313,18 @@ Regular markdown text continues here.
 - Verify all required fields are present (title, description, author, publishDate)
 
 **Post doesn't appear on site**
-- Check filename is in `src/content/blog/` (not nested in subdirectories)
-- Verify filename has `.mdx` extension
+- Check directory is in `src/content/blog/`
+- Verify the directory contains `index.mdx`
 - Run `npm run build` to trigger type checking
 
-**Social preview not showing custom image**
-- Verify image file exists at `public/og-images/[slug].png`
-- Check filename matches post slug exactly
-- Try clearing browser cache and resharing
+**Featured image not showing**
+- Verify image file exists at `[post-dir]/featured-image.webp`
+- Check image dimensions are 1200×630 (1.91:1 aspect ratio)
+- Try clearing browser cache
+
+**Images broken in post content**
+- Use relative paths: `./image-name.webp` not `/image-name.webp`
+- Verify image files are in the same directory as `index.mdx`
 
 **Frontmatter not parsing**
 - Ensure YAML is valid (check indentation)
