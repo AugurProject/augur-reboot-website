@@ -165,8 +165,10 @@ Posts automatically display:
 When you share a blog post on social media (Twitter, LinkedIn, Facebook), the platform automatically:
 1. Pulls the post title from the page
 2. Pulls the description
-3. Pulls the featured image from the post directory
+3. Pulls the featured image (optimized at build time from `featured-image.webp`)
 4. Displays a preview card
+
+**Note:** The featured image is automatically optimized for Open Graph (1200×630) at build time from the `featured-image.webp` in your post directory.
 
 ### Share Buttons
 

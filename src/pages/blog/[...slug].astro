@@ -1,17 +1,28 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import BlogLayout from '../../layouts/BlogLayout.astro';
 
 export const prerender = true;
 
+interface Post {
+  title: string;
+  path: string;
+}
+
 interface Props {
-  entry: any;
-  prevPost?: { title: string; path: string };
-  nextPost?: { title: string; path: string };
+  entry: CollectionEntry<'blog'>;
+  prevPost?: Post;
+  nextPost?: Post;
+  featuredImage?: ImageMetadata;
 }
 
 export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
+
+  // Import featured images from all blog posts
+  const images = import.meta.glob('/src/content/blog/*/featured-image.webp', { eager: true });
 
   // Sort posts by publish date (oldest first for navigation purposes)
   const sortedPosts = blogPosts.sort(
@@ -20,6 +31,10 @@ export async function getStaticPaths() {
 
   return sortedPosts.map((entry, index) => {
     const slug = entry.slug;
+
+    // Get the featured image for this post
+    const imagePath = `/src/content/blog/${slug}/featured-image.webp`;
+    const featuredImage = images[imagePath]?.default;
 
     // Get previous and next posts for navigation
     const prevPost = index > 0 ? {
@@ -34,17 +49,19 @@ export async function getStaticPaths() {
 
     return {
       params: { slug },
-      props: { entry, prevPost, nextPost },
+      props: { entry, prevPost, nextPost, featuredImage },
     };
   });
 }
 
-const { entry, prevPost, nextPost } = Astro.props;
+const { entry, prevPost, nextPost, featuredImage } = Astro.props;
 const { Content } = await entry.render();
 const { title, description, author, publishDate, updatedDate } = entry.data;
 
-// Auto-assign OG image from slug
-const ogImage = `/og-images/${entry.slug}.png`;
+// Generate OG image from featured image (if available)
+const ogImage = featuredImage
+  ? (await getImage({ src: featuredImage }, { width: 1200, height: 630, format: 'webp' })).src
+  : undefined;
 
 // Construct full post URL (only if site is configured)
 const postUrl = Astro.site ? new URL(`/blog/${entry.slug}`, Astro.site).href : undefined;
