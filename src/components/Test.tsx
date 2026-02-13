@@ -2,24 +2,6 @@ import { cn } from '@/lib/utils';
 
 const testImageUrl = '/src/content/blog/the-augur-lituus-whitepaper/featured-image.webp';
 
-interface PostFooterProps {
-  date: string;
-  isPadded?: boolean;
-}
-
-const PostFooter = ({ date, isPadded = false }: PostFooterProps) => (
-  <div className={`flex flex-col md:flex-row lg:flex-col items-start justify-between ${isPadded ? 'px-6' : ''}`}>
-    <div className="text-muted-foreground before:content-['\25F4'] before:mr-1 before:text-foreground mb-2">
-      {date}
-    </div>
-    <div className="text-right">
-      <a href="#" className="outline-none cursor-pointer font-custom text-xs font-bold focus:text-loud-foreground hover:text-loud-foreground before:content-['[['] after:content-[']]'] group">
-        <span className="whitespace-nowrap group-focus:underline group-hover:underline underline-offset-4">+ READ MORE</span>
-      </a>
-    </div>
-  </div>
-);
-
 interface PostProps {
   title: string;
   description: string;
@@ -49,7 +31,16 @@ const Post = ({ title, description, date, imageUrl, featured = false }: PostProp
           {description}
         </p>
       </div>
-      <PostFooter date={date} isPadded={featured} />
+      <div className={cn('flex items-start justify-between', featured && 'px-6')}>
+        <div className="text-muted-foreground before:content-['\25F4'] before:mr-1 before:text-foreground mb-2">
+          {date}
+        </div>
+        <div className="text-right">
+          <a href="#" className="outline-none cursor-pointer font-custom text-xs font-bold focus:text-loud-foreground hover:text-loud-foreground before:content-['[['] after:content-[']]'] group">
+            <span className="whitespace-nowrap group-focus:underline group-hover:underline underline-offset-4">+ READ MORE</span>
+          </a>
+        </div>
+      </div>
     </div>
   </article>
 );
