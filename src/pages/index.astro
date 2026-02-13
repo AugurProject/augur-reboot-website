@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Intro from '../components/Intro.tsx';
 import HeroBanner from '../components/HeroBanner.astro';
-import BlogPreview from '../components/BlogPreview.astro';
+import FeaturedBlogs from '../components/FeaturedBlogs.astro';
 import Footer from '../components/Footer.astro';
 ---
 
@@ -28,6 +28,6 @@ import Footer from '../components/Footer.astro';
 >
   <Intro client:only="react" />
   <HeroBanner />
-  <BlogPreview />
+  <FeaturedBlogs />
   <Footer />
 </Layout>

@@ -62,7 +62,7 @@ export const PostCard = ({ title, description, date, imageUrl, featured = false,
         featured && "md:text-2xl"
       )}>{title}</h3>
         <p className={cn(
-        "font-custom tracking-prose text-sm leading-tight text-muted-foreground line-clamp-2 mb-4",
+        "font-prose tracking-prose text-sm leading-tight text-muted-foreground line-clamp-2 mb-4",
         featured && "md:text-[1rem]"
 
       )}>

@@ -19,8 +19,10 @@
   --font-weight-normal: 300;
   --font-weight-bold: 400;
   --tracking-normal: 0.05em;
+  --tracking-prose: 0.015em;
 
   --font-display: "Handjet", sans-serif;
+  --font-prose: "Oxanium", sans-serif;
   --tw-prose-p-font-family: "Oxanium", sans-serif;
 
   --glow-size-xs: 0.1375rem;
@@ -244,7 +246,7 @@ html {
 
   /* Auto pointers: animate on focus, stop on hover */
   &.pointer-animated {
-    animation: bounce-horizontal 1s ease-in-out infinite; 
+    animation: bounce-horizontal 1s ease-in-out infinite;
 
     :hover > & {
       animation: none;
@@ -252,8 +254,8 @@ html {
   }
 
   /* Always animate */
-  &.pointer-animate-always { 
-    animation: bounce-horizontal 1s ease-in-out infinite; 
+  &.pointer-animate-always {
+    animation: bounce-horizontal 1s ease-in-out infinite;
   }
 
   /* Down pointer uses vertical bounce */
