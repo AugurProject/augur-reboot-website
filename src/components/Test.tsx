@@ -11,8 +11,30 @@ interface PostProps {
 }
 
 const Post = ({ title, description, date, imageUrl, featured = false }: PostProps) => (
-  <article className={cn('overflow-hidden flex flex-col', featured ? '' : 'border border-foreground/30 rounded')}>
-    <div className={cn('overflow-hidden w-full', featured ? 'border border-foreground/30 mb-4' : 'aspect-video rounded-t')}>
+  <article className={cn(
+    "group flex flex-col border border-foreground/30 bg-background/70 relative overflow-visible",
+    "transition-all hover:shadow-xl shadow-foreground/10",
+
+    // "before:content-[''] before:block before:absolute before:size-8 before:border-l-2 before:border-t-2 before:border-foreground",
+    // "before:transition-transform hover:before:-translate-x-3 hover:before:-translate-y-3",
+
+    // "after:content-[''] after:block after:absolute after:bottom-0 after:right-0 after:size-8 after:border-r-2 after:border-b-2 after:border-foreground",
+    // "after:transition-transform hover:after:translate-x-3 hover:after:translate-y-3"
+
+  )}>
+    {/*  */}
+    <div className={cn(
+      "absolute inset-0 pointer-events-none",
+
+      // top left sights
+      "before:content-[''] before:block before:absolute before:size-8 before:border-l-2 before:border-t-2 before:border-foreground",
+      "before:transition-transform group-hover:before:-translate-x-3 group-hover:before:-translate-y-3",
+
+      // bottom right sights
+      "after:content-[''] after:block after:absolute after:bottom-0 after:right-0 after:size-8 after:border-r-2 after:border-b-2 after:border-foreground",
+      "after:transition-transform group-hover:after:translate-x-3 group-hover:after:translate-y-3"
+    )} />
+    <div className={cn('overflow-hidden w-full mb-4 aspect-video')}>
       <img
         src={imageUrl}
         alt={title}
@@ -24,19 +46,26 @@ const Post = ({ title, description, date, imageUrl, featured = false }: PostProp
         className="w-full h-full object-cover"
       />
     </div>
-    <div className={cn('flex flex-col justify-between flex-1', featured ? '' : 'p-4')}>
-      <div>
-        <h3 className={cn('text-xl font-bold mb-2 uppercase', featured && 'px-6')}>{title}</h3>
-        <p className={cn('font-custom text-sm leading-tight text-muted-foreground', featured ? 'px-6 mb-4' : 'line-clamp-2')}>
-          {description}
-        </p>
-      </div>
-      <div className={cn('flex items-start justify-between', featured && 'px-6')}>
-        <div className="text-muted-foreground before:content-['\25F4'] before:mr-1 before:text-foreground mb-2">
+    <div className={cn(
+      "flex flex-col justify-between flex-1 border-t border-foreground/30 p-4",
+      featured && "md:p-6"
+    )}>
+      <h3 className={cn('text-xl font-bold mb-2 uppercase')}>{title}</h3>
+      <p className={cn('font-custom text-sm leading-tight text-muted-foreground line-clamp-2 mb-4')}>
+        {description}
+      </p>
+      <div className={cn('flex items-start justify-between')}>
+        <div className="text-sm text-muted-foreground before:content-['\25F4'] before:mr-1 before:text-foreground">
           {date}
         </div>
         <div className="text-right">
-          <a href="#" className="outline-none cursor-pointer font-custom text-xs font-bold focus:text-loud-foreground hover:text-loud-foreground before:content-['[['] after:content-[']]'] group">
+          <a href="#" className={cn(
+            "outline-none cursor-pointer font-custom text-sm font-bold focus:text-loud-foreground hover:text-loud-foreground group",
+            "before:inline-block before:content-['[['] after:inline-block after:content-[']]'] before:mr-1 after:ml-1",
+            "focus:fx-glow hover:fx-glow",
+            "before:transition-transform focus:before:-translate-x-1 hover:after:translate-x-1",
+            "after:transition-transform focus:after:translate-x-1 hover:before:-translate-x-1"
+          )}>
             <span className="whitespace-nowrap group-focus:underline group-hover:underline underline-offset-4">+ READ MORE</span>
           </a>
         </div>
