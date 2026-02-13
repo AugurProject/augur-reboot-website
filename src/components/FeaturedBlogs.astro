@@ -1,36 +1,49 @@
 ---
 import { getCollection } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 import { withBase } from '../lib/utils';
-import { PostCard } from './PostCard';
-import { BlogCTA } from './BlogCTA';
 import PageHeading from './PageHeading.astro';
+import PostCard from './PostCard.astro';
+import { BlogCTA } from './BlogCTA';
 
-// Get all blog posts
+const images = import.meta.glob('/src/content/blog/*/featured-image.webp', { eager: true });
+
+const imageMap = Object.entries(images).reduce((acc, [path, module]) => {
+  const slug = path.split('/').at(-2);
+  if (!slug) {
+    console.warn(`Invalid image path structure: ${path}`);
+    return acc;
+  }
+  acc[slug] = (module as { default: ImageMetadata }).default;
+  return acc;
+}, {} as Record<string, ImageMetadata>);
+
 const allPosts = await getCollection('blog');
 
-// Sort by publish date (newest first) and take first 3 for homepage preview
 const blogPosts = allPosts
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
   .slice(0, 3);
 
-// Extract featured and secondary posts
 const featuredPost = blogPosts[0];
 const secondaryPosts = blogPosts.slice(1, 3);
+
+const featuredImage = featuredPost ? imageMap[featuredPost.slug] : undefined;
+if (!featuredImage && featuredPost) {
+  console.warn(`Missing featured image for post: ${featuredPost.slug}`);
+}
+
+const secondaryWithImages = secondaryPosts.map(post => ({
+  post,
+  image: imageMap[post.slug]
+}));
 ---
 
 <section class="max-w-3xl mx-auto px-6 py-12 md:py-16">
-    <!-- Section Title -->
     <PageHeading text="The Augur Arc" />
-    <!-- <h2 class="text-3xl md:text-4xl font-bold uppercase mb-8 md:mb-12 text-center">
-      The Augur Arc
-    </h2> -->
 
-    <!-- Blog Preview Container -->
     <div class="flex flex-col gap-8 md:gap-12">
-      {/* Featured Post */}
       {featuredPost && (
         <PostCard
-          client:idle
           title={featuredPost.data.title}
           description={featuredPost.data.description}
           date={featuredPost.data.publishDate.toLocaleDateString('en-US', {
@@ -38,18 +51,16 @@ const secondaryPosts = blogPosts.slice(1, 3);
             month: '2-digit',
             day: '2-digit'
           })}
-          imageUrl={`/src/content/blog/${featuredPost.slug}/featured-image.webp`}
+          image={featuredImage}
           href={withBase(`/blog/${featuredPost.slug}`)}
           featured
         />
       )}
 
-      {/* Secondary Posts Grid */}
-      {secondaryPosts.length > 0 && (
+      {secondaryWithImages.length > 0 && (
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {secondaryPosts.map((post) => (
+          {secondaryWithImages.map(({ post, image }) => (
             <PostCard
-              client:idle
               title={post.data.title}
               description={post.data.description}
               date={post.data.publishDate.toLocaleDateString('en-US', {
@@ -57,14 +68,13 @@ const secondaryPosts = blogPosts.slice(1, 3);
                 month: '2-digit',
                 day: '2-digit'
               })}
-              imageUrl={`/src/content/blog/${post.slug}/featured-image.webp`}
+              image={image}
               href={withBase(`/blog/${post.slug}`)}
             />
           ))}
         </div>
       )}
 
-      {/* View All Link */}
       <div class="flex justify-center pt-4 md:pt-6">
           <BlogCTA client:idle href={withBase('/blog')}>View all posts</BlogCTA>
       </div>

@@ -2,6 +2,7 @@
 import AugurLogo from '../assets/augur.svg';
 import ForkMonitor from './ForkMonitor.tsx';
 import SocialLinks from './SocialLinks.astro';
+import { ScrollIndicator } from './ScrollIndicator';
 import { withBase } from '../lib/utils';
 ---
 
@@ -48,6 +49,8 @@ import { withBase } from '../lib/utils';
     </div>
   </div>
 </div>
+
+<ScrollIndicator client:idle />
 
 <style>
   /* --- Keyframe Definitions --- */
