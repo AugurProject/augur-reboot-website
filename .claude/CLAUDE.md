@@ -43,7 +43,7 @@
 
 - **Workspace Management**: Use `jubalm/workspace` for worktree management (`ws` alias if installed locally—check `ws --help`)
 - **Linting**: `@biomejs/biome` for type checking and formatting (runs in pre-commit, pre-merge CI)
-- **Skills**: Use astro-dev skill for modern Astro framework patterns and best practices with React islands
+- **Skills**: Use `fork-gauge` for visualization work, `blogging` for content, `island-state` for state management patterns, `tailwind-v4-validator` for Tailwind class validation
 - **Code Review**: Use superpowers skill for brainstorming, debugging, planning, and code review workflows
 
 ## Content & Features
