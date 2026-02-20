@@ -11,14 +11,16 @@ import { withBase } from "../lib/utils";
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_max-content_max-content_max-content] gap-12"
       >
         <!-- Column 1: Logo & Tagline -->
-        <div class="md:col-span-2 lg:col-span-1 place-content-end">
-          <Button variant="link" href={withBase('/?intro=false')} className="text-7xl">
-            <!-- Footer Logo (White) -->
-            <AugurLogo />
-          </Button>
-          <p class="text-foreground mt-4 text-sm">
-            THE FRONTIER OF PREDICTION MARKETS
-          </p>
+        <div class="md:col-span-2 lg:col-span-1 lg:place-content-end">
+            <div class="text-center lg:w-max">
+                <Button variant="link" href={withBase('/?intro=false')} className="text-7xl">
+                    <!-- Footer Logo (White) -->
+                    <AugurLogo />
+                </Button>
+                <p class="text-foreground mt-1 text-sm leading-tight">
+                    THE FRONTIER OF <br class="hidden lg:inline" />PREDICTION MARKETS
+                </p>
+            </div>
         </div>
         <!-- Column 2: Social -->
         <div>
@@ -92,13 +94,13 @@ import { withBase } from "../lib/utils";
           <h4 class="text-muted-foreground mb-4">&gt;_ COMPANIES</h4>
           <ul class="space-y-2 text-sm mb-6">
             <li>
-              <Button variant="link" href="https://dark.florist">
+              <Button variant="link" href="https://dark.florist/#about-us">
                 THE DARK FLORIST
               </Button>
             </li>
             <li>
-              <Button variant="link" href="https://lituus.io">
-                LITUUS LABS
+              <Button variant="link" href="https://lituus.foundation">
+                LITUUS FOUNDATION
               </Button>
             </li>
             <li>
@@ -114,11 +116,6 @@ import { withBase } from "../lib/utils";
                 AUGUR WHITEPAPER
               </Button>
             </li>
-            <!-- <li> -->
-            <!--   <Button variant="link" href="https://augur.guide"> -->
-            <!--     AUGUR.GUIDE -->
-            <!--   </Button> -->
-            <!-- </li> -->
           </ul>
         </div>
       </div>
