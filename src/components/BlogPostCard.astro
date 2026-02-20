@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  author: string;
+  publishDate: Date;
+  slug: string;
+  featuredImage?: ImageMetadata;
+}
+
+const { title, description, author, publishDate, slug, featuredImage } = Astro.props;
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+---
+
+<article class="blog-post-card border border-foreground/20 bg-background/70 hover:border-primary/50 transition-colors flex flex-col md:flex-row gap-0 md:gap-6">
+  {/* Featured Image - OG ratio (1.91:1 = 1200×630) */}
+  {featuredImage && (
+    <div class="w-full md:w-64 aspect-191/100">
+      <Image
+        src={featuredImage}
+        alt={title}
+        width={384}
+        height={202}
+        loading="lazy"
+        class="w-full h-full object-cover"
+      />
+    </div>
+  )}
+
+  {/* Content */}
+  <a href={`/blog/${slug}`} class="block flex-1">
+    <div class="flex flex-col gap-3 p-6">
+      {/* Post Title */}
+      <h3 class="text-xl font-bold text-loud-foreground tracking-[0.125em] uppercase hover:fx-glow transition-all duration-200">
+        {title}
+      </h3>
+
+      {/* Metadata */}
+      <div class="flex gap-3 text-xs text-muted-foreground uppercase tracking-wider">
+        <span>{formatDate(publishDate)}</span>
+        <span>•</span>
+        <span>BY {author}</span>
+      </div>
+
+      {/* Description */}
+      {description && (
+        <p class="text-sm font-prose tracking-prose text-foreground">
+          {description}
+        </p>
+      )}
+
+      {/* Read More */}
+      <div class="text-primary text-sm font-bold uppercase tracking-wider mt-2">
+        READ MORE →
+      </div>
+    </div>
+  </a>
+</article>

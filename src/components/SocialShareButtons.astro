@@ -1,0 +1,72 @@
+---
+interface Props {
+  title: string;
+  url: string;
+  description?: string;
+}
+
+const { title, url, description } = Astro.props;
+
+// Encode parameters for URLs
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+const encodedDesc = encodeURIComponent(description || title);
+
+// Social share URLs
+const twitterUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+const emailUrl = `mailto:?subject=${encodedTitle}&body=${encodedDesc}%0A%0A${encodedUrl}`;
+---
+
+<div class="flex gap-4 items-center">
+  <span class="text-sm text-muted-foreground">Share:</span>
+
+  <a
+    href={twitterUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex items-center gap-2 px-3 py-1.5 rounded text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+    aria-label="Share on Twitter"
+  >
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7a10.6 10.6 0 01-9-5.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+    Twitter
+  </a>
+
+  <a
+    href={linkedinUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex items-center gap-2 px-3 py-1.5 rounded text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+    aria-label="Share on LinkedIn"
+  >
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" fill="currentColor"/>
+      <circle cx="4" cy="4" r="2" fill="currentColor"/>
+    </svg>
+    LinkedIn
+  </a>
+
+  <a
+    href={emailUrl}
+    class="inline-flex items-center gap-2 px-3 py-1.5 rounded text-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+    aria-label="Share via email"
+  >
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+    Email
+  </a>
+</div>
+
+<style>
+  a {
+    border: 1px solid var(--color-muted-foreground);
+  }
+
+  a:hover {
+    border-color: var(--color-primary);
+  }
+</style>
