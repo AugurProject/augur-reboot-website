@@ -1,13 +1,24 @@
 ---
 name: astro-dev
-description: Comprehensive Astro development with React, Tailwind v4, and Cloudflare Workers deployment
+description: Astro 5.10+ development with React 19, Tailwind v4, and GitHub Pages static deployment
 ---
 
 # Astro Development Skill
 
+## ⚠️ PROJECT OVERRIDES
+
+This project uses **GitHub Pages static deployment** with the following non-standard patterns. These override any generic Astro guidance:
+
+- **Deployment**: GitHub Pages (`output: 'static'` in astro.config.mjs) — NOT Cloudflare Workers/SSR
+- **State Management**: Nanostores + React Context ONLY — never use `useState` for global state
+- **WebGL Lifecycle**: Implement `dispose()` + `isDisposed` guard in `useEffect` cleanup; never render after disposal
+- **Visualizations**: SVG preferred (resolution-independent, GPU-accelerated animations) over Canvas
+- **TypeScript Runtimes**: Dual tsconfig — `tsconfig.app.json` (frontend React), `tsconfig.scripts.json` (Node.js scripts)
+- **Styling**: Tailwind v4 CSS-first via `@theme`/`@utility` directives in `src/styles/global.css` only
+
 ## Overview
 
-Comprehensive guide for building modern web applications with Astro, React, Tailwind CSS v4, and Cloudflare Workers deployment.
+Comprehensive guide for building modern web applications with Astro 5.10+, React 19, and Tailwind CSS v4. This documentation is tailored for static GitHub Pages deployment with interactive React islands.
 
 ## What This Skill Provides
 
@@ -17,11 +28,13 @@ Comprehensive guide for building modern web applications with Astro, React, Tail
 - **View Transitions integration** - Add smooth page transitions automatically
 
 ### Reference Documentation
-- **Cloudflare Workers** - Workers-first deployment (NOT Pages)
-- **Cloudflare D1** - Serverless SQLite database integration
+- **GitHub Pages Static Deployment** - Pre-built static output, no SSR
 - **React integration** - Interactive islands and hydration strategies
 - **Tailwind CSS v4** - CSS-first configuration without config files
-- **Content Collections** - Type-safe content management
+- **Nanostores** - Global state management (required pattern, NOT useState)
+- **WebGL Components** - Lifecycle management with dispose() pattern
+- **SVG Visualizations** - Resolution-independent, GPU-accelerated animations
+- **Content Collections** - Type-safe content management (blog, learn sections)
 - **View Transitions** - Smooth page animations
 - **GitHub Actions** - CI/CD automation
 
@@ -32,24 +45,16 @@ Comprehensive guide for building modern web applications with Astro, React, Tail
 
 ## Quick Start
 
-### Initialize New Project
+### This Project: Static GitHub Pages Deployment
 
-**For Cloudflare Workers deployment (recommended):**
-```bash
-./scripts/init_astro_cloudflare.sh my-app
-```
+This project uses pre-built static output for GitHub Pages. No SSR, no Workers bindings. Configuration is in `astro.config.mjs` with `output: 'static'`.
 
-Creates:
-- Astro project with SSR
-- React integration
-- Tailwind CSS v4
-- Cloudflare adapter configured
-- wrangler.jsonc for Workers deployment
-
-**For standard static site:**
-```bash
-./scripts/init_astro_standard.sh my-site
-```
+The project structure includes:
+- React islands for interactive components (e.g., ForkGauge with WebGL)
+- Nanostores for global state (fork risk data, demo mode)
+- React Context for provider wrappers
+- MDX blog content with RSS feed
+- SVG-based visualizations (preferred over Canvas)
 
 ### Add Content Collections
 
@@ -77,250 +82,309 @@ Automatically adds View Transitions API to all layouts in `src/layouts/`.
 
 ## Common Workflows
 
-### 1. Create Astro + Cloudflare Workers Site
+### 1. Add Global State with Nanostores
 
-```bash
-# Initialize project
-./scripts/init_astro_cloudflare.sh my-blog
+**Always use Nanostores, NOT useState, for global state:**
 
-cd my-blog
+```typescript
+// src/stores/forkRiskStore.ts
+import { atom } from 'nanostores';
 
-# Set up content collections
-python ../scripts/setup_content_collection.py blog
+export const forkRiskStore = atom<ForkRiskData>({
+  level: 'None',
+  percentage: 0,
+  // ... state
+});
 
-# Add View Transitions
-python ../scripts/add_view_transitions.py
+// Use in React component with proper hydration:
+import { useAtom } from 'nanostores';
 
-# Start development
-npm run dev
-
-# Deploy to Cloudflare Workers
-npx wrangler deploy
+export function ForkGauge() {
+  const [forkRisk] = useAtom(forkRiskStore);
+  // Component stays purely reactive
+}
 ```
 
-### 2. Add D1 Database
+### 2. Build WebGL/Canvas Components
 
-See `references/cloudflare-d1.md` for:
-- Database creation
-- Schema definition
-- Query patterns
-- Drizzle ORM integration
+**Implement dispose() + isDisposed guard pattern:**
 
-### 3. Build Interactive Components
+```typescript
+export function MyWebGLComponent() {
+  const webglRef = useRef<THREE.Renderer | null>(null);
+  const isDisposed = useRef(false);
 
-See `references/react-integration.md` for:
-- Client directives (load, idle, visible)
-- Hooks and state management
-- Form handling
-- Context API
+  useEffect(() => {
+    const renderer = new THREE.WebGLRenderer();
+    webglRef.current = renderer;
 
-### 4. Style with Tailwind v4
+    return () => {
+      if (webglRef.current && !isDisposed.current) {
+        webglRef.current.dispose();
+        isDisposed.current = true;
+      }
+    };
+  }, []);
 
-See `references/tailwind-setup.md` for:
-- CSS-first configuration
-- Custom themes
-- Dark mode
-- OKLCH colors
-- Container queries
+  if (isDisposed.current) return null;
+  return <div ref={webglRef} />;
+}
+```
+
+### 3. Create SVG Visualizations
+
+SVG is preferred for resolution-independent, GPU-accelerated animations:
+
+```astro
+---
+// Use SVG for any chart, gauge, or diagram
+import ForkGauge from '../components/ForkGauge.astro';
+---
+<ForkGauge riskLevel="High" />
+```
+
+### 4. Use Blog Content Collections
+
+Blog posts are in `src/content/blog/` with MDX frontmatter. RSS feed auto-generated.
+
+See `docs/blog.md` for:
+- Frontmatter schema
+- MDX syntax
+- Learn section structure
+
+### 5. Manage Dual TypeScript Runtimes
+
+```json
+// tsconfig.app.json - React frontend
+{
+  "extends": "@tsconfig/strictest",
+  "include": ["src"],
+  "compilerOptions": { "lib": ["ES2020", "DOM"] }
+}
+
+// tsconfig.scripts.json - Node.js scripts
+{
+  "extends": "@tsconfig/strictest",
+  "include": ["scripts"],
+  "compilerOptions": { "lib": ["ES2020"] }
+}
+```
 
 ## Deployment
 
-### Cloudflare Workers (Recommended)
+### GitHub Pages (Static)
+
+The project builds static HTML/CSS/JS and deploys to GitHub Pages:
 
 ```bash
-# One-time setup
-npm install -g wrangler
-wrangler login
-
-# Deploy
+# Build creates dist/ with pre-rendered pages
 npm run build
-npx wrangler deploy
+
+# GitHub Actions workflows handle deployment to gh-pages branch
+# .github/workflows/deploy.yml orchestrates build and push
 ```
 
 **Key points:**
-- Uses `wrangler.jsonc` configuration
-- Deploys to Cloudflare Workers (NOT Pages)
-- Main entry: `./dist/_worker.js`
-- Static assets served from `./dist`
+- `astro.config.mjs` uses `output: 'static'`
+- No SSR, no server-side bindings
+- Pre-rendered at build time
+- GitHub Actions triggers on commits to main
+- Sitemap auto-generated in build
 
-See `references/cloudflare-workers.md` for:
-- Bindings (KV, D1, R2)
-- Environment variables
-- TypeScript types
-- SSR configuration
-
-### GitHub Actions
+### GitHub Actions CI/CD
 
 See `references/github-actions.md` for:
-- Automated deployments
-- Preview deployments for PRs
-- Security scanning
-- Performance budgets
+- Build and deployment workflows
+- Pre-commit checks (typecheck, lint)
+- Pre-merge checks (build verification)
+- Automated deployment to gh-pages branch
 
 ## Key Concepts
 
-### Rendering Modes
+### Static Rendering (This Project)
 
 ```javascript
-// astro.config.mjs
-
-// Server-Side Rendering (all pages on-demand)
+// astro.config.mjs - This project uses static output
 export default defineConfig({
-  output: 'server',
-});
-
-// Hybrid (static by default, opt-in to SSR)
-export default defineConfig({
-  output: 'hybrid',
-});
-
-// Static (pre-rendered at build time)
-export default defineConfig({
-  output: 'static',
+  output: 'static',  // Pre-render all pages at build time
 });
 ```
+
+All pages are pre-rendered to HTML/CSS/JS at build time. No server-side rendering. Interactive React islands are hydrated as needed.
+
+### Nanostores for Global State
+
+Never use React's `useState` for global state. Always use Nanostores:
+
+```typescript
+// src/stores/myStore.ts
+import { atom } from 'nanostores';
+
+export const myGlobalState = atom({
+  value: 'initial',
+});
+
+// In any React component:
+import { useAtom } from 'nanostores';
+
+export function MyComponent() {
+  const [state, setState] = useAtom(myGlobalState);
+  return <div>{state}</div>;
+}
+```
+
+**Why:** Nanostores provides reactive updates across all components without prop drilling or Context overhead.
 
 ### File Structure
 
 ```
-my-astro-app/
+augur-reboot-website/
 ├── src/
 │   ├── pages/              # File-based routing
 │   │   ├── index.astro
 │   │   ├── blog/
 │   │   │   └── [...slug].astro
-│   │   └── api/           # API endpoints
-│   │       └── data.ts
+│   │   └── learn/
+│   │       └── [...slug].astro
 │   ├── layouts/           # Page layouts
 │   │   └── BaseLayout.astro
 │   ├── components/        # Astro components
-│   │   └── Card.astro
-│   ├── components/        # React components
-│   │   └── Button.tsx
+│   │   ├── Card.astro
+│   │   ├── ForkGauge.astro
+│   │   └── ...
+│   ├── components/        # React interactive islands
+│   │   ├── Button.tsx
+│   │   ├── ForkGauge.tsx (WebGL)
+│   │   └── ...
 │   ├── content/           # Content collections
 │   │   ├── config.ts
-│   │   └── blog/
-│   ├── styles/            # Global CSS
+│   │   ├── blog/
+│   │   └── learn/
+│   ├── stores/            # Nanostores global state
+│   │   ├── forkRiskStore.ts
+│   │   └── demoModeStore.ts
+│   ├── styles/            # Global CSS (ONLY EDIT THIS)
 │   │   └── global.css
 │   └── env.d.ts           # TypeScript types
 ├── public/                # Static assets
-│   └── .assetsignore      # Workers asset config
-├── astro.config.mjs       # Astro configuration
-├── wrangler.jsonc         # Cloudflare Workers config
+├── astro.config.mjs       # Astro configuration (output: 'static')
 ├── package.json
-└── tsconfig.json
+├── tsconfig.app.json      # Frontend React config
+├── tsconfig.scripts.json  # Node.js scripts config
+└── .github/workflows/     # GitHub Actions CI/CD
+    └── deploy.yml
 ```
 
-### Client Directives
+### Hydration & React Islands
 
 Control when React components hydrate:
 
 ```astro
-<!-- Hydrate immediately -->
+---
+// In .astro files
+import Counter from '../components/Counter.tsx';
+---
+
+<!-- Hydrate immediately (required for animations) -->
 <Counter client:load />
 
 <!-- Hydrate when idle -->
-<SocialShare client:idle />
+<Comments client:idle />
 
 <!-- Hydrate when visible -->
-<Comments client:visible />
+<RelatedPosts client:visible />
 
-<!-- Hydrate on specific media query -->
+<!-- Hydrate on media query (mobile nav) -->
 <MobileMenu client:media="(max-width: 768px)" />
 
 <!-- Client-only (no SSR) -->
-<BrowserWidget client:only="react" />
+<BrowserOnlyWidget client:only="react" />
 ```
 
-### Cloudflare Runtime
-
-Access Workers APIs in pages and API routes:
-
-```astro
----
-// In .astro files
-const { env, cf, ctx } = Astro.locals.runtime;
-
-// Use KV
-const data = await env.MY_KV.get('key');
-
-// Use D1
-const { results } = await env.DB.prepare('SELECT * FROM users').all();
-
-// Request properties
-const country = cf.country;
----
-```
+**Pro tip:** Always add hydration directives or React components won't be interactive!
 
 ## Best Practices
 
 ### Performance
-1. **Use SSG when possible** - Pre-render static content
+1. **Pre-render all content** - Astro handles SSG, no servers to manage
 2. **Optimize images** - Use Astro's `<Image />` component
-3. **Minimize client JS** - Use React only where needed
-4. **Leverage edge caching** - Set cache headers on API routes
-5. **Use KV for caching** - Cache expensive operations
+3. **Minimize client JS** - Use React islands only where needed (ForkGauge, demo controls)
+4. **Use SVG for visualizations** - Preferred over Canvas (resolution-independent, GPU-accelerated)
+5. **Lazy-load interactive components** - Use `client:visible` for below-the-fold React islands
 
 ### Development
-1. **Type everything** - Use TypeScript for better DX
-2. **Validate content** - Use Zod schemas for content collections
-3. **Test locally** - Use `platformProxy` for bindings in dev
-4. **Generate types** - Run `wrangler types` after binding changes
-5. **Follow conventions** - Use file-based routing
+1. **Type everything** - Use TypeScript for frontend (tsconfig.app.json) and scripts (tsconfig.scripts.json)
+2. **Use Nanostores, not useState** - Global state must use Nanostores + useAtom
+3. **Validate content** - Use Zod schemas in `src/content/config.ts`
+4. **Test locally** - Run `npm run dev` and verify on `localhost:4321`
+5. **Follow conventions** - File-based routing in `src/pages/`, content collections in `src/content/`
+
+### WebGL/GPU Safety
+1. **Always implement dispose()** - Essential for Three.js, Babylon.js, Canvas contexts
+2. **Use isDisposed flag** - Guard against rendering after disposal
+3. **Clean up in useEffect** - Call dispose() in cleanup function
+4. **Never render after dispose** - Return null if isDisposed is true
 
 ### Deployment
-1. **Deploy to Workers** - Use Workers, not Pages (Cloudflare recommendation)
-2. **Use environments** - staging/production in wrangler.jsonc
-3. **Automate with CI/CD** - GitHub Actions for deployments
-4. **Monitor performance** - Use Cloudflare Analytics
-5. **Review logs** - Use `wrangler tail` for debugging
+1. **GitHub Actions handles everything** - No manual deployment
+2. **Pre-merge checks required** - typecheck, lint, build must pass
+3. **Automated to gh-pages branch** - GitHub Actions pushes `dist/` to gh-pages
+4. **Verify sitemap** - GitHub Actions confirms sitemap.xml generation
+5. **Monitor build logs** - Check Actions tab if deployment fails
 
 ## Troubleshooting
 
 ### Common Issues
 
 **Build Errors:**
+- Run `npm run build` to test production build
 - Run `npx astro check` for TypeScript errors
 - Check Node.js version (18+)
-- Clear `.astro` cache and rebuild
+- Clear `.astro/` cache: `rm -rf .astro/` and rebuild
 
-**Hydration Issues:**
-- Ensure React components have `client:*` directive
-- Check for SSR-incompatible code (browser APIs)
-- Use `client:only` if component can't be server-rendered
-
-**Deployment Issues:**
-- Verify `wrangler.jsonc` configuration
-- Check `CLOUDFLARE_API_TOKEN` permissions
-- Ensure bindings are configured correctly
-- Review `wrangler tail` logs
+**React Component Not Interactive:**
+- Ensure component has `client:load` (or `client:idle`/`client:visible`)
+- Check browser console for hydration warnings
+- Verify component uses `client:only="react"` if server-rendering fails
 
 **Tailwind Not Working:**
-- Import `global.css` in layout
-- Verify Vite plugin in `astro.config.mjs`
-- Check `@import "tailwindcss"` at top of CSS
+- Ensure `global.css` is imported in BaseLayout.astro
+- Check that `@import "tailwindcss"` is at top of `src/styles/global.css`
+- Verify custom @utility directives in global.css
+- Clear Tailwind cache: `rm -rf .next/` (if using Tailwind CLI)
+
+**WebGL Component Crashes:**
+- Check browser console for Three.js/WebGL errors
+- Verify dispose() is called in useEffect cleanup
+- Check isDisposed flag prevents post-disposal renders
+- Monitor for memory leaks (DevTools Profiler)
+
+**GitHub Actions Deploy Fails:**
+- Check Actions logs for build errors
+- Verify `npm run build` succeeds locally
+- Confirm sitemap.xml is in dist/
+- Check gh-pages branch exists in repo settings
 
 ## Resources
 
-### Documentation
-- [Astro Docs](https://docs.astro.build)
-- [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
-- [Tailwind CSS v4](https://tailwindcss.com/docs/v4-alpha)
-- [React Docs](https://react.dev)
+### Official Documentation
+- [Astro Docs](https://docs.astro.build) - Build system, routing, islands architecture
+- [Tailwind CSS v4](https://tailwindcss.com/docs) - CSS-first, @theme/@utility directives
+- [React Docs](https://react.dev) - Component patterns, hooks, state management
+- [Nanostores Docs](https://github.com/nanostores/nanostores) - Global reactive state
+- [MDX Docs](https://mdxjs.com) - Blog content authoring
 
-### Tools
-- [Astro VS Code Extension](https://marketplace.visualstudio.com/items?itemName=astro-build.astro-vscode)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
-- [Drizzle Studio](https://orm.drizzle.team/drizzle-studio/overview)
+### Project Documentation
+- **Fork Risk Monitoring** - `.claude/CLAUDE.md` references
+- **Technical Architecture** - Component patterns, state management
+- **Blog Structure** - Content frontmatter, MDX syntax (docs/blog.md)
 
-### Reference Files
-- `cloudflare-workers.md` - Workers deployment guide
-- `cloudflare-d1.md` - D1 database setup
-- `react-integration.md` - React patterns
-- `tailwind-setup.md` - Tailwind v4 config
-- `content-collections.md` - Content management
-- `view-transitions.md` - Page animations
-- `github-actions.md` - CI/CD workflows
+### Project Reference Files
+- `react-integration.md` - React hydration patterns
+- `tailwind-setup.md` - Tailwind v4 CSS-first configuration
+- `content-collections.md` - Blog & learn content setup
+- `view-transitions.md` - Page transition animations
+- `github-actions.md` - CI/CD GitHub Actions workflows
 
 ## Updating This Skill
 
@@ -333,18 +397,23 @@ Astro and its ecosystem evolve rapidly. To update:
 
 ## Version Information
 
-This skill is current as of:
-- **Astro** 5.x
+Project stack versions:
+- **Astro** 5.10+
 - **React** 19.x
 - **Tailwind CSS** 4.x
-- **Cloudflare Workers** (latest)
-- **@astrojs/cloudflare** 11.x+
+- **Nanostores** (latest)
+- **@astrojs/mdx** (for blog)
+- **@astrojs/rss** (for feed)
+- **Node.js** 18+
 
-Last updated: October 2024
+Last updated: February 2026
 
-## Notes
+## Critical Reminders
 
-- **Cloudflare Workers, NOT Pages** - This skill focuses exclusively on Workers deployment
-- **Tailwind v4** - Uses CSS-first configuration (no tailwind.config.js)
-- **Type-safe** - Leverages TypeScript throughout
-- **Modern stack** - Latest versions and best practices
+- **NOT Cloudflare Workers** - This project uses GitHub Pages static deployment
+- **Nanostores required** - Global state MUST use Nanostores + useAtom, never useState
+- **Dual TypeScript configs** - Frontend (tsconfig.app.json) and scripts (tsconfig.scripts.json)
+- **WebGL lifecycle** - dispose() + isDisposed guard pattern is non-negotiable
+- **SVG > Canvas** - Prefer SVG for resolution-independent visualizations
+- **Hydration directives required** - All React components need `client:*` directive or they won't be interactive
+- **GitHub Pages CI/CD** - Actions workflow handles build and deployment to gh-pages branch
