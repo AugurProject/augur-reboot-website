@@ -56,6 +56,12 @@ jobs:
             echo "✓ Created initial fork-risk.json"
           fi
 
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build site
         run: npm run build
         env:

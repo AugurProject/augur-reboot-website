@@ -22,7 +22,10 @@ export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
 
   // Import featured images from all blog posts
-  const images = import.meta.glob('/src/content/blog/*/featured-image.webp', { eager: true });
+  const images: Record<string, { default: ImageMetadata }> = import.meta.glob(
+    '/src/content/blog/*/featured-image.webp',
+    { eager: true }
+  );
 
   // Sort posts by publish date (oldest first for navigation purposes)
   const sortedPosts = blogPosts.sort(
@@ -34,7 +37,7 @@ export async function getStaticPaths() {
 
     // Get the featured image for this post
     const imagePath = `/src/content/blog/${slug}/featured-image.webp`;
-    const featuredImage = images[imagePath]?.default;
+    const featuredImage = images[imagePath]?.default ?? undefined;
 
     // Get previous and next posts for navigation
     const prevPost = index > 0 ? {
@@ -60,7 +63,7 @@ const { title, description, author, publishDate, updatedDate } = entry.data;
 
 // Generate OG image from featured image (if available)
 const ogImage = featuredImage
-  ? (await getImage({ src: featuredImage }, { width: 1200, height: 630, format: 'webp' })).src
+  ? (await getImage({ src: featuredImage, width: 1200, height: 630, format: 'webp' })).src
   : undefined;
 
 // Construct full post URL (only if site is configured)

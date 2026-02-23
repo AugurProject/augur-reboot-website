@@ -28,10 +28,10 @@ if (!gaId) {
 {gaId && (
   <>
     <!-- Load gtag library -->
-    <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
 
     <!-- Initialize GA and handle View Transitions -->
-    <script define:vars={{ gaId }}>
+    <script is:inline define:vars={{ gaId }}>
       // Initialize GA data layer
       window.dataLayer = window.dataLayer || [];
       function gtag() {

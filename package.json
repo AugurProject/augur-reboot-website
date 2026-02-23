@@ -12,7 +12,7 @@
     "astro": "astro",
     "deploy": "astro build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "typecheck": "tsc --build",
+    "typecheck": "astro check",
     "lint": "npx @biomejs/biome lint"
   },
   "dependencies": {
