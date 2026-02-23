@@ -86,6 +86,9 @@ const ForkGaugeComponent = ({
 	const riskLevel = useMemo(() => getRiskLevel(percentage), [percentage])
 	const needleEndpoint = useMemo(() => getNeedleEndpoint(percentage), [percentage])
 
+	const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	const needleTransition = prefersReducedMotion ? 'none' : 'all 0.3s ease-in-out'
+
 	return (
 		<div className={cn('relative mb-2 flex flex-col items-center')}>
 			<svg className="max-w-45 w-full" viewBox="60 60 280 160" role="img" aria-label="Fork risk gauge">
@@ -144,7 +147,7 @@ const ForkGaugeComponent = ({
 				{/* Needle pointer group */}
 				<g
 					style={{
-						transition: 'all 0.3s ease-in-out',
+						transition: needleTransition,
 					}}
 				>
 					{/* Needle shadow for depth */}

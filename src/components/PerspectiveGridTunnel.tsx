@@ -371,12 +371,13 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       return;
     }
 
-    let width: number, height: number;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
 
     const resizeCanvas = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-      
+
       if (rendererRef.current) {
         rendererRef.current.resize(width, height);
       }
@@ -384,9 +385,25 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
 
     // Initialize WebGL renderer
     rendererRef.current = new WebGLGridRenderer(gl as WebGLRenderingContext, numLines, lineColor, vanishingPoint);
-    
+
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
+    // Exit early if user prefers reduced motion - render static frame only
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      if (rendererRef.current) {
+        rendererRef.current.render(0, 0, width, height);
+      }
+
+      return () => {
+        window.removeEventListener('resize', resizeCanvas);
+        if (rendererRef.current) {
+          rendererRef.current.dispose();
+          rendererRef.current = null;
+        }
+      };
+    }
 
     const animate = () => {
       if (rendererRef.current) {
@@ -396,7 +413,6 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
       animationFrameId.current = requestAnimationFrame(animate);
     };
 
-    // Always animate - this is just a background animation
     animate();
 
     return () => {

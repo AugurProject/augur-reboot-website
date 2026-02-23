@@ -507,3 +507,53 @@ body:not(:has(#hero-banner-container)) #github-link {
 	text-shadow: 0 0 8px rgba(42, 231, 168, 0.6);
 	animation: none;
 }
+
+/* Reduce Motion Support: Disable animations for users with prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+	/* Gradient animation on title */
+	.title {
+		animation: none;
+	}
+
+	/* Blinking cursor animation */
+	.cursor.blink-active {
+		animation: none;
+	}
+
+	/* Pointer bounce animations */
+	.pointer-animated,
+	.pointer-animate-always {
+		animation: none;
+	}
+
+	/* Keycap press and glow animations */
+	.scroll-indicator-keycap {
+		animation: none;
+	}
+
+	/* CRT display on/off animations */
+	.crt.display-on,
+	.crt.display-off {
+		animation: none;
+	}
+
+	/* Pulse glow effect */
+	.fx-pulse-glow {
+		animation: none;
+	}
+
+	/* Social media icon fade-in animations */
+	#hero-banner-container.animations-started #twitter-link,
+	#hero-banner-container.animations-started #discord-link,
+	#hero-banner-container.animations-started #github-link {
+		animation: none;
+		opacity: 1;
+	}
+
+	/* HeroBanner entrance animations */
+	#hero-banner-container.animations-started [data-animation-delay] {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+}
