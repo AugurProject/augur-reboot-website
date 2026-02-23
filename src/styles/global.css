@@ -449,25 +449,6 @@ body:not(:has(#hero-banner-container)) #github-link {
 			0 6px 12px rgba(0, 0, 0, 0.4),
 			0 0 20px rgba(42, 231, 168, 0.15);
 	}
-	15%,
-	25% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 2px 0 0 #1a1a1a,
-			0 3px 6px rgba(0, 0, 0, 0.3),
-			0 0 30px rgba(42, 231, 168, 0.25);
-	}
-}
-
-@keyframes keycap-glow {
-	0%,
-	100% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 4px 0 0 #1a1a1a,
-			0 6px 12px rgba(0, 0, 0, 0.4),
-			0 0 20px rgba(42, 231, 168, 0.15);
-	}
 	50% {
 		box-shadow:
 			0 0 0 2px var(--color-primary),

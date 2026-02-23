@@ -251,8 +251,6 @@ class WebGLGridRenderer {
   }
 
   private updateGridVertices(frameCount: number, animationSpeed: number, width: number, height: number) {
-    const _horizonWidth = width * 0.1;
-    const horizonHeight = height * 0.15;
     const zOffset = frameCount * animationSpeed;
     const segmentLength = 40;
     const totalSegments = 15;

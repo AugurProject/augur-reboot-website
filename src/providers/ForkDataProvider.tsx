@@ -122,7 +122,6 @@ export const ForkDataProvider = ({
 			case 'critical':
 				level = 'Critical'
 				break
-			case 'unknown':
 			default:
 				level = 'No Risk'
 		}

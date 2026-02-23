@@ -22,8 +22,8 @@ const getInitialState = (): AppState => {
     // For custom domain (augur.net), base path will be '/' and pathname will be '/'
     // For GitHub Pages without custom domain, base path will be '/augur-reboot-website/' 
     // For Cloudflare testing, base path will be '/'
-    const normalizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
-    const normalizedPathname = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+    const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+    const normalizedPathname = window.location.pathname.endsWith('/') ? window.location.pathname : `${window.location.pathname}/`;
     
     const isHomepage = normalizedPathname === normalizedBasePath;
     const hasSkipParam = new URLSearchParams(window.location.search).get('intro') === 'false';

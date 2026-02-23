@@ -6,7 +6,6 @@ import { ForkControls } from './ForkControls'
 import { ForkDetailsCard } from './ForkDetailsCard'
 import { useForkData } from '../providers/ForkDataProvider'
 import { $appStore, UIState } from '../stores/animationStore'
-import { cn } from '@/lib/utils'
 
 // Helper function to format timestamps as relative time
 function formatRelativeTime(isoTimestamp: string): string {
@@ -31,7 +30,7 @@ const ForkDisplay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
 
   // Use the fork risk hook to get real data
-  const { gaugeData, riskLevel, lastUpdated, isLoading, error } = useForkData()
+  const { gaugeData, lastUpdated, isLoading, error } = useForkData()
 
   // Subscribe to animation state
   useEffect(() => {
@@ -61,7 +60,7 @@ const ForkDisplay: React.FC = () => {
         {/* Gauge with Details Card - ForkDetailsCard wraps the gauge */}
         <ForkDetailsCard gauge={<ForkGauge percentage={gaugeData.percentage} />} />
 
-        <ForkStats riskLevel={riskLevel} repStaked={gaugeData.repStaked} activeDisputes={gaugeData.activeDisputes} />
+        <ForkStats />
 
         <button
           type="button"

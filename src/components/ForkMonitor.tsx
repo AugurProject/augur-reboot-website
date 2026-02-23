@@ -7,7 +7,7 @@ interface ForkMonitorProps {
   animated?: boolean
 }
 
-export const ForkMonitor: React.FC<ForkMonitorProps> = ({ animated = true }) => {
+export const ForkMonitor: React.FC<ForkMonitorProps> = ({ animated: _animated = true }) => {
   return (
     <ForkDataProvider>
       <ForkMockProvider>

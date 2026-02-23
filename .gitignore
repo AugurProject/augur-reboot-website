@@ -57,3 +57,6 @@ public/cache/
 
 # LLM settings
 .claude/settings.local.json
+
+# Wrangler generated types (auto-generated, not our code)
+worker-configuration.d.ts
