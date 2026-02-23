@@ -2,6 +2,20 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+@font-face {
+	font-family: 'Handjet';
+	src: url('/fonts/handjet.woff2') format('woff2');
+	font-weight: 300 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Oxanium';
+	src: url('/fonts/oxanium.woff2') format('woff2');
+	font-weight: 300 400;
+	font-display: swap;
+}
+
 @theme {
 	--color-primary: #2ae7a8;
 	--color-foreground: var(--color-green-600);

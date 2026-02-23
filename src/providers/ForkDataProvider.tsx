@@ -5,6 +5,7 @@ import {
 	useState,
 	useEffect,
 	useCallback,
+	useMemo,
 } from 'react'
 import type { ForkRiskData, GaugeData, RiskLevel } from '../types/gauge'
 
@@ -22,6 +23,46 @@ interface ForkDataContextValue {
 const ForkDataContext = createContext<ForkDataContextValue | undefined>(
 	undefined,
 )
+
+const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
+	percentage: data.riskPercentage, // Pass actual percentage, let GaugeDisplay handle visual scaling
+	repStaked: data.metrics.largestDisputeBond,
+	activeDisputes: data.metrics.activeDisputes,
+})
+
+const convertToRiskLevel = (data: ForkRiskData): RiskLevel => {
+	let level: RiskLevel['level']
+
+	switch (data.riskLevel) {
+		case 'none':
+			level = 'No Risk'
+			break
+		case 'low':
+			level = 'Low'
+			break
+		case 'moderate':
+			level = 'Moderate'
+			break
+		case 'high':
+			level = 'High'
+			break
+		case 'critical':
+			level = 'Critical'
+			break
+		default:
+			level = 'No Risk'
+	}
+
+	return { level }
+}
+
+const formatLastUpdated = (data: ForkRiskData): string => {
+	try {
+		return new Date(data.lastRiskChange).toLocaleString()
+	} catch {
+		return 'Unknown'
+	}
+}
 
 interface ForkDataProviderProps {
 	children: React.ReactNode
@@ -97,46 +138,6 @@ export const ForkDataProvider = ({
 		}
 	}, [loadForkRiskData, updateInterval, hasHydrated])
 
-	const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
-		percentage: data.riskPercentage, // Pass actual percentage, let GaugeDisplay handle visual scaling
-		repStaked: data.metrics.largestDisputeBond,
-		activeDisputes: data.metrics.activeDisputes,
-	})
-
-	const convertToRiskLevel = (data: ForkRiskData): RiskLevel => {
-		let level: RiskLevel['level']
-
-		switch (data.riskLevel) {
-			case 'none':
-				level = 'No Risk'
-				break
-			case 'low':
-				level = 'Low'
-				break
-			case 'moderate':
-				level = 'Moderate'
-				break
-			case 'high':
-				level = 'High'
-				break
-			case 'critical':
-				level = 'Critical'
-				break
-			default:
-				level = 'No Risk'
-		}
-
-		return { level }
-	}
-
-	const formatLastUpdated = (data: ForkRiskData): string => {
-		try {
-			return new Date(data.lastRiskChange).toLocaleString()
-		} catch {
-			return 'Unknown'
-		}
-	}
-
 	const currentData = forkRiskData || defaultData
 
 	// Allow external updates to the data (for demo usage)
@@ -144,7 +145,7 @@ export const ForkDataProvider = ({
 		setForkRiskData(data)
 	}, [])
 
-	const contextValue: ForkDataContextValue = {
+	const contextValue = useMemo<ForkDataContextValue>(() => ({
 		gaugeData: convertToGaugeData(currentData),
 		riskLevel: convertToRiskLevel(currentData),
 		lastUpdated: formatLastUpdated(currentData),
@@ -153,7 +154,7 @@ export const ForkDataProvider = ({
 		rawData: currentData,
 		setData: updateData,
 		refetch: loadForkRiskData,
-	}
+	}), [currentData, isLoading, error, updateData, loadForkRiskData])
 
 	return (
 		<ForkDataContext.Provider value={contextValue}>
