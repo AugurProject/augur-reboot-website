@@ -5,17 +5,20 @@ import { Image } from 'astro:assets';
 import { withBase } from '../lib/utils';
 
 // Import featured images from all blog posts
-const images = import.meta.glob('/src/content/blog/*/featured-image.webp', { eager: true });
+const images: Record<string, { default: ImageMetadata }> = import.meta.glob(
+  '/src/content/blog/*/featured-image.webp',
+  { eager: true }
+);
 
 // Create a map from slug to image object
-const imageMap = Object.entries(images).reduce((acc, [path, module]) => {
+const imageMap = Object.entries(images).reduce((acc, [path, { default: image }]) => {
   // Extract blog post slug from path: /src/content/blog/{slug}/featured-image.webp
   const slug = path.split('/').at(-2);
   if (!slug) {
     console.warn(`Invalid image path structure: ${path}`);
     return acc;
   }
-  acc[slug] = module.default;
+  acc[slug] = image;
   return acc;
 }, {} as Record<string, ImageMetadata>);
 
@@ -101,7 +104,7 @@ const secondaryImages = secondaryPosts.map(post => ({
       {secondaryPosts.length > 0 && (
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {secondaryImages.map(({ post, image }) => (
-            <article key={post.slug} class="secondary-post flex flex-col md:flex-row gap-4 h-full">
+            <article class="secondary-post flex flex-col md:flex-row gap-4 h-full">
               {/* Post Image */}
               {image && (
                 <div class="w-full md:w-48 aspect-square md:flex-shrink-0 overflow-hidden rounded">

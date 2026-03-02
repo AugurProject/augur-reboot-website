@@ -11,12 +11,17 @@ import BlogPostCard from '../../components/BlogPostCard.astro';
 import { withBase } from '../../lib/utils';
 
 // Import featured images from all blog posts
-const images = import.meta.glob('/src/content/blog/*/featured-image.webp', { eager: true });
+const images: Record<string, { default: ImageMetadata }> = import.meta.glob(
+  '/src/content/blog/*/featured-image.webp',
+  { eager: true }
+);
 
 // Create a map from slug to image object
-const imageMap = Object.entries(images).reduce((acc, [path, module]) => {
+const imageMap = Object.entries(images).reduce((acc, [path, { default: image }]) => {
   const slug = path.split('/').at(-2);
-  acc[slug] = module.default;
+  if (slug) {
+    acc[slug] = image;
+  }
   return acc;
 }, {} as Record<string, ImageMetadata>);
 
@@ -36,7 +41,7 @@ const sortedPosts = blogPosts.sort(
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     {/* Top Section: Navigation */}
     <div class="flex justify-between items-start p-8">
-      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autofocus>
+      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autoFocus>
         <Pointer direction="left" animated="auto" />
         BACK TO HOME
       </Button>

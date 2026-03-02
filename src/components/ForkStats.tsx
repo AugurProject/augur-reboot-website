@@ -1,13 +1,7 @@
 import type React from 'react'
-import { cn } from '../lib/utils'
 import { useForkData } from '../providers/ForkDataProvider'
-import type { DataPanelsProps } from '../types/gauge'
 
-export const ForkStats = ({
-	riskLevel,
-	repStaked,
-	activeDisputes,
-}: DataPanelsProps): React.JSX.Element => {
+export const ForkStats = (): React.JSX.Element => {
 	const { rawData } = useForkData()
 
 	const formatNumber = (num: number): string => {

@@ -2,6 +2,20 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+@font-face {
+	font-family: 'Handjet';
+	src: url('/fonts/handjet.woff2') format('woff2');
+	font-weight: 300 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Oxanium';
+	src: url('/fonts/oxanium.woff2') format('woff2');
+	font-weight: 300 400;
+	font-display: swap;
+}
+
 @theme {
 	--color-primary: #2ae7a8;
 	--color-foreground: var(--color-green-600);
@@ -449,25 +463,6 @@ body:not(:has(#hero-banner-container)) #github-link {
 			0 6px 12px rgba(0, 0, 0, 0.4),
 			0 0 20px rgba(42, 231, 168, 0.15);
 	}
-	15%,
-	25% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 2px 0 0 #1a1a1a,
-			0 3px 6px rgba(0, 0, 0, 0.3),
-			0 0 30px rgba(42, 231, 168, 0.25);
-	}
-}
-
-@keyframes keycap-glow {
-	0%,
-	100% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 4px 0 0 #1a1a1a,
-			0 6px 12px rgba(0, 0, 0, 0.4),
-			0 0 20px rgba(42, 231, 168, 0.15);
-	}
 	50% {
 		box-shadow:
 			0 0 0 2px var(--color-primary),
@@ -511,4 +506,54 @@ body:not(:has(#hero-banner-container)) #github-link {
 	color: var(--color-primary);
 	text-shadow: 0 0 8px rgba(42, 231, 168, 0.6);
 	animation: none;
+}
+
+/* Reduce Motion Support: Disable animations for users with prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+	/* Gradient animation on title */
+	.title {
+		animation: none;
+	}
+
+	/* Blinking cursor animation */
+	.cursor.blink-active {
+		animation: none;
+	}
+
+	/* Pointer bounce animations */
+	.pointer-animated,
+	.pointer-animate-always {
+		animation: none;
+	}
+
+	/* Keycap press and glow animations */
+	.scroll-indicator-keycap {
+		animation: none;
+	}
+
+	/* CRT display on/off animations */
+	.crt.display-on,
+	.crt.display-off {
+		animation: none;
+	}
+
+	/* Pulse glow effect */
+	.fx-pulse-glow {
+		animation: none;
+	}
+
+	/* Social media icon fade-in animations */
+	#hero-banner-container.animations-started #twitter-link,
+	#hero-banner-container.animations-started #discord-link,
+	#hero-banner-container.animations-started #github-link {
+		animation: none;
+		opacity: 1;
+	}
+
+	/* HeroBanner entrance animations */
+	#hero-banner-container.animations-started [data-animation-delay] {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
 }
