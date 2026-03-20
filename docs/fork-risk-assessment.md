@@ -8,7 +8,7 @@ The Augur Fork Meter provides transparent monitoring of the risk that Augur's or
 
 Based on the Augur v2 whitepaper, forks are triggered when:
 
-1. **A dispute bond reaches ≥2.5% of all theoretical REP** (275,000 REP out of 11 million total)
+1. **A dispute bond reaches ≥2.5% of all theoretical REP** (275,000 REP in the genesis universe; in post-fork universes, this threshold changes based on migratable REP from sibling universes)
 2. **This creates a 60-day forking period** where REP holders must migrate to child universes
 3. **The universe with the most migrated REP becomes the "winning" universe**
 
@@ -20,7 +20,7 @@ The Augur Fork Meter uses a direct, transparent calculation based solely on disp
 
 #### Core Calculation
 - **Dispute Bond Monitoring**: Track the largest active dispute bond across all markets
-- **Fork Threshold**: 275,000 REP (2.5% of theoretical 11 million REP supply)
+- **Fork Threshold**: 275,000 REP in the genesis universe (2.5% of theoretical REP supply; threshold varies in post-fork universes based on migratable REP from sibling universes)
 - **Risk Percentage**: Direct calculation of how close the largest dispute is to triggering a fork
 
 **Primary Formula**: `Risk % = (Largest Dispute Bond / 275,000 REP) × 100`
@@ -36,10 +36,11 @@ The system assigns risk levels based directly on the fork threshold percentage:
 
 #### Risk Level Assignment
 ```
+if risk_percentage == 0%:    RISK_LEVEL = NONE
 if risk_percentage < 10%:    RISK_LEVEL = LOW
-if risk_percentage < 25%:    RISK_LEVEL = MODERATE  
+if risk_percentage < 25%:    RISK_LEVEL = MODERATE
 if risk_percentage < 75%:    RISK_LEVEL = HIGH
-if risk_percentage >= 75%:   RISK_LEVEL = ELEVATED
+if risk_percentage >= 75%:   RISK_LEVEL = CRITICAL
 ```
 
 This direct mapping provides clear, understandable risk assessment without complex multi-factor adjustments.
@@ -59,6 +60,7 @@ These thresholds replace previously conservative levels that would have triggere
 
 | Level | Fork Threshold % | Description | Color |
 |-------|------------------|-------------|--------|
+| **None** | 0% | No active disputes | Default |
 | **Low** | <10% | Normal operation, typical dispute activity | Green |
 | **Moderate** | 10-25% | Elevated dispute activity above baseline | Yellow |
 | **High** | 25-75% | Large disputes requiring close monitoring | Orange |
@@ -127,7 +129,7 @@ Anyone can verify calculations by:
 2. **Historical Event Limits**: Only monitors events from the last 7 days (sufficient for dispute window timings)
 
 ### Timing Considerations
-- **Dispute Windows**: 7 days each, hourly monitoring is sufficient
+- **Dispute Windows**: up to 7 days each (first round: up to 24 hours), hourly monitoring is sufficient
 - **Fork Duration**: Up to 60 days, providing ample warning time
 - **Escalation Speed**: Multiple rounds required, attacks develop over days/weeks
 
@@ -158,7 +160,7 @@ Anyone can verify calculations by:
 ```yaml
 # GitHub Actions Schedule
 schedule:
-  - cron: '5 * * * *'  # Every hour at minute 5
+  - cron: '0 * * * *'  # Every hour on the hour
 workflow_dispatch:     # Manual trigger available
 ```
 
@@ -178,12 +180,12 @@ This methodology may evolve based on:
 
 ## References
 
-1. [Augur v2 Whitepaper](../docs/augur-whitepaper-v2.pdf) - Core fork mechanics
+1. [Augur v2 Whitepaper](augur-whitepaper-v2.pdf) - Core fork mechanics
 2. [Augur Documentation](https://docs.augur.net/) - Technical specifications
 3. [GitHub Repository](/) - Source code and audit trail
 
 ---
 
-**Last Updated**: August 24, 2025  
+**Last Updated**: March 20, 2026  
 **Version**: 1.0  
 **Maintained By**: Augur Fork Meter Project

@@ -24,7 +24,7 @@ Augur disputes have 7-day resolution windows. Hourly checks provide:
 - 168 data points per dispute window (far exceeds requirements)
 - Negligible RPC cost (~50 calls/day)
 
-See: `scripts/calculate-fork-risk.ts:508-540` for incremental query implementation.
+See: `scripts/calculate-fork-risk.ts` (incremental query logic) for implementation.
 
 ---
 
@@ -53,7 +53,7 @@ See: `scripts/calculate-fork-risk.ts:508-540` for incremental query implementati
 - GH Actions cache provides sufficient persistence (~7 days)
 - Full rebuild from blockchain is cheap (~50 RPC calls)
 
-See: `.github/workflows/build-and-deploy.yml:118-138` for cache restoration logic.
+See: `.github/workflows/build-and-deploy.yml` (cache restoration step) for implementation.
 
 ### Two-Job Workflow
 
@@ -67,7 +67,7 @@ See: `.github/workflows/build-and-deploy.yml:118-138` for cache restoration logi
 - Performs full 7-day blockchain rescan
 - Repopulates cache from scratch
 
-See: `.github/workflows/build-and-deploy.yml:69-191` (risk-monitor), `:192-231` (cache-rebuild)
+See: `.github/workflows/build-and-deploy.yml` — `risk-monitor` and `cache-rebuild` jobs
 
 ### Concurrency Locking
 
@@ -89,7 +89,7 @@ Both jobs share concurrency group `fork-risk-cache` with `cancel-in-progress: fa
 
 **Why 8 blocks**: Covers 99%+ of reorgs (max observed: 7 blocks in May 2022).
 
-See: `scripts/calculate-fork-risk.ts:580-650` for validation implementation.
+See: `scripts/calculate-fork-risk.ts` (`validateCacheHealth()`) for validation implementation.
 
 ---
 
@@ -148,7 +148,7 @@ Frontend fetches JSON → displays gauge
 }
 ```
 
-See: `src/types/gauge.ts:11-41` for TypeScript interface.
+See: `src/types/gauge.ts` for TypeScript interface.
 
 ---
 
@@ -163,7 +163,7 @@ Structured warnings for operational visibility:
 | RPC fallback | Primary endpoint fails | `::warning::Using RPC fallback endpoint` |
 | All RPC fail | All 4 endpoints fail | `::error::All RPC endpoints failed` |
 
-See: `.github/workflows/build-and-deploy.yml:157-162` (validation warning), `scripts/calculate-fork-risk.ts:218-224` (RPC warnings)
+See: `.github/workflows/build-and-deploy.yml` (validation warning step), `scripts/calculate-fork-risk.ts` (RPC warning logging)
 
 ---
 
@@ -200,9 +200,9 @@ See: `.github/workflows/build-and-deploy.yml:157-162` (validation warning), `scr
 |-----------|----------|
 | Workflow | `.github/workflows/build-and-deploy.yml` |
 | Calculation script | `scripts/calculate-fork-risk.ts` |
-| TypeScript interface | `src/types/gauge.ts:11-41` |
+| TypeScript interface | `src/types/gauge.ts` |
 | Data provider | `src/providers/ForkDataProvider.tsx` |
-| Gauge display | `src/components/ForkRiskGauge.tsx` |
+| Gauge display | `src/components/ForkGauge.tsx` |
 | Details card | `src/components/ForkDetailsCard.tsx` |
 
 ---
