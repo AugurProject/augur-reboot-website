@@ -12,6 +12,12 @@
 
 **Blog and Content Structure** (`docs/blog-feature.md`): Blog post organization, frontmatter schema, MDX integration, RSS feed generation, and Learn section collection structure. Read when adding or modifying blog content.
 
+**Augur v2 Whitepaper Summary** (`docs/whitepapers/augur-v2-summary.md`): Distilled knowledge from the Augur v2 whitepaper — prediction market lifecycle, dispute mechanics, forking process, security model. Read when building features related to Augur's market/oracle system.
+
+**Lituus Whitepaper Summary** (`docs/whitepapers/lituus-summary.md`): Distilled knowledge from the Lituus whitepaper — MBUFSR oracle protocol, escalation game, fee economics, security analysis comparing all oracle classes. Read when building features related to the next-generation oracle.
+
+**Protocol Evolution** (`docs/whitepapers/protocol-evolution.md`): How and why Augur's oracle evolved from v2 (MBUF) to Lituus (MBUFSR). Read for understanding the relationship between the two protocols.
+
 ## Technical Constraints
 
 - **Astro 5.10+**: Build-time HTML generation with selective client hydration. No full SPA mode.
