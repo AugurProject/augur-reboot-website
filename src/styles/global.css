@@ -16,6 +16,20 @@
 	font-display: swap;
 }
 
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('/fonts/ibm-plex-mono-light.woff2') format('woff2');
+	font-weight: 300;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'IBM Plex Mono';
+	src: url('/fonts/ibm-plex-mono-regular.woff2') format('woff2');
+	font-weight: 400;
+	font-display: swap;
+}
+
 @theme {
 	--color-primary: #2ae7a8;
 	--color-foreground: var(--color-green-600);
@@ -36,8 +50,8 @@
 	--tracking-prose: 0.015em;
 
 	--font-display: "Handjet", sans-serif;
-	--font-prose: "Oxanium", sans-serif;
-	--tw-prose-p-font-family: "Oxanium", sans-serif;
+	--font-prose: "IBM Plex Mono", monospace;
+	--tw-prose-p-font-family: "IBM Plex Mono", monospace;
 
 	--glow-size-xs: 0.1375rem;
 	--glow-size-sm: 0.25rem;

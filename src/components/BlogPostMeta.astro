@@ -1,11 +1,11 @@
 ---
 interface Props {
-  author: string;
+  author?: string;
   publishDate: Date;
   updatedDate?: Date;
 }
 
-const { author, publishDate, updatedDate } = Astro.props;
+const { publishDate } = Astro.props;
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -16,16 +16,6 @@ function formatDate(date: Date): string {
 }
 ---
 
-<div class="flex flex-col gap-2 mb-8 text-sm text-muted-foreground uppercase tracking-wider border-b border-foreground/20 pb-4">
-  <div class="flex flex-wrap gap-4 justify-center">
-    <span>BY <span class="text-loud-foreground">{author}</span></span>
-    <span>•</span>
-    <span>{formatDate(publishDate)}</span>
-    {updatedDate && (
-      <>
-        <span>•</span>
-        <span>UPDATED {formatDate(updatedDate)}</span>
-      </>
-    )}
-  </div>
+<div class="text-center text-sm text-muted-foreground uppercase tracking-wider mb-8">
+  {formatDate(publishDate)}
 </div>

@@ -4,10 +4,8 @@ import SocialLinks from "../components/SocialLinks.astro";
 import Footer from "../components/Footer.astro";
 import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
-import SocialShareButtons from "../components/SocialShareButtons.astro";
 import Button from "../components/ui/Button.tsx";
 import Pointer from "../components/Pointer.tsx";
-import PageHeading from "../components/PageHeading.astro";
 import { withBase } from "../lib/utils";
 
 interface Post {
@@ -51,24 +49,20 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 mb-12">
-      <div class="max-w-xl mx-auto">
-        <PageHeading text={title} />
+      <div class="max-w-2xl mx-auto">
+        <h1 class="text-center uppercase text-2xl mb-4">
+          <span class="text-muted-foreground">BLOG</span>
+          <span class="text-muted-foreground mx-2">//</span>
+          <span class="text-loud-foreground font-bold">{title}</span>
+        </h1>
         <BlogPostMeta
           author={author}
           publishDate={publishDate}
           updatedDate={updatedDate}
         />
 
-        {postUrl && (
-          <SocialShareButtons
-            title={title}
-            url={postUrl}
-            description={description}
-          />
-        )}
-
         {/* Main Content */}
-        <article class="prose prose-sm prose-invert max-w-none">
+        <article class="prose prose-sm prose-invert max-w-none pt-6 px-4">
           <slot />
         </article>
       </div>
@@ -97,12 +91,25 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
     }
 
     .prose-sm {
-      line-height: 1.325em;
+      line-height: 1.5em;
       letter-spacing: 0.025em;
+      font-size: 0.825rem;
     }
 
     .prose :is(h1, h2, h3, h4, h5, h6) {
       text-transform: uppercase;
+    }
+
+    .prose :is(h2, h3, h4, h5, h6)::before {
+      content: '';
+      display: inline-block;
+      width: 0.75em;
+      height: 0.75em;
+      margin-right: 0.375em;
+      vertical-align: middle;
+      background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1v6H1v2h6v6h2V9h6V7H9V1z'/%3E%3C/svg%3E") center/contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1v6H1v2h6v6h2V9h6V7H9V1z'/%3E%3C/svg%3E") center/contain no-repeat;
     }
 
     .prose h1 {
@@ -143,6 +150,43 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
 
     .prose blockquote p {
       color: var(--color-foreground);
+    }
+
+    .prose img {
+      border: 1px solid oklch(from var(--color-muted-foreground) l c h / 0.3);
+      box-shadow: 0 0 2em oklch(from var(--color-primary) l c h / 0.1);
+    }
+
+    /* Top-left accent on the first child of the article */
+    .prose > :first-child {
+      position: relative;
+    }
+
+    .prose > :first-child + p:has(img)::after,
+    .prose > :first-child::before {
+        position: absolute;
+        content: '';
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .prose > :first-child::before {
+      top: -1rem;
+      left: -1rem;
+      border-top: 1px solid var(--color-muted-foreground);
+      border-left: 1px solid var(--color-muted-foreground);
+    }
+
+    /* Bottom-right accent on the first image's container */
+    .prose > :first-child + p:has(img) {
+      position: relative;
+    }
+
+    .prose > :first-child + p:has(img)::after {
+      bottom: -1rem;
+      right: -1rem;
+      border-bottom: 1px solid var(--color-muted-foreground);
+      border-right: 1px solid var(--color-muted-foreground);
     }
   </style>
 </Layout>
