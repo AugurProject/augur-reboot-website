@@ -92,7 +92,6 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
 
     .prose-sm {
       line-height: 1.5em;
-      letter-spacing: 0.025em;
       font-size: 0.825rem;
     }
 
@@ -100,16 +99,17 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
       text-transform: uppercase;
     }
 
-    .prose :is(h2, h3, h4, h5, h6)::before {
-      content: '';
+    .prose :is(h1, h2, h3, h4, h5, h6):has(.heading-icon) {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .prose :is(h2, h3, h4, h5, h6) .heading-icon {
       display: inline-block;
-      width: 0.75em;
-      height: 0.75em;
+      width: 1em;
+      height: 1em;
       margin-right: 0.375em;
       vertical-align: middle;
-      background: currentColor;
-      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1v6H1v2h6v6h2V9h6V7H9V1z'/%3E%3C/svg%3E") center/contain no-repeat;
-      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M7 1v6H1v2h6v6h2V9h6V7H9V1z'/%3E%3C/svg%3E") center/contain no-repeat;
     }
 
     .prose h1 {
@@ -122,6 +122,14 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
 
     .prose li {
       font-family: var(--tw-prose-p-font-family);
+    }
+
+    .prose ul {
+      list-style-type: square;
+    }
+
+    .prose ul > li::marker {
+      color: var(--color-muted-foreground);
     }
 
     .prose ol > li::marker {

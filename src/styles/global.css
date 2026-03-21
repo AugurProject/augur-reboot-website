@@ -46,7 +46,7 @@
 	--text-lg--line-height: calc(1.125 / 1);
 	--font-weight-normal: 300;
 	--font-weight-bold: 400;
-	--tracking-normal: 0.05em;
+	--tracking-normal: 0.025em;
 	--tracking-prose: 0.015em;
 
 	--font-display: "Handjet", sans-serif;
