@@ -46,8 +46,12 @@
 	--text-lg--line-height: calc(1.125 / 1);
 	--font-weight-normal: 300;
 	--font-weight-bold: 400;
+	--tracking-tight: 0.01em;
 	--tracking-normal: 0.025em;
 	--tracking-prose: 0.015em;
+	--tracking-wide: 0.05em;
+	--tracking-wider: 0.1em;
+	--tracking-display: 0.15em;
 
 	--font-display: "Handjet", sans-serif;
 	--font-prose: "IBM Plex Mono", monospace;
@@ -260,6 +264,95 @@ html {
 	}
 }
 
+/* --- Shared Prose Styles --- */
+.prose {
+	--tw-prose-headings: var(--color-loud-foreground);
+	--tw-prose-links: var(--color-primary);
+	--tw-prose-body: var(--color-foreground);
+	--tw-prose-bold: var(--color-foreground);
+	--tw-prose-code: var(--color-green-400);
+	--tw-prose-borders: var(--color-primary);
+	--tw-prose-td-borders: var(--color-muted-foreground);
+	--tw-prose-th-borders: var(--color-muted-foreground);
+	--tw-prose-bg-hover: var(--color-primary);
+	--tw-prose-line-height: 1.2;
+	--tw-prose-pre-bg: transparent;
+	--tw-prose-pre-code: var(--color-foreground);
+}
+
+.prose-sm {
+	line-height: 1.5em;
+	font-size: 0.825rem;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+	text-transform: uppercase;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6):has(.heading-icon) {
+	display: inline-flex;
+	align-items: center;
+}
+
+.prose :is(h2, h3, h4, h5, h6) .heading-icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	margin-right: 0.375em;
+	vertical-align: middle;
+}
+
+.prose h1 {
+	font-size: 1.5rem;
+}
+
+.prose p {
+	font-family: var(--tw-prose-p-font-family);
+}
+
+.prose li {
+	font-family: var(--tw-prose-p-font-family);
+}
+
+.prose ul {
+	list-style-type: square;
+}
+
+.prose ul > li::marker {
+	color: var(--color-muted-foreground);
+}
+
+.prose ol > li::marker {
+	color: var(--color-muted-foreground);
+}
+
+.prose table td {
+	font-family: var(--tw-prose-p-font-family);
+}
+
+.prose pre.astro-code {
+	background-color: transparent !important;
+	border: none;
+	padding: 0;
+}
+
+.prose pre.astro-code code {
+	color: var(--color-foreground);
+}
+
+.prose blockquote {
+	border-left-color: var(--color-muted-foreground);
+}
+
+.prose blockquote p {
+	color: var(--color-foreground);
+}
+
+.prose img {
+	border: 1px solid oklch(from var(--color-muted-foreground) l c h / 0.3);
+	box-shadow: 0 0 2em oklch(from var(--color-primary) l c h / 0.1);
+}
+
 .crt {
 	background: linear-gradient(to top, #000000, #000000, #222222, #222222);
 	background-size: 100% 3px;
@@ -375,7 +468,7 @@ html {
 		font-weight: bold;
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: var(--tracking-wide);
 	}
 
 	& ul {
