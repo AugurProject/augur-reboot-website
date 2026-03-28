@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -70,7 +70,7 @@ jobs:
           PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist/
 
@@ -90,12 +90,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -109,7 +109,7 @@ jobs:
       # - No git commits for cache - ephemeral by design
 
       - name: Restore event cache from GH Actions
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: public/cache/event-cache.json
           key: event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}
@@ -169,7 +169,7 @@ jobs:
           fi
 
       - name: Save event cache to GH Actions
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: public/cache/event-cache.json
           key: event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}
@@ -186,10 +186,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -219,13 +219,13 @@ jobs:
 
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: github-pages
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   summary:
     needs: risk-monitor
