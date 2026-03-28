@@ -81,7 +81,7 @@ These thresholds replace previously conservative levels that would have triggere
 - **GitHub Actions**: Hourly automated calculations (sufficient for 7-day dispute windows)
 - **Public RPC Endpoints**: No API keys required, fully transparent access
   - Primary: PublicNode (`https://ethereum-rpc.publicnode.com`)
-  - Fallbacks: Cloudflare, Ankr, 1RPC
+  - Fallbacks: dRPC, 1RPC
   - Optional: `ETH_RPC_URL` env var prepended as primary when set
 - **Static JSON Storage**: Results saved to version-controlled JSON file
 - **Audit Trail**: All calculations and changes tracked in git history
@@ -96,9 +96,8 @@ These thresholds replace previously conservative levels that would have triggere
 The system attempts to connect to public RPC endpoints in order of preference:
 1. **`ETH_RPC_URL`** (when configured via environment/secret)
 2. **PublicNode** (`https://ethereum-rpc.publicnode.com`)
-3. **Cloudflare** (`https://cloudflare-eth.com`)
-4. **Ankr** (`https://rpc.ankr.com/eth`)
-5. **1RPC** (`https://1rpc.io/eth`)
+3. **dRPC** (`https://eth.drpc.org`)
+4. **1RPC** (`https://1rpc.io/eth`)
 
 Each endpoint is tested with a `getBlockNumber()` call before use. If all endpoints fail, the system reports an error state rather than falling back to mock data. Connection latency and endpoint used are logged for transparency.
 

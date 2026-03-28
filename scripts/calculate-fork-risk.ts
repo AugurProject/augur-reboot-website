@@ -104,8 +104,7 @@ const VALIDATION_DEPTH = 8 // blocks (detects corruption within ~2 minutes)
 const PUBLIC_RPC_ENDPOINTS = [
 	...(process.env.ETH_RPC_URL ? [process.env.ETH_RPC_URL] : []),
 	'https://ethereum-rpc.publicnode.com', // PublicNode (Allnodes)
-	'https://cloudflare-eth.com', // Cloudflare
-	'https://rpc.ankr.com/eth', // Ankr
+	'https://eth.drpc.org', // dRPC
 	'https://1rpc.io/eth', // 1RPC (Automata)
 ]
 
