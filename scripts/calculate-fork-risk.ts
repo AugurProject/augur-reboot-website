@@ -100,11 +100,13 @@ const FINALITY_DEPTH = 32 // Ethereum finality depth (~6.4 minutes)
 const VALIDATION_DEPTH = 8 // blocks (detects corruption within ~2 minutes)
 
 // Public RPC endpoints (no API keys required!)
+// ETH_RPC_URL env var is prepended as primary when set
 const PUBLIC_RPC_ENDPOINTS = [
-	'https://eth.llamarpc.com', // LlamaRPC
-	'https://main-light.eth.linkpool.io', // LinkPool
-	'https://ethereum.publicnode.com', // PublicNode
-	'https://1rpc.io/eth', // 1RPC
+	...(process.env.ETH_RPC_URL ? [process.env.ETH_RPC_URL] : []),
+	'https://ethereum-rpc.publicnode.com', // PublicNode (Allnodes)
+	'https://cloudflare-eth.com', // Cloudflare
+	'https://rpc.ankr.com/eth', // Ankr
+	'https://1rpc.io/eth', // 1RPC (Automata)
 ]
 
 interface RpcConnection {

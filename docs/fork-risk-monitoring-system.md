@@ -135,7 +135,7 @@ Frontend fetches JSON → displays gauge
     "disputeDetails": []
   },
   "rpcInfo": {
-    "endpoint": "https://eth.llamarpc.com",
+    "endpoint": "https://ethereum-rpc.publicnode.com",
     "latency": 632,
     "fallbacksAttempted": 0
   },
