@@ -3,29 +3,29 @@
 @plugin "@tailwindcss/typography";
 
 @font-face {
-	font-family: 'Handjet';
-	src: url('/fonts/handjet.woff2') format('woff2');
+	font-family: "Handjet";
+	src: url("/fonts/handjet.woff2") format("woff2");
 	font-weight: 300 400;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Oxanium';
-	src: url('/fonts/oxanium.woff2') format('woff2');
+	font-family: "Oxanium";
+	src: url("/fonts/oxanium.woff2") format("woff2");
 	font-weight: 300 400;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'IBM Plex Mono';
-	src: url('/fonts/ibm-plex-mono-light.woff2') format('woff2');
+	font-family: "IBM Plex Mono";
+	src: url("/fonts/ibm-plex-mono-light.woff2") format("woff2");
 	font-weight: 300;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'IBM Plex Mono';
-	src: url('/fonts/ibm-plex-mono-regular.woff2') format('woff2');
+	font-family: "IBM Plex Mono";
+	src: url("/fonts/ibm-plex-mono-regular.woff2") format("woff2");
 	font-weight: 400;
 	font-display: swap;
 }
@@ -292,7 +292,7 @@ html {
 }
 
 .prose :is(h1, h2, h3, h4, h5, h6):has(.heading-icon) {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 }
 
