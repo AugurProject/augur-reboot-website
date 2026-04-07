@@ -7,6 +7,8 @@ export interface Props {
 const { text, class: className = "" } = Astro.props;
 ---
 
-<h2 class={`flex justify-center items-center gap-3 text-loud-foreground text-2xl tracking-display font-bold uppercase mb-12 ${className}`}>
-  <span class="text-muted-foreground">[[</span> {text} <span class="text-muted-foreground">]]</span>
-</h2>
+<div class="flex justify-center mb-6">
+  <h2 class={`text-loud-foreground text-sm tracking-display font-bold uppercase border border-primary/30 px-3 py-1 ${className}`}>
+    {text}
+  </h2>
+</div>

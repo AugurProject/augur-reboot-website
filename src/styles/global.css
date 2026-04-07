@@ -670,20 +670,22 @@ body:not(:has(#hero-banner-container)) #github-link {
 /* ─── FAQ Collapsible Q&A ─────────────────────────────── */
 
 .faq-item {
-	border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+	margin-bottom: 2px;
 }
 
 .faq-item summary {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
-	padding: 1rem 0;
+	padding: 1rem;
 	cursor: pointer;
 	list-style: none;
 	color: var(--color-foreground);
 	letter-spacing: var(--tracking-wide);
 	user-select: none;
-	transition: color 0.2s;
+	transition: color 0.2s, background 0.2s;
+	background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+	border-radius: 0.25rem;
 }
 
 .faq-item summary::-webkit-details-marker {
@@ -711,13 +713,16 @@ body:not(:has(#hero-banner-container)) #github-link {
 }
 
 .faq-answer {
-	padding: 0.25rem 0 1.25rem 2.75rem;
+	padding: 1rem;
+	padding-left: 2.75rem;
 	font-family: var(--font-prose);
 	font-size: 0.875rem;
 	line-height: 1.7;
 	letter-spacing: var(--tracking-prose);
 	color: var(--color-foreground);
 	text-transform: none;
+	background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+	border-radius: 0 0 0.25rem 0.25rem;
 }
 
 .faq-answer p + p {
