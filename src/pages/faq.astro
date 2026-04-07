@@ -1,0 +1,210 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/ui/Button.tsx";
+import Pointer from "../components/Pointer.tsx";
+import SectionHeading from "../components/SectionHeading.astro";
+import { withBase } from "../lib/utils";
+---
+
+<Layout
+  title="FAQ — Fork & Migration | Augur"
+  description="If you own REP, read this. Everything you need to know about the Augur fork and how to migrate your tokens safely."
+  keywords={[
+    "augur fork",
+    "REP migration",
+    "augur FAQ",
+    "REP token fork",
+    "augur universe",
+    "REP holder",
+    "fork migration",
+    "augur reboot"
+  ]}
+>
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    <!-- Top Section: Navigation -->
+    <div class="flex justify-between items-start p-8">
+      <Button variant="link" href={withBase('/?intro=false')} autoFocus>
+        <Pointer direction="left" animated="auto" />
+        BACK TO HOME
+      </Button>
+      <SocialLinks />
+    </div>
+
+    <!-- Middle Section: Content -->
+    <main class="overflow-y-auto px-4 md:px-8 mb-12 uppercase">
+      <div class="max-w-2xl mx-auto">
+
+        <!-- Title -->
+        <h1 class="text-center uppercase text-2xl mb-8">
+          <span class="text-muted-foreground">FAQ</span>
+          <span class="text-muted-foreground mx-2">//</span>
+          <span class="text-loud-foreground font-bold">FORK & MIGRATION</span>
+        </h1>
+
+        <!-- IMAGE SLOT: Task 5 will insert the hero image here -->
+
+        <!-- Intro -->
+        <p class="text-center font-prose normal-case tracking-prose text-foreground mb-12 mx-auto max-w-xl">
+          Augur is going through its first algorithmic fork. If you own REP, you must act —
+          <span class="text-loud-foreground">failing to migrate your tokens within the window
+          will likely render them worthless.</span>
+          This page answers the most important questions.
+        </p>
+
+        <!-- TIMELINE -->
+        <SectionHeading text="Timeline" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>WHEN DOES THE FORK START AND END?</summary>
+            <div class="faq-answer">
+              <p><strong>Start:</strong> April 8</p>
+              <p><strong>Escalation game:</strong> 2 months</p>
+              <p><strong>Migration window:</strong> 2 months</p>
+              <p><strong>Total duration:</strong> ~4 months</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHAT HAPPENS DURING THE ESCALATION GAME?</summary>
+            <div class="faq-answer">
+              <p>People can dispute outcomes by staking REP. You do NOT need to participate.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHEN DO I NEED TO TAKE ACTION?</summary>
+            <div class="faq-answer">
+              <p>During the migration period (last 2 months). This is the only time you must act.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- REQUIRED ACTION -->
+        <SectionHeading text="Required Action" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>DO I NEED TO PARTICIPATE IN THE ESCALATION GAME?</summary>
+            <div class="faq-answer">
+              <p>No. It is optional.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>DO I NEED TO PARTICIPATE IN MIGRATION?</summary>
+            <div class="faq-answer">
+              <p><strong>Yes.</strong> If you do not migrate, your REP will likely become worthless.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHAT DOES "MIGRATION" MEAN?</summary>
+            <div class="faq-answer">
+              <p>You send your REP into the new, correct version of Augur. This is a one-time, one-way action.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHAT HAPPENS IF I DON'T MIGRATE?</summary>
+            <div class="faq-answer">
+              <p>Your REP may remain in an old version that no one uses. It will likely have no value.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHAT HAPPENS IF I MIGRATE TO THE WRONG UNIVERSE?</summary>
+            <div class="faq-answer">
+              <p>Your REP will likely become worthless. Always follow the official guide.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- TOKENS -->
+        <SectionHeading text="Tokens" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>WILL THERE BE A NEW REP TOKEN?</summary>
+            <div class="faq-answer">
+              <p>Yes. The migrated version becomes the official REP.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WILL THE OLD REP TOKEN STILL EXIST?</summary>
+            <div class="faq-answer">
+              <p>Yes, but it will likely have no value or use.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WILL MY TOKEN BALANCE CHANGE?</summary>
+            <div class="faq-answer">
+              <p>No. You will have the same amount of REP after migration.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- REPV1 HOLDERS -->
+        <SectionHeading text="REPv1 Holders" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>I OWN REPV1. WHAT SHOULD I DO?</summary>
+            <div class="faq-answer">
+              <p>Convert it to REPv2 first using the official migration page. Then follow the fork migration steps.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>CAN I SKIP REPV2 AND GO DIRECTLY TO THE NEW TOKEN?</summary>
+            <div class="faq-answer">
+              <p>No. You must go through REPv2 first.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- EXCHANGES -->
+        <SectionHeading text="Exchanges" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>MY REP IS ON AN EXCHANGE (KRAKEN, GATE). WHAT SHOULD I DO?</summary>
+            <div class="faq-answer">
+              <p><strong>Best option:</strong> Withdraw to your own wallet and migrate yourself.</p>
+              <p>We are in discussions with exchanges, and they may support migration, but this is not guaranteed.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WHAT HAPPENS IF I LEAVE MY REP ON AN EXCHANGE?</summary>
+            <div class="faq-answer">
+              <p>If the exchange does not support migration, you may lose access to your REP's value.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- SAFETY & PROCESS -->
+        <SectionHeading text="Safety & Process" />
+        <div class="faq-group mb-12">
+          <details class="faq-item">
+            <summary>IS MIGRATION REVERSIBLE?</summary>
+            <div class="faq-answer">
+              <p>No. Once you migrate, it cannot be undone.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>IS THERE A DEADLINE?</summary>
+            <div class="faq-answer">
+              <p>Yes. You only have the 2-month migration window.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>WILL THERE BE AN OFFICIAL MIGRATION TOOL?</summary>
+            <div class="faq-answer">
+              <p>Yes. Always use official Augur links only.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>HOW DO I KNOW WHICH UNIVERSE IS CORRECT?</summary>
+            <div class="faq-answer">
+              <p>Follow official Augur communications. Do not guess.</p>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Bottom Section: Footer -->
+    <Footer />
+  </div>
+</Layout>
