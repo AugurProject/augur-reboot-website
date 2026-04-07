@@ -683,8 +683,10 @@ body:not(:has(#hero-banner-container)) #github-link {
 	color: var(--color-foreground);
 	letter-spacing: var(--tracking-wide);
 	user-select: none;
-	transition: color 0.2s, background 0.2s;
-	background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+	transition:
+		color 0.2s,
+		background 0.2s;
+	background: color-mix(in srgb, var(--color-foreground) 5%, transparent);
 	border-radius: 0.25rem;
 }
 
@@ -697,10 +699,12 @@ body:not(:has(#hero-banner-container)) #github-link {
 }
 
 .faq-item summary::before {
-	content: '>_';
+	content: "+";
 	color: var(--color-muted-foreground);
 	flex-shrink: 0;
-	transition: color 0.2s, filter 0.2s;
+	transition:
+		color 0.2s,
+		filter 0.2s;
 }
 
 .faq-item[open] > summary {
@@ -708,6 +712,7 @@ body:not(:has(#hero-banner-container)) #github-link {
 }
 
 .faq-item[open] > summary::before {
+	content: "\2212";
 	color: var(--color-primary);
 	filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
 }
@@ -716,12 +721,11 @@ body:not(:has(#hero-banner-container)) #github-link {
 	padding: 1rem;
 	padding-left: 2.75rem;
 	font-family: var(--font-prose);
-	font-size: 0.875rem;
-	line-height: 1.7;
+	font-size: 0.75rem;
 	letter-spacing: var(--tracking-prose);
 	color: var(--color-foreground);
 	text-transform: none;
-	background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+	background: color-mix(in srgb, var(--color-foreground) 2%, transparent);
 	border-radius: 0 0 0.25rem 0.25rem;
 }
 
