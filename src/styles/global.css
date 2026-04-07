@@ -666,3 +666,65 @@ body:not(:has(#hero-banner-container)) #github-link {
 		transform: none;
 	}
 }
+
+/* ─── FAQ Collapsible Q&A ─────────────────────────────── */
+
+.faq-item {
+	border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.faq-item summary {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1rem 0;
+	cursor: pointer;
+	list-style: none;
+	color: var(--color-foreground);
+	letter-spacing: var(--tracking-wide);
+	user-select: none;
+	transition: color 0.2s;
+}
+
+.faq-item summary::-webkit-details-marker {
+	display: none;
+}
+
+.faq-item summary::marker {
+	display: none;
+}
+
+.faq-item summary::before {
+	content: '>_';
+	color: var(--color-muted-foreground);
+	flex-shrink: 0;
+	transition: color 0.2s, filter 0.2s;
+}
+
+.faq-item[open] > summary {
+	color: var(--color-loud-foreground);
+}
+
+.faq-item[open] > summary::before {
+	color: var(--color-primary);
+	filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
+}
+
+.faq-answer {
+	padding: 0.25rem 0 1.25rem 2.75rem;
+	font-family: var(--font-prose);
+	font-size: 0.875rem;
+	line-height: 1.7;
+	letter-spacing: var(--tracking-prose);
+	color: var(--color-foreground);
+	text-transform: none;
+}
+
+.faq-answer p + p {
+	margin-top: 0.5rem;
+}
+
+.faq-answer strong {
+	color: var(--color-loud-foreground);
+	font-weight: 400;
+}
