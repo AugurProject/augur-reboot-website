@@ -1,21 +1,19 @@
 ---
 import AugurLogo from '../assets/augur.svg';
 import ForkMonitor from './ForkMonitor.tsx';
-import SocialLinks from './SocialLinks.astro';
 import { ScrollIndicator } from './ScrollIndicator';
 import { withBase } from '../lib/utils';
-import BorderBeam from './ui/BorderBeam';
+import PageHeader from './PageHeader.astro';
 ---
 
 <div class="h-screen min-h-fit w-full relative">
   <div id="hero-banner-container" class="grid grid-rows-[auto_auto_auto] min-h-full z-10 text-center content-between">
-    <!-- Top Section: Social Links Only -->
-    <div class="flex justify-center md:justify-end place-content-start p-8">
-      <SocialLinks />
+    <div id="top-header-row">
+      <PageHeader showCta={true} />
     </div>
 
     <!-- Middle Section: Main Content (Logo, Tagline, IS REBOOTING, Menu) -->
-    <div class="flex flex-col items-center place-items-center gap-y-4">
+    <div class="flex flex-col items-center place-items-center py-8 gap-y-4">
       <AugurLogo id="augur-logo" class:list="text-9xl" />
       <p id="prediction-market-text" class="border border-foreground/20 px-3 py-1 mx-4 text-lg tracking-display leading-none">
         THE FRONTIER OF PREDICTION MARKETS
@@ -34,19 +32,6 @@ import BorderBeam from './ui/BorderBeam';
         <span id="line-right" class="h-px bg-foreground"></span>
       </h2>
 
-      <!-- Fork CTA: standalone bordered button with beam effect -->
-      <div id="fork-cta-container">
-        <BorderBeam client:load duration={2.5}>
-          <a
-            id="first-menu-item"
-            href={withBase('/faq')}
-            class="block px-6 py-2 text-xl font-bold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow focus:fx-glow focus:outline-none whitespace-nowrap"
-          >
-            THE FORK IS HERE! OWN REP? ACT NOW.
-          </a>
-        </BorderBeam>
-      </div>
-
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
         <a href={withBase('/mission')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
           THE NEXT GENERATION OF ORACLES
@@ -58,13 +43,13 @@ import BorderBeam from './ui/BorderBeam';
     </div>
 
     <!-- Bottom Section: Fork Monitor -->
-    <div id="fork-meter-container" class="place-content-end pb-4">
+    <div id="fork-meter-container" class="py-6">
       <ForkMonitor client:load animated={true} />
     </div>
   </div>
 </div>
 
-<ScrollIndicator client:idle />
+<ScrollIndicator client:load delay={5000} />
 
 <style>
   /* --- Keyframe Definitions --- */
@@ -103,6 +88,11 @@ import BorderBeam from './ui/BorderBeam';
     to { opacity: 1; transform: translateX(0); }
   }
 
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
   @keyframes bounce-horizontal {
     0%, 100% {
       transform: translateX(0);
@@ -113,11 +103,11 @@ import BorderBeam from './ui/BorderBeam';
   }
 
   /* --- Initial Animation States --- */
+  #top-header-row,
   #is-rebooting-text,
   #line-left,
   #line-right,
   #prediction-market-text,
-  #fork-cta-container,
   #menu-items-container a,
   #fork-meter-container {
     opacity: 0;
@@ -171,11 +161,11 @@ import BorderBeam from './ui/BorderBeam';
     transform: scale(1) translateY(0);
   }
 
+  #hero-banner-container.animations-skipped #top-header-row,
   #hero-banner-container.animations-skipped #is-rebooting-text,
   #hero-banner-container.animations-skipped #line-left,
   #hero-banner-container.animations-skipped #line-right,
   #hero-banner-container.animations-skipped #prediction-market-text,
-  #hero-banner-container.animations-skipped #fork-cta-container,
   #hero-banner-container.animations-skipped #menu-items-container a,
   #hero-banner-container.animations-skipped #fork-meter-container {
     opacity: 1;
@@ -205,9 +195,10 @@ import BorderBeam from './ui/BorderBeam';
     animation: scale-in 0.4s ease-in 2.6s forwards;
   }
 
-  #hero-banner-container.animations-started #fork-cta-container {
-    animation: fade-in-up 0.5s ease-out 3.0s forwards;
+  #hero-banner-container.animations-started #top-header-row {
+    animation: fade-in-up 0.5s ease-out 4.4s forwards;
   }
+
   #hero-banner-container.animations-started #menu-items-container a:nth-of-type(1) {
     animation: fade-in-up 0.5s ease-out 3.2s forwards;
   }
@@ -269,7 +260,7 @@ import BorderBeam from './ui/BorderBeam';
           focusTimeout = window.setTimeout(() => {
             firstMenuItem?.focus();
             focusTimeout = null;
-          }, 3600);
+          }, 4900);
         }
         break;
 

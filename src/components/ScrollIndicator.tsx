@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 
-export const ScrollIndicator = () => {
-	const [isVisible, setIsVisible] = useState(true);
+interface ScrollIndicatorProps {
+	delay?: number; // ms before the indicator first appears
+}
+
+export const ScrollIndicator = ({ delay = 0 }: ScrollIndicatorProps) => {
+	const [isVisible, setIsVisible] = useState(false);
+	const [hasAppeared, setHasAppeared] = useState(delay === 0);
 
 	useEffect(() => {
 		let scrollTimeout: NodeJS.Timeout | null = null;
@@ -26,21 +31,25 @@ export const ScrollIndicator = () => {
 		// Add scroll listener
 		window.addEventListener("scroll", handleScroll);
 
-		// Initialize visibility on mount
-		handleScroll();
+		// Initialize visibility after delay
+		const appearTimeout = setTimeout(() => {
+			setHasAppeared(true);
+			handleScroll();
+		}, delay);
 
 		// Cleanup
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
-			if (scrollTimeout) {
-				clearTimeout(scrollTimeout);
-			}
+			if (scrollTimeout) clearTimeout(scrollTimeout);
+			clearTimeout(appearTimeout);
 		};
-	}, []);
+	}, [delay]);
+
+	const visible = hasAppeared && isVisible;
 
 	return (
 		<div
-			className={`fixed bottom-8 right-8 z-10 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+			className={`fixed bottom-8 right-8 z-10 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
 		>
 			<div className="scroll-indicator-keycap" />
 		</div>

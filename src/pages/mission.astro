@@ -1,10 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import SocialLinks from "../components/SocialLinks.astro";
 import TimelineSection from "../components/TimelineSection.astro";
 import Footer from "../components/Footer.astro";
-import Button from "../components/ui/Button.tsx";
-import Pointer from "../components/Pointer.tsx";
+import PageHeader from "../components/PageHeader.astro";
 import PageHeading from "../components/PageHeading.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import { withBase } from "../lib/utils";
@@ -27,16 +25,7 @@ import { withBase } from "../lib/utils";
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen uppercase">
     <!-- Top Section: Navigation -->
-    <div class="flex justify-between items-start p-8">
-      <!-- Back Button -->
-      <Button id="back-button" variant="link" href={withBase('/?intro=false')} autoFocus>
-        <Pointer direction="left" animated="auto" />
-        BACK TO HOME
-      </Button>
-
-      <!-- Social Links -->
-      <SocialLinks />
-    </div>
+    <PageHeader backHref={withBase('/?intro=false')} />
 
     <!-- Middle Section: Scrollable Content -->
     <main class="overflow-y-auto px-4 md:px-8 mb-12">

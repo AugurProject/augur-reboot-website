@@ -37,7 +37,7 @@ const BorderBeam: React.FC<BorderBeamProps> = ({
           display: inline-block;
           border-radius: 0;
           padding: 1px;
-          background: transparent;
+          background: #070b07;
         }
 
         /* Rotating beam layer */
