@@ -49,20 +49,22 @@ const faqHref = withBase('/faq');
     )}
   </div>
 
-  <!-- Center: Fork CTA -->
-  {showCta && (
-    <div class="animate-[bob_2s_ease-in-out_infinite]">
-      <BorderBeam client:load duration={2.5}>
-        <a
-          href={faqHref}
-          class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
-        >
-          <WarningMark class="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
-          THE FORK IS HERE! OWN REP? ACT NOW.
-        </a>
-      </BorderBeam>
-    </div>
-  )}
+  <!-- Center: Fork CTA (always occupies column to keep grid stable) -->
+  <div class="flex justify-center">
+    {showCta && (
+      <div class="animate-[bob_2s_ease-in-out_infinite]">
+        <BorderBeam client:load duration={2.5}>
+          <a
+            href={faqHref}
+            class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
+          >
+            <WarningMark class="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
+            THE FORK IS HERE! OWN REP? ACT NOW.
+          </a>
+        </BorderBeam>
+      </div>
+    )}
+  </div>
 
   <!-- Right slot: social links -->
   <div class="flex md:justify-end">
@@ -74,6 +76,6 @@ const faqHref = withBase('/faq');
 <style>
   @keyframes bob {
     0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(-5px); }
+    50%       { transform: translateY(5px); }
   }
 </style>
