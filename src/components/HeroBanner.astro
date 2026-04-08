@@ -4,12 +4,14 @@ import ForkMonitor from './ForkMonitor.tsx';
 import { ScrollIndicator } from './ScrollIndicator';
 import { withBase } from '../lib/utils';
 import PageHeader from './PageHeader.astro';
+import BorderBeam from './ui/BorderBeam';
+import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
 ---
 
 <div class="h-screen min-h-fit w-full relative">
   <div id="hero-banner-container" class="grid grid-rows-[auto_auto_auto] min-h-full z-10 text-center content-between">
     <div id="top-header-row">
-      <PageHeader showCta={true} />
+      <PageHeader showCta={false} />
     </div>
 
     <!-- Middle Section: Main Content (Logo, Tagline, IS REBOOTING, Menu) -->
@@ -39,6 +41,21 @@ import PageHeader from './PageHeader.astro';
         <a href={withBase('/team')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
           THE MINDS BEHIND THE REBOOT
         </a>
+      </div>
+
+      <!-- Fork CTA: moved to hero, below nav links -->
+      <div id="fork-cta-container">
+        <div class="animate-[bob_2s_ease-in-out_infinite]">
+          <BorderBeam client:load duration={2.5}>
+            <a
+              href={withBase('/faq')}
+              class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
+            >
+              <WarningMark class="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
+              THE FORK IS HERE! OWN REP? ACT NOW.
+            </a>
+          </BorderBeam>
+        </div>
       </div>
     </div>
 
@@ -109,6 +126,7 @@ import PageHeader from './PageHeader.astro';
   #line-right,
   #prediction-market-text,
   #menu-items-container a,
+  #fork-cta-container,
   #fork-meter-container {
     opacity: 0;
   }
@@ -167,6 +185,7 @@ import PageHeader from './PageHeader.astro';
   #hero-banner-container.animations-skipped #line-right,
   #hero-banner-container.animations-skipped #prediction-market-text,
   #hero-banner-container.animations-skipped #menu-items-container a,
+  #hero-banner-container.animations-skipped #fork-cta-container,
   #hero-banner-container.animations-skipped #fork-meter-container {
     opacity: 1;
     transform: none; /* Resets any initial transform */
@@ -206,8 +225,12 @@ import PageHeader from './PageHeader.astro';
     animation: fade-in-up 0.5s ease-out 3.4s forwards;
   }
 
+  #hero-banner-container.animations-started #fork-cta-container {
+    animation: fade-in-up 0.5s ease-out 3.6s forwards;
+  }
+
   #hero-banner-container.animations-started #fork-meter-container {
-    animation: fade-in-up 0.6s ease-out 3.6s forwards;
+    animation: fade-in-up 0.6s ease-out 3.8s forwards;
   }
 </style>
 
