@@ -3,6 +3,7 @@ import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
 import GoogleAnalytics from "../components/GoogleAnalytics.astro";
+import AnnouncementBar from "../components/AnnouncementBar.astro";
 import { withBase } from "../lib/utils";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 	noindex?: boolean;
 	author?: string;
 	keywords?: string[];
+	showAnnouncementBar?: boolean;
 }
 
 // Safe URL construction for Cloudflare Workers
@@ -28,6 +30,7 @@ const {
 	canonicalURL = defaultCanonicalURL,
 	noindex = false,
 	author = "Augur Project",
+	showAnnouncementBar = true,
 	keywords = [
 		"prediction markets",
 		"blockchain",
@@ -115,14 +118,15 @@ const {
 	<GoogleAnalytics gaId={import.meta.env.PUBLIC_GA_ID} />
 </head>
 	<body>
-		<PerspectiveGridTunnel 
-			client:load 
+		<AnnouncementBar show={showAnnouncementBar} />
+		<PerspectiveGridTunnel
+			client:load
 			transition:persist
 			transition:persist-props
 			transition:name="grid-tunnel"
-			numLines={12} 
-			animationSpeed={0.1} 
-			maxOpacity={0.2} 
+			numLines={12}
+			animationSpeed={0.1}
+			maxOpacity={0.2}
 			lineColor="#2AE7A8"
 			vanishingPoint={0.75}
 		/>

@@ -1,0 +1,41 @@
+---
+import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
+import { withBase } from '../lib/utils';
+
+export interface Props {
+  show?: boolean;
+}
+
+const { show = true } = Astro.props;
+---
+
+{show && (
+  <div id="announcement-bar" class="relative w-full bg-green-500 text-black flex items-center justify-center gap-3 px-10 py-2.5 text-sm font-bold tracking-wide z-50">
+    <WarningMark class="w-5 h-5 shrink-0" />
+    <a href={withBase('/faq')} class="hover:underline focus:underline focus:outline-none whitespace-nowrap">
+      THE FORK IS HERE! OWN REP? ACT NOW.
+    </a>
+    <button
+      id="announcement-bar-close"
+      aria-label="Dismiss announcement"
+      class="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:opacity-70 focus:opacity-70 focus:outline-none"
+    >
+      ✕
+    </button>
+  </div>
+)}
+
+<script>
+  function initAnnouncementBar() {
+    const bar = document.getElementById('announcement-bar');
+    const closeBtn = document.getElementById('announcement-bar-close');
+    if (!bar || !closeBtn) return;
+
+    closeBtn.addEventListener('click', () => {
+      bar.remove();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initAnnouncementBar);
+  initAnnouncementBar();
+</script>
