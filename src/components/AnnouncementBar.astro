@@ -10,7 +10,7 @@ const { show = true } = Astro.props;
 ---
 
 {show && (
-  <div id="announcement-bar" class="relative w-full bg-green-500 text-black flex items-center justify-center gap-3 px-10 py-2.5 text-sm font-bold tracking-wide z-50">
+  <div id="announcement-bar" class="relative w-full bg-green-500 text-black flex items-center justify-center gap-3 px-10 py-2.5 text-sm font-bold tracking-wide z-50 opacity-0">
     <WarningMark class="w-5 h-5 shrink-0" />
     <a href={withBase('/faq')} class="hover:underline focus:underline focus:outline-none whitespace-nowrap">
       THE FORK IS HERE! OWN REP? ACT NOW.
@@ -31,11 +31,26 @@ const { show = true } = Astro.props;
     document.documentElement.style.setProperty('--bar-height', bar ? `${bar.offsetHeight}px` : '0px');
   }
 
+  function revealBar(bar: HTMLElement) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('intro') === 'false') {
+      bar.style.opacity = '1';
+    } else {
+      // Wait for the intro animation to complete (~4.9s)
+      setTimeout(() => {
+        bar.style.transition = 'opacity 0.5s ease-out';
+        bar.style.opacity = '1';
+      }, 4900);
+    }
+  }
+
   function initAnnouncementBar() {
     setBarHeight();
     const bar = document.getElementById('announcement-bar');
     const closeBtn = document.getElementById('announcement-bar-close');
     if (!bar || !closeBtn) return;
+
+    revealBar(bar);
 
     closeBtn.addEventListener('click', () => {
       bar.remove();
