@@ -10,6 +10,8 @@
 
 **Augur Protocol Reference** (`docs/augur-protocol-v2-reference.md`): Fork trigger mechanics, dispute bond formulas, REP migration process, security model, and protocol constants (275K REP threshold, 60-day fork duration, etc.). Read for protocol understanding and edge cases.
 
+**FAQ Feature** (`docs/faq-feature.md`): FAQ page design, route, collapsible Q&A styling, landing page and footer integration, and content structure. Read when modifying the FAQ page or its styles.
+
 **Blog and Content Structure** (`docs/blog-feature.md`): Blog post organization, frontmatter schema, MDX integration, RSS feed generation, and Learn section collection structure. Read when adding or modifying blog content.
 
 **Augur v2 Whitepaper Summary** (`docs/whitepapers/augur-v2-summary.md`): Distilled knowledge from the Augur v2 whitepaper — prediction market lifecycle, dispute mechanics, forking process, security model. Read when building features related to Augur's market/oracle system.
