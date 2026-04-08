@@ -33,14 +33,17 @@ const { show = true } = Astro.props;
 
   function revealBar(bar: HTMLElement) {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('intro') === 'false') {
-      bar.style.opacity = '1';
-    } else {
+    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html';
+    const introPlaying = isHome && urlParams.get('intro') !== 'false';
+
+    if (introPlaying) {
       // Wait for the intro animation to complete (~4.9s)
       setTimeout(() => {
         bar.style.transition = 'opacity 0.5s ease-out';
         bar.style.opacity = '1';
       }, 4900);
+    } else {
+      bar.style.opacity = '1';
     }
   }
 
