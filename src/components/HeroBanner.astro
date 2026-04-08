@@ -6,7 +6,7 @@ import { withBase } from '../lib/utils';
 import PageHeader from './PageHeader.astro';
 ---
 
-<div class="h-screen min-h-fit w-full relative">
+<div class="h-[calc(100vh-var(--bar-height,0px))] min-h-fit w-full relative">
   <div id="hero-banner-container" class="grid grid-rows-[auto_auto_auto] min-h-full z-10 text-center content-between">
     <div id="top-header-row">
       <PageHeader />

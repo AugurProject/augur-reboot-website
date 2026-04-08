@@ -26,13 +26,20 @@ const { show = true } = Astro.props;
 )}
 
 <script>
+  function setBarHeight() {
+    const bar = document.getElementById('announcement-bar');
+    document.documentElement.style.setProperty('--bar-height', bar ? `${bar.offsetHeight}px` : '0px');
+  }
+
   function initAnnouncementBar() {
+    setBarHeight();
     const bar = document.getElementById('announcement-bar');
     const closeBtn = document.getElementById('announcement-bar-close');
     if (!bar || !closeBtn) return;
 
     closeBtn.addEventListener('click', () => {
       bar.remove();
+      document.documentElement.style.setProperty('--bar-height', '0px');
     });
   }
 
