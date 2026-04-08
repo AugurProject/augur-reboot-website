@@ -26,38 +26,54 @@ const { show = true } = Astro.props;
 )}
 
 <script>
+  import { $appStore, UIState, shouldSkipFromURL } from '../stores/animationStore';
+
+  let unsubscribe: (() => void) | null = null;
+  let revealTimeout: number | null = null;
+
   function setBarHeight() {
     const bar = document.getElementById('announcement-bar');
     document.documentElement.style.setProperty('--bar-height', bar ? `${bar.offsetHeight}px` : '0px');
   }
 
-  function revealBar(bar: HTMLElement) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html';
-    const introPlaying = isHome && urlParams.get('intro') !== 'false';
-
-    if (introPlaying) {
-      // Wait for the intro animation to complete (~4.9s)
-      setTimeout(() => {
-        bar.style.transition = 'opacity 0.5s ease-out';
-        bar.style.opacity = '1';
-      }, 4900);
-    } else {
-      bar.style.opacity = '1';
-    }
-  }
-
   function initAnnouncementBar() {
     setBarHeight();
+
     const bar = document.getElementById('announcement-bar');
     const closeBtn = document.getElementById('announcement-bar-close');
     if (!bar || !closeBtn) return;
 
-    revealBar(bar);
-
     closeBtn.addEventListener('click', () => {
       bar.remove();
       document.documentElement.style.setProperty('--bar-height', '0px');
+    });
+
+    // Clean up any previous subscription/timeout
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    if (revealTimeout) { clearTimeout(revealTimeout); revealTimeout = null; }
+
+    // Subscribe to the app store — same pattern as HeroBanner
+    unsubscribe = $appStore.subscribe((state) => {
+      if (state.uiState !== UIState.MAIN_CONTENT) return;
+
+      const bar = document.getElementById('announcement-bar');
+      if (!bar) return;
+
+      if (shouldSkipFromURL()) {
+        // Intro was skipped — show immediately
+        bar.style.opacity = '1';
+      } else {
+        // Intro animation played — wait for it to finish (~4.9s from animations-started)
+        revealTimeout = window.setTimeout(() => {
+          bar.style.transition = 'opacity 0.5s ease-out';
+          bar.style.opacity = '1';
+          revealTimeout = null;
+        }, 4900);
+      }
+
+      // One-shot: unsubscribe after revealing
+      unsubscribe?.();
+      unsubscribe = null;
     });
   }
 
