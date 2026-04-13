@@ -350,6 +350,21 @@ html {
 	color: var(--color-foreground);
 }
 
+.prose .callout {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5em;
+	background: oklch(from var(--color-primary) l c h / 0.07);
+	border-left: 3px solid var(--color-foreground);
+	font-family: var(--tw-prose-p-font-family);
+	padding: 0.5em 1em;
+	margin: 1em 0;
+}
+
+.prose .callout + .callout {
+	margin-top: -0.25em;
+}
+
 .prose img {
 	border: 1px solid oklch(from var(--color-muted-foreground) l c h / 0.3);
 	box-shadow: 0 0 2em oklch(from var(--color-primary) l c h / 0.1);

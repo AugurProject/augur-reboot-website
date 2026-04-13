@@ -6,6 +6,7 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import rehypeHeadingIcons from './src/lib/rehype-heading-icons.mjs';
+import rehypeCallouts from './src/lib/rehype-callouts.mjs';
 
 // Check if building in GitHub Actions (for GitHub Pages)
 const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
@@ -39,6 +40,6 @@ export default defineConfig({
       } : undefined
     }
   },
-  integrations: [react(), sitemap(), mdx({ rehypePlugins: [rehypeHeadingIcons] })],
+  integrations: [react(), sitemap(), mdx({ rehypePlugins: [rehypeHeadingIcons, rehypeCallouts] })],
   ...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig)
 });
