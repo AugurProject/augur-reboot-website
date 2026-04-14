@@ -4,6 +4,7 @@ import Footer from "../components/Footer.astro";
 import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
 import PageHeader from "../components/PageHeader.astro";
+import PageTitle from "../components/PageTitle.astro";
 import { withBase } from "../lib/utils";
 
 interface Post {
@@ -39,11 +40,7 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
       <div class="max-w-3xl mx-auto">
-        <h1 class="text-center font-display uppercase text-3xl sm:text-[2.2rem] leading-none mb-4">
-          <span class="text-muted-foreground">BLOG</span>
-          <span class="text-muted-foreground mx-2">//</span>
-          <span class="text-loud-foreground font-bold">{title}</span>
-        </h1>
+        <PageTitle prefix="BLOG" title={title} />
         <BlogPostMeta
           author={author}
           publishDate={publishDate}

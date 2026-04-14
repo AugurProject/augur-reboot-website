@@ -1,0 +1,15 @@
+---
+export interface Props {
+  prefix: string;
+  title: string;
+  class?: string;
+}
+
+const { prefix, title, class: className = "" } = Astro.props;
+---
+
+<h1 class={`text-center font-display uppercase text-3xl sm:text-[2.2rem] leading-none mb-4 ${className}`}>
+  <span class="text-muted-foreground">{prefix}</span>
+  <span class="text-muted-foreground mx-2">//</span>
+  <span class="text-loud-foreground font-bold">{title}</span>
+</h1>
