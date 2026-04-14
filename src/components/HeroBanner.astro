@@ -215,6 +215,11 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
     animation: scale-in 0.4s ease-in 2.6s forwards, gradient-animation 2s linear 3s infinite;
   }
 
+  /* 404 page: no hero sequence, run gradient immediately */
+  .ascii-text:not(#is-rebooting-text) {
+    animation: gradient-animation 2s linear infinite;
+  }
+
   #hero-banner-container.animations-started #top-header-row {
     animation: fade-in-up 0.5s ease-out 4.4s forwards;
   }
