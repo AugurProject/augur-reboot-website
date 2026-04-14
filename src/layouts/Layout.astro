@@ -44,7 +44,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="bg-background text-foreground">
 	<head>
 		<!-- Basic meta tags -->
 		<meta charset="UTF-8" />
@@ -115,14 +115,14 @@ const {
 	<GoogleAnalytics gaId={import.meta.env.PUBLIC_GA_ID} />
 </head>
 	<body>
-		<PerspectiveGridTunnel 
-			client:load 
+		<PerspectiveGridTunnel
+			client:load
 			transition:persist
 			transition:persist-props
 			transition:name="grid-tunnel"
-			numLines={12} 
-			animationSpeed={0.1} 
-			maxOpacity={0.2} 
+			numLines={12}
+			animationSpeed={0.1}
+			maxOpacity={0.2}
 			lineColor="#2AE7A8"
 			vanishingPoint={0.75}
 		/>

@@ -50,17 +50,13 @@
 
 	--default-font-family: "IBM Plex Mono", monospace;
 	--font-display: "Handjet", sans-serif;
-	--font-display-default-tracking: var(--tracking-wider);
+	--font-display-tracking: var(--tracking-wider);
 	--font-prose: "IBM Plex Mono", monospace;
 
 	--glow-size-xs: 0.1375rem;
 	--glow-size-sm: 0.25rem;
 	--glow-size: 0.375rem;
 	--glow-size-lg: 1rem;
-}
-
-html {
-	@apply bg-background text-foreground;
 }
 
 @utility fx-glow {
@@ -143,15 +139,6 @@ html {
 		transform: scale(0, 0.0001) translate3d(0, 0, 0);
 		-webkit-filter: brightness(50);
 		filter: brightness(50);
-	}
-}
-
-@keyframes gradient-animation {
-	0% {
-		background-position: 0% 0%;
-	}
-	100% {
-		background-position: 0% 200%;
 	}
 }
 
@@ -321,20 +308,6 @@ html {
 	&.display-off {
 		animation: crt-off 0.5s;
 	}
-}
-
-.title {
-	background: linear-gradient(
-		to bottom,
-		var(--color-green-600),
-		var(--color-green-400),
-		var(--color-green-600)
-	);
-	background-size: 100% 200%;
-	background-clip: text;
-	-webkit-text-fill-color: transparent;
-	animation: gradient-animation 2s linear infinite;
-	filter: drop-shadow(0 4px 0 #ffffff15);
 }
 
 .cursor {
@@ -515,11 +488,6 @@ body:not(:has(#hero-banner-container)) #github-link {
 
 /* Reduce Motion Support: Disable animations for users with prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-	/* Gradient animation on title */
-	.title {
-		animation: none;
-	}
-
 	/* Blinking cursor animation */
 	.cursor.blink-active {
 		animation: none;
@@ -562,4 +530,3 @@ body:not(:has(#hero-banner-container)) #github-link {
 		transform: none;
 	}
 }
-

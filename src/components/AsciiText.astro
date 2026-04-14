@@ -1,0 +1,38 @@
+---
+export interface Props {
+  class?: string;
+  id?: string;
+  label?: string;
+}
+
+const { class: className = "", id, label } = Astro.props;
+---
+
+<pre id={id} class:list={["ascii-text leading-none", className]} aria-label={label}>
+  <slot />
+</pre>
+
+<style>
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 0% 200%;
+    }
+  }
+
+  .ascii-text {
+    background: linear-gradient(
+      to bottom,
+      var(--color-green-600),
+      var(--color-green-400),
+      var(--color-green-600)
+    );
+    background-size: 100% 200%;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-animation 2s linear infinite;
+    filter: drop-shadow(0 4px 0 #ffffff15);
+  }
+</style>

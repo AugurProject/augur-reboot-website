@@ -1,5 +1,6 @@
 ---
 import AugurLogo from '../assets/augur.svg';
+import AsciiText from './AsciiText.astro';
 import ForkMonitor from './ForkMonitor.tsx';
 import { ScrollIndicator } from './ScrollIndicator';
 import { withBase } from '../lib/utils';
@@ -21,21 +22,21 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
         THE FRONTIER OF PREDICTION MARKETS
       </p>
 
-      <h2 class="grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4 title">
+      <h2 class="grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4">
         <span id="line-left" class="h-px bg-foreground"></span>
-        <pre id="is-rebooting-text" class="title leading-none tracking-tighter text-[clamp(0.325rem,1vw,0.625rem)]">
+        <AsciiText id="is-rebooting-text" class="tracking-tighter text-[clamp(0.325rem,1vw,0.625rem)]">
 ██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
 ██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝
  ██║ ███████╗     ██████╔╝ █████╗   ██████╔╝ ██║   ██║ ██║   ██║    ██║    ██║ ██╔██╗ ██║ ██║  ███╗
  ██║ ╚════██║     ██╔══██╗ ██╔══╝   ██╔══██╗ ██║   ██║ ██║   ██║    ██║    ██║ ██║╚██╗██║ ██║   ██║
  ██║ ███████║     ██║  ██║ ███████╗ ██████╔╝ ╚██████╔╝ ╚██████╔╝    ██║    ██║ ██║ ╚████║ ╚██████╔╝
 ╚═╝ ╚══════╝     ╚═╝  ╚═╝ ╚══════╝ ╚═════╝   ╚═════╝   ╚═════╝     ╚═╝    ╚═╝ ╚═╝  ╚═══╝  ╚═════╝
-        </pre>
+        </AsciiText>
         <span id="line-right" class="h-px bg-foreground"></span>
       </h2>
 
-      <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
-        <a href={withBase('/mission')} class="font-display text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none uppercase">
+      <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto mb-3">
+          <a id="first-menu-item" href={withBase('/mission')} class="font-display text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none uppercase">
           THE NEXT GENERATION OF ORACLES
         </a>
         <a href={withBase('/team')} class="font-display text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none uppercase">
