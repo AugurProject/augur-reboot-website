@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import PageHeader from "../components/PageHeader.astro";
-import PageHeading from "../components/PageHeading.astro";
+import PageTitle from "../components/PageTitle.astro";
 import { withBase } from "../lib/utils";
 ---
 
@@ -14,7 +14,7 @@ import { withBase } from "../lib/utils";
     <!-- Middle Section: Scrollable Content -->
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
       <div class="max-w-7xl mx-auto">
-        <PageHeading text="Terms of Service" />
+        <PageTitle prefix="LEGAL" title="TERMS OF SERVICE" />
 
         <div class="max-w-4xl mx-auto space-y-8">
           <p class="text-center text-foreground mb-12 mx-auto max-w-2xl">
