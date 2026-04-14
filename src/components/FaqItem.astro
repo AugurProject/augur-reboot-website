@@ -6,11 +6,15 @@ export interface Props {
 const { question } = Astro.props;
 ---
 
-<details class="faq-item mb-0.5 group border border-transparent focus-within:border-foreground/50">
-  <summary class="flex items-center gap-3 p-4 cursor-pointer list-none text-xl text-foreground tracking-wider font-display font-light uppercase select-none transition-colors duration-200 rounded outline-none groupd-focus-within:text-underline">
-    {question}
+<details class="mb-0.5 group border border-transparent focus-within:border-foreground/50">
+  <summary class="flex items-center gap-3 p-4 cursor-pointer list-none text-xl text-foreground tracking-wider font-display font-light uppercase select-none transition-colors duration-200 rounded outline-none bg-foreground/5">
+    <span class="text-muted-foreground shrink-0 transition-colors duration-200 group-open:text-primary group-open:drop-shadow-[0_0_var(--glow-size-sm)_var(--color-primary)]">
+      <span class="group-open:hidden">+</span>
+      <span class="hidden group-open:inline">−</span>
+    </span>
+    <span class="group-open:text-loud-foreground">{question}</span>
   </summary>
-  <div class="faq-answer p-4 pl-11 text-foreground rounded-b [&_a]:focus:outline-none [&_a]:focus:bg-muted-foreground/50">
+  <div class="p-4 pl-11 text-foreground rounded-b bg-foreground/2 [&_p+p]:mt-2 [&_strong]:text-loud-foreground [&_a]:text-loud-foreground [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-filter [&_a]:duration-200 [&_a:hover]:drop-shadow-[0_0_0.375rem_var(--color-primary)] [&_a]:focus:outline-none [&_a]:focus:bg-muted-foreground/50 [&_ul]:list-square [&_ul]:pl-6 [&_ul]:my-2 [&_ul>li]:mb-1 [&_ul>li]:marker:text-muted-foreground">
     <slot />
   </div>
 </details>
