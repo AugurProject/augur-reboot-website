@@ -386,43 +386,26 @@
 	}
 }
 
+/* Menu link pointer pseudo-element */
+.menu-link {
+	position: relative;
 
+	&::before {
+		content: '>';
+		opacity: 0;
+		color: var(--color-foreground);
+		display: inline-block;
+		margin-right: 0.5rem;
+		transition: opacity 0.2s ease-in-out;
+	}
 
-/* --- Social Media Icons Animation Rules --- */
-/* Initial hidden state for social media icons (homepage only) */
-#discord-link,
-#twitter-link,
-#github-link {
-	opacity: 0;
+	&:hover::before,
+	&:focus::before {
+		opacity: 1;
+		animation: bounce-horizontal 1s ease-in-out infinite;
+	}
 }
 
-/* Show social media icons on non-homepage pages (when hero-banner-container is not present) */
-body:not(:has(#hero-banner-container)) #discord-link,
-body:not(:has(#hero-banner-container)) #twitter-link,
-body:not(:has(#hero-banner-container)) #github-link {
-	opacity: 1;
-}
-
-/* Animation skip state - show immediately */
-#hero-banner-container.animations-skipped #discord-link,
-#hero-banner-container.animations-skipped #twitter-link,
-#hero-banner-container.animations-skipped #github-link {
-	opacity: 1;
-	transform: none;
-}
-
-/* Animation trigger - show with timing */
-#hero-banner-container.animations-started #twitter-link {
-	animation: fade-in-down 0.5s ease-out 0.5s forwards;
-}
-
-#hero-banner-container.animations-started #discord-link {
-	animation: fade-in-down 0.5s ease-out 0.7s forwards;
-}
-
-#hero-banner-container.animations-started #github-link {
-	animation: fade-in-down 0.5s ease-out 0.9s forwards;
-}
 
 /* Scroll indicator 3D keycap */
 @keyframes keycap-press {
@@ -527,20 +510,5 @@ body:not(:has(#hero-banner-container)) #github-link {
 	/* Pulse glow effect */
 	.fx-pulse-glow {
 		animation: none;
-	}
-
-	/* Social media icon fade-in animations */
-	#hero-banner-container.animations-started #twitter-link,
-	#hero-banner-container.animations-started #discord-link,
-	#hero-banner-container.animations-started #github-link {
-		animation: none;
-		opacity: 1;
-	}
-
-	/* HeroBanner entrance animations */
-	#hero-banner-container.animations-started [data-animation-delay] {
-		animation: none;
-		opacity: 1;
-		transform: none;
 	}
 }
