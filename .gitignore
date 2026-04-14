@@ -60,3 +60,4 @@ public/cache/
 
 # Wrangler generated types (auto-generated, not our code)
 worker-configuration.d.ts
+.superpowers/
