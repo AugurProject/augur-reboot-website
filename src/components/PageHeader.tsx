@@ -1,10 +1,10 @@
 import { useRef, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { $appStore, UIState } from '../stores/animationStore';
-import DiscordLogo from '../assets/discord.svg';
-import XLogo from '../assets/x.svg';
-import GithubLogo from '../assets/github.svg';
-import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
+import DiscordLogoUrl from '../assets/discord.svg';
+import XLogoUrl from '../assets/x.svg';
+import GithubLogoUrl from '../assets/github.svg';
+import WarningMarkUrl from '@phosphor-icons/core/assets/regular/siren.svg';
 import BorderBeam from './ui/BorderBeam';
 import Pointer from './Pointer';
 import { withBase } from '../lib/utils';
@@ -69,7 +69,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 href={faqHref}
                 className="font-display bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground uppercase shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
               >
-                <WarningMark className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
+                <img src={WarningMarkUrl} alt="" className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
                 THE FORK IS HERE! OWN REP? ACT NOW.
               </a>
             </BorderBeam>
@@ -86,7 +86,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <XLogo />
+            <img src={XLogoUrl} alt="X (Twitter)" className="text-3xl" />
           </a>
           <a
             ref={(el) => { socialRefs.current[1] = el; }}
@@ -94,7 +94,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <DiscordLogo />
+            <img src={DiscordLogoUrl} alt="Discord" className="text-3xl" />
           </a>
           <a
             ref={(el) => { socialRefs.current[2] = el; }}
@@ -102,7 +102,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <GithubLogo />
+            <img src={GithubLogoUrl} alt="GitHub" className="text-3xl" />
           </a>
         </div>
       </div>
