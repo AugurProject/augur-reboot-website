@@ -12,7 +12,7 @@ const { class: className = "", id, label } = Astro.props;
   <slot />
 </pre>
 
-<style is:global>
+<style>
   @keyframes gradient-animation {
     0% {
       background-position: 0% 0%;
@@ -32,6 +32,7 @@ const { class: className = "", id, label } = Astro.props;
     background-size: 100% 200%;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: gradient-animation 2s linear infinite;
     filter: drop-shadow(0 4px 0 #ffffff15);
   }
 </style>
