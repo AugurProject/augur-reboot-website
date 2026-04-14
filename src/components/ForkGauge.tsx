@@ -90,7 +90,7 @@ const ForkGaugeComponent = ({
 	const needleTransition = prefersReducedMotion ? 'none' : 'all 0.3s ease-in-out'
 
 	return (
-		<div className={cn('relative mb-2 flex flex-col items-center')}>
+		<div className={cn('relative flex flex-col items-center')}>
 			<svg className="max-w-45 w-full" viewBox="60 60 280 160" role="img" aria-label="Fork risk gauge">
 				<defs>
 					<linearGradient
@@ -192,15 +192,14 @@ const ForkGaugeComponent = ({
 					y="165"
 					textAnchor="middle"
 					fill={riskColor}
-					fontSize="2.15rem"
 					fontWeight="bold"
-					className={cn('fx-glow-sm', `fx-glow-[${riskColor}]`)}
+					className={cn('text-4xl font-display fx-glow-sm', `fx-glow-[${riskColor}]`)}
 				>
 					{riskLevel}
 				</text>
 			</svg>
 
-			<div className="font-display uppercase tracking-[0.5em] font-light text-muted-foreground">
+			<div className="font-display text-lg uppercase tracking-[0.75rem] -mr-2 font-light text-muted-foreground">
 				FORK RISK
 			</div>
 		</div>

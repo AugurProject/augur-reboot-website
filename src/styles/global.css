@@ -35,17 +35,6 @@
 	--color-red-500: #ef4444;
 
 	--default-font-family: "IBM Plex Mono", monospace;
-	/*--text-base: 1.25rem;
-	--text-base--line-height: calc(1.125 / 1);
-	--font-weight-normal: 300;
-	--font-weight-bold: 400;
-	--tracking-tight: 0.01em;
-	--tracking-normal: 0.025em;
-	--tracking-prose: 0.015em;
-	--tracking-wide: 0.05em;
-	--tracking-wider: 0.1em;
-	--tracking-display: 0.15em;*/
-
 	--font-display: "Handjet", sans-serif;
 	--font-prose: "IBM Plex Mono", monospace;
 
@@ -367,7 +356,7 @@ html {
 	--tw-prose-headings: var(--color-loud-foreground);
 	--tw-prose-links: var(--color-primary);
 	--tw-prose-body: var(--color-foreground);
-	--tw-prose-bold: var(--color-foreground);
+	--tw-prose-bold: var(--color-loud-foreground);
 	--tw-prose-code: var(--color-green-400);
 	--tw-prose-borders: var(--color-primary);
 	--tw-prose-td-borders: var(--color-muted-foreground);

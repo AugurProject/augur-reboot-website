@@ -19,39 +19,39 @@ export const ForkStats = (): React.JSX.Element => {
 		: null
 
 	return (
-		<div className="w-full mb-1 uppercase font-display">
+		<div className="w-full mb-1">
 			{isStable ? (
-				<div className="uppercase font-light text-green-400 tracking-widest fx-glow">
+				<div className="text-lg font-display uppercase font-light text-green-400 tracking-widest fx-glow">
 					System steady - No market disputes
 				</div>
 			) : (
-				<div className="grid md:grid-cols-[8rem_8rem_8rem] md:place-content-center md:gap-y-2">
+				<div className="grid md:grid-cols-[8rem_8rem_8rem] md:place-content-center md:gap-y-4">
 					{/* Panel 1 - Fork Risk */}
 					<div className="text-center">
-						<div className="text-xs uppercase tracking-widest font-light text-muted-foreground">
+						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							FORK RISK
 						</div>
-						<div className="uppercase font-light text-primary tracking-widest fx-glow">
+						<div className="uppercase text-primary fx-glow-sm">
 							{rawData.metrics.forkThresholdPercent.toFixed(1)}%
 						</div>
 					</div>
 
 					{/* Panel 2 - Dispute Bond */}
 					<div className="text-center md:border-x md:border-muted-foreground/40">
-						<div className="text-xs uppercase tracking-widest font-light text-muted-foreground">
+  					<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							DISPUTE BOND
 						</div>
-						<div className="uppercase font-light text-primary tracking-widest fx-glow">
+						<div className="uppercase text-primary fx-glow-sm">
 							{formatNumber(rawData.metrics.largestDisputeBond)} REP
 						</div>
 					</div>
 
 					{/* Panel 3 - Dispute Round */}
 					<div className="text-center">
-						<div className="text-xs uppercase tracking-widest font-light text-muted-foreground">
+  					<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							DISPUTE ROUND
 						</div>
-						<div className="uppercase font-light text-primary tracking-widest fx-glow">
+						<div className="uppercase text-primary fx-glow-sm">
 							{largestDispute?.disputeRound || 1}
 						</div>
 					</div>
@@ -59,10 +59,10 @@ export const ForkStats = (): React.JSX.Element => {
 					{/* Market Address - properly constrained for truncation */}
 					{largestDispute && (
 						<div className="text-center md:col-span-full">
-							<div className="text-xs uppercase tracking-widest font-light text-muted-foreground">
+  						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 								MARKET IN DISPUTE
 							</div>
-							<div className="uppercase font-light text-primary tracking-widest truncate mx-auto fx-glow" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+							<div className="uppercase text-primary fx-glow-sm">
 								{largestDispute.marketId}
 							</div>
 						</div>

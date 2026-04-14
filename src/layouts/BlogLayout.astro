@@ -38,8 +38,8 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
-      <div class="max-w-2xl mx-auto">
-        <h1 class="text-center font-display uppercase text-2xl mb-4">
+      <div class="max-w-3xl mx-auto">
+        <h1 class="text-center font-display uppercase text-3xl sm:text-[2.2rem] leading-none mb-4">
           <span class="text-muted-foreground">BLOG</span>
           <span class="text-muted-foreground mx-2">//</span>
           <span class="text-loud-foreground font-bold">{title}</span>
@@ -51,7 +51,7 @@ const { title, description, author, publishDate, updatedDate, ogImage, postUrl, 
         />
 
         {/* Main Content */}
-        <article class="prose prose-sm prose-invert max-w-none pt-6 px-4 prose-headings:uppercase prose-h1:text-2xl prose-ul:list-square">
+        <article class="prose prose-invert max-w-none pt-6 px-4 prose-headings:font-display prose-p:leading-snug prose-headings:uppercase prose-headings:tracking-wide prose-ul:list-[square] prose-li:leading-snug">
           <slot />
         </article>
       </div>

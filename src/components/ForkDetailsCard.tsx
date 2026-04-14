@@ -39,14 +39,12 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 			<DialogTrigger asChild>
 				<button
 					type="button"
-					className="relative inline-block group cursor-pointer focus:outline-hidden transition-all duration-200"
+					className="relative mb-2 inline-block group cursor-pointer focus:outline-hidden transition-all duration-200"
 					aria-label="View fork meter details"
 					title="Click for more information"
 				>
 					{/* Gauge */}
-					<div className="mb-2">
-						{gauge}
-					</div>
+          {gauge}
 
 					{/* Info Icon - Top Right */}
 					<InfoIcon className="absolute -top-2 -right-2 p-2 rounded-full" />
