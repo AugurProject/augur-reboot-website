@@ -337,6 +337,17 @@ html {
 	--tw-prose-pre-code: var(--color-foreground);
 }
 
+/* Astro syntax highlighting overrides */
+.prose pre.astro-code {
+	background-color: transparent !important;
+	border: none;
+	padding: 0;
+}
+
+.prose pre.astro-code code {
+	color: var(--color-foreground);
+}
+
 /* rehype-heading-icons plugin: layout for heading + icon pairs */
 .prose :is(h1, h2, h3, h4, h5, h6):has(.heading-icon) {
 	display: flex;
@@ -351,31 +362,6 @@ html {
 	vertical-align: middle;
 }
 
-.prose ul > li::marker {
-	color: var(--color-muted-foreground);
-}
-
-.prose ol > li::marker {
-	color: var(--color-muted-foreground);
-}
-
-.prose pre.astro-code {
-	background-color: transparent !important;
-	border: none;
-	padding: 0;
-}
-
-.prose pre.astro-code code {
-	color: var(--color-foreground);
-}
-
-.prose blockquote {
-	border-left-color: var(--color-muted-foreground);
-}
-
-.prose blockquote p {
-	color: var(--color-foreground);
-}
 
 /* rehype-callout plugin: inline callout blocks */
 .prose .callout {
@@ -392,10 +378,6 @@ html {
 	margin-top: -0.25em;
 }
 
-.prose img {
-	border: 1px solid oklch(from var(--color-muted-foreground) l c h / 0.3);
-	box-shadow: 0 0 2em oklch(from var(--color-primary) l c h / 0.1);
-}
 
 .crt {
 	background: linear-gradient(to top, #000000, #000000, #222222, #222222);
