@@ -22,7 +22,7 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
         THE FRONTIER OF PREDICTION MARKETS
       </p>
 
-      <h2 class="ascii-text grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4">
+      <h2 class="grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4">
         <span id="line-left" class="h-px bg-foreground"></span>
         <AsciiText id="is-rebooting-text" class="tracking-tighter text-[clamp(0.325rem,1vw,0.625rem)]">
 ██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
@@ -212,7 +212,7 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
   }
 
   #hero-banner-container.animations-started #is-rebooting-text {
-    animation: scale-in 0.4s ease-in 2.6s forwards;
+    animation: scale-in 0.4s ease-in 2.6s forwards, gradient-animation 2s linear 3s infinite;
   }
 
   #hero-banner-container.animations-started #top-header-row {
