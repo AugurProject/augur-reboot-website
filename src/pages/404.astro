@@ -12,7 +12,7 @@ import { withBase } from "../lib/utils";
     <!-- Main content wrapper that fills viewport -->
     <div class="min-h-screen flex flex-col">
       <!-- Top Section: Navigation -->
-      <PageHeader backHref={withBase('/?intro=false')} showCta={false} />
+      <PageHeader client:load backHref={withBase('/?intro=false')} showCta={false} />
 
       <!-- Middle Section: 404 Content -->
       <main class="flex-1 flex items-center justify-center px-4 md:px-8">

@@ -9,7 +9,7 @@ import { withBase } from "../lib/utils";
 <Layout title="Terms of Service - Augur">
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     <!-- Top Section: Navigation -->
-    <PageHeader backHref={withBase('/?intro=false')} showCta={false} />
+    <PageHeader client:load backHref={withBase('/?intro=false')} showCta={false} />
 
     <!-- Middle Section: Scrollable Content -->
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
