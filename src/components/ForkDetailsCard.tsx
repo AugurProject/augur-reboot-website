@@ -66,12 +66,12 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 
 				{/* Current Metrics */}
 				<div className="pb-3 border-b border-foreground/30">
-					<div>
+					<div className="font-display uppercase font-light">
 						<div className="flex justify-between">
-							<span className="text-muted-foreground">
+							<span className="text-muted-foreground tracking-wide">
 								Largest Bond
 							</span>
-							<span className="text-foreground">
+							<span className="text-foreground tracking-wider">
 								{formatNumber(
 									rawData.metrics.largestDisputeBond,
 								)}{' '}
@@ -79,18 +79,18 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 							</span>
 						</div>
 						<div className="flex justify-between">
-							<span className="text-muted-foreground">
+  						<span className="text-muted-foreground tracking-wide">
 								Active Disputes
 							</span>
-							<span className="text-foreground">
+							<span className="text-foreground tracking-wider">
 								{rawData.metrics.activeDisputes}
 							</span>
 						</div>
 						<div className="flex justify-between">
-							<span className="text-muted-foreground">
+  						<span className="text-muted-foreground tracking-wide">
 								Fork Threshold
 							</span>
-							<span className="text-foreground">
+							<span className="text-foreground tracking-wider">
 								{formatNumber(
 									rawData.calculation.forkThreshold,
 								)}{' '}
@@ -98,10 +98,10 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 							</span>
 						</div>
 						<div className="flex justify-between">
-							<span className="text-muted-foreground">
+							<span className="text-muted-foreground tracking-wide">
 								Last Updated
 							</span>
-							<span className="text-foreground">
+							<span className="text-foreground tracking-wider">
 								{formatTime(rawData.lastRiskChange)}
 							</span>
 						</div>
@@ -114,8 +114,8 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 						<ForkAsciiArt />
 					</div>
 					<div className="text-left uppercase font-display">
-						<div className="pb-2 mb-2 border-b text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
-						<p className="leading-tight">Forking is the last market resolution method. It is a very disruptive process and is intended to be a rare occurrence.</p>
+						<div className="pb-2 mb-2 border-b text-lg tracking-wider text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
+						<p className="font-prose normal-case text-sm leading-tight">Forking is the last market resolution method. It is a very disruptive process and is intended to be a rare occurrence.</p>
 					</div>
 				</div>
 

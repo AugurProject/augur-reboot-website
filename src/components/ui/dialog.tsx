@@ -43,7 +43,7 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Close className={cn(
         'absolute right-4 top-4 focus:outline-none disabled:pointer-events-none cursor-pointer',
         'transition-colors focus:fx-glow hover:fx-glow',
-        'text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground'
+        'text-xs text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground'
       )}>
         <span className="flex items-center uppercase">[ X ] Close</span>
       </DialogPrimitive.Close>

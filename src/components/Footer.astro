@@ -11,15 +11,15 @@ import { withBase } from "../lib/utils";
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_max-content_max-content_max-content] gap-12"
       >
         <!-- Column 1: Logo & Tagline -->
-        <div class="md:col-span-2 lg:col-span-1 lg:place-content-end">
+        <div class="md:col-span-2 lg:col-span-1 lg:place-content-end group">
             <div class="text-center lg:w-max">
-                <Button variant="link" href={withBase('/?intro=false')} className="text-7xl">
+                <Button variant="link" href={withBase('/?intro=false')} className="flex flex-col gap-y-2 group">
                     <!-- Footer Logo (White) -->
-                    <AugurLogo />
+                    <AugurLogo class="text-8xl" />
+                    <span class="text-xl font-display text-muted-foreground mt-1 leading-none tracking-wider font-light uppercase group-focus:text-loud-foreground">
+                        THE FRONTIER OF <br class="hidden lg:inline" />PREDICTION MARKETS
+                    </span>
                 </Button>
-                <p class="font-display text-foreground mt-1 leading-tight uppercase">
-                    THE FRONTIER OF <br class="hidden lg:inline" />PREDICTION MARKETS
-                </p>
             </div>
         </div>
         <!-- Column 2: Social -->

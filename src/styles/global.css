@@ -50,6 +50,7 @@
 
 	--default-font-family: "IBM Plex Mono", monospace;
 	--font-display: "Handjet", sans-serif;
+	--font-display-default-tracking: var(--tracking-wider);
 	--font-prose: "IBM Plex Mono", monospace;
 
 	--glow-size-xs: 0.1375rem;

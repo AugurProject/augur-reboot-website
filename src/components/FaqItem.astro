@@ -6,11 +6,11 @@ export interface Props {
 const { question } = Astro.props;
 ---
 
-<details class="faq-item mb-0.5">
-  <summary class="flex items-center gap-3 p-4 cursor-pointer list-none text-foreground tracking-wide font-display uppercase select-none transition-colors duration-200 rounded">
+<details class="faq-item mb-0.5 group border border-transparent focus-within:border-foreground/50">
+  <summary class="flex items-center gap-3 p-4 cursor-pointer list-none text-xl text-foreground tracking-wider font-display font-light uppercase select-none transition-colors duration-200 rounded outline-none groupd-focus-within:text-underline">
     {question}
   </summary>
-  <div class="faq-answer p-4 pl-11 text-sm leading-relaxed text-foreground normal-case rounded-b">
+  <div class="faq-answer p-4 pl-11 text-foreground rounded-b [&_a]:focus:outline-none [&_a]:focus:bg-muted-foreground/50">
     <slot />
   </div>
 </details>

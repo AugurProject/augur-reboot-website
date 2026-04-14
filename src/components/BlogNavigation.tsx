@@ -11,8 +11,8 @@ interface BlogNavigationProps {
 export default function BlogNavigation({ prevPost, nextPost }: BlogNavigationProps) {
   return (
     <aside className="sticky bottom-0 border-t border-foreground/30 bg-background uppercase font-display">
-      <div className="max-w-2xl mx-auto px-4 md:px-8 py-3 md:py-6 w-full">
-        <div className="flex items-center justify-between gap-4 text-xs md:text-sm font-light tracking-widest">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-3 md:py-6 w-full">
+        <div className="flex items-center justify-between gap-4 font-light tracking-wider">
           {/* Previous Post */}
           {prevPost ? (
             <a

@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import LearnNavigation from "../components/LearnNavigation.tsx";
 import PageHeader from "../components/PageHeader.astro";
-import PageHeading from "../components/PageHeading.astro";
+import PageTitle from "../components/PageTitle.astro";
 import { withBase } from "../lib/utils";
 
 interface Props {
@@ -39,7 +39,7 @@ const currentPath = Astro.url.pathname
 		{/* Middle Section: Scrollable Content */}
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
 			<div class="max-w-3xl mx-auto">
-				<PageHeading text={title} />
+				<PageTitle prefix="LEARN" title={title} />
 
 				{/* Main Content */}
 				<article class="prose prose-invert max-w-none pt-6 px-4 prose-headings:font-display prose-p:leading-snug prose-headings:uppercase prose-headings:tracking-wide prose-ul:list-[square] prose-li:leading-snug">
