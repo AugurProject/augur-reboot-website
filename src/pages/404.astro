@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import PageHeader from "../components/PageHeader.astro";
-import AsciiText from "../components/AsciiText.astro";
+import AsciiText from "../components/AsciiText.tsx";
 import Pointer from "../components/Pointer.tsx";
 import { withBase } from "../lib/utils";
 ---
@@ -19,14 +19,12 @@ import { withBase } from "../lib/utils";
         <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
           <h1 class="font-display uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
           <!-- ASCII Art 404 -->
-          <AsciiText class="tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" label="404 - Page Not Found">
-██╗  ██╗ ██████╗ ██╗  ██╗
+          <AsciiText client:load animated class="tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" label="404 - Page Not Found" content={`██╗  ██╗ ██████╗ ██╗  ██╗
 ██║  ██║██╔═████╗██║  ██║
 ███████║██║██╔██║███████║
 ╚════██║████╔╝██║╚════██║
      ██║╚██████╔╝     ██║
-     ╚═╝ ╚═════╝      ╚═╝
-          </AsciiText>
+     ╚═╝ ╚═════╝      ╚═╝`} />
 
           <!-- Error Message -->
           <div class="border border-foreground/20 bg-background/70 px-6 py-4 mx-auto max-w-sm my-6">

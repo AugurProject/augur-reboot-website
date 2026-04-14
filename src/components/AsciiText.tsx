@@ -5,11 +5,12 @@ export interface AsciiTextProps {
   className?: string;
   animated?: boolean;
   label?: string;
+  content?: string;
   children?: React.ReactNode;
 }
 
 const AsciiText = forwardRef<HTMLPreElement, AsciiTextProps>(
-  ({ className, animated = false, label, children }, ref) => {
+  ({ className, animated = false, label, content, children }, ref) => {
     return (
       <pre
         ref={ref}
@@ -29,7 +30,7 @@ const AsciiText = forwardRef<HTMLPreElement, AsciiTextProps>(
           } : {}),
         }}
       >
-        {children}
+        {content || children}
       </pre>
     );
   }
