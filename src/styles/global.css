@@ -10,13 +10,6 @@
 }
 
 @font-face {
-	font-family: "Oxanium";
-	src: url("/fonts/oxanium.woff2") format("woff2");
-	font-weight: 300 400;
-	font-display: swap;
-}
-
-@font-face {
 	font-family: "IBM Plex Mono";
 	src: url("/fonts/ibm-plex-mono-light.woff2") format("woff2");
 	font-weight: 300;
@@ -41,10 +34,10 @@
 	--color-orange-400: #fb923c;
 	--color-red-500: #ef4444;
 
-	--font-console-narrow: "Handjet", sans-serif;
-
 	--default-font-family: "Handjet", sans-serif;
-	--text-base: 1.25rem;
+	--font-weight-normal: 300;
+	--font-weight-bold: 600;
+	/*--text-base: 1.25rem;
 	--text-base--line-height: calc(1.125 / 1);
 	--font-weight-normal: 300;
 	--font-weight-bold: 400;
@@ -53,11 +46,10 @@
 	--tracking-prose: 0.015em;
 	--tracking-wide: 0.05em;
 	--tracking-wider: 0.1em;
-	--tracking-display: 0.15em;
+	--tracking-display: 0.15em;*/
 
 	--font-display: "Handjet", sans-serif;
 	--font-prose: "IBM Plex Mono", monospace;
-	--tw-prose-p-font-family: "IBM Plex Mono", monospace;
 
 	--glow-size-xs: 0.1375rem;
 	--glow-size-sm: 0.25rem;
@@ -89,6 +81,115 @@ html {
 
 @utility fx-pulse-glow {
 	animation: pulse-glow 6s ease-in-out infinite;
+}
+
+/* Timeline section marker: green circle dot + body text styling */
+@utility timeline-marker {
+	position: relative;
+	padding-left: 2rem;
+	font-family: var(--font-prose);
+	text-transform: none;
+
+	&::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0.5rem;
+		width: 10px;
+		height: 10px;
+		border: 1px solid var(--color-loud-foreground);
+		border-radius: 9999px;
+	}
+
+	& h3 {
+		color: var(--color-loud-foreground);
+		font-size: 1.125rem;
+		font-weight: bold;
+		margin-bottom: 0.5rem;
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+	}
+
+	& ul {
+		margin-block: 1rem;
+		padding-left: 1.5rem;
+		list-style: disc;
+	}
+
+	& li {
+		margin-bottom: 0.25rem;
+	}
+
+	& p + p {
+		margin-top: 1rem;
+	}
+
+	& strong {
+		color: var(--color-loud-foreground);
+		font-weight: bold;
+	}
+
+	& em {
+		color: var(--color-loud-foreground);
+		font-style: italic;
+	}
+
+	& a {
+		color: var(--color-loud-foreground);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+
+		&:hover {
+			filter: drop-shadow(0 0 0.375rem var(--color-primary));
+		}
+	}
+}
+
+/* FAQ answer body: prose-like styling for collapsible answer content */
+@utility faq-answer {
+	padding: 1rem;
+	padding-left: 2.75rem;
+	font-family: var(--font-prose);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	letter-spacing: var(--tracking-prose);
+	color: var(--color-foreground);
+	text-transform: none;
+	background: color-mix(in srgb, var(--color-foreground) 2%, transparent);
+	border-radius: 0 0 0.25rem 0.25rem;
+
+	& p + p {
+		margin-top: 0.5rem;
+	}
+
+	& strong {
+		color: var(--color-loud-foreground);
+	}
+
+	& a {
+		color: var(--color-loud-foreground);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		transition: filter 0.2s;
+
+		&:hover {
+			filter: drop-shadow(0 0 0.375rem var(--color-primary));
+		}
+	}
+
+	& ul {
+		list-style: square;
+		padding-left: 1.5rem;
+		margin: 0.5rem 0;
+	}
+
+	& ul > li {
+		margin-bottom: 0.25rem;
+	}
+
+	& ul > li::marker {
+		color: var(--color-muted-foreground);
+	}
 }
 
 @keyframes blink-animation {
@@ -266,7 +367,7 @@ html {
 	}
 }
 
-/* --- Shared Prose Styles --- */
+/* --- Prose: color overrides + rehype plugin support --- */
 .prose {
 	--tw-prose-headings: var(--color-loud-foreground);
 	--tw-prose-links: var(--color-primary);
@@ -277,20 +378,11 @@ html {
 	--tw-prose-td-borders: var(--color-muted-foreground);
 	--tw-prose-th-borders: var(--color-muted-foreground);
 	--tw-prose-bg-hover: var(--color-primary);
-	--tw-prose-line-height: 1.4;
 	--tw-prose-pre-bg: transparent;
 	--tw-prose-pre-code: var(--color-foreground);
 }
 
-.prose-sm {
-	line-height: 1.5em;
-	font-size: 0.825rem;
-}
-
-.prose :is(h1, h2, h3, h4, h5, h6) {
-	text-transform: uppercase;
-}
-
+/* rehype-heading-icons plugin: layout for heading + icon pairs */
 .prose :is(h1, h2, h3, h4, h5, h6):has(.heading-icon) {
 	display: flex;
 	align-items: center;
@@ -304,32 +396,12 @@ html {
 	vertical-align: middle;
 }
 
-.prose h1 {
-	font-size: 1.5rem;
-}
-
-.prose p {
-	font-family: var(--tw-prose-p-font-family);
-}
-
-.prose li {
-	font-family: var(--tw-prose-p-font-family);
-}
-
-.prose ul {
-	list-style-type: square;
-}
-
 .prose ul > li::marker {
 	color: var(--color-muted-foreground);
 }
 
 .prose ol > li::marker {
 	color: var(--color-muted-foreground);
-}
-
-.prose table td {
-	font-family: var(--tw-prose-p-font-family);
 }
 
 .prose pre.astro-code {
@@ -350,13 +422,14 @@ html {
 	color: var(--color-foreground);
 }
 
+/* rehype-callout plugin: inline callout blocks */
 .prose .callout {
 	display: flex;
 	align-items: baseline;
 	gap: 0.5em;
 	background: oklch(from var(--color-primary) l c h / 0.07);
 	border-left: 3px solid var(--color-foreground);
-	font-family: var(--tw-prose-p-font-family);
+	font-family: var(--font-prose);
 	padding: 0.5em 1em;
 	margin: 1em 0;
 }
@@ -462,67 +535,7 @@ html {
 	}
 }
 
-.timeline-content {
-	position: relative;
-	padding-left: 2rem; /* Spacing for the marker */
 
-	/* The circular green marker for each timeline section */
-	&::before {
-		content: "";
-		position: absolute;
-		left: 0;
-		top: 0.5rem; /* Vertically align with the first line of text */
-		width: 10px;
-		height: 10px;
-		border: 1px solid var(--color-loud-foreground);
-		border-radius: 9999px;
-	}
-
-	/* Style content within timeline sections */
-	& h3 {
-		color: var(--color-loud-foreground);
-		font-size: 1.125rem;
-		font-weight: bold;
-		margin-bottom: 0.5rem;
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-	}
-
-	& ul {
-		margin-block: 1rem;
-		padding-left: 1.5rem;
-	}
-
-	& p + p {
-		margin-top: 1rem;
-	}
-
-	& li {
-		list-style: disc;
-		margin-bottom: 0.25rem;
-	}
-
-	& strong {
-		color: var(--color-loud-foreground);
-		font-weight: bold;
-	}
-
-	& em {
-		color: var(--color-loud-foreground);
-		font-style: italic;
-	}
-
-	& a {
-		color: var(--color-loud-foreground);
-		text-decoration: underline;
-		text-underline-offset: 2px;
-
-		&:hover {
-			color: var(--color-loud-foreground);
-			filter: drop-shadow(0 0 0.375rem var(--color-primary));
-		}
-	}
-}
 
 /* --- Social Media Icons Animation Rules --- */
 /* Initial hidden state for social media icons (homepage only) */
@@ -734,52 +747,4 @@ body:not(:has(#hero-banner-container)) #github-link {
 	content: "\2212";
 	color: var(--color-primary);
 	filter: drop-shadow(0 0 var(--glow-size-sm) var(--color-primary));
-}
-
-.faq-answer {
-	padding: 1rem;
-	padding-left: 2.75rem;
-	font-family: var(--font-prose);
-	font-size: 0.825rem;
-	line-height: var(--tw-prose-line-height);
-	letter-spacing: var(--tracking-prose);
-	color: var(--color-foreground);
-	text-transform: none;
-	background: color-mix(in srgb, var(--color-foreground) 2%, transparent);
-	border-radius: 0 0 0.25rem 0.25rem;
-}
-
-.faq-answer p + p {
-	margin-top: 0.5rem;
-}
-
-.faq-answer strong {
-	color: var(--color-loud-foreground);
-	font-weight: 400;
-}
-
-.faq-answer a {
-	color: var(--color-loud-foreground);
-	text-decoration: underline;
-	text-underline-offset: 2px;
-	transition: filter 0.2s;
-
-	&:hover {
-		color: var(--color-loud-foreground);
-		filter: drop-shadow(0 0 0.375rem var(--color-primary));
-	}
-}
-
-.faq-answer ul {
-	list-style-type: square;
-	padding-left: 1.5rem;
-	margin: 0.5rem 0;
-}
-
-.faq-answer ul > li {
-	margin-bottom: 0.25rem;
-}
-
-.faq-answer ul > li::marker {
-	color: var(--color-muted-foreground);
 }
