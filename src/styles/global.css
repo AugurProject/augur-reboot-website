@@ -34,9 +34,7 @@
 	--color-orange-400: #fb923c;
 	--color-red-500: #ef4444;
 
-	--default-font-family: "Handjet", sans-serif;
-	--font-weight-normal: 300;
-	--font-weight-bold: 600;
+	--default-font-family: "IBM Plex Mono", monospace;
 	/*--text-base: 1.25rem;
 	--text-base--line-height: calc(1.125 / 1);
 	--font-weight-normal: 300;
@@ -58,7 +56,7 @@
 }
 
 html {
-	@apply bg-background text-foreground text-base font-normal tracking-normal;
+	@apply bg-background text-foreground;
 }
 
 @utility fx-glow {
@@ -87,7 +85,6 @@ html {
 @utility timeline-marker {
 	position: relative;
 	padding-left: 2rem;
-	font-family: var(--font-prose);
 	text-transform: none;
 
 	&::before {
@@ -149,10 +146,8 @@ html {
 @utility faq-answer {
 	padding: 1rem;
 	padding-left: 2.75rem;
-	font-family: var(--font-prose);
 	font-size: 0.875rem;
 	line-height: 1.5;
-	letter-spacing: var(--tracking-prose);
 	color: var(--color-foreground);
 	text-transform: none;
 	background: color-mix(in srgb, var(--color-foreground) 2%, transparent);
@@ -429,7 +424,6 @@ html {
 	gap: 0.5em;
 	background: oklch(from var(--color-primary) l c h / 0.07);
 	border-left: 3px solid var(--color-foreground);
-	font-family: var(--font-prose);
 	padding: 0.5em 1em;
 	margin: 1em 0;
 }
@@ -714,6 +708,8 @@ body:not(:has(#hero-banner-container)) #github-link {
 	list-style: none;
 	color: var(--color-foreground);
 	letter-spacing: var(--tracking-wide);
+	font-family: var(--font-display);
+	text-transform: uppercase;
 	user-select: none;
 	transition:
 		color 0.2s,

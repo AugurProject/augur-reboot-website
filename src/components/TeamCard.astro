@@ -26,7 +26,7 @@ const { name, description, SvgLogo, url } = Astro.props;
     )}
 
     <div class="flex-1 text-center md:text-center lg:text-left">
-      <h3 class="text-xl font-bold text-loud-foreground tracking-wider uppercase mb-2">
+      <h3 class="text-xl font-display font-bold text-loud-foreground tracking-wider uppercase mb-2">
         {name}
       </h3>
 
@@ -35,7 +35,7 @@ const { name, description, SvgLogo, url } = Astro.props;
       </p>
 
       {url && (
-        <a href={`https://${url}`} target="_blank" rel="noopener noreferrer" class="text-loud-foreground hover:fx-glow transition-all duration-200 text-sm font-bold uppercase tracking-wider">
+        <a href={`https://${url}`} target="_blank" rel="noopener noreferrer" class="text-loud-foreground hover:fx-glow transition-all duration-200 text-sm font-display font-bold uppercase tracking-wider">
           {url} →
         </a>
       )}

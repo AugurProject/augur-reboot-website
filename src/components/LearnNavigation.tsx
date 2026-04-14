@@ -40,7 +40,7 @@ export default function LearnNavigation({
 	return (
 		<aside
 			ref={drawerRef}
-			className="sticky bottom-0 border-t border-foreground/30 bg-background uppercase transition-all duration-300"
+			className="sticky bottom-0 border-t border-foreground/30 bg-background uppercase font-display transition-all duration-300"
 			style={{
 				zIndex: isExpanded ? 50 : 10,
 			}}

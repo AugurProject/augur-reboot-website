@@ -115,7 +115,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 					<div className="flex justify-center">
 						<ForkAsciiArt />
 					</div>
-					<div className="text-left uppercase">
+					<div className="text-left uppercase font-display">
 						<div className="pb-2 mb-2 border-b text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
 						<p className="leading-tight">Forking is the last market resolution method. It is a very disruptive process and is intended to be a rare occurrence.</p>
 					</div>

@@ -40,7 +40,7 @@ const faqHref = withBase('/faq');
   <!-- Left slot: back button (or empty spacer on md+ to keep CTA centered) -->
   <div class="w-full flex md:justify-start justify-center order-last md:order-none">
     {backHref ? (
-      <a href={backHref} class="inline-flex items-center gap-1 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none transition-colors">
+      <a href={backHref} class="font-display inline-flex items-center gap-1 text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none transition-colors uppercase">
         <span class="pointer pointer-left pointer-animated"></span>
         BACK TO HOME
       </a>
@@ -56,7 +56,7 @@ const faqHref = withBase('/faq');
         <BorderBeam client:load duration={2.5}>
           <a
             href={faqHref}
-            class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
+            class="font-display bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground uppercase shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
           >
             <WarningMark class="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
             THE FORK IS HERE! OWN REP? ACT NOW.

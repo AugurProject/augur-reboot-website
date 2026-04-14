@@ -64,7 +64,7 @@ const Intro: React.FC = () => {
         <Pointer animated="auto" direction="right" />
         SKIP INTRO (ESC)
       </Button>
-      <div className="flex items-center justify-center h-screen uppercase text-foreground text-2xl">
+      <div className="flex items-center justify-center h-screen uppercase font-display text-foreground text-2xl">
         <TypewriterSequence
           sentences={bootSentences}
           defaultTypingSpeed={40}

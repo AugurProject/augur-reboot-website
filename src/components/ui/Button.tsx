@@ -24,7 +24,7 @@ type Props = ButtonProps | AnchorProps;
 
 // buttonVariants function (mimics shadcn's CVA approach)
 function buttonVariants({ variant, size }: { variant: string; size: string }) {
-  const base = "tracking-wide inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 hover:cursor-pointer";
+  const base = "tracking-wide font-display inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 hover:cursor-pointer";
 
   const variants = {
     default: "bg-primary text-background hover:bg-primary/90",

@@ -16,7 +16,7 @@ import { withBase } from "../lib/utils";
       <!-- Middle Section: 404 Content -->
       <main class="flex-1 flex items-center justify-center px-4 md:px-8">
         <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
-          <h1 class="uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
+          <h1 class="font-display uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
           <!-- ASCII Art 404 -->
           <pre class="title leading-none tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" aria-label="404 - Page Not Found">
 ██╗  ██╗ ██████╗ ██╗  ██╗
@@ -29,14 +29,14 @@ import { withBase } from "../lib/utils";
 
           <!-- Error Message -->
           <div class="border border-foreground/20 bg-background/70 px-6 py-4 mx-auto max-w-sm my-6">
-            <p class="uppercase text-muted-foreground leading-6">
+            <p class="font-display uppercase text-muted-foreground leading-6">
               The oracle has spoken: <span class="text-loud-foreground">This page does not exist in our reality</span>. Perhaps it's in an alternate timeline, or maybe the prediction market for its existence resolved to FALSE.
             </p>
           </div>
 
           <!-- Navigation Message -->
           <div class="text-center space-y-4">
-            <p class="text-sm uppercase text-muted-foreground font-console-narrow opacity-80">
+            <p class="text-sm uppercase text-muted-foreground opacity-80">
               Return to the homepage by <a href={withBase("/?intro=false")} class="text-loud-foreground hover:fx-glow-sm transition-all">clicking here</a> <br />
               or scroll further down to explore community links.
             </p>

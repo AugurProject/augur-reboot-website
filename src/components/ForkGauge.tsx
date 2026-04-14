@@ -200,7 +200,7 @@ const ForkGaugeComponent = ({
 				</text>
 			</svg>
 
-			<div className="uppercase tracking-[0.5em] font-light text-muted-foreground">
+			<div className="font-display uppercase tracking-[0.5em] font-light text-muted-foreground">
 				FORK RISK
 			</div>
 		</div>

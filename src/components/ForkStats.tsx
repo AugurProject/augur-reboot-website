@@ -19,7 +19,7 @@ export const ForkStats = (): React.JSX.Element => {
 		: null
 
 	return (
-		<div className="w-full mb-1">
+		<div className="w-full mb-1 uppercase font-display">
 			{isStable ? (
 				<div className="uppercase font-light text-green-400 tracking-widest fx-glow">
 					System steady - No market disputes
