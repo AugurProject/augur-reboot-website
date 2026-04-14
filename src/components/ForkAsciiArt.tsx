@@ -41,7 +41,7 @@ export const ForkAsciiArt = ({ className, ...props }: ForkAsciiArtProps) => {
 
   return (
     <pre
-      className={cn('text-[clamp(0.2rem,100%,0.25rem)] tracking-[-0.025em]', className)} {...props}>
+      className={cn('text-[clamp(0.2rem,100%,0.25rem)] leading-tight tracking-[-0.025em]', className)} {...props}>
       {asciiArt}
     </pre>
   )

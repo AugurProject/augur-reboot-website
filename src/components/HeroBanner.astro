@@ -17,13 +17,13 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
     <!-- Middle Section: Main Content (Logo, Tagline, IS REBOOTING, Menu) -->
     <div class="flex flex-col items-center place-items-center py-8 gap-y-4">
       <AugurLogo id="augur-logo" class:list="text-9xl" />
-      <p id="prediction-market-text" class="border border-foreground/20 px-3 py-1 mx-4 text-lg tracking-display leading-none">
+      <p id="prediction-market-text" class="border border-foreground/20 px-3 py-1 mx-4 sm:text-xl tracking-widest leading-none">
         THE FRONTIER OF PREDICTION MARKETS
       </p>
 
       <h2 class="grid grid-cols-[minmax(0.25rem,1rem)_1fr_minmax(0.25rem,1rem)] items-center gap-x-4 title">
         <span id="line-left" class="h-px bg-foreground"></span>
-        <pre id="is-rebooting-text" class="title leading-none tracking-tight text-[clamp(0.285rem,1vw,0.5rem)]">
+        <pre id="is-rebooting-text" class="title leading-none tracking-tighter text-[clamp(0.325rem,1vw,0.625rem)]">
 ██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
 ██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝
  ██║ ███████╗     ██████╔╝ █████╗   ██████╔╝ ██║   ██║ ██║   ██║    ██║    ██║ ██╔██╗ ██║ ██║  ███╗
@@ -35,10 +35,10 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
       </h2>
 
       <div id="menu-items-container" class="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto">
-        <a href={withBase('/mission')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
+        <a href={withBase('/mission')} class="text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
           THE NEXT GENERATION OF ORACLES
         </a>
-        <a href={withBase('/team')} class="text-2xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
+        <a href={withBase('/team')} class="text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none">
           THE MINDS BEHIND THE REBOOT
         </a>
       </div>
@@ -49,7 +49,7 @@ import WarningMark from '@phosphor-icons/core/assets/regular/siren.svg';
           <BorderBeam client:load duration={2.5}>
             <a
               href={withBase('/faq')}
-              class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
+              class="bg-foreground/5 tracking-wide flex items-center px-4 py-2 sm:text-xl font-semibold text-loud-foreground shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
             >
               <WarningMark class="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
               THE FORK IS HERE! OWN REP? ACT NOW.

@@ -64,7 +64,7 @@ const ForkDisplay: React.FC = () => {
 
         <button
           type="button"
-          className="cursor-help italic text-center text-xs text-muted-foreground hover:underline hover:text-foreground focus:underline focus:text-foreground underline-offset-2 outline-none"
+          className="cursor-help italic text-center text-muted-foreground hover:underline hover:text-foreground focus:underline focus:text-foreground underline-offset-2 outline-none"
           title={`Last changed: ${formatRelativeTime(lastUpdated)}`}
         >
           <span>* levels are monitored hourly</span>
