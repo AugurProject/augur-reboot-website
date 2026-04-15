@@ -1,14 +1,14 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { $appStore, UIState } from '../stores/animationStore';
-import AsciiText from './AsciiText';
-import PageHeader from './PageHeader';
-import { ForkMonitor } from './ForkMonitor';
-import { ScrollIndicator } from './ScrollIndicator';
-import BorderBeam from './ui/BorderBeam';
+import AsciiText from '@/components/AsciiText';
+import PageHeader from '@/components/PageHeader';
+import { ForkMonitor } from '@/components/ForkMonitor';
+import { ScrollIndicator } from '@/components/ScrollIndicator';
+import BorderBeam from '@/components/ui/BorderBeam';
 import WarningMarkUrl from '@phosphor-icons/core/assets/regular/siren.svg';
-import AugurLogoUrl from '../assets/augur.svg';
-import { withBase } from '../lib/utils';
+import { AugurLogo } from '@/components/icons';
+import { withBase } from '@/lib/utils';
 
 // Animation timing table (delays in ms)
 const TIMINGS = {
@@ -182,13 +182,13 @@ const HeroBanner: React.FC = () => {
     <div className="h-screen min-h-fit w-full relative">
       <div className="grid grid-rows-[auto_auto_auto] min-h-full z-10 text-center content-between">
         <div ref={headerRowRef}>
-          <PageHeader showCta={false} />
+          <PageHeader />
         </div>
 
         {/* Middle Section */}
         <div className="flex flex-col items-center place-items-center py-8 gap-y-4">
           <span ref={logoRef}>
-            <img src={AugurLogoUrl} alt="Augur" className="text-9xl" />
+            <AugurLogo className="text-9xl" />
           </span>
           <p
             ref={predictionMarketRef}
@@ -202,7 +202,7 @@ const HeroBanner: React.FC = () => {
             <AsciiText
               ref={asciiTextRef}
               content={ASCII_ART}
-              className="tracking-tighter text-[clamp(0.325rem,1vw,0.625rem)]"
+              className="text-[clamp(0.325rem,1vw,0.625rem)] leading-[1.1]"
             />
             <span ref={lineRightRef} className="h-px bg-foreground" />
           </h2>

@@ -14,21 +14,13 @@ const AsciiText = forwardRef<HTMLPreElement, AsciiTextProps>(
     return (
       <pre
         ref={ref}
-        className={cn('ascii-text leading-none', className)}
+        className={cn(
+          'bg-clip-text bg-linear-to-b from-green-600 via-green-400 to-green-600',
+          'bg-size-[100%_200%]',
+          className
+        )}
         aria-label={label}
-        style={{
-          background: 'linear-gradient(to bottom, var(--color-green-600), var(--color-green-400), var(--color-green-600))',
-          backgroundSize: '100% 200%',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          filter: 'drop-shadow(0 4px 0 #ffffff15)',
-          ...(animated ? {
-            animationName: 'gradient-animation',
-            animationDuration: '2s',
-            animationTimingFunction: 'linear',
-            animationIterationCount: 'infinite',
-          } : {}),
-        }}
+        style={{ WebkitTextFillColor: 'transparent' }}
       >
         {content || children}
       </pre>

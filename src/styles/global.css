@@ -57,6 +57,24 @@
 	--glow-size-sm: 0.25rem;
 	--glow-size: 0.375rem;
 	--glow-size-lg: 1rem;
+
+	--animate-gradient-animation: gradient-animation 2s linear infinite;
+
+	@keyframes gradient-animation {
+		0% { background-position: 0% 0% }
+		100% { background-position: 0% 200% }
+    }
+
+    --animate-wiggle: wiggle 1s ease-in-out infinite;
+    @keyframes wiggle {
+      0%,
+      100% {
+        transform: rotate(-3deg);
+      }
+      50% {
+        transform: rotate(3deg);
+      }
+    }
 }
 
 @utility fx-glow {

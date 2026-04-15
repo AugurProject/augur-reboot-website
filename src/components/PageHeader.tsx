@@ -1,27 +1,18 @@
 import { useRef, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { $appStore, UIState } from '../stores/animationStore';
-import DiscordLogoUrl from '../assets/discord.svg';
-import XLogoUrl from '../assets/x.svg';
-import GithubLogoUrl from '../assets/github.svg';
-import WarningMarkUrl from '@phosphor-icons/core/assets/regular/siren.svg';
-import BorderBeam from './ui/BorderBeam';
+import { XIcon, DiscordIcon, GithubIcon } from './icons';
 import Pointer from './Pointer';
 import { withBase } from '../lib/utils';
 
 interface PageHeaderProps {
   backHref?: string;
-  showCta?: boolean;
   className?: string;
 }
 
 const SOCIAL_DELAYS = [0.5, 0.7, 0.9]; // twitter, discord, github
 
-const PageHeader: React.FC<PageHeaderProps> = ({
-  backHref,
-  showCta = false,
-  className = '',
-}) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ backHref, className = '' }) => {
   const appState = useStore($appStore);
   const socialRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const socialAnimated = useRef(false);
@@ -60,22 +51,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         )}
       </div>
 
-      {/* Center: Fork CTA */}
-      <div className="flex justify-center">
-        {showCta && (
-          <div className="animate-[bob_2s_ease-in-out_infinite]">
-            <BorderBeam duration={2.5}>
-              <a
-                href={faqHref}
-                className="font-display bg-foreground/5 tracking-wide flex items-center px-4 py-2 text-lg font-semibold text-loud-foreground uppercase shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
-              >
-                <img src={WarningMarkUrl} alt="" className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
-                THE FORK IS HERE! OWN REP? ACT NOW.
-              </a>
-            </BorderBeam>
-          </div>
-        )}
-      </div>
+      <div className="flex justify-center" />
 
       {/* Right slot: social links */}
       <div className="flex md:justify-end">
@@ -86,7 +62,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <img src={XLogoUrl} alt="X (Twitter)" className="text-3xl" />
+            <XIcon className="text-3xl" />
           </a>
           <a
             ref={(el) => { socialRefs.current[1] = el; }}
@@ -94,7 +70,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <img src={DiscordLogoUrl} alt="Discord" className="text-3xl" />
+            <DiscordIcon className="text-3xl" />
           </a>
           <a
             ref={(el) => { socialRefs.current[2] = el; }}
@@ -102,7 +78,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             className="text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
             style={isHomepage ? { opacity: 0 } : undefined}
           >
-            <img src={GithubLogoUrl} alt="GitHub" className="text-3xl" />
+            <GithubIcon className="text-3xl" />
           </a>
         </div>
       </div>
