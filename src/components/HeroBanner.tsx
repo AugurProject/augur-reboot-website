@@ -6,7 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import { ForkMonitor } from '@/components/ForkMonitor';
 import { ScrollIndicator } from '@/components/ScrollIndicator';
 import BorderBeam from '@/components/ui/BorderBeam';
-import WarningMarkUrl from '@phosphor-icons/core/assets/regular/siren.svg';
+import { SirenIcon } from '@/components/icons';
 import { AugurLogo } from '@/components/icons';
 import { withBase } from '@/lib/utils';
 
@@ -232,7 +232,7 @@ const HeroBanner: React.FC = () => {
                   href={withBase('/faq')}
                   className="font-display bg-foreground/5 tracking-wide flex items-center px-4 py-2 sm:text-xl font-semibold text-loud-foreground uppercase shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
                 >
-                  <img src={WarningMarkUrl} alt="" className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
+                  <SirenIcon className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />
                   THE FORK IS HERE! OWN REP? ACT NOW.
                 </a>
               </BorderBeam>
