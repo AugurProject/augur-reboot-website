@@ -2,74 +2,62 @@
  * Rehype plugin that replaces leading emojis in headings with Phosphor SVG icons.
  * If no emoji is found, a default "plus" icon is used.
  */
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import * as Icons from "@phosphor-icons/react";
 import { fromHtml } from "hast-util-from-html";
 import { visit } from "unist-util-visit";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ICONS_DIR = join(
-	__dirname,
-	"../../node_modules/@phosphor-icons/core/assets/regular",
-);
-
-// Emoji → Phosphor icon name mapping
+// Emoji → Phosphor icon component mapping
 const EMOJI_MAP = {
-	"🔮": "crystal-ball",
-	"⚖️": "scales",
-	"🧪": "flask",
-	"📈": "chart-line-up",
-	"🌍": "globe",
-	"🔥": "fire",
-	"⚙️": "gear",
-	"💡": "lightbulb",
-	"🏛️": "bank",
-	"💸": "currency-circle-dollar",
-	"🌀": "spiral",
-	"🧠": "brain",
-	"🔄": "arrows-clockwise",
-	"🌉": "bridge",
-	"💼": "briefcase",
-	"🧩": "puzzle-piece",
-	"💰": "coins",
-	"📅": "calendar",
-	"👉": "arrow-right",
-	"👨‍💻": "user-gear",
-	"⛩️": "castle-turret",
-	"📣": "megaphone",
+	"🔮": Icons.MagicWandIcon,
+	"⚖️": Icons.ScalesIcon,
+	"🧪": Icons.FlaskIcon,
+	"📈": Icons.ChartLineUpIcon,
+	"🌍": Icons.GlobeIcon,
+	"🔥": Icons.FireIcon,
+	"⚙️": Icons.GearIcon,
+	"💡": Icons.LightbulbIcon,
+	"🏛️": Icons.BankIcon,
+	"💸": Icons.CurrencyCircleDollarIcon,
+	"🌀": Icons.SpiralIcon,
+	"🧠": Icons.BrainIcon,
+	"🔄": Icons.ArrowsClockwiseIcon,
+	"🌉": Icons.BridgeIcon,
+	"💼": Icons.BriefcaseIcon,
+	"🧩": Icons.PuzzlePieceIcon,
+	"💰": Icons.CoinsIcon,
+	"📅": Icons.CalendarIcon,
+	"👉": Icons.ArrowRightIcon,
+	"👨‍💻": Icons.UserGearIcon,
+	"⛩️": Icons.CastleTurretIcon,
+	"📣": Icons.MegaphoneIcon,
 };
-
-const DEFAULT_ICON = "plus";
 
 // Fallback icons by heading level (when no emoji is present)
 const FALLBACK_ICONS_BY_LEVEL = {
-	2: "plus",
-	3: "dots-six-vertical",
-	4: "equals",
+	2: Icons.PlusIcon,
+	3: Icons.DotsSixVerticalIcon,
+	4: Icons.EqualsIcon,
 };
 
-// Cache loaded SVGs
+// Cache loaded SVG HAST nodes
 const svgCache = new Map();
 
-function loadSvgNode(iconName) {
-	if (svgCache.has(iconName)) return svgCache.get(iconName);
+function loadSvgNode(IconComponent) {
+	if (svgCache.has(IconComponent)) return svgCache.get(IconComponent);
 
-	try {
-		const svgPath = join(ICONS_DIR, `${iconName}.svg`);
-		const raw = readFileSync(svgPath, "utf-8");
-		const tree = fromHtml(raw, { fragment: true, space: "svg" });
-		// Get the <svg> element from the parsed tree
-		const svgNode = tree.children.find((n) => n.tagName === "svg");
-		if (svgNode) {
-			svgNode.properties.className = ["heading-icon"];
-			svgNode.properties.ariaHidden = "true";
-		}
-		svgCache.set(iconName, svgNode);
-		return svgNode;
-	} catch {
-		return null;
-	}
+	const html = renderToStaticMarkup(
+		createElement(IconComponent, {
+			weight: "regular",
+			className: "heading-icon",
+			"aria-hidden": true,
+		}),
+	);
+	const tree = fromHtml(html, { fragment: true, space: "svg" });
+	const svgNode = tree.children.find((n) => n.tagName === "svg");
+	svgCache.set(IconComponent, svgNode ?? null);
+	return svgNode ?? null;
 }
 
 // Regex to match leading emoji (including compound emojis like 👨‍💻)
@@ -87,7 +75,6 @@ export default function rehypeHeadingIcons() {
 		visit(tree, "element", (node) => {
 			if (!/^h[2-6]$/.test(node.tagName)) return;
 
-			// Track heading level for fallback icon selection
 			const headingLevel = parseInt(node.tagName.slice(1));
 
 			// Find the first text node
@@ -97,17 +84,16 @@ export default function rehypeHeadingIcons() {
 			const text = firstChild.value;
 			const emojiInfo = getLeadingEmoji(text);
 
-			let iconName = DEFAULT_ICON;
+			let IconComponent;
 			if (emojiInfo) {
-				iconName = EMOJI_MAP[emojiInfo.emoji] || DEFAULT_ICON;
+				IconComponent = EMOJI_MAP[emojiInfo.emoji] ?? Icons.PlusIcon;
 				// Strip emoji from text
 				firstChild.value = text.slice(emojiInfo.length);
 			} else {
-				// Use level-specific fallback when no emoji is present
-				iconName = FALLBACK_ICONS_BY_LEVEL[headingLevel] || DEFAULT_ICON;
+				IconComponent = FALLBACK_ICONS_BY_LEVEL[headingLevel] ?? Icons.PlusIcon;
 			}
 
-			const svgNode = loadSvgNode(iconName);
+			const svgNode = loadSvgNode(IconComponent);
 			if (!svgNode) return;
 
 			// Deep clone so each heading gets its own node

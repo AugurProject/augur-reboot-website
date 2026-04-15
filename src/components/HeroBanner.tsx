@@ -6,7 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import { ForkMonitor } from '@/components/ForkMonitor';
 import { ScrollIndicator } from '@/components/ScrollIndicator';
 import BorderBeam from '@/components/ui/BorderBeam';
-import { SirenIcon } from '@/components/icons';
+import { SirenIcon } from '@phosphor-icons/react';
 import { AugurLogo } from '@/components/icons';
 import { withBase } from '@/lib/utils';
 
