@@ -33,9 +33,3 @@ export const XIcon = (props: React.HTMLAttributes<SVGSVGElement>) => {
     <svg role="img" aria-label="X" width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}><path fillRule="evenodd" clipRule="evenodd" d="M13 16.001v2h1v1l1-.004V20h1v1h5v-1h-1v-1h-1v-2h-1v-.999h-1v-1h-1v-.999h-1v-1h-1v-1.997l1-.01V10h1V9h1V7h1V6h1V5h1V4h1v-.989L19 3v1h-1v1h-1v1.005L16 6v2h-1v1h-1v1h-1v1.005L12 11V8.999h-1.053v-1H10V6H9V5l-1 .003V4H7V3H2v1h1v1h1v2h1v1h1v.999h1v1h1v.999h1V13l-1 .011v.995H7v1H6v2H5v1H4v1H3v1H2v.989l2 .01v-1h1v-1h1V18l1 .006v-2h1v-1h1v-1h1V13l1 .006v1.996h1.053v1zm1-1.999h-1V12h-1v2.006l1-.004v1h1V17l1-.003v1L16 18v1h1v1h1v-2h-1v-1h-1v-.999h-1v-1h-1zm-3-4.004h-1v-1H9V7l-1 .003v-1L7 6V5H6V4H5v2h1v1h1v1h1v.999h1v1h1v1.993l1 .014z" fill="currentColor"/></svg>
   )
 };
-
-export const SirenIcon = (props: React.HTMLAttributes<SVGSVGElement>) => {
-  return (
-    <svg role="img" aria-label="Siren" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" {...props}><path d="M120,16V8a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Zm80,32a8,8,0,0,0,5.66-2.34l8-8a8,8,0,0,0-11.32-11.32l-8,8A8,8,0,0,0,200,48ZM50.34,45.66A8,8,0,0,0,61.66,34.34l-8-8A8,8,0,0,0,42.34,37.66Zm87,26.45a8,8,0,1,0-2.64,15.78C153.67,91.08,168,108.32,168,128a8,8,0,0,0,16,0C184,100.6,163.93,76.57,137.32,72.11ZM232,176v24a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V176a16,16,0,0,1,16-16V128a88,88,0,0,1,88.67-88c48.15.36,87.33,40.29,87.33,89v31A16,16,0,0,1,232,176ZM56,160H200V129c0-40-32.05-72.71-71.45-73H128a72,72,0,0,0-72,72Zm160,40V176H40v24H216Z"/></svg>
-  )
-};
