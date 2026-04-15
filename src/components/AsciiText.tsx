@@ -10,7 +10,7 @@ export interface AsciiTextProps {
 }
 
 const AsciiText = forwardRef<HTMLPreElement, AsciiTextProps>(
-  ({ className, animated = false, label, content, children }, ref) => {
+  ({ className, label, content, children }, ref) => {
     return (
       <pre
         ref={ref}
@@ -19,6 +19,7 @@ const AsciiText = forwardRef<HTMLPreElement, AsciiTextProps>(
           'bg-size-[100%_200%]',
           className
         )}
+        role="img"
         aria-label={label}
         style={{ WebkitTextFillColor: 'transparent' }}
       >

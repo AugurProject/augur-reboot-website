@@ -12,14 +12,14 @@ import { withBase } from "../lib/utils";
     <!-- Main content wrapper that fills viewport -->
     <div class="min-h-screen flex flex-col">
       <!-- Top Section: Navigation -->
-      <PageHeader client:load backHref={withBase('/?intro=false')} showCta={false} />
+      <PageHeader client:load backHref={withBase('/?intro=false')} />
 
       <!-- Middle Section: 404 Content -->
       <main class="flex-1 flex items-center justify-center px-4 md:px-8">
         <div class="text-center max-w-2xl mx-auto flex flex-col items-center">
           <h1 class="font-display uppercase mb-4 text-2xl font-bold tracking-widest">Page Not Found</h1>
           <!-- ASCII Art 404 -->
-          <AsciiText client:load animated class="tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" label="404 - Page Not Found" content={`██╗  ██╗ ██████╗ ██╗  ██╗
+          <AsciiText client:load animated className="tracking-tight text-[clamp(0.8rem,1vw,0.9rem)] fx-glow-sm max-w-full overflow-hidden mx-auto" label="404 - Page Not Found" content={`██╗  ██╗ ██████╗ ██╗  ██╗
 ██║  ██║██╔═████╗██║  ██║
 ███████║██║██╔██║███████║
 ╚════██║████╔╝██║╚════██║

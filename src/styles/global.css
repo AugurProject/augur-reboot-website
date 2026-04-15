@@ -509,9 +509,11 @@
 	}
 
 	/* Pointer bounce animations */
-	.pointer-animated,
-	.pointer-animate-always {
-		animation: none;
+	.pointer {
+		&.pointer-animated,
+		&.pointer-animate-always {
+			animation: none;
+		}
 	}
 
 	/* Keycap press and glow animations */

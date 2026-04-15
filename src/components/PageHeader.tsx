@@ -3,7 +3,6 @@ import { useStore } from '@nanostores/react';
 import { $appStore, UIState } from '../stores/animationStore';
 import { XIcon, DiscordIcon, GithubIcon } from './icons';
 import Pointer from './Pointer';
-import { withBase } from '../lib/utils';
 
 interface PageHeaderProps {
   backHref?: string;
@@ -16,7 +15,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({ backHref, className = '' }) => 
   const appState = useStore($appStore);
   const socialRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const socialAnimated = useRef(false);
-  const faqHref = withBase('/faq');
 
   // Animate social links when hero sequence starts
   useEffect(() => {

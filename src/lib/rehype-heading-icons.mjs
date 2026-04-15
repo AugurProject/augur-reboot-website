@@ -75,7 +75,7 @@ export default function rehypeHeadingIcons() {
 		visit(tree, "element", (node) => {
 			if (!/^h[2-6]$/.test(node.tagName)) return;
 
-			const headingLevel = parseInt(node.tagName.slice(1));
+			const headingLevel = parseInt(node.tagName.slice(1), 10);
 
 			// Find the first text node
 			const firstChild = node.children[0];
