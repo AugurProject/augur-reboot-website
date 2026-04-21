@@ -94,7 +94,6 @@ interface CacheValidationResult {
 }
 
 // Configuration
-const FORK_THRESHOLD_REP = 275000 // 2.5% of 11 million REP
 const CACHE_VERSION = '1.0.0'
 const FINALITY_DEPTH = 32 // Ethereum finality depth (~6.4 minutes)
 const VALIDATION_DEPTH = 8 // blocks (detects corruption within ~2 minutes)
@@ -252,6 +251,20 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// Get current blockchain state
 			const blockNumber = await connection.provider.getBlockNumber()
 			console.log(`Block Number: ${blockNumber}`)
+
+			// Read fork threshold from chain (varies per universe)
+			let forkThresholdRep = 275000 // fallback constant
+			try {
+				const thresholdWei = await retryContractCall(
+					() => contracts.universe.getDisputeThresholdForFork(),
+					'universe.getDisputeThresholdForFork()'
+				)
+				forkThresholdRep = Number(ethers.formatEther(thresholdWei))
+				console.log(`Fork Threshold: ${forkThresholdRep} REP (from chain)`)
+			} catch (e) {
+				console.warn(`⚠️ Failed to read fork threshold from chain, using fallback: ${forkThresholdRep} REP`)
+			}
+
 			// Check if universe is already forking with retry logic
 			let isForking = false
 			try {
@@ -266,7 +279,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			if (isForking) {
 				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
-				return getForkingResult(blockNumber, connection)
+				return getForkingResult(blockNumber, connection, forkThresholdRep)
 			}
 
 			// Calculate key metrics
@@ -284,7 +297,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			// Calculate risk level
 			const forkThresholdPercent =
-				(largestDisputeBond / FORK_THRESHOLD_REP) * 100
+				(largestDisputeBond / forkThresholdRep) * 100
 			const riskLevel = determineRiskLevel(forkThresholdPercent)
 			const riskPercentage = forkThresholdPercent
 
@@ -306,7 +319,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				fallbacksAttempted: connection.fallbacksAttempted,
 			},
 			calculation: {
-				forkThreshold: FORK_THRESHOLD_REP,
+				forkThreshold: forkThresholdRep,
 			},
 			cacheValidation,
 			}
@@ -836,21 +849,21 @@ function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
 	return 'low'
 }
 
-function getForkingResult(blockNumber: number, connection: RpcConnection): ForkRiskData {
+function getForkingResult(blockNumber: number, connection: RpcConnection, forkThresholdRep: number): ForkRiskData {
 		return {
 			lastRiskChange: new Date().toISOString(),
 			blockNumber,
 			riskLevel: 'critical',
 			riskPercentage: 100,
 			metrics: {
-				largestDisputeBond: FORK_THRESHOLD_REP, // Fork threshold was reached
+				largestDisputeBond: forkThresholdRep, // Fork threshold was reached
 				forkThresholdPercent: 100,
 				activeDisputes: 0,
 				disputeDetails: [
 					{
 						marketId: 'FORKING',
 						title: 'Universe is currently forking',
-						disputeBondSize: FORK_THRESHOLD_REP,
+						disputeBondSize: forkThresholdRep,
 						disputeRound: 99,
 						daysRemaining: 0,
 					},
@@ -862,7 +875,7 @@ function getForkingResult(blockNumber: number, connection: RpcConnection): ForkR
 				fallbacksAttempted: connection.fallbacksAttempted,
 			},
 			calculation: {
-				forkThreshold: FORK_THRESHOLD_REP,
+				forkThreshold: forkThresholdRep,
 			},
 			cacheValidation: { isHealthy: true },
 		}
@@ -886,7 +899,7 @@ function getErrorResult(errorMessage: string): ForkRiskData {
 				fallbacksAttempted: 0,
 			},
 			calculation: {
-					forkThreshold: FORK_THRESHOLD_REP,
+					forkThreshold: 275000, // fallback threshold
 			},
 		cacheValidation: { isHealthy: false, discrepancy: errorMessage },
 		}

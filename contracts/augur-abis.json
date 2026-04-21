@@ -1,6 +1,6 @@
 {
 	"universe": {
-		"address": "0xe991247b78f937d7b69cfc00f1a487a293557677",
+		"address": "0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA",
 		"abi": [
 			{
 				"constant": true,
@@ -73,7 +73,7 @@
 		]
 	},
 	"augur": {
-		"address": "0x75228dce4d82566d93068a8d5d49435216551599",
+		"address": "0x23916a8F5C3846e3100e5f587FF14F3098722F5d",
 		"abi": [
 			{
 				"constant": true,
