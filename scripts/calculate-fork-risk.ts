@@ -71,11 +71,19 @@ interface SerializedEventLog {
 	eventType: 'created' | 'contribution' | 'completed'
 }
 
+interface TrackedMarket {
+	marketId: string
+	discoveredAtBlock: number
+	lastVerifiedBlock: number
+	source: 'event' | 'seed'
+}
+
 interface EventCache {
 	version: string
 	lastQueriedBlock: number
 	lastQueriedTimestamp: string
 	oldestEventBlock: number
+	trackedMarkets: TrackedMarket[]
 	events: {
 		created: SerializedEventLog[]
 		contributions: SerializedEventLog[]
@@ -394,6 +402,7 @@ function createEmptyCache(): EventCache {
 		lastQueriedBlock: 0,
 		lastQueriedTimestamp: new Date().toISOString(),
 		oldestEventBlock: 0,
+		trackedMarkets: [],
 		events: {
 			created: [],
 			contributions: [],
@@ -450,6 +459,12 @@ function validateCache(cache: EventCache): boolean {
 		return false
 	}
 
+	// Migrate caches missing trackedMarkets
+	if (!cache.trackedMarkets) {
+		cache.trackedMarkets = []
+		console.log('Migrated cache: added empty trackedMarkets')
+	}
+
 	// Check block number sanity
 	if (cache.lastQueriedBlock < 0 || cache.lastQueriedBlock > 999999999) {
 		console.warn('Cache has invalid block number')
@@ -477,18 +492,33 @@ function serializeEvent(
 	event: ethers.EventLog,
 	eventType: 'created' | 'contribution' | 'completed'
 ): SerializedEventLog {
+	// Args layout differs per event type:
+	//   Created:     universe(args[0]), market(args[1]), crowdsourcer(args[2])
+	//   Contribution: universe(args[0]), reporter(args[1]), market(args[2]), crowdsourcer(args[3])
+	//   Completed:   universe(args[0]), market(args[1]), crowdsourcer(args[2])
+	let marketAddr = ''
+	let crowdAddr = ''
+	if (eventType === 'contribution') {
+		marketAddr = event.args?.[2] || ''
+		crowdAddr = event.args?.[3] || ''
+	} else {
+		marketAddr = event.args?.[1] || ''
+		crowdAddr = event.args?.[2] || ''
+	}
 	return {
 		blockNumber: event.blockNumber,
 		transactionHash: event.transactionHash,
-		disputeCrowdsourcerAddress: event.args?.[2] || '',
-		marketAddress: event.args?.[1] || '',
+		disputeCrowdsourcerAddress: crowdAddr,
+		marketAddress: marketAddr,
 		args: event.args ? event.args.map(arg => String(arg)) : [],
 		eventType
 	}
 }
 
 /**
- * Prune events older than 7 days from cache
+ * Prune events older than 7 days from cache.
+ * Tracked markets are NEVER pruned — they persist until on-chain verification
+ * confirms the market is finalized.
  */
 function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
 	const blocksPerDay = 7200
@@ -497,6 +527,7 @@ function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
 
 	const prunedCache: EventCache = {
 		...cache,
+		trackedMarkets: cache.trackedMarkets, // never prune
 		events: {
 			created: cache.events.created.filter(e => e.blockNumber >= cutoffBlock),
 			contributions: cache.events.contributions.filter(e => e.blockNumber >= cutoffBlock),
@@ -517,6 +548,67 @@ function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
 	return prunedCache
 }
 
+
+/**
+ * Load dispute-markets-seed.json from the repo.
+ * This is a git-committed safety net of known long-running disputes
+ * that survive total cache loss.
+ */
+async function loadSeedMarkets(): Promise<TrackedMarket[]> {
+	const seedPath = path.join(__dirname, '../public/data/dispute-markets-seed.json')
+	try {
+		const data = await fs.readFile(seedPath, 'utf8')
+		const markets: TrackedMarket[] = JSON.parse(data)
+		if (Array.isArray(markets) && markets.length > 0) {
+			console.log(`🌱 Loaded ${markets.length} seed markets from repo`)
+			return markets
+		}
+	} catch {
+		// No seed file — that's fine, events + cache handle discovery
+	}
+	return []
+}
+
+/**
+ * Extract market address from a serialized event, handling the
+ * different args layouts per event type.
+ */
+function extractMarketFromSerializedEvent(event: SerializedEventLog): string | null {
+	try {
+		if (event.eventType === 'contribution') {
+			const marketAddr = event.args?.[2]
+			if (marketAddr) return String(marketAddr).toLowerCase()
+		} else {
+			const marketAddr = event.args?.[1]
+			if (marketAddr) return String(marketAddr).toLowerCase()
+		}
+	} catch {
+		// skip
+	}
+	return null
+}
+
+/**
+ * Extract market address from a live EventLog.
+ * Contribution: market is args[2]
+ * Created/Completed: market is args[1]
+ */
+function extractMarketFromEventLog(event: ethers.EventLog, eventType: 'created' | 'contribution' | 'completed'): string | null {
+	try {
+		if (!event.args || !Array.isArray(event.args)) return null
+		if (eventType === 'contribution') {
+			const addr = event.args[2]
+			if (addr) return String(addr).toLowerCase()
+		} else {
+			const addr = event.args[1]
+			if (addr) return String(addr).toLowerCase()
+		}
+	} catch {
+		// skip
+	}
+	return null
+}
+
 async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental'): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
@@ -527,28 +619,28 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
 		const currentBlock = await provider.getBlockNumber()
 		const blocksPerDay = 7200 // Approximate blocks per day (12 second blocks)
-		const searchPeriod = 7 * blocksPerDay // Last 7 days (~50,400 blocks)
-		const fullSearchStartBlock = currentBlock - searchPeriod
+		const discoveryPeriod = 30 * blocksPerDay // 30-day initial scan for market discovery
+		const incrementalPeriod = 7 * blocksPerDay // 7-day for incremental event queries
+		const fullSearchStartBlock = currentBlock - discoveryPeriod
 
 		// Determine query range based on mode and cache
 		let fromBlock: number
 		let newEventsOnly = false
 
 		if (mode === 'full-rebuild' || !cache.lastQueriedBlock || cache.lastQueriedBlock === 0) {
-			// Full 7-day rescan
-			fromBlock = Math.max(currentBlock - searchPeriod, 0)
-			console.log(`[Query] Full 7-day rescan: blocks ${fromBlock} to ${currentBlock}`)
+			// Full 30-day rescan for market discovery
+			fromBlock = Math.max(currentBlock - discoveryPeriod, 0)
+			console.log(`[Query] Full 30-day rescan: blocks ${fromBlock} to ${currentBlock}`)
 		} else {
 			// Incremental: only new blocks since last query
 			fromBlock = Math.max(cache.lastQueriedBlock - FINALITY_DEPTH, 0)
 			newEventsOnly = true
 			const blocksToQuery = currentBlock - fromBlock
 			console.log(`[Query] Incremental: blocks ${fromBlock} to ${currentBlock} (~${blocksToQuery} blocks)`)
-			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events`)
+			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events, ${cache.trackedMarkets.length} tracked markets`)
 		}
 
 		// Initialize event arrays
-		// For incremental queries, start with cached events
 		const allCreatedEvents: ethers.EventLog[] = []
 		const allContributionEvents: ethers.EventLog[] = []
 		const allCompletedEvents: ethers.EventLog[] = []
@@ -600,7 +692,6 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 				// Detect rate limiting
 				if (isRateLimitError(chunkError)) {
 					console.warn(`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`)
-					// Exponential backoff for rate limits (2s, 4s, 8s)
 					const backoffDelay = Math.min(2 ** consecutiveFailures * 1000, 10000)
 					console.log(`Waiting ${backoffDelay}ms before continuing...`)
 					await new Promise(resolve => setTimeout(resolve, backoffDelay))
@@ -618,17 +709,14 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		}
 
 		console.log(`Chunk query complete: ${successfulChunks}/${totalChunks} successful`)
-
 		console.log(`New events found: ${newEventsFound} (${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed)`)
 
 		// Merge with cached events if this was an incremental query
 		if (newEventsOnly && cache.lastQueriedBlock > 0) {
-			// Load cached events (but filter out events from the re-queried finality window to avoid duplicates)
 			const finalityStartBlock = cache.lastQueriedBlock - FINALITY_DEPTH
 
 			for (const cachedEvent of cache.events.created) {
 				if (cachedEvent.blockNumber < finalityStartBlock) {
-					// Reconstruct minimal EventLog for processing
 					const reconstructed = {
 						blockNumber: cachedEvent.blockNumber,
 						transactionHash: cachedEvent.transactionHash,
@@ -669,6 +757,7 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			lastQueriedBlock: currentBlock,
 			lastQueriedTimestamp: new Date().toISOString(),
 			oldestEventBlock: fullSearchStartBlock,
+			trackedMarkets: cache.trackedMarkets || [], // preserve tracked markets
 			events: {
 				created: allCreatedEvents.map(e => serializeEvent(e, 'created')),
 				contributions: allContributionEvents.map(e => serializeEvent(e, 'contribution')),
@@ -681,145 +770,183 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			}
 		}
 
-		// Prune old events (older than 7 days)
+		// Prune old events (older than 7 days) — trackedMarkets preserved by pruneOldEvents
 		const prunedCache = pruneOldEvents(updatedCache, currentBlock)
+
+		// === MARKET DISCOVERY ===
+		// Three sources: seed file, cached tracked markets, and fresh events.
+
+		// 1. Load seed markets (git-committed safety net)
+		const seedMarkets = await loadSeedMarkets()
+
+		// 2. Merge all sources into a single tracked markets map
+		const trackedMap = new Map<string, TrackedMarket>()
+
+		// Add seed markets
+		for (const sm of seedMarkets) {
+			trackedMap.set(sm.marketId.toLowerCase(), sm)
+		}
+
+		// Add cached tracked markets (may override seed with newer lastVerifiedBlock)
+		for (const tm of prunedCache.trackedMarkets) {
+			const key = tm.marketId.toLowerCase()
+			const existing = trackedMap.get(key)
+			if (!existing || tm.lastVerifiedBlock > existing.lastVerifiedBlock) {
+				trackedMap.set(key, tm)
+			}
+		}
+
+		// 3. Discover markets from events (fresh + previously cached)
+		const eventMarketIds = new Set<string>()
+		for (const event of allCreatedEvents) {
+			const m = extractMarketFromEventLog(event, 'created')
+			if (m) eventMarketIds.add(m)
+		}
+		for (const event of allContributionEvents) {
+			const m = extractMarketFromEventLog(event, 'contribution')
+			if (m) eventMarketIds.add(m)
+		}
+		for (const event of allCompletedEvents) {
+			const m = extractMarketFromEventLog(event, 'completed')
+			if (m) eventMarketIds.add(m)
+		}
+		// Also extract from cached serialized events (may have been pruned
+		// but their markets should still be tracked)
+		for (const event of cache.events.contributions) {
+			const m = extractMarketFromSerializedEvent(event)
+			if (m) eventMarketIds.add(m)
+		}
+		for (const event of cache.events.completed) {
+			const m = extractMarketFromSerializedEvent(event)
+			if (m) eventMarketIds.add(m)
+		}
+		for (const event of cache.events.created) {
+			const m = extractMarketFromSerializedEvent(event)
+			if (m) eventMarketIds.add(m)
+		}
+
+		// Add event-discovered markets to tracking
+		for (const marketId of eventMarketIds) {
+			if (!trackedMap.has(marketId)) {
+				trackedMap.set(marketId, {
+					marketId,
+					discoveredAtBlock: currentBlock,
+					lastVerifiedBlock: 0,
+					source: 'event'
+				})
+			}
+		}
+
+		console.log(`Market discovery: ${seedMarkets.length} seed + ${prunedCache.trackedMarkets.length} cached + ${eventMarketIds.size} from events → ${trackedMap.size} unique markets`)
+
+		// === ON-CHAIN VERIFICATION & BOND READOUT ===
+		const disputes: DisputeDetails[] = []
+		const marketAbi = [
+			'function getNumParticipants() view returns (uint256)',
+			'function participants(uint256) view returns (address)',
+			'function isFinalized() view returns (bool)',
+		]
+		const participantAbi = [
+			'function getSize() view returns (uint256)',
+		]
+
+		const verifiedMarkets: TrackedMarket[] = []
+
+		for (const [marketId, tracked] of trackedMap) {
+			try {
+				const market = new ethers.Contract(marketId, marketAbi, provider)
+
+				// Check if market is finalized
+				let isFinalized = false
+				try {
+					isFinalized = await market.isFinalized()
+				} catch (_err) {
+					// Assume active if we can't check
+				}
+
+				if (isFinalized) {
+					console.log(`  ✗ ${marketId.slice(0, 10)}... finalized — removed from tracking`)
+					continue
+				}
+
+				const numParticipants = Number(await market.getNumParticipants())
+				if (numParticipants === 0) {
+					console.log(`  ✗ ${marketId.slice(0, 10)}... no participants — removed from tracking`)
+					continue
+				}
+
+				// Read participants from highest index down.
+				// The highest non-zero getSize() is the current/latest dispute round.
+				let largestSize = 0
+				let latestRound = 0
+
+				for (let i = numParticipants - 1; i >= 0; i--) {
+					try {
+						const participantAddr = await market.participants(i)
+						if (!participantAddr || participantAddr === ethers.ZeroAddress) continue
+
+						const participant = new ethers.Contract(participantAddr, participantAbi, provider)
+						const sizeWei = await participant.getSize()
+						const sizeRep = Number(ethers.formatEther(sizeWei))
+
+						if (sizeRep > largestSize) {
+							largestSize = sizeRep
+							latestRound = i
+						}
+					} catch (_err) {
+						// Participant read failed, skip
+					}
+				}
+
+				// Keep tracking this market (verified alive)
+				verifiedMarkets.push({
+					...tracked,
+					lastVerifiedBlock: currentBlock
+				})
+
+				if (largestSize > 0) {
+					disputes.push({
+						marketId,
+						title: `Market ${marketId.substring(0, 10)}...`,
+						disputeBondSize: largestSize,
+						disputeRound: latestRound,
+						daysRemaining: 7,
+					})
+					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}`)
+				}
+			} catch (error) {
+				// Market read failed — keep tracking but don't add to disputes
+				verifiedMarkets.push({
+					...tracked,
+					lastVerifiedBlock: currentBlock
+				})
+				console.warn(`  ⚠ ${marketId.slice(0, 10)}... read error:`, error instanceof Error ? error.message.slice(0, 60) : String(error).slice(0, 60))
+			}
+		}
+
+		// Save verified markets back to cache
+		prunedCache.trackedMarkets = verifiedMarkets
+		console.log(`Tracked markets: ${verifiedMarkets.length} verified alive, ${trackedMap.size - verifiedMarkets.length} pruned (finalized/empty)`)
 
 		// Save cache for next run
 		await saveEventCache(prunedCache)
 
 		// Log cache efficiency metrics
 		if (newEventsOnly) {
-			const blocksQueried = currentBlock - fromBlock
-			const fullQueryBlocks = searchPeriod
-			const queriesSaved = Math.floor(fullQueryBlocks / 1000) - Math.floor(blocksQueried / 1000)
-			console.log(`💰 RPC queries saved: ~${queriesSaved} queries (queried ${blocksQueried} blocks instead of ${fullQueryBlocks})`)
+			const incrementalBlocks = currentBlock - fromBlock
+			const fullQueryBlocks = incrementalPeriod
+			const queriesSaved = Math.floor(fullQueryBlocks / 1000) - Math.floor(incrementalBlocks / 1000)
+			console.log(`💰 RPC queries saved: ~${queriesSaved} queries (queried ${incrementalBlocks} blocks instead of ${fullQueryBlocks})`)
 		}
 
 		console.log(`Total events after pruning: ${prunedCache.metadata.totalEventsTracked}`)
-
-		// Create a map to track dispute crowdsourcer states
-		const disputeStates = new Map<string, {
-			marketId: string,
-			currentStake: number,
-			disputeRound: number,
-			isCompleted: boolean,
-			lastContributionTimestamp: number
-		}>()
-
-		// First, process Created events to initialize disputes
-		for (const event of allCreatedEvents) {
-			try {
-				if (!event.args || !Array.isArray(event.args) || event.args.length < 6) continue
-
-				const [_universe, marketAddress, disputeCrowdsourcerAddress, _payoutNumerators, initialSizeWei, _isInvalid] = event.args
-				const initialSizeRep = Number(ethers.formatEther(initialSizeWei))
-
-				disputeStates.set(disputeCrowdsourcerAddress, {
-					marketId: marketAddress,
-					currentStake: initialSizeRep, // Will be updated by contribution events
-					disputeRound: 1, // Will be updated by contribution events
-					isCompleted: false,
-					lastContributionTimestamp: 0
-				})
-			} catch (error) {
-				console.warn('Error processing created event:', error instanceof Error ? error.message : String(error))
-			}
-		}
-
-		// Second, process Contribution events to get ACTUAL stake amounts
-		for (const event of allContributionEvents) {
-			try {
-				if (!event.args || !Array.isArray(event.args) || event.args.length < 11) continue
-
-				const [
-					_universe, _reporter, marketAddress, disputeCrowdsourcerAddress,
-					_amountStaked, _description, _payoutNumerators,
-					currentStakeWei, _stakeRemaining, disputeRound, timestamp
-				] = event.args
-
-				const currentStakeRep = Number(ethers.formatEther(currentStakeWei))
-				const disputeRoundNum = Number(disputeRound)
-				const timestampNum = Number(timestamp)
-
-				// Update or create dispute state with actual stake
-				const existing = disputeStates.get(disputeCrowdsourcerAddress)
-				if (existing) {
-					// Update with latest contribution data
-					existing.currentStake = currentStakeRep
-					existing.disputeRound = disputeRoundNum
-					existing.lastContributionTimestamp = Math.max(existing.lastContributionTimestamp, timestampNum)
-				} else {
-					// Create new entry if we missed the Created event
-					disputeStates.set(disputeCrowdsourcerAddress, {
-						marketId: marketAddress,
-						currentStake: currentStakeRep,
-						disputeRound: disputeRoundNum,
-						isCompleted: false,
-						lastContributionTimestamp: timestampNum
-					})
-				}
-			} catch (error) {
-				console.warn('Error processing contribution event:', error instanceof Error ? error.message : String(error))
-			}
-		}
-
-		// Third, mark completed disputes
-		for (const event of allCompletedEvents) {
-			try {
-				if (!event.args || !Array.isArray(event.args) || event.args.length < 11) continue
-
-				const [_universe, _marketAddress, disputeCrowdsourcerAddress] = event.args
-				const existing = disputeStates.get(disputeCrowdsourcerAddress)
-				if (existing) {
-					existing.isCompleted = true
-				}
-			} catch (error) {
-				console.warn('Error processing completed event:', error instanceof Error ? error.message : String(error))
-			}
-		}
-
-		// Convert to DisputeDetails array, filtering out completed disputes
-		const disputes: DisputeDetails[] = []
-		for (const [_disputeCrowdsourcerAddress, state] of disputeStates.entries()) {
-			// Only include active (non-completed) disputes
-			if (state.isCompleted) continue
-
-			// Check if market is finalized (skip finalized markets)
-			try {
-				const marketContract = new ethers.Contract(
-					state.marketId,
-					[{
-						constant: true,
-						inputs: [],
-						name: 'isFinalized',
-						outputs: [{ name: '', type: 'bool' }],
-						type: 'function',
-					}],
-					provider,
-				)
-
-				const isFinalized = await marketContract.isFinalized()
-				if (isFinalized) continue
-			} catch (_marketError) {
-				// If we can't check finalization, assume it's active
-			}
-
-			// Create dispute details with ACTUAL stake from contribution events
-			disputes.push({
-				marketId: state.marketId,
-				title: `Market ${state.marketId.substring(0, 10)}...`,
-				disputeBondSize: state.currentStake, // This is the REAL stake amount!
-				disputeRound: state.disputeRound,
-				daysRemaining: 7, // Estimate based on dispute window
-			})
-		}
 
 		// Sort by bond size (largest first) and return top 10
 		const sortedDisputes = disputes.sort(
 			(a, b) => b.disputeBondSize - a.disputeBondSize,
 		)
 
-		console.log(`Processed ${sortedDisputes.length} active disputes from ${disputeStates.size} total dispute crowdsourcers`)
+		console.log(`Processed ${sortedDisputes.length} active markets with disputes`)
 		if (sortedDisputes.length > 0) {
 			console.log(`Largest dispute bond: ${sortedDisputes[0].disputeBondSize.toLocaleString()} REP`)
 		}
@@ -833,7 +960,6 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 		return []
 	}
 }
-
 function getLargestDisputeBond(disputes: DisputeDetails[]): number {
 	if (disputes.length === 0) return 0
 	return Math.max(...disputes.map((d) => d.disputeBondSize))

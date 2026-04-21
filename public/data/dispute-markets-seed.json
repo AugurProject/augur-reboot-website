@@ -1,0 +1,20 @@
+[
+	{
+		"marketId": "0x963eed85778cc23e2d4636cd4f29eecdf9827e9e",
+		"discoveredAtBlock": 24834534,
+		"lastVerifiedBlock": 0,
+		"source": "seed"
+	},
+	{
+		"marketId": "0x797a858e5264f53c312918bcee99ed59db835c77",
+		"discoveredAtBlock": 24834604,
+		"lastVerifiedBlock": 0,
+		"source": "seed"
+	},
+	{
+		"marketId": "0x190b6aceaf477deb64a6609bfa0ee24acb45a8f2",
+		"discoveredAtBlock": 24834614,
+		"lastVerifiedBlock": 0,
+		"source": "seed"
+	}
+]
