@@ -4,10 +4,6 @@ import { useForkData } from '../providers/ForkDataProvider'
 export const ForkStats = (): React.JSX.Element => {
 	const { rawData } = useForkData()
 
-	const formatNumber = (num: number): string => {
-		return num.toLocaleString()
-	}
-
 	// Check if there are no active disputes (stable state)
 	const isStable = rawData.metrics.largestDisputeBond === 0
 
@@ -25,7 +21,7 @@ export const ForkStats = (): React.JSX.Element => {
 					System steady - No market disputes
 				</div>
 			) : (
-				<div className="grid md:grid-cols-[8rem_8rem_8rem] md:place-content-center md:gap-y-4">
+				<div className="grid md:grid-cols-[10rem_12rem_10rem] md:place-content-center md:gap-y-4">
 					{/* Panel 1 - Fork Risk */}
 					<div className="text-center">
 						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
@@ -41,8 +37,11 @@ export const ForkStats = (): React.JSX.Element => {
   					<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							DISPUTE BOND
 						</div>
-						<div className="uppercase text-primary fx-glow-sm">
-							{formatNumber(rawData.metrics.largestDisputeBond)} REP
+						<div
+							className="uppercase text-primary fx-glow-sm"
+							title={`${rawData.metrics.largestDisputeBond.toLocaleString(undefined, { maximumFractionDigits: 3 })} REP`}
+						>
+							~{Math.round(rawData.metrics.largestDisputeBond).toLocaleString()} REP
 						</div>
 					</div>
 
