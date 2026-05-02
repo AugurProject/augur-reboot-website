@@ -18,19 +18,17 @@ const updateArc = (percentage: number): string => {
 	return `M 80 200 A 120 120 0 0 1 ${endX} ${endY}`
 }
 
-const getRiskLevel = (percentage: number): string => {
-	if (percentage === 0) return 'NO RISK'
-	if (percentage < 25) return 'LOW'
-	if (percentage < 50) return 'MEDIUM'
-	if (percentage < 75) return 'HIGH'
-	return 'EXTREME'
+const RISK_COLORS: Record<string, string> = {
+	none: 'var(--color-green-400)',
+	low: 'var(--color-green-400)',
+	moderate: 'var(--color-yellow-400)',
+	high: 'var(--color-orange-400)',
+	critical: 'var(--color-red-500)',
+	unknown: 'var(--color-green-400)',
 }
 
-const getRiskColor = (percentage: number): string => {
-	if (percentage < 25) return 'var(--color-green-400)'
-	if (percentage < 50) return 'var(--color-yellow-400)'
-	if (percentage < 75) return 'var(--color-orange-400)'
-	return 'var(--color-red-500)'
+const getRiskColor = (riskLevel: string): string => {
+	return RISK_COLORS[riskLevel] || 'var(--color-green-400)'
 }
 
 const getNeedleEndpoint = (percentage: number): { x: number; y: number } => {
@@ -47,10 +45,11 @@ const getNeedleEndpoint = (percentage: number): { x: number; y: number } => {
 
 const ForkGaugeComponent = ({
 	percentage,
+	riskLevel: riskLevelProp,
 }: GaugeDisplayProps): React.JSX.Element => {
 	const arcPath = useMemo(() => updateArc(percentage), [percentage])
-	const riskColor = useMemo(() => getRiskColor(percentage), [percentage])
-	const riskLevel = useMemo(() => getRiskLevel(percentage), [percentage])
+	const riskLevel = riskLevelProp ?? 'none'
+	const riskColor = useMemo(() => getRiskColor(riskLevel), [riskLevel])
 	const needleEndpoint = useMemo(() => getNeedleEndpoint(percentage), [percentage])
 
 	const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -162,7 +161,7 @@ const ForkGaugeComponent = ({
 					fontWeight="bold"
 					className={cn('text-4xl font-display fx-glow-sm', `fx-glow-[${riskColor}]`)}
 				>
-					{riskLevel}
+					{riskLevel === 'none' ? 'NO RISK' : riskLevel.toUpperCase()}
 				</text>
 			</svg>
 

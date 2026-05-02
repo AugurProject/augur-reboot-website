@@ -1,16 +1,8 @@
 import type React from 'react'
 import { useForkData } from '../providers/ForkDataProvider'
 
-const getRiskLabel = (roundProgress: number): string => {
-	if (roundProgress === 0) return 'NONE'
-	if (roundProgress < 25) return 'LOW'
-	if (roundProgress < 50) return 'MEDIUM'
-	if (roundProgress < 75) return 'HIGH'
-	return 'EXTREME'
-}
-
 export const ForkStats = (): React.JSX.Element => {
-	const { rawData } = useForkData()
+	const { rawData, riskLevel } = useForkData()
 
 	const isStable = rawData.metrics.largestDisputeBond === 0
 	const largestDispute = rawData.metrics.disputeDetails?.length > 0
@@ -19,10 +11,12 @@ export const ForkStats = (): React.JSX.Element => {
 			)
 		: null
 
-	const riskLabel = getRiskLabel(rawData.metrics.roundProgress)
-	const roundDisplay = rawData.metrics.estimatedTotalRounds
-		? `${rawData.metrics.currentRound}/${rawData.metrics.estimatedTotalRounds}`
-		: `${rawData.metrics.currentRound}`
+	const riskLabel = riskLevel.level === 'No Risk' ? 'NONE' : riskLevel.level === 'Unknown' ? 'PROJECTION UNAVAILABLE' : riskLevel.level.toUpperCase()
+	const roundDisplay = rawData.metrics.roundProgress === null
+		? `${rawData.metrics.currentRound}/?`
+		: rawData.metrics.estimatedTotalRounds
+			? `${rawData.metrics.currentRound}/${rawData.metrics.estimatedTotalRounds}`
+			: `${rawData.metrics.currentRound}`
 
 	return (
 		<div className="w-full mb-1">
