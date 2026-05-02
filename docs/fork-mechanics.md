@@ -76,11 +76,13 @@ The bonds are **crowdsourced** — no single user needs to fund the entire amoun
 
 The fork monitor reads live on-chain state to answer one question:
 
-> **How close is the largest active dispute bond to the fork threshold?**
+> **How far through the escalation path is this market?**
 
-This is measured as a percentage: `(largest dispute bond / fork threshold) × 100`. The fork threshold is read live from the contract (`universe.getDisputeThresholdForFork()`), currently ~274,859 REP (2.5% of the REP supply in the v2 genesis universe).
+This is measured as round progress: `(current round / estimated total rounds) × 100`. The current round is the index of the highest funded participant. The estimated total rounds is projected from the bond growth trajectory — using the last few rounds' growth factor to extrapolate when the bond would reach the fork threshold.
 
-The monitor doesn't predict whether a fork will happen. It measures how much stake is committed to disputing outcomes — a mechanical reading of the protocol's state.
+The monitor also computes the bond/threshold percentage `(largest dispute bond / fork threshold) × 100` for informational purposes, but the primary gauge signal and risk labels are derived from round progress. This is because the bond/threshold ratio grows exponentially while round progress is linear — a market at round 7 of ~12 is well past the halfway point, but its bond may only be ~3% of the fork threshold.
+
+The monitor doesn't predict whether a fork will happen. It measures how far the dispute has progressed through the escalation path — a mechanical reading of the protocol's state.
 
 > **Source**: [[augur-v2-protocol-glossary]] → Fork Trigger, Key Constants
 > **Implementation**: [[fork-monitoring-methodology]]

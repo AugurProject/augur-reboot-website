@@ -62,9 +62,10 @@ Layout.astro (Base HTML shell)
 
 ### Data Flow
 1. `ForkDataProvider` fetches `/data/fork-risk.json` on mount
-2. Single metric: largest active dispute bond / 275,000 REP
-3. Auto-refresh every 5 minutes
-4. `ForkMockProvider` wraps for demo scenarios
+2. Primary gauge signal: `roundProgress` (current round / estimated total rounds × 100)
+3. Bond/threshold percentage still computed and stored, but used only for informational display
+4. Auto-refresh every 5 minutes
+5. `ForkMockProvider` wraps for demo scenarios
 
 **Data Source:** `fork-risk.json` is generated hourly by GitHub Actions. See [[fork-monitoring-pipeline]] for the monitoring workflow.
 
@@ -126,19 +127,20 @@ public/               # Static assets (fonts, images, data)
 Interactive components use `client:load` for immediate hydration. Static content (layouts, navigation chrome, blog cards) renders as pure Astro with zero JS.
 
 ### Fork Gauge Visual Scaling
-Non-linear mapping for intuitive display:
-- 0% actual → 0% gauge fill
-- 5% actual → ~25% gauge fill
-- 25% actual → ~50% gauge fill
-- 75% actual → ~90% gauge fill
+Linear mapping — round progress maps directly to gauge fill:
+- 0% round progress → 0% gauge fill
+- 50% round progress → 50% gauge fill
+- 100% round progress → 100% gauge fill
+
+No non-linear stretching. The gauge is a straightforward half-circle arc where fill equals the round progress percentage.
 
 ### Progressive Disclosure
 - **No disputes**: "System steady — No market disputes"
 - **Active disputes**: Dispute bond, threshold %, dispute round
 - **Demo mode**: Additional controls and current values
 
-### Threshold Calculation
+### Risk Calculation
 ```typescript
-const forkThresholdPercent = (largestActiveDisputeBond / forkThreshold) * 100
+const roundProgress = (currentRound / estimatedTotalRounds) * 100
 ```
-Where `forkThreshold` is read live from `universe.getDisputeThresholdForFork()`. See [[fork-monitoring-methodology]] for the full calculation.
+Where `currentRound` is the highest non-zero participant index and `estimatedTotalRounds` is projected from the bond growth trajectory. See [[fork-monitoring-methodology]] for the full calculation.

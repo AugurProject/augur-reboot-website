@@ -14,16 +14,19 @@ tags: [fork-monitoring, methodology, calculation]
 
 The monitor answers one question:
 
-> **What percentage of the fork threshold is the largest active dispute bond?**
+> **How far through its dispute rounds is the market, relative to the estimated total rounds before a fork?**
 
 ```
-threshold % = (largest dispute bond / fork threshold) × 100
+round progress = (current round / estimated total rounds) × 100
 ```
 
+- **Current round**: the index of the highest non-zero participant (0-indexed)
+- **Estimated total rounds**: projected from the bond growth trajectory (see Round Projection below)
 - **Fork threshold**: read live from `universe.getDisputeThresholdForFork()` (~274,859 REP as of April 2026)
-- **Largest dispute bond**: read from `market.participants(i).getSize()` for each active market
 
-The threshold is not hardcoded — it's read from the contract each run.
+The gauge signal is round progress, not bond/threshold percentage. During active disputes, the bond grows exponentially but may be only ~3% of the fork threshold even at round 7 of ~12 — visually invisible. Round progress maps the same state to a linear, intuitive scale.
+
+> **Historical note**: The monitor previously used `(largest dispute bond / fork threshold) × 100` as the gauge signal. This was replaced with round-based progress in May 2026 because the bond/threshold ratio compresses exponential escalation into an invisible sliver during active dispute phases, making the gauge read "LOW" while the dispute was well past the halfway point.
 
 ---
 
@@ -56,11 +59,23 @@ Every tracked market is verified on-chain each run:
 
 1. `market.isFinalized()` → **true**: removed from tracking (dispute resolved)
 2. `market.getNumParticipants()` == 0: **removed** (no dispute activity)
-3. Participants queried from highest index down:
+3. All participants read sequentially (index 0 through N):
    - `market.participants(i).getSize()` → target bond for round *i*
+   - Bond trajectory recorded for projection (see Round Projection below)
    - Highest non-zero participant = current/latest dispute round
    - Largest `getSize()` across all participants = the market's dispute bond
 4. Read error: **kept** in tracking (conservative — don't lose track of a market)
+
+### Round Projection
+
+The script reads ALL participant bonds (not just the largest) to build a bond trajectory: `[b0, b1, b2, …, bn]`. It uses the last 3–4 rounds to compute an average growth factor, then projects forward until the bond would exceed the fork threshold:
+
+```
+avg_growth = mean(b[i] / b[i-1] for recent rounds)
+estimated_total = smallest n where b[n] × avg_growth^(n-current) >= fork_threshold
+```
+
+The projection is conservative — if fewer than 3 rounds exist, or the growth factor diverges (projection exceeds 30 rounds), `estimatedTotalRounds` is `null` and round progress defaults to 0.
 
 ### Why `getSize()` not `getStake()`
 
@@ -136,19 +151,19 @@ Events are only used for *discovery* — once a market is tracked, it stays unti
 
 ---
 
-## Threshold Levels
+## Risk Levels
 
-The UI displays the threshold percentage as a level:
+The UI displays round progress as a risk level:
 
-| Level | Threshold % | Description |
-|-------|-------------|-------------|
+| Level | Round Progress | Description |
+|-------|----------------|-------------|
 | None | 0% | No active disputes |
-| Low | <10% | Normal dispute activity |
-| Moderate | 10–25% | Elevated activity |
-| High | 25–75% | Large disputes requiring attention |
-| Critical | ≥75% | Fork threshold proximity is high |
+| Low | <25% | Early dispute rounds |
+| Moderate | 25–50% | Mid-escalation |
+| High | 50–75% | Late-stage dispute |
+| Critical | ≥75% | Approaching fork threshold |
 
-These levels are display categories. The monitor measures a constant — the ratio of bond to threshold — and presents it for human consumption.
+These levels are display categories derived from round progress. The bond/threshold percentage is still computed and stored in the data, but the primary gauge signal and risk labels use round progress.
 
 ---
 

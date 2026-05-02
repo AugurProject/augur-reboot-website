@@ -3,78 +3,45 @@ import { cn } from '../lib/utils'
 import type { GaugeDisplayProps } from '../types/gauge'
 
 /**
- * Convert fork threshold percentage to visual gauge percentage
- * Maps the actual risk to intuitive visual representation
+ * Calculate arc path endpoint for a given fill percentage (0-100).
+ * Maps percentage to angle from 180° to 0° (π to 0 radians).
  */
-const getVisualPercentage = (forkThresholdPercent: number): number => {
-	// No minimum fill - 0% risk shows 0% visual fill
-	const MIN_VISUAL_FILL = 0
-
-	if (forkThresholdPercent === 0) {
-		// No visual fill when no risk detected
-		return MIN_VISUAL_FILL
-	} else if (forkThresholdPercent <= 10) {
-		// 0-10% fork threshold = 0-25% gauge (Low risk zone)
-		// Linear scaling from 0% to 25%
-		return MIN_VISUAL_FILL + ((forkThresholdPercent / 10) * (25 - MIN_VISUAL_FILL))
-	} else if (forkThresholdPercent <= 25) {
-		// 10-25% fork threshold = 25-50% gauge (Medium risk zone)
-		return 25 + ((forkThresholdPercent - 10) / 15) * 25
-	} else if (forkThresholdPercent <= 75) {
-		// 25-75% fork threshold = 50-90% gauge (High risk zone)
-		return 50 + ((forkThresholdPercent - 25) / 50) * 40
-	} else {
-		// 75%+ fork threshold = 90-100% gauge (Extreme risk zone)
-		return Math.min(100, 90 + ((forkThresholdPercent - 75) / 25) * 10)
-	}
-}
-
-const updateArc = (actualPercentage: number): string => {
-	// Use visual percentage for arc display
-	const visualPercentage = getVisualPercentage(actualPercentage)
-
-	// Calculate the end point of the arc based on visual percentage
-	// Map percentage to angle from 180° to 0° (π to 0 radians)
-	const angle = Math.PI - (visualPercentage / 100) * Math.PI
+const updateArc = (percentage: number): string => {
+	const angle = Math.PI - (percentage / 100) * Math.PI
 	const centerX = 200
 	const centerY = 200
 	const radius = 120
 
-	// Calculate end point
 	const endX = centerX + radius * Math.cos(angle)
 	const endY = centerY - radius * Math.sin(angle)
 
-	// Create arc path based on visual percentage (can be 0% for no fill)
 	return `M 80 200 A 120 120 0 0 1 ${endX} ${endY}`
 }
 
-const getRiskLevel = (forkThresholdPercent: number): string => {
-	if (forkThresholdPercent === 0) return 'NO RISK'
-	if (forkThresholdPercent < 10) return 'LOW'
-	if (forkThresholdPercent < 25) return 'MEDIUM'
-	if (forkThresholdPercent < 75) return 'HIGH'
+const getRiskLevel = (percentage: number): string => {
+	if (percentage === 0) return 'NO RISK'
+	if (percentage < 25) return 'LOW'
+	if (percentage < 50) return 'MEDIUM'
+	if (percentage < 75) return 'HIGH'
 	return 'EXTREME'
 }
 
-const getRiskColor = (forkThresholdPercent: number): string => {
-	// Use the site's existing color variables
-	if (forkThresholdPercent < 10) return 'var(--color-green-400)'
-	if (forkThresholdPercent < 25) return 'var(--color-yellow-400)'
-	if (forkThresholdPercent < 75) return 'var(--color-orange-400)'
+const getRiskColor = (percentage: number): string => {
+	if (percentage < 25) return 'var(--color-green-400)'
+	if (percentage < 50) return 'var(--color-yellow-400)'
+	if (percentage < 75) return 'var(--color-orange-400)'
 	return 'var(--color-red-500)'
 }
 
-// Calculate needle endpoint to match the arc endpoint
-const getNeedleEndpoint = (forkThresholdPercent: number): {x: number, y: number} => {
-	const visualPercentage = getVisualPercentage(forkThresholdPercent)
-	const angle = Math.PI - (visualPercentage / 100) * Math.PI
+const getNeedleEndpoint = (percentage: number): { x: number; y: number } => {
+	const angle = Math.PI - (percentage / 100) * Math.PI
 	const centerX = 200
 	const centerY = 200
-	const radius = 100 // Reduced from 120 to create gap from arc edge
+	const radius = 100
 
 	return {
 		x: centerX + radius * Math.cos(angle),
-		y: centerY - radius * Math.sin(angle)
+		y: centerY - radius * Math.sin(angle),
 	}
 }
 
