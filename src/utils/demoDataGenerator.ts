@@ -14,6 +14,17 @@ export enum DisputeBondScenario {
 	ELEVATED_RISK = 'elevated_risk'
 }
 
+// Representative round data per scenario
+const SCENARIO_ROUNDS: Record<Exclude<DisputeBondScenario, DisputeBondScenario.NO_DISPUTES>, {
+	currentRound: number
+	estimatedTotalRounds: number
+}> = {
+	[DisputeBondScenario.LOW_RISK]: { currentRound: 3, estimatedTotalRounds: 12 },
+	[DisputeBondScenario.MODERATE_RISK]: { currentRound: 7, estimatedTotalRounds: 12 },
+	[DisputeBondScenario.HIGH_RISK]: { currentRound: 9, estimatedTotalRounds: 12 },
+	[DisputeBondScenario.ELEVATED_RISK]: { currentRound: 11, estimatedTotalRounds: 12 },
+}
+
 /**
  * Generate realistic ForkRiskData based on dispute bond scenario
  * Only available in development mode
@@ -27,6 +38,8 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	let largestDisputeBond: number
 	let riskLevel: ForkRiskLevel
 	let activeDisputes: number
+	let currentRound = 0
+	let estimatedTotalRounds: number | null = null
 	
 	// Generate dispute bond scenarios aligned with risk levels
 	switch (scenario) {
@@ -36,27 +49,27 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			break
 			
 		case DisputeBondScenario.LOW_RISK:
-			// Low risk bonds: 0.4-10% of threshold (1100-27500 REP)
 			largestDisputeBond = 1100 + Math.floor(Math.random() * 26400)
-			activeDisputes = Math.floor(Math.random() * 3) + 1 // 1-3 disputes
+			activeDisputes = Math.floor(Math.random() * 3) + 1
+			;({ currentRound, estimatedTotalRounds } = SCENARIO_ROUNDS[scenario])
 			break
 			
 		case DisputeBondScenario.MODERATE_RISK:
-			// Medium risk bonds: 10-25% of threshold (27500-68750 REP)
 			largestDisputeBond = 27500 + Math.floor(Math.random() * 41250)
-			activeDisputes = Math.floor(Math.random() * 4) + 2 // 2-5 disputes
+			activeDisputes = Math.floor(Math.random() * 4) + 2
+			;({ currentRound, estimatedTotalRounds } = SCENARIO_ROUNDS[scenario])
 			break
 			
 		case DisputeBondScenario.HIGH_RISK:
-			// High risk bonds: 25-75% of threshold (68750-206250 REP)
 			largestDisputeBond = 68750 + Math.floor(Math.random() * 137500)
-			activeDisputes = Math.floor(Math.random() * 5) + 3 // 3-7 disputes
+			activeDisputes = Math.floor(Math.random() * 5) + 3
+			;({ currentRound, estimatedTotalRounds } = SCENARIO_ROUNDS[scenario])
 			break
 			
 		case DisputeBondScenario.ELEVATED_RISK:
-			// Extreme risk bonds: 75-98% of threshold (206250-269500 REP)
 			largestDisputeBond = 206250 + Math.floor(Math.random() * 63250)
-			activeDisputes = Math.floor(Math.random() * 8) + 4 // 4-11 disputes
+			activeDisputes = Math.floor(Math.random() * 8) + 4
+			;({ currentRound, estimatedTotalRounds } = SCENARIO_ROUNDS[scenario])
 			break
 	}
 
@@ -72,13 +85,12 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	}>
 
 	if (activeDisputes > 0) {
-		// Generate realistic dispute details focused on the bond sizes
 		disputeDetails = Array.from({ length: Math.min(activeDisputes, 5) }, (_, i) => ({
 			marketId: `0x${Math.random().toString(16).substring(2, 42).padStart(40, '0')}`,
 			title: getDemoMarketTitle(i),
 			disputeBondSize: i === 0 ? largestDisputeBond : generateVariedBondSize(largestDisputeBond, scenario),
-			disputeRound: Math.floor(Math.random() * 3) + 1,
-			estimatedTotalRounds: null,
+			disputeRound: i === 0 ? currentRound : Math.floor(Math.random() * 3) + 1,
+			estimatedTotalRounds: i === 0 ? estimatedTotalRounds : null,
 			roundProgress: null,
 			daysRemaining: Math.floor(Math.random() * 6) + 1,
 		}))
@@ -86,37 +98,38 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 		disputeDetails = []
 	}
 
-	const now = new Date()
 	const forkThresholdPercent = (largestDisputeBond / FORK_THRESHOLD_REP) * 100
-	
-	// Determine risk level based on actual fork threshold percentage
-	if (forkThresholdPercent === 0) {
+	const roundProgress = activeDisputes > 0 && estimatedTotalRounds
+		? Math.round((currentRound / estimatedTotalRounds) * 1000) / 10
+		: activeDisputes > 0 ? null : 0
+
+	// Determine risk level from round progress
+	if (roundProgress === null) {
+		riskLevel = 'unknown'
+	} else if (roundProgress === 0) {
 		riskLevel = 'none'
-	} else if (forkThresholdPercent < 10) {
-		riskLevel = 'low'
-	} else if (forkThresholdPercent < 25) {
-		riskLevel = 'moderate'
-	} else if (forkThresholdPercent < 75) {
-		riskLevel = 'high'
-	} else {
+	} else if (roundProgress >= 75) {
 		riskLevel = 'critical'
+	} else if (roundProgress >= 50) {
+		riskLevel = 'high'
+	} else if (roundProgress >= 25) {
+		riskLevel = 'moderate'
+	} else {
+		riskLevel = 'low'
 	}
-	
-	// Use the actual calculated percentage
-	const riskPercentage = forkThresholdPercent
 
 	return {
-		lastRiskChange: now.toISOString(),
+		lastRiskChange: new Date().toISOString(),
 		blockNumber: Math.floor(Math.random() * 1000000) + 20000000,
 		riskLevel,
-		riskPercentage: Math.round(riskPercentage * 100) / 100,
+		riskPercentage: roundProgress,
 		metrics: {
 			largestDisputeBond,
 			forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
 			activeDisputes,
-			currentRound: disputeDetails.length > 0 ? disputeDetails[0].disputeRound : 0,
-			estimatedTotalRounds: null,
-			roundProgress: Math.round(forkThresholdPercent * 10) / 10,
+			currentRound,
+			estimatedTotalRounds,
+			roundProgress,
 			disputeDetails,
 		},
 		rpcInfo: {
@@ -136,13 +149,13 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 const generateVariedBondSize = (largestBond: number, scenario: DisputeBondScenario): number => {
 	switch (scenario) {
 		case DisputeBondScenario.LOW_RISK:
-			return Math.floor(largestBond * (0.2 + Math.random() * 0.6)) // 20%-80% of largest
+			return Math.floor(largestBond * (0.2 + Math.random() * 0.6))
 		case DisputeBondScenario.MODERATE_RISK:
-			return Math.floor(largestBond * (0.3 + Math.random() * 0.5)) // 30%-80% of largest
+			return Math.floor(largestBond * (0.3 + Math.random() * 0.5))
 		case DisputeBondScenario.HIGH_RISK:
-			return Math.floor(largestBond * (0.4 + Math.random() * 0.4)) // 40%-80% of largest
+			return Math.floor(largestBond * (0.4 + Math.random() * 0.4))
 		case DisputeBondScenario.ELEVATED_RISK:
-			return Math.floor(largestBond * (0.5 + Math.random() * 0.3)) // 50%-80% of largest
+			return Math.floor(largestBond * (0.5 + Math.random() * 0.3))
 		default:
 			return Math.floor(largestBond * 0.5)
 	}

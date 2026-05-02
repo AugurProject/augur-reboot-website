@@ -42,7 +42,7 @@ interface Metrics {
 	disputeDetails: DisputeDetails[]
 	currentRound: number
 	estimatedTotalRounds: number | null
-	roundProgress: number
+	roundProgress: number | null
 }
 
 interface Calculation {
@@ -55,7 +55,7 @@ interface ForkRiskData {
 	lastRiskChange: string
 	blockNumber?: number
 	riskLevel: RiskLevel
-	riskPercentage: number
+	riskPercentage: number | null
 	metrics: Metrics
 	rpcInfo: RpcInfo
 	calculation: Calculation
@@ -333,7 +333,8 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				: null
 			const currentRound = topDispute?.disputeRound ?? 0
 			const estimatedTotalRounds = topDispute?.estimatedTotalRounds ?? null
-			const roundProgress = topDispute?.roundProgress ?? 0
+			// null means projection unavailable — active dispute but can't estimate progress
+			const roundProgress: number | null = topDispute?.roundProgress ?? null
 
 			// Validate cache health
 			const cache = await loadEventCache()
@@ -355,7 +356,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				lastRiskChange: new Date().toISOString(),
 				blockNumber,
 				riskLevel,
-				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
+				riskPercentage: riskPercentage !== null ? Math.min(100, Math.max(0, riskPercentage)) : null,
 				metrics: {
 					largestDisputeBond,
 					forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
@@ -363,7 +364,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					disputeDetails: activeDisputes.slice(0, 5),
 					currentRound,
 					estimatedTotalRounds,
-					roundProgress: Math.round(roundProgress * 10) / 10,
+					roundProgress: roundProgress !== null ? Math.round(roundProgress * 10) / 10 : null,
 				},
 				rpcInfo: {
 					endpoint: connection.endpoint,
@@ -378,7 +379,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			console.log('Calculation completed successfully')
 			console.log(`Risk Level: ${riskLevel}`)
-			console.log(`Round Progress: ${currentRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%)`)
+			console.log(`Round Progress: ${currentRound}/${estimatedTotalRounds ?? '?'} (${roundProgress !== null ? `${roundProgress.toFixed(1)}%` : 'projection unavailable'})`)
 			console.log(`Largest Dispute Bond: ${largestDisputeBond} REP`)
 			console.log(`Bond/Threshold: ${forkThresholdPercent.toFixed(2)}%`)
 			console.log(`RPC Used: ${connection.endpoint} (${connection.latency}ms)`)
@@ -1025,10 +1026,11 @@ function getLargestDisputeBond(disputes: DisputeDetails[]): number {
 
 
 
-function determineRiskLevel(roundProgress: number): RiskLevel {
+function determineRiskLevel(roundProgress: number | null): RiskLevel {
+	if (roundProgress === null) return 'unknown'
 	if (roundProgress === 0) return 'none'
-	if (roundProgress >= 100) return 'critical'
-	if (roundProgress >= 75) return 'high'
+	if (roundProgress >= 75) return 'critical'
+	if (roundProgress >= 50) return 'high'
 	if (roundProgress >= 25) return 'moderate'
 	return 'low'
 }

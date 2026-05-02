@@ -30,7 +30,7 @@ const ForkDisplay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
 
   // Use the fork risk hook to get real data
-  const { gaugeData, lastUpdated, isLoading, error } = useForkData()
+  const { gaugeData, riskLevel, lastUpdated, isLoading, error } = useForkData()
 
   // Subscribe to animation state
   useEffect(() => {
@@ -58,7 +58,7 @@ const ForkDisplay: React.FC = () => {
         {error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
         {/* Gauge with Details Card - ForkDetailsCard wraps the gauge */}
-        <ForkDetailsCard gauge={<ForkGauge percentage={gaugeData.percentage} />} />
+        <ForkDetailsCard gauge={<ForkGauge percentage={gaugeData.percentage} riskLevel={riskLevel.level.toLowerCase()} />} />
 
         <ForkStats />
 

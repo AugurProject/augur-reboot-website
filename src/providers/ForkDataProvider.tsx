@@ -25,7 +25,7 @@ const ForkDataContext = createContext<ForkDataContextValue | undefined>(
 )
 
 const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
-	percentage: data.riskPercentage, // Pass actual percentage, let GaugeDisplay handle visual scaling
+	percentage: data.riskPercentage ?? 0,
 	repStaked: data.metrics.largestDisputeBond,
 	activeDisputes: data.metrics.activeDisputes,
 })
@@ -49,8 +49,11 @@ const convertToRiskLevel = (data: ForkRiskData): RiskLevel => {
 		case 'critical':
 			level = 'Critical'
 			break
+		case 'unknown':
+			level = 'Unknown'
+			break
 		default:
-			level = 'No Risk'
+			level = 'Unknown'
 	}
 
 	return { level }

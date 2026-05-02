@@ -5,21 +5,21 @@ export interface GaugeData {
 }
 
 export interface RiskLevel {
-	level: 'No Risk' | 'Low' | 'Moderate' | 'High' | 'Critical'
+	level: 'No Risk' | 'Low' | 'Moderate' | 'High' | 'Critical' | 'Unknown'
 }
 
 export interface ForkRiskData {
 	lastRiskChange: string
 	blockNumber?: number
 	riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
-	riskPercentage: number
+	riskPercentage: number | null
 	metrics: {
 		largestDisputeBond: number
 		forkThresholdPercent: number
 		activeDisputes: number
 		currentRound: number
 		estimatedTotalRounds: number | null
-		roundProgress: number
+		roundProgress: number | null
 		disputeDetails: Array<{
 			marketId: string
 			title: string
@@ -47,6 +47,7 @@ export interface ForkRiskData {
 
 export interface GaugeDisplayProps {
 	percentage: number
+	riskLevel?: string
 	onPercentageChange?: (percentage: number) => void
 }
 
