@@ -15,7 +15,7 @@ export const ForkStats = (): React.JSX.Element => {
 	const roundDisplay = rawData.metrics.roundProgress === null
 		? `${rawData.metrics.currentRound}/?`
 		: rawData.metrics.estimatedTotalRounds
-			? `${rawData.metrics.currentRound}/${rawData.metrics.estimatedTotalRounds}`
+			? `${rawData.metrics.currentRound}/~${rawData.metrics.estimatedTotalRounds}`
 			: `${rawData.metrics.currentRound}`
 
 	return (
