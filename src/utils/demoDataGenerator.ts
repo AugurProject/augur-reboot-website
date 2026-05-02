@@ -66,6 +66,8 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 		title: string
 		disputeBondSize: number
 		disputeRound: number
+		estimatedTotalRounds: number | null
+		roundProgress: number | null
 		daysRemaining: number
 	}>
 
@@ -76,6 +78,8 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			title: getDemoMarketTitle(i),
 			disputeBondSize: i === 0 ? largestDisputeBond : generateVariedBondSize(largestDisputeBond, scenario),
 			disputeRound: Math.floor(Math.random() * 3) + 1,
+			estimatedTotalRounds: null,
+			roundProgress: null,
 			daysRemaining: Math.floor(Math.random() * 6) + 1,
 		}))
 	} else {
@@ -110,6 +114,9 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			largestDisputeBond,
 			forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
 			activeDisputes,
+			currentRound: disputeDetails.length > 0 ? disputeDetails[0].disputeRound : 0,
+			estimatedTotalRounds: null,
+			roundProgress: Math.round(forkThresholdPercent * 10) / 10,
 			disputeDetails,
 		},
 		rpcInfo: {

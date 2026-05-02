@@ -83,6 +83,9 @@ export const ForkDataProvider = ({
 			largestDisputeBond: 0,
 			forkThresholdPercent: 0,
 			activeDisputes: 0,
+			currentRound: 0,
+			estimatedTotalRounds: null,
+			roundProgress: 0,
 			disputeDetails: [],
 		},
 		calculation: {

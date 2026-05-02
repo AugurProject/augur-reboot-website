@@ -24,6 +24,8 @@ interface DisputeDetails {
 	title: string
 	disputeBondSize: number
 	disputeRound: number
+	estimatedTotalRounds: number | null
+	roundProgress: number | null
 	daysRemaining: number
 }
 
@@ -38,6 +40,9 @@ interface Metrics {
 	forkThresholdPercent: number
 	activeDisputes: number
 	disputeDetails: DisputeDetails[]
+	currentRound: number
+	estimatedTotalRounds: number | null
+	roundProgress: number
 }
 
 interface Calculation {
@@ -59,6 +64,40 @@ interface ForkRiskData {
 		isHealthy: boolean
 		discrepancy?: string
 	}
+}
+
+/**
+ * Project total rounds based on bond growth trajectory.
+ * Uses the last few rounds to average the growth factor,
+ * then projects forward until bond exceeds threshold.
+ */
+function projectTotalRounds(
+	participantBonds: number[],
+	threshold: number,
+): { estimatedTotalRounds: number; growthFactor: number } | null {
+	if (participantBonds.length < 3) return null
+
+	// Use last 3-4 rounds for stable growth factor
+	const recentBonds = participantBonds.slice(-4)
+	const growthFactors: number[] = []
+	for (let i = 1; i < recentBonds.length; i++) {
+		if (recentBonds[i - 1] > 0) {
+			growthFactors.push(recentBonds[i] / recentBonds[i - 1])
+		}
+	}
+	if (growthFactors.length === 0) return null
+
+	const avgGrowth = growthFactors.reduce((a, b) => a + b, 0) / growthFactors.length
+	let bond = recentBonds[recentBonds.length - 1]
+	let round = participantBonds.length - 1
+
+	while (bond < threshold) {
+		bond *= avgGrowth
+		round++
+		if (round > 30) return null // diverging
+	}
+
+	return { estimatedTotalRounds: round, growthFactor: Math.round(avgGrowth * 100) / 100 }
 }
 
 // Cache interfaces for incremental event caching
@@ -122,13 +161,7 @@ interface RpcConnection {
 	fallbacksAttempted: number
 }
 
-// Risk level thresholds (percentage of fork threshold)
-const RISK_LEVELS = {
-	LOW: 10, // <10% of fork threshold
-	MODERATE: 25, // 10-25% of threshold
-	HIGH: 75, // 25-75% of threshold
-	CRITICAL: 75, // >75% of threshold
-}
+
 
 /**
  * Retry wrapper for contract calls with exponential backoff
@@ -291,8 +324,16 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			}
 
 			// Calculate key metrics
-			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode)
+			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode, forkThresholdRep)
 			const largestDisputeBond = getLargestDisputeBond(activeDisputes)
+
+			// Derive round-based metrics from the largest dispute
+			const topDispute = activeDisputes.length > 0
+				? activeDisputes.reduce((a, b) => a.disputeBondSize > b.disputeBondSize ? a : b)
+				: null
+			const currentRound = topDispute?.disputeRound ?? 0
+			const estimatedTotalRounds = topDispute?.estimatedTotalRounds ?? null
+			const roundProgress = topDispute?.roundProgress ?? 0
 
 			// Validate cache health
 			const cache = await loadEventCache()
@@ -303,39 +344,43 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				console.error('⚠️  Consider triggering Cache Rebuild job to repair the cache')
 			}
 
-			// Calculate risk level
+			// Calculate risk level based on round progress
 			const forkThresholdPercent =
 				(largestDisputeBond / forkThresholdRep) * 100
-			const riskLevel = determineRiskLevel(forkThresholdPercent)
-			const riskPercentage = forkThresholdPercent
+			const riskLevel = determineRiskLevel(roundProgress)
+			const riskPercentage = roundProgress
 
 			// Prepare results
 			const results: ForkRiskData = {
-			lastRiskChange: new Date().toISOString(),
-			blockNumber,
-			riskLevel,
-			riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
-			metrics: {
-				largestDisputeBond,
-				forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
-				activeDisputes: activeDisputes.length,
-				disputeDetails: activeDisputes.slice(0, 5), // Top 5 disputes
-			},
-			rpcInfo: {
-				endpoint: connection.endpoint,
-				latency: connection.latency,
-				fallbacksAttempted: connection.fallbacksAttempted,
-			},
-			calculation: {
-				forkThreshold: forkThresholdRep,
-			},
-			cacheValidation,
+				lastRiskChange: new Date().toISOString(),
+				blockNumber,
+				riskLevel,
+				riskPercentage: Math.min(100, Math.max(0, riskPercentage)),
+				metrics: {
+					largestDisputeBond,
+					forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
+					activeDisputes: activeDisputes.length,
+					disputeDetails: activeDisputes.slice(0, 5),
+					currentRound,
+					estimatedTotalRounds,
+					roundProgress: Math.round(roundProgress * 10) / 10,
+				},
+				rpcInfo: {
+					endpoint: connection.endpoint,
+					latency: connection.latency,
+					fallbacksAttempted: connection.fallbacksAttempted,
+				},
+				calculation: {
+					forkThreshold: forkThresholdRep,
+				},
+				cacheValidation,
 			}
 
 			console.log('Calculation completed successfully')
 			console.log(`Risk Level: ${riskLevel}`)
+			console.log(`Round Progress: ${currentRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%)`)
 			console.log(`Largest Dispute Bond: ${largestDisputeBond} REP`)
-			console.log(`Fork Threshold: ${forkThresholdPercent.toFixed(2)}%`)
+			console.log(`Bond/Threshold: ${forkThresholdPercent.toFixed(2)}%`)
 			console.log(`RPC Used: ${connection.endpoint} (${connection.latency}ms)`)
 			console.log(`Block Number: ${blockNumber}`)
 
@@ -609,7 +654,7 @@ function extractMarketFromEventLog(event: ethers.EventLog, eventType: 'created' 
 	return null
 }
 
-async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental'): Promise<DisputeDetails[]> {
+async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental', forkThresholdRep: number = 275000): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
 
@@ -875,26 +920,30 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 					continue
 				}
 
-				// Read participants from highest index down.
-				// The highest non-zero getSize() is the current/latest dispute round.
+				// Read ALL participants to build bond trajectory for projection
+				const allBonds: number[] = []
 				let largestSize = 0
 				let latestRound = 0
 
-				for (let i = numParticipants - 1; i >= 0; i--) {
+				for (let i = 0; i < numParticipants; i++) {
 					try {
 						const participantAddr = await market.participants(i)
-						if (!participantAddr || participantAddr === ethers.ZeroAddress) continue
+						if (!participantAddr || participantAddr === ethers.ZeroAddress) {
+							allBonds.push(0)
+							continue
+						}
 
 						const participant = new ethers.Contract(participantAddr, participantAbi, provider)
 						const sizeWei = await participant.getSize()
 						const sizeRep = Number(ethers.formatEther(sizeWei))
+						allBonds.push(sizeRep)
 
 						if (sizeRep > largestSize) {
 							largestSize = sizeRep
 							latestRound = i
 						}
 					} catch (_err) {
-						// Participant read failed, skip
+						allBonds.push(0)
 					}
 				}
 
@@ -905,14 +954,23 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 				})
 
 				if (largestSize > 0) {
+					// Run projection for this market
+					const projection = projectTotalRounds(allBonds, forkThresholdRep)
+					const estimatedTotalRounds = projection?.estimatedTotalRounds ?? null
+					const roundProgress = estimatedTotalRounds
+						? (latestRound / estimatedTotalRounds) * 100
+						: 0
+
 					disputes.push({
 						marketId,
 						title: `Market ${marketId.substring(0, 10)}...`,
 						disputeBondSize: largestSize,
 						disputeRound: latestRound,
+						estimatedTotalRounds,
+						roundProgress,
 						daysRemaining: 7,
 					})
-					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}`)
+					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%)`)
 				}
 			} catch (error) {
 				// Market read failed — keep tracking but don't add to disputes
@@ -967,11 +1025,11 @@ function getLargestDisputeBond(disputes: DisputeDetails[]): number {
 
 
 
-function determineRiskLevel(forkThresholdPercent: number): RiskLevel {
-	if (forkThresholdPercent === 0) return 'none'
-	if (forkThresholdPercent > RISK_LEVELS.CRITICAL) return 'critical'
-	if (forkThresholdPercent >= RISK_LEVELS.HIGH) return 'high'
-	if (forkThresholdPercent >= RISK_LEVELS.MODERATE) return 'moderate'
+function determineRiskLevel(roundProgress: number): RiskLevel {
+	if (roundProgress === 0) return 'none'
+	if (roundProgress >= 100) return 'critical'
+	if (roundProgress >= 75) return 'high'
+	if (roundProgress >= 25) return 'moderate'
 	return 'low'
 }
 
@@ -982,7 +1040,7 @@ function getForkingResult(blockNumber: number, connection: RpcConnection, forkTh
 			riskLevel: 'critical',
 			riskPercentage: 100,
 			metrics: {
-				largestDisputeBond: forkThresholdRep, // Fork threshold was reached
+				largestDisputeBond: forkThresholdRep,
 				forkThresholdPercent: 100,
 				activeDisputes: 0,
 				disputeDetails: [
@@ -991,9 +1049,14 @@ function getForkingResult(blockNumber: number, connection: RpcConnection, forkTh
 						title: 'Universe is currently forking',
 						disputeBondSize: forkThresholdRep,
 						disputeRound: 99,
+						estimatedTotalRounds: null,
+						roundProgress: 100,
 						daysRemaining: 0,
 					},
 				],
+				currentRound: 99,
+				estimatedTotalRounds: null,
+				roundProgress: 100,
 			},
 			rpcInfo: {
 				endpoint: connection.endpoint,
@@ -1018,6 +1081,9 @@ function getErrorResult(errorMessage: string): ForkRiskData {
 				forkThresholdPercent: 0,
 				activeDisputes: 0,
 				disputeDetails: [],
+				currentRound: 0,
+				estimatedTotalRounds: null,
+				roundProgress: 0,
 			},
 				rpcInfo: {
 				endpoint: null,
@@ -1025,7 +1091,7 @@ function getErrorResult(errorMessage: string): ForkRiskData {
 				fallbacksAttempted: 0,
 			},
 			calculation: {
-					forkThreshold: 275000, // fallback threshold
+					forkThreshold: 275000,
 			},
 		cacheValidation: { isHealthy: false, discrepancy: errorMessage },
 		}

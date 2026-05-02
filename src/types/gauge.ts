@@ -17,11 +17,16 @@ export interface ForkRiskData {
 		largestDisputeBond: number
 		forkThresholdPercent: number
 		activeDisputes: number
+		currentRound: number
+		estimatedTotalRounds: number | null
+		roundProgress: number
 		disputeDetails: Array<{
 			marketId: string
 			title: string
 			disputeBondSize: number
 			disputeRound: number
+			estimatedTotalRounds: number | null
+			roundProgress: number | null
 			daysRemaining: number
 		}>
 	}
