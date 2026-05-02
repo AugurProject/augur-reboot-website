@@ -1,18 +1,28 @@
 import type React from 'react'
 import { useForkData } from '../providers/ForkDataProvider'
 
+const getRiskLabel = (roundProgress: number): string => {
+	if (roundProgress === 0) return 'NONE'
+	if (roundProgress < 25) return 'LOW'
+	if (roundProgress < 50) return 'MEDIUM'
+	if (roundProgress < 75) return 'HIGH'
+	return 'EXTREME'
+}
+
 export const ForkStats = (): React.JSX.Element => {
 	const { rawData } = useForkData()
 
-	// Check if there are no active disputes (stable state)
 	const isStable = rawData.metrics.largestDisputeBond === 0
-
-	// Get the largest dispute details if available
 	const largestDispute = rawData.metrics.disputeDetails?.length > 0
 		? rawData.metrics.disputeDetails.reduce((largest, current) =>
 				current.disputeBondSize > largest.disputeBondSize ? current : largest
 			)
 		: null
+
+	const riskLabel = getRiskLabel(rawData.metrics.roundProgress)
+	const roundDisplay = rawData.metrics.estimatedTotalRounds
+		? `${rawData.metrics.currentRound}/${rawData.metrics.estimatedTotalRounds}`
+		: `${rawData.metrics.currentRound}`
 
 	return (
 		<div className="w-full mb-1">
@@ -28,7 +38,7 @@ export const ForkStats = (): React.JSX.Element => {
 							FORK RISK
 						</div>
 						<div className="uppercase text-primary fx-glow-sm">
-							{rawData.metrics.forkThresholdPercent.toFixed(1)}%
+							{riskLabel}
 						</div>
 					</div>
 
@@ -51,11 +61,11 @@ export const ForkStats = (): React.JSX.Element => {
 							DISPUTE ROUND
 						</div>
 						<div className="uppercase text-primary fx-glow-sm">
-							{largestDispute?.disputeRound || 1}
+							{roundDisplay}
 						</div>
 					</div>
 
-					{/* Market Address - properly constrained for truncation */}
+					{/* Market Address */}
 					{largestDispute && (
 						<div className="text-center md:col-span-full">
   						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
