@@ -26,19 +26,21 @@ export const ForkStats = (): React.JSX.Element => {
 				</div>
 			) : (
 				<div className="grid md:grid-cols-[10rem_12rem_10rem] md:place-content-center md:gap-y-4">
-					{/* Panel 1 - Fork Risk */}
+					{/* Panel 1 - Estimated Time to Fork */}
 					<div className="text-center">
 						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
-							FORK RISK
+							EST. TIME TO FORK
 						</div>
 						<div className="uppercase text-primary fx-glow-sm">
-							{riskLabel}
+							{largestDispute && largestDispute.weeksRemaining > 0
+								? `~${largestDispute.weeksRemaining}W`
+								: riskLabel}
 						</div>
 					</div>
 
 					{/* Panel 2 - Dispute Bond */}
 					<div className="text-center md:border-x md:border-muted-foreground/40">
-  					<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
+						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							DISPUTE BOND
 						</div>
 						<div
@@ -51,7 +53,7 @@ export const ForkStats = (): React.JSX.Element => {
 
 					{/* Panel 3 - Dispute Round */}
 					<div className="text-center">
-  					<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
+						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 							DISPUTE ROUND
 						</div>
 						<div className="uppercase text-primary fx-glow-sm">
@@ -59,13 +61,16 @@ export const ForkStats = (): React.JSX.Element => {
 						</div>
 					</div>
 
-					{/* Market Address */}
+					{/* Market Title + Address */}
 					{largestDispute && (
 						<div className="text-center md:col-span-full">
-  						<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
+							<div className="text-sm uppercase font-display tracking-widest font-light text-muted-foreground">
 								MARKET IN DISPUTE
 							</div>
-							<div className="uppercase text-primary fx-glow-sm">
+							<div className="uppercase text-primary fx-glow-sm text-sm">
+								{largestDispute.title}
+							</div>
+							<div className="text-xs text-muted-foreground/50 font-mono mt-0.5">
 								{largestDispute.marketId}
 							</div>
 						</div>
