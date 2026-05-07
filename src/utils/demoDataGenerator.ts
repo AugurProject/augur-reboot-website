@@ -81,7 +81,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 		disputeRound: number
 		estimatedTotalRounds: number | null
 		roundProgress: number | null
-		daysRemaining: number
+		weeksRemaining: number
 	}>
 
 	if (activeDisputes > 0) {
@@ -92,7 +92,7 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 			disputeRound: i === 0 ? currentRound : Math.floor(Math.random() * 3) + 1,
 			estimatedTotalRounds: i === 0 ? estimatedTotalRounds : null,
 			roundProgress: null,
-			daysRemaining: Math.floor(Math.random() * 6) + 1,
+			weeksRemaining: Math.floor(Math.random() * 5) + 2,
 		}))
 	} else {
 		disputeDetails = []

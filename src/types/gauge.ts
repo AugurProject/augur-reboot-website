@@ -27,7 +27,7 @@ export interface ForkRiskData {
 			disputeRound: number
 			estimatedTotalRounds: number | null
 			roundProgress: number | null
-			daysRemaining: number
+			weeksRemaining: number
 		}>
 	}
 	rpcInfo?: {

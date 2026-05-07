@@ -26,7 +26,7 @@ interface DisputeDetails {
 	disputeRound: number
 	estimatedTotalRounds: number | null
 	roundProgress: number | null
-	daysRemaining: number
+	weeksRemaining: number
 }
 
 interface RpcInfo {
@@ -112,6 +112,7 @@ interface SerializedEventLog {
 
 interface TrackedMarket {
 	marketId: string
+	title?: string
 	discoveredAtBlock: number
 	lastVerifiedBlock: number
 	source: 'event' | 'seed'
@@ -324,7 +325,20 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			}
 
 			// Calculate key metrics
-			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode, forkThresholdRep)
+			// Read dispute round duration from chain (for ETA calculation)
+			let disputeRoundDurationSeconds = 7 * 24 * 60 * 60 // fallback: 7 days
+			try {
+				const duration = await retryContractCall(
+					() => contracts.universe.getDisputeRoundDurationInSeconds(),
+					'universe.getDisputeRoundDurationInSeconds()'
+				)
+				disputeRoundDurationSeconds = Number(duration)
+				console.log(`Dispute Round Duration: ${disputeRoundDurationSeconds}s (${Math.round(disputeRoundDurationSeconds / 86400)} days)`)
+			} catch {
+				console.warn(`⚠️ Failed to read round duration, using fallback: ${disputeRoundDurationSeconds}s`)
+			}
+
+			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode, forkThresholdRep, disputeRoundDurationSeconds)
 			const largestDisputeBond = getLargestDisputeBond(activeDisputes)
 
 			// Derive round-based metrics from the largest dispute
@@ -655,7 +669,7 @@ function extractMarketFromEventLog(event: ethers.EventLog, eventType: 'created' 
 	return null
 }
 
-async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental', forkThresholdRep: number = 275000): Promise<DisputeDetails[]> {
+async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental', forkThresholdRep: number = 275000, roundDurationSeconds: number = 7 * 24 * 60 * 60): Promise<DisputeDetails[]> {
 	try {
 		console.log('Querying dispute events for accurate stake calculation...')
 
@@ -838,6 +852,10 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			const key = tm.marketId.toLowerCase()
 			const existing = trackedMap.get(key)
 			if (!existing || tm.lastVerifiedBlock > existing.lastVerifiedBlock) {
+				// Preserve seed title if cached entry doesn't have one
+				if (existing?.title && !tm.title) {
+					tm.title = existing.title
+				}
 				trackedMap.set(key, tm)
 			}
 		}
@@ -962,16 +980,24 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 						? (latestRound / estimatedTotalRounds) * 100
 						: 0
 
+					// Use title from seed data, or fallback to truncated address
+					const marketTitle = tracked.title ?? `Market ${marketId.substring(0, 10)}...`
+
+					const roundsRemaining = estimatedTotalRounds ? Math.max(0, estimatedTotalRounds - latestRound) : null
+					const weeksRemaining = roundsRemaining !== null
+						? Math.round(roundsRemaining * roundDurationSeconds / (7 * 24 * 60 * 60) * 10) / 10
+						: 0
+
 					disputes.push({
 						marketId,
-						title: `Market ${marketId.substring(0, 10)}...`,
+						title: marketTitle,
 						disputeBondSize: largestSize,
 						disputeRound: latestRound,
 						estimatedTotalRounds,
 						roundProgress,
-						daysRemaining: 7,
+						weeksRemaining,
 					})
-					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%)`)
+					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%) ~${weeksRemaining}w to fork`)
 				}
 			} catch (error) {
 				// Market read failed — keep tracking but don't add to disputes
@@ -1053,7 +1079,7 @@ function getForkingResult(blockNumber: number, connection: RpcConnection, forkTh
 						disputeRound: 99,
 						estimatedTotalRounds: null,
 						roundProgress: 100,
-						daysRemaining: 0,
+						weeksRemaining: 0,
 					},
 				],
 				currentRound: 99,
