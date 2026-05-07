@@ -88,38 +88,40 @@ The 275,000 REP threshold was chosen as a balance:
 
 ## How Fork Risk is Calculated
 
-The fork meter shows a simple calculation:
+The fork meter tracks the dispute's progress through the escalation path:
 
 <ProseCard class="text-center">
-(Largest Dispute Bond ÷ 275,000 REP) × 100 = Fork Risk %
+(Current Round ÷ Estimated Total Rounds) × 100 = Fork Risk %
 </ProseCard>
 
 ### Understanding the Formula
 
-**Largest Dispute Bond**: This is the single largest bond currently active across all markets. Why track the largest? Because it determines how close we are to the fork threshold.
+**Current Round**: The highest dispute round that has been funded so far. Each round corresponds to a crowdsourcer — when someone fills the bond for round 3, the dispute is at round 3.
 
-**Example**: If the largest active dispute is 150,000 REP, the next challenger would need to post ~300,000 REP to dispute it—which exceeds 275,000 and triggers a fork immediately.
+**Estimated Total Rounds**: Projected from the bond growth trajectory. Since bonds grow exponentially each round, the script extrapolates how many more rounds it would take before the bond reaches the 275,000 REP fork threshold.
 
 ### Two Calculation Examples
 
 <ProseCard>
 **EXAMPLE 1: LOW RISK**
 
-Current largest dispute bond: **15,000 REP**
+Current dispute round: **3**
+Estimated total rounds: **~12**
 
-(15,000 ÷ 275,000) × 100 = **5.5% risk**
+(3 ÷ 12) × 100 = **25% risk**
 
-*Interpretation: Disputes are active but still far from fork. The next dispute would need ~30,000 REP.*
+*Interpretation: Early rounds. Bonds are still small relative to the fork threshold. Many more escalations needed before a fork is possible.*
 </ProseCard>
 
 <ProseCard>
 **EXAMPLE 2: HIGH RISK**
 
-Current largest dispute bond: **200,000 REP**
+Current dispute round: **9**
+Estimated total rounds: **~12**
 
-(200,000 ÷ 275,000) × 100 = **73% risk**
+(9 ÷ 12) × 100 = **75% risk**
 
-*Interpretation: Close to fork. The next dispute would need ~400,000 REP, exceeding the threshold. Fork is likely with one more escalation.*
+*Interpretation: Late-stage dispute. Only a few more rounds of escalation remain before the bond would reach the fork threshold.*
 </ProseCard>
 
 ## What Happens When Fork Conditions Are Met?
@@ -149,8 +151,8 @@ Once a dispute bond reaches or exceeds 275,000 REP:
 ## Key Takeaways
 
 - **Disputes escalate:** Each new dispute doubles the bond size (approximately)
-- **Forks are triggered mechanically:** When the largest bond hits 275,000 REP
-- **Risk is measurable:** The fork formula lets you calculate exactly how close we are
+- **Forks are triggered mechanically:** When the dispute bond hits 275,000 REP
+- **Risk is measurable:** The meter tracks how far through the escalation path the dispute has progressed
 - **Escalation is expensive:** High-stakes disputes require serious financial commitment
 - **Fork is ultimate resolution:** When community disagreement is severe, REP holders decide
 
