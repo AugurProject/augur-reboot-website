@@ -94,7 +94,7 @@ The Augur v2 contract emits two event types used for discovery. Their argument p
 | `DisputeCrowdsourcerContribution` | universe | reporter | **market** | crowdsourcer |
 | `DisputeCrowdsourcerCompleted` | universe | **market** | crowdsourcer | — |
 
-`DisputeCrowdsourcerCreated` is **not emitted** by the Augur v2 contract. Discovery relies on Contribution events.
+`DisputeCrowdsourcerCreated` is also queried for discovery. Contribution events are the primary source; Created events provide additional coverage.
 
 ---
 

@@ -33,8 +33,8 @@ Layout.astro (Base HTML shell)
 │   │   │   ├── ForkGauge.tsx (SVG visualization)
 │   │   │   ├── ForkStats.tsx (progressive disclosure)
 │   │   │   ├── ForkDisplay.tsx (layout)
-│   │   │   ├── ForkControls.tsx (demo mode)
-│   │   │   └── ForkDetailsCard.tsx (expanded metrics)
+│   │   │   ├── ForkDetailsCard.tsx (dialog with expanded metrics + ForkAsciiArt)
+│   │   │   └── ForkControls.tsx (demo mode, F2 toggle)
 │   │   ├── Intro.tsx (client:load)
 │   │   └── FeaturedBlogs.astro
 │   │       └── BlogPostCard.astro
@@ -89,7 +89,7 @@ Risk level colors for ForkGauge:
 --color-green-500   /* Gauge gradient stop */
 --color-yellow-400  /* MODERATE risk */
 --color-orange-400  /* HIGH risk */
---color-red-500     /* ELEVATED risk */
+--color-red-500     /* CRITICAL risk */
 ```
 
 ### Custom Utilities

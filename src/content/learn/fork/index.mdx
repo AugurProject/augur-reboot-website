@@ -35,24 +35,24 @@ Forks are Augur's ultimate security mechanism. They ensure that:
 
 ## How to Monitor Fork Risk
 
-The fork meter shows **how close we are to a fork** by tracking the largest dispute bond:
+The fork meter tracks **how far through the escalation path the largest dispute has progressed**:
 
 <ProseCard class="text-center">
 The Formula
 
-**(Largest Dispute Bond ÷ 275,000 REP) × 100 = Risk %**
+**(Current Dispute Round ÷ Estimated Total Rounds) × 100 = Risk %**
 </ProseCard>
 
-The percentage tells you how much of the way to fork we are:
+The percentage tells you how far along the path to a fork the dispute has reached:
 
 <ProseCard>
 | LEVEL | RANGE | WHAT IT MEANS |
 |-------|-------|--------------|
 | NO RISK | 0% | No disputes. Normal trading. |
-| LOW | 0-10% | Early disputes. Fork unlikely. |
-| MEDIUM | 10-25% | Serious disputes. Monitor closely. |
-| HIGH | 25-75% | Large bonds active. Fork possible. |
-| EXTREME | 75-100%+ | Fork imminent or triggered. |
+| LOW | &lt;25% | Early dispute rounds. Fork unlikely. |
+| MODERATE | 25-50% | Mid-escalation. Monitor closely. |
+| HIGH | 50-75% | Late-stage dispute. Fork possible. |
+| CRITICAL | ≥75% | Approaching fork threshold. |
 </ProseCard>
 
 ## What Happens If a Fork Occurs
