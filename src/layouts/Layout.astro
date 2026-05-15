@@ -111,6 +111,26 @@ const {
 		</script>
 
 		<ClientRouter />
+
+		<!-- Pre-paint: decide whether the landing page should boot into the
+		     CRT intro or skip straight to the hero. Runs synchronously before
+		     first paint to prevent any flash. Re-runs on view transitions. -->
+		<script is:inline define:vars={{ basePath: import.meta.env.BASE_URL || '/' }}>
+			(function () {
+				var normalizedBase = basePath.endsWith('/') ? basePath : basePath + '/';
+				function applyBootClass() {
+					var path = location.pathname;
+					var normalizedPath = path.endsWith('/') ? path : path + '/';
+					var isLanding = normalizedPath === normalizedBase;
+					var skip = sessionStorage.getItem('introSeen') === '1'
+						|| matchMedia('(prefers-reduced-motion: reduce)').matches;
+					document.documentElement.classList.toggle('boot', isLanding && !skip);
+				}
+				applyBootClass();
+				document.addEventListener('astro:page-load', applyBootClass);
+			})();
+		</script>
+
 	<!-- Google Analytics -->
 	<GoogleAnalytics gaId={import.meta.env.PUBLIC_GA_ID} />
 </head>
@@ -129,23 +149,4 @@ const {
 		<slot />
 	</body>
 
-	<script>
-		import { appActions } from '../stores/animationStore';
-
-		// Initialize app store on first page load
-		function initializeAppStore() {
-			appActions.initializeFromURL();
-		}
-
-		function handlePageLoad() {
-			// Ensure store is properly initialized after navigation
-			appActions.handleNavigation();
-		}
-
-		// Initialize on first load
-		initializeAppStore();
-
-		// Set up view transition event listeners
-		document.addEventListener('astro:page-load', handlePageLoad);
-	</script>
 </html>

@@ -1,11 +1,9 @@
 import type React from 'react'
-import { useState, useEffect } from 'react'
 import { ForkGauge } from './ForkGauge'
 import { ForkStats } from './ForkStats'
 import { ForkControls } from './ForkControls'
 import { ForkDetailsCard } from './ForkDetailsCard'
 import { useForkData } from '../providers/ForkDataProvider'
-import { $appStore, UIState } from '../stores/animationStore'
 
 // Helper function to format timestamps as relative time
 function formatRelativeTime(isoTimestamp: string): string {
@@ -27,28 +25,7 @@ function formatRelativeTime(isoTimestamp: string): string {
 }
 
 const ForkDisplay: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false)
-
-  // Use the fork risk hook to get real data
   const { gaugeData, riskLevel, lastUpdated, isLoading, error } = useForkData()
-
-  // Subscribe to animation state
-  useEffect(() => {
-    const unsubscribe = $appStore.subscribe((state) => {
-      const shouldShow = state.uiState === UIState.MAIN_CONTENT
-      setIsVisible(shouldShow)
-    })
-
-    // Initialize with current state
-    const currentState = $appStore.get()
-    const shouldShow = currentState.uiState === UIState.MAIN_CONTENT
-    setIsVisible(shouldShow)
-
-    return unsubscribe
-  }, [])
-
-  // Don't render anything until animation state allows it
-  if (!isVisible) return null
 
   return (
     <>

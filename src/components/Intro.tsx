@@ -1,7 +1,5 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useStore } from '@nanostores/react';
-import { $appStore, UIState, appActions } from '../stores/animationStore';
 import CrtDisplay from './CrtDisplay';
 import TypewriterSequence from './TypewriterSequence';
 import Button from './ui/Button';
@@ -14,8 +12,14 @@ const bootSentences: string[] = [
   "AUGUR REBOOT BEGINS"
 ];
 
+function exitBoot() {
+  sessionStorage.setItem('introSeen', '1');
+  requestAnimationFrame(() => {
+    document.documentElement.classList.remove('boot');
+  });
+}
+
 const Intro: React.FC = () => {
-  const appState = useStore($appStore);
   const [isPoweredOn, setIsPoweredOn] = useState(true);
 
   const handleSequenceComplete = () => {
@@ -24,14 +28,14 @@ const Intro: React.FC = () => {
       setTimeout(() => {
         setIsPoweredOn(true);
         setTimeout(() => {
-          appActions.completeBootSequence();
+          exitBoot();
         }, 500);
       }, 200);
     }, 1000);
   };
 
   const handleSkipClick = useCallback(() => {
-    appActions.skipToMainContent();
+    exitBoot();
   }, []);
 
   useEffect(() => {
@@ -48,30 +52,27 @@ const Intro: React.FC = () => {
     };
   }, [handleSkipClick]);
 
-  // Only render when in boot sequence state
-  if (appState.uiState !== UIState.BOOT_SEQUENCE) {
-    return null;
-  }
-
   return (
-    <CrtDisplay isPoweredUp={isPoweredOn}>
-      <Button
-        onClick={handleSkipClick}
-        variant="link"
-        size="lg"
-        className="fixed top-8 right-10 z-50 text-muted-foreground hover:no-underline"
-      >
-        <Pointer animated="auto" direction="right" />
-        SKIP INTRO (ESC)
-      </Button>
-      <div className="flex items-center justify-center h-screen uppercase font-display text-foreground text-2xl">
-        <TypewriterSequence
-          sentences={bootSentences}
-          defaultTypingSpeed={40}
-          onSequenceComplete={handleSequenceComplete}
-        />
-      </div>
-    </CrtDisplay>
+    <div id="crt-overlay">
+      <CrtDisplay isPoweredUp={isPoweredOn}>
+        <Button
+          onClick={handleSkipClick}
+          variant="link"
+          size="lg"
+          className="fixed top-8 right-10 z-50 text-muted-foreground hover:no-underline"
+        >
+          <Pointer animated="auto" direction="right" />
+          SKIP INTRO (ESC)
+        </Button>
+        <div className="flex items-center justify-center h-screen uppercase font-display text-foreground text-2xl">
+          <TypewriterSequence
+            sentences={bootSentences}
+            defaultTypingSpeed={40}
+            onSequenceComplete={handleSequenceComplete}
+          />
+        </div>
+      </CrtDisplay>
+    </div>
   );
 };
 
