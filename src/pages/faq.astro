@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import FaqItem from "../components/FaqItem.astro";
+import MigrationCta from "../components/MigrationCta.tsx";
 import { withBase } from "../lib/utils";
 ---
 
@@ -42,6 +43,14 @@ import { withBase } from "../lib/utils";
           will likely render them worthless.</span>
           This page answers the most important questions.
         </p>
+
+        <!-- Migration guide CTA -->
+        <MigrationCta
+          className="mb-12"
+          eyebrow="MIGRATION WINDOW // OPEN NOW"
+          title="Your REP is worthless if you don't migrate"
+          description="The full procedure — wallet, token contracts, signing order — before Aug 1, 2026."
+        />
 
         <!-- WHAT IS HAPPENING -->
         <SectionHeading text="What is happening?" />
@@ -92,7 +101,8 @@ import { withBase } from "../lib/utils";
               <p>Your REP will likely become worthless, since that universe will not be used going forward.</p>
             </FaqItem>
           <FaqItem question="HOW DO I MIGRATE?">
-              <p>You will use the tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>. A step-by-step guide will also be provided.</p>
+              <p>You will use the tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>.</p>
+              <p><strong><a href="/learn/fork/migration/">→ Read the full step-by-step migration guide</a></strong> for wallet setup, token addresses, and every step in order.</p>
             </FaqItem>
         </div>
 

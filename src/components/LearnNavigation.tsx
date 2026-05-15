@@ -4,6 +4,7 @@ interface Topic {
 	title: string
 	slug: string
 	path: string
+	critical?: boolean
 }
 
 interface LearnNavigationProps {
@@ -82,19 +83,26 @@ export default function LearnNavigation({
 				<div className="border-t border-foreground/30 bg-background overflow-hidden animate-in fade-in duration-200 w-full">
 					<div className="max-w-2xl mx-auto px-4 md:px-8 py-4 w-full">
 						<div className="space-y-2">
-							{topics.map((topic) => (
-								<a
-									key={topic.path}
-									href={topic.path}
-									className={`block text-sm font-light uppercase tracking-widest px-3 py-2 transition-colors ${
-										currentPath === topic.path
-											? 'bg-foreground/10 text-primary border border-foreground/30'
-											: 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
-									}`}
-								>
-									{topic.title}
-								</a>
-							))}
+							{topics.map((topic) => {
+								const isActive = currentPath === topic.path
+								const base = 'flex items-center gap-2 text-sm font-light uppercase tracking-widest px-3 py-2 transition-colors'
+								const cls = topic.critical
+									? isActive
+										? 'bg-red-500/10 text-red-500 border border-red-500/60'
+										: 'text-red-500 hover:bg-red-500/10 border border-red-500/40'
+									: isActive
+										? 'bg-foreground/10 text-primary border border-foreground/30'
+										: 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
+								return (
+									<a key={topic.path} href={topic.path} className={`${base} ${cls}`}>
+										{topic.critical && (
+											<span className="inline-block w-1.5 h-1.5 bg-red-500" aria-hidden="true" />
+										)}
+										<span>{topic.title}</span>
+										{topic.critical && <span className="ml-auto text-[0.65rem] opacity-80">{'// ACT NOW'}</span>}
+									</a>
+								)
+							})}
 						</div>
 					</div>
 				</div>

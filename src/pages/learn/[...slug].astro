@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import LearnLayout from '../../layouts/LearnLayout.astro';
+import MigrationGuideLayout from '../../layouts/MigrationGuideLayout.astro';
 
 export const prerender = true;
 
@@ -27,6 +28,12 @@ const { Content } = await entry.render();
 const { title, description } = entry.data;
 ---
 
-<LearnLayout title={title} description={description}>
-  <Content />
-</LearnLayout>
+{entry.slug === 'fork/migration' ? (
+  <MigrationGuideLayout title={title} description={description}>
+    <Content />
+  </MigrationGuideLayout>
+) : (
+  <LearnLayout title={title} description={description}>
+    <Content />
+  </LearnLayout>
+)}
