@@ -1,0 +1,111 @@
+---
+title: "Moon Fork Migration Guide"
+description: "Step-by-step REP migration guide. Migrate before August 1, 2026 or lose your REP."
+---
+
+import { Image } from 'astro:assets'
+import ProseCard from '../../../components/ProseCard.astro'
+import step01 from '../../../assets/migration/step-01.png'
+import step02 from '../../../assets/migration/step-02.png'
+import step03 from '../../../assets/migration/step-03.png'
+import step04 from '../../../assets/migration/step-04.png'
+import step05 from '../../../assets/migration/step-05.png'
+import step06 from '../../../assets/migration/step-06.png'
+
+## Why?
+
+By design, when Augur forks all REP holders are required to declare what they believe to be true. This significantly increases the cost to attack Augur. Doing anything other than voting how future Augur customers would want you to vote will result in a complete loss of funds.
+
+Augur is forking before the next version for three reasons:
+
+1. To learn from and improve the forking experience.
+2. To verify the incentive mechanisms work as theorized.
+3. To increase security by removing the portion of REP holders that would fail to respond should an attack happen.
+
+## When?
+
+<ProseCard>
+| If you…                       | You can take action after | The last day this will happen between |
+|-------------------------------|---------------------------|---------------------------------------|
+| migrate early (40% ROI)       | April 8ᵗʰ – May 12ᵗʰ      | June 4ᵗʰ – June 11ᵗʰ                  |
+| migrate late (1:1 conversion) | June 4ᵗʰ – June 11ᵗʰ      | August 2ⁿᵈ – August 10ᵗʰ              |
+</ProseCard>
+
+## Moon Fork Migration Guide
+
+### 0. Consolidate your REP on Ethereum mainnet
+
+If your REP is not on Ethereum (exchanges, L2s), send it to your Ethereum address.
+
+Sometimes wallets will not automatically detect your REP. You can manually add tokens by pasting the token address:
+
+- **REPv2** — [`0x221657776846890989a759ba2973e427dff5c9bb`](https://etherscan.io/token/0x221657776846890989a759ba2973e427dff5c9bb)
+- **REPv1** — [`0x1985365e9f78359a9B6AD760e32412f4a445E862`](https://etherscan.io/address/0x1985365e9f78359a9B6AD760e32412f4a445E862)
+
+If you have REP in multiple places, send it all to a single Ethereum address on the original Ethereum. Don't forget REP you might have on Layer 2, Coinbase, or other exchanges. You must own your Ethereum address — an Ethereum address is yours if you have the private key.
+
+### 1. Open the migration site
+
+Go to [https://6.augurfork.eth.limo/](https://6.augurfork.eth.limo/).
+
+<Image src={step01} alt="The augurfork.eth.limo homepage" />
+
+### 2. Connect your Ethereum wallet
+
+<Image src={step02} alt="Wallet connection prompt" />
+
+### 3. Convert any remaining REPv1 to REPv2
+
+Make sure the page says **"You have 0 REPv1"**. If not, convert all REPv1 into REPv2.
+
+<Image src={step03} alt="REPv1 to REPv2 conversion screen" />
+
+### 4. (Optional) Early Migration
+
+- Early migration is only available from April 8ᵗʰ to early June.
+- The system pays a **40% return** for early migration to the correct outcome.
+- This return comes from the penalty paid by reporters who migrate to a different outcome. The 40% return was funded by crowdsourced donations.
+- Early migration comes with one small risk compared to late migration: if less than **3.33%** of the REP supply migrates to the same outcome as you, a different outcome will win and you will lose all REP.
+- Early migration is limited to the **first 367,000 REP**.
+- You may have to check the page multiple times on different days to make it into a round before it fills. It is easiest to make it in near the end — around 75% of early migration happens during the last several days because the migration limit grows exponentially.
+- If you want to participate, check [the reporting page](https://6.augurfork.eth.limo/#/reporting?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e) each day until it allows you to migrate to the correct outcome. If you are not able to select an outcome, the yellow note at the top will tell you how long to wait.
+
+<Image src={step04} alt="Early migration reporting screen" />
+
+### 5. Wait until June 11ᵗʰ
+
+Augur will have forked by this date, enabling unlimited migration. You will have until **August 1ˢᵗ** to migrate or sell your REP before it becomes worthless — possibly up to 10 days longer.
+
+### 6. Open the migration page
+
+Go to [the migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e).
+
+### 7. Migrate all REPv2 to the correct outcome
+
+Select the correct answer to the Augur market **"Will the Artemis II Mission successfully liftoff in the first week of April?"**. The correct answer is the one that will result in a more valuable REP token, which is usually the truthful answer.
+
+If you are unsure what to pick, research and debate on the [Augur Discord](https://discord.gg/qxdxRV8S). If you select the wrong answer, you should expect to receive a different REP token that has no value.
+
+<Image src={step05} alt="Migration outcome selection" />
+
+### 8. Verify the new token
+
+After the migration is complete, verify you hold the new token **REPv2_1** in your wallet.
+
+### 9. If you only did late migration, you are done
+
+There are no further steps. Assuming you migrated to the correct universe, the tokens you received will be used for both **Augur Lituus** and **Augur Zoltar**.
+
+### 10. If you did early migration, claim your bonus
+
+Return to the [migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e).
+
+### 11. Redeem fork disputes
+
+Refresh possible claims, check all boxes, then redeem fork disputes. This will give you **140%** of your early migration REP. You are done when no boxes are left to check and you have additional REPv2_1 in your wallet.
+
+<Image src={step06} alt="Fork dispute redemption screen" />
+
+---
+
+For additional help, visit the **moon-fork** channel on the [Augur Discord server](https://discord.gg/qxdxRV8S) or read [The Augur Fork Is Here](https://www.augur.net/blog/the-augur-fork-is-here/).

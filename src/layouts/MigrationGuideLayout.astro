@@ -1,0 +1,65 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Footer from "../components/Footer.astro";
+import LearnNavigation from "../components/LearnNavigation.tsx";
+import PageHeader from "../components/PageHeader.tsx";
+import { withBase } from "../lib/utils";
+
+interface Props {
+	title: string;
+	description?: string;
+	deadline?: string;
+}
+
+const { title, description, deadline = "AUGUST 1, 2026" } = Astro.props;
+
+const topics = [
+	{ title: "MIGRATION GUIDE", slug: "fork/migration", path: "/learn/fork/migration/", critical: true },
+	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
+	{
+		title: "HOW DISPUTES & BONDS WORK",
+		slug: "fork/disputes-and-bonds",
+		path: "/learn/fork/disputes-and-bonds/",
+	},
+	{ title: "WHAT TO DO", slug: "fork/what-to-do", path: "/learn/fork/what-to-do/" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<Layout
+	title={`${title} - Moon Fork Migration`}
+	description={description || "Step-by-step REP migration guide for the Augur Moon Fork."}
+	ogType="article"
+>
+	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+		<PageHeader client:load backHref={withBase("/?intro=false")} />
+
+		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
+			<div class="max-w-3xl mx-auto">
+				{/* Alert hero — dramatic, critical-coded, glow-pulsed */}
+				<header class="relative border border-red-500/60 bg-red-500/4 px-6 py-8 mb-8">
+					<div class="font-display uppercase tracking-wider text-sm text-red-500 mb-3 flex items-center gap-2">
+						<span class="inline-block w-2 h-2 bg-red-500" aria-hidden="true"></span>
+						<span>CRITICAL · MIGRATION IMMINENT</span>
+					</div>
+					<h1 class="font-display uppercase leading-[0.95] text-3xl sm:text-3xl">
+						<span class="block text-loud-foreground">You will lose all of your REP</span>
+						<span class="block text-foreground text-2xl sm:text-2xl mt-2">
+							if you do not migrate before
+							<span class="text-red-500 fx-glow-sm-red-500">{deadline}</span>
+						</span>
+					</h1>
+				</header>
+
+				{/* Body: standard prose shell, same as LearnLayout */}
+				<article class="prose prose-invert max-w-none pt-2 px-1 prose-headings:font-display prose-headings:uppercase prose-headings:tracking-wide prose-p:leading-snug prose-li:leading-snug prose-ul:list-[square] prose-li:marker:text-muted-foreground prose-ol:marker:text-muted-foreground prose-blockquote:border-l-muted-foreground prose-blockquote:text-foreground prose-img:border prose-img:border-muted-foreground/30 prose-img:shadow-[0_0_2em_oklch(from_var(--color-primary)_l_c_h_/0.1)]">
+					<slot />
+				</article>
+			</div>
+		</main>
+
+		<LearnNavigation client:load currentPath={currentPath} currentTitle={title} topics={topics} />
+		<Footer />
+	</div>
+</Layout>
