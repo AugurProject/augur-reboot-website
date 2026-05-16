@@ -7,6 +7,14 @@ import { DisputeBondScenario } from '../utils/demoDataGenerator'
 export const ForkControls = (): React.JSX.Element | null => {
 	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useForkMock()
 	const [isVisible, setIsVisible] = useState(false)
+	const [mounted, setMounted] = useState(false)
+
+	// Defer rendering until after mount so SSR and client first render
+	// both produce null — avoids a hydration mismatch on the dev-only
+	// portal.
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 
 	// Keyboard shortcut to toggle demo overlay (F2)
 	useEffect(() => {
@@ -21,11 +29,8 @@ export const ForkControls = (): React.JSX.Element | null => {
 		return () => window.removeEventListener('keydown', handleKeydown)
 	}, [])
 
-	// Only show in development mode
-	if (!isDemoAvailable) {
-		return null
-	}
-	
+	if (!mounted || !isDemoAvailable) return null
+
 	if (!isVisible) {
 		return ReactDOM.createPortal(
 			<div className="fixed top-4 left-4 z-50 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded">
@@ -34,7 +39,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 			document.body
 		)
 	}
-	
+
 	return ReactDOM.createPortal(
 		<div className="fixed top-4 left-4 z-50 bg-background/95 border border-primary/30 p-4 rounded text-sm max-w-xs">
 			<div className="flex justify-between items-center mb-3">
@@ -47,7 +52,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 					×
 				</button>
 			</div>
-			
+
 			{isDemo && (
 				<div className="mb-3 p-2 bg-orange-900/20 border border-orange-500/30 rounded">
 					<div className="text-orange-400 text-xs font-bold mb-1">DEMO MODE ACTIVE</div>
@@ -60,7 +65,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 					</button>
 				</div>
 			)}
-			
+
 			<div className="space-y-2">
 				<div className="text-xs text-muted-foreground mb-2">Generate Scenarios:</div>
 
@@ -104,7 +109,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 					Extreme Risk (75%+)
 				</button>
 			</div>
-			
+
 			<div className="mt-3 text-xs text-muted-foreground">
 				Demo data shows different dispute bond scenarios for testing UI behavior.
 			</div>

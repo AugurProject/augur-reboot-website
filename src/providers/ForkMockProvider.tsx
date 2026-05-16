@@ -27,9 +27,9 @@ interface ForkMockProviderProps {
 export const ForkMockProvider = ({ children }: ForkMockProviderProps): React.JSX.Element => {
 	const [isDemo, setIsDemo] = useState(false)
 	const { setData } = useForkData()
-	
+
 	// Demo is only available in development mode
-	const isDemoAvailable = !import.meta.env.PROD
+	const isDemoAvailable = !import.meta.env.PROD && !import.meta.env.SSR
 
 	const generateRisk = useCallback((_percentage: number) => {
 		if (!isDemoAvailable) return
@@ -38,7 +38,7 @@ export const ForkMockProvider = ({ children }: ForkMockProviderProps): React.JSX
 		setData(generatedData)
 		setIsDemo(true)
 	}, [setData])
-	
+
 	const generateScenario = useCallback((scenario: DisputeBondScenario) => {
 		if (!isDemoAvailable) return
 
@@ -46,7 +46,7 @@ export const ForkMockProvider = ({ children }: ForkMockProviderProps): React.JSX
 		setData(generatedData)
 		setIsDemo(true)
 	}, [setData])
-	
+
 	const setDemoData = useCallback((data: ForkRiskData) => {
 		if (!isDemoAvailable) return
 

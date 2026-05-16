@@ -12,7 +12,7 @@ import { withBase } from "../lib/utils";
     <!-- Main content wrapper that fills viewport -->
     <div class="min-h-screen flex flex-col">
       <!-- Top Section: Navigation -->
-      <PageHeader client:load backHref={withBase('/?intro=false')} />
+      <PageHeader client:load backHref={withBase('/')} />
 
       <!-- Middle Section: 404 Content -->
       <main class="flex-1 flex items-center justify-center px-4 md:px-8">
@@ -36,7 +36,7 @@ import { withBase } from "../lib/utils";
           <!-- Navigation Message -->
           <div class="text-center space-y-4">
             <p class="text-sm uppercase text-muted-foreground opacity-80">
-              Return to the homepage by <a href={withBase("/?intro=false")} class="text-loud-foreground hover:fx-glow-sm transition-all">clicking here</a> <br />
+              Return to the homepage by <a href={withBase("/")} class="text-loud-foreground hover:fx-glow-sm transition-all">clicking here</a> <br />
               or scroll further down to explore community links.
             </p>
 

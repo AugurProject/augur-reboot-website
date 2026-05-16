@@ -26,8 +26,8 @@ import Footer from '../components/Footer.astro';
     "next generation"
   ]}
 >
-  <Intro client:only="react" />
-  <HeroBanner client:only="react" />
+  <Intro client:load />
+  <HeroBanner client:load />
   <FeaturedBlogs />
   <Footer />
 </Layout>
