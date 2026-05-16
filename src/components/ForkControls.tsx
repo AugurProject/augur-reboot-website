@@ -7,6 +7,14 @@ import { DisputeBondScenario } from '../utils/demoDataGenerator'
 export const ForkControls = (): React.JSX.Element | null => {
 	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useForkMock()
 	const [isVisible, setIsVisible] = useState(false)
+	const [mounted, setMounted] = useState(false)
+
+	// Defer rendering until after mount so SSR and client first render
+	// both produce null — avoids a hydration mismatch on the dev-only
+	// portal.
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 
 	// Keyboard shortcut to toggle demo overlay (F2)
 	useEffect(() => {
@@ -21,8 +29,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 		return () => window.removeEventListener('keydown', handleKeydown)
 	}, [])
 
-	// Only show in development mode and client
-	if (import.meta.env.SSR || !isDemoAvailable) return null
+	if (!mounted || !isDemoAvailable) return null
 
 	if (!isVisible) {
 		return ReactDOM.createPortal(

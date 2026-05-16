@@ -430,7 +430,7 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-screen h-screen bg-transparent -z-10"
+      className="grid-tunnel fixed inset-0 w-screen h-screen bg-transparent -z-10"
       style={{ opacity: opacity }}
     />
   );

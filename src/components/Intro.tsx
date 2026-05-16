@@ -13,7 +13,7 @@ const bootSentences: string[] = [
 ];
 
 function exitBoot() {
-  sessionStorage.setItem('introSeen', '1');
+  sessionStorage.setItem('skipIntro', '1');
   requestAnimationFrame(() => {
     document.documentElement.classList.remove('boot');
   });
