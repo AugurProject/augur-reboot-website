@@ -162,6 +162,7 @@ The UI displays round progress as a risk level:
 | Moderate | 25–50% | Mid-escalation |
 | High | 50–75% | Late-stage dispute |
 | Critical | ≥75% | Approaching fork threshold |
+| Unknown | null | Projection unavailable (fewer than 3 rounds or divergent growth) |
 
 These levels are display categories derived from round progress. The bond/threshold percentage is still computed and stored in the data, but the primary gauge signal and risk labels use round progress.
 

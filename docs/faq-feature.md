@@ -55,13 +55,13 @@ Collapsible Q&A styled to match the terminal aesthetic via `.faq-item` and `.faq
 
 ## Landing Page Integration
 
-`src/components/HeroBanner.astro` — FAQ is the **first item** in `#menu-items-container`:
+The FAQ page is linked from two places on the landing page:
 
-- **Copy:** `THE FORK IS HERE! OWN REP? ACT NOW.`
-- **Style:** `text-loud-foreground` + persistent `fx-glow` (always on, not hover-only) to distinguish urgency
-- **ID:** `id="first-menu-item"` for keyboard focus targeting after hero animation
+1. **`MigrationCta.tsx`** — a red-bordered CTA block that links to `/learn/fork/migration/` (the migration guide). This is rendered in the FAQ page itself as an inline call-to-action.
 
-Mission and Team links follow below.
+2. **`src/components/Footer.astro`** — FAQ link in the `>_ KB` section.
+
+The hero no longer contains a direct FAQ link. The original urgent hero item (`THE FORK IS HERE! OWN REP? ACT NOW.`) was removed when the hero was refactored to CSS-driven animation. The migration guide in `learn/fork/migration/` now serves as the primary entry point for fork/migration content.
 
 ## Footer Integration
 

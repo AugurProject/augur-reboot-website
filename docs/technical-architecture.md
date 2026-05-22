@@ -20,22 +20,21 @@ The site is built with:
 ## Component Hierarchy
 
 ```
-Layout.astro (Base HTML shell)
+Layout.astro (Base HTML shell — toggles html.boot class for CSS-driven intro)
 ├── Header / Footer / SocialLinks (Astro components)
 ├── Pages
 │   ├── index.astro (Homepage)
-│   │   ├── HeroBanner.astro
+│   │   ├── Intro.tsx (client:load — CRT boot overlay, removes html.boot on complete)
+│   │   ├── HeroBanner.tsx (client:load — CSS-animated entrance via .hero-* classes)
 │   │   │   ├── PerspectiveGridTunnel.tsx (client:load)
-│   │   │   ├── Typewriter.tsx / TypewriterSequence.tsx (client:load)
-│   │   │   └── ScrollIndicator.tsx (client:load)
-│   │   ├── ForkMonitor.tsx (client:load — Fork Gauge island)
-│   │   │   ├── ForkDataProvider.tsx (data fetching)
-│   │   │   ├── ForkGauge.tsx (SVG visualization)
-│   │   │   ├── ForkStats.tsx (progressive disclosure)
-│   │   │   ├── ForkDisplay.tsx (layout)
-│   │   │   ├── ForkDetailsCard.tsx (dialog with expanded metrics + ForkAsciiArt)
-│   │   │   └── ForkControls.tsx (demo mode, F2 toggle)
-│   │   ├── Intro.tsx (client:load)
+│   │   │   ├── PageHeader.tsx (social links + back nav)
+│   │   │   └── ForkMonitor.tsx (client:load — Fork Gauge island)
+│   │   │       ├── ForkDataProvider.tsx (data fetching)
+│   │   │       ├── ForkGauge.tsx (SVG visualization)
+│   │   │       ├── ForkStats.tsx (progressive disclosure)
+│   │   │       ├── ForkDisplay.tsx (layout)
+│   │   │       ├── ForkDetailsCard.tsx (dialog with expanded metrics + ForkAsciiArt)
+│   │   │       └── ForkControls.tsx (demo mode, F2 toggle)
 │   │   └── FeaturedBlogs.astro
 │   │       └── BlogPostCard.astro
 │   ├── blog/index.astro → BlogPostCard.astro
@@ -44,8 +43,9 @@ Layout.astro (Base HTML shell)
 │   │   ├── BlogNavigation.tsx (client:load)
 │   │   ├── BlogCTA.tsx (client:load)
 │   │   └── SocialShareButtons.astro
-│   ├── learn/[...slug].astro → LearnLayout.astro
+│   ├── learn/[...slug].astro → LearnLayout.astro or MigrationGuideLayout.astro
 │   │   ├── ProseCard.astro
+│   │   ├── MigrationCta.tsx (fork/migration CTA block)
 │   │   └── LearnNavigation.tsx (client:load)
 │   ├── mission.astro → TimelineSection.astro
 │   └── team.astro → TeamCard.astro
@@ -53,8 +53,13 @@ Layout.astro (Base HTML shell)
 
 ## State Management
 
-### Nanostores (Global State)
-- `animationStore.ts` — tracks hero animation state across components
+### CSS-Driven Animation (Landing Page)
+The hero/intro animation sequence is CSS-driven — no JavaScript state machine. A synchronous `<script is:inline>` in **Layout.astro** toggles `html.boot` based on:
+- Whether the current page is the landing page (`pathname === basePath`)
+- `sessionStorage.getItem('skipIntro')` (set after first boot or skip)
+- `prefers-reduced-motion` media query
+
+When `.boot` is present, the CRT overlay (`#crt-overlay`) is shown and all hero entrance animations are suppressed via `html.boot .hero-* { animation: none; opacity: 0 }`. When **Intro.tsx** completes (or skip is pressed), it removes `.boot`, which triggers all CSS `animation` declarations from delay 0.
 
 ### React Context (Island-scoped)
 - `ForkDataProvider.tsx` — provides fork risk data to the gauge island
@@ -63,9 +68,10 @@ Layout.astro (Base HTML shell)
 ### Data Flow
 1. `ForkDataProvider` fetches `/data/fork-risk.json` on mount
 2. Primary gauge signal: `roundProgress` (current round / estimated total rounds × 100)
-3. Bond/threshold percentage still computed and stored, but used only for informational display
-4. Auto-refresh every 5 minutes
-5. `ForkMockProvider` wraps for demo scenarios
+3. `riskPercentage` may be `null` when the round projection is unavailable (fewer than 3 rounds or divergent growth) — the risk level becomes `unknown`
+4. Bond/threshold percentage still computed and stored, but used only for informational display
+5. Auto-refresh every 5 minutes
+6. `ForkMockProvider` wraps for demo scenarios
 
 **Data Source:** `fork-risk.json` is generated hourly by GitHub Actions. See [[fork-monitoring-pipeline]] for the monitoring workflow.
 
@@ -106,13 +112,13 @@ Risk level colors for ForkGauge:
 
 ```
 src/
+├── assets/           # Bundled images (migration step screenshots)
 ├── components/       # Astro + React components
 ├── content/          # MDX content collections (blog, learn)
-├── layouts/          # Layout.astro, BlogLayout.astro, LearnLayout.astro
+├── layouts/          # Layout.astro, BlogLayout.astro, LearnLayout.astro, MigrationGuideLayout.astro
 ├── lib/              # Shared utilities
 ├── pages/            # Astro file-based routing
 ├── providers/        # React context providers
-├── stores/           # Nanostores
 ├── styles/           # global.css (single source of truth for theme)
 ├── types/            # TypeScript type definitions
 └── utils/            # Helper functions
@@ -136,8 +142,8 @@ No non-linear stretching. The gauge is a straightforward half-circle arc where f
 
 ### Progressive Disclosure
 - **No disputes**: "System steady — No market disputes"
-- **Active disputes**: Dispute bond, threshold %, dispute round
-- **Demo mode**: Additional controls and current values
+- **Active disputes**: Est. time to fork, dispute bond (approximate), dispute round (current/~estimated), market title + address
+- **Unknown projection**: When round projection is unavailable, shows "PROJECTION UNAVAILABLE"
 
 ### Risk Calculation
 ```typescript
