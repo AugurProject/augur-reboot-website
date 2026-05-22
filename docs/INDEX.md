@@ -23,6 +23,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 | [Technical Architecture](technical-architecture.md) | React/TypeScript component hierarchy, state management (Context API), UI patterns, visual rendering |
 | [FAQ Feature](faq-feature.md) | FAQ page design, route, collapsible Q&A, landing page/footer integration |
 | [Blog Feature](blog-feature.md) | Blog frontmatter schema, MDX integration, RSS feed, Learn section |
+| [Migration Guide Feature](migration-guide-feature.md) | Moon Fork migration guide, step-by-step REP migration, MigrationGuideLayout |
 
 ## Whitepaper Summaries
 
