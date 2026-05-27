@@ -9,13 +9,17 @@ const FORK_THRESHOLD_REP = 275000 // 2.5% of 11 million REP
 export enum DisputeBondScenario {
 	NO_DISPUTES = 'no_disputes',
 	LOW_RISK = 'low_risk',
-	MODERATE_RISK = 'moderate_risk', 
+	MODERATE_RISK = 'moderate_risk',
 	HIGH_RISK = 'high_risk',
-	ELEVATED_RISK = 'elevated_risk'
+	ELEVATED_RISK = 'elevated_risk',
+	ACTIVE_FORK = 'active_fork',
+	ACTIVE_FORK_MID = 'active_fork_mid',
+	ACTIVE_FORK_NEAR_GOAL = 'active_fork_near_goal',
+	ACTIVE_FORK_RESOLVED = 'active_fork_resolved'
 }
 
 // Representative round data per scenario
-const SCENARIO_ROUNDS: Record<Exclude<DisputeBondScenario, DisputeBondScenario.NO_DISPUTES>, {
+const SCENARIO_ROUNDS: Record<Exclude<DisputeBondScenario, DisputeBondScenario.NO_DISPUTES | DisputeBondScenario.ACTIVE_FORK | DisputeBondScenario.ACTIVE_FORK_MID | DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL | DisputeBondScenario.ACTIVE_FORK_RESOLVED>, {
 	currentRound: number
 	estimatedTotalRounds: number
 }> = {
@@ -33,6 +37,15 @@ export const generateDemoForkRiskData = (scenario: DisputeBondScenario): ForkRis
 	// Only allow demo data generation in development
 	if (import.meta.env.PROD) {
 		throw new Error('Demo data generation is only available in development mode')
+	}
+
+	if (
+		scenario === DisputeBondScenario.ACTIVE_FORK ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_MID ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_RESOLVED
+	) {
+		return generateActiveForkDemo(scenario)
 	}
 
 	let largestDisputeBond: number
@@ -177,6 +190,80 @@ const getDemoMarketTitle = (index: number): string => {
 	]
 	
 	return titles[index % titles.length]
+}
+
+// Moon Fork active-fork simulation. Numbers approximate the discovery
+// snapshot from probe-fork-state.ts: 8.17M REP universe supply, ~50%
+// early-resolution goal, three outcomes with partial migration.
+const ACTIVE_FORK_MIGRATIONS: Record<
+	DisputeBondScenario.ACTIVE_FORK | DisputeBondScenario.ACTIVE_FORK_MID | DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL | DisputeBondScenario.ACTIVE_FORK_RESOLVED,
+	{ invalid: number; no: number; yes: number; daysRemaining: number }
+> = {
+	[DisputeBondScenario.ACTIVE_FORK]: { invalid: 87_002, no: 892_341, yes: 1_604_228, daysRemaining: 53 },
+	[DisputeBondScenario.ACTIVE_FORK_MID]: { invalid: 210_500, no: 1_870_000, yes: 2_540_000, daysRemaining: 38 },
+	[DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL]: { invalid: 312_000, no: 1_420_000, yes: 5_310_000, daysRemaining: 21 },
+	[DisputeBondScenario.ACTIVE_FORK_RESOLVED]: { invalid: 198_000, no: 940_000, yes: 5_620_000, daysRemaining: 12 },
+}
+
+const generateActiveForkDemo = (
+	scenario:
+		| DisputeBondScenario.ACTIVE_FORK
+		| DisputeBondScenario.ACTIVE_FORK_MID
+		| DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL
+		| DisputeBondScenario.ACTIVE_FORK_RESOLVED = DisputeBondScenario.ACTIVE_FORK
+): ForkRiskData => {
+	const universeRepSupply = 8_174_577
+	const forkReputationGoal = 5_497_186
+	const forkThreshold = 274_859
+	const { invalid, no, yes, daysRemaining } = ACTIVE_FORK_MIGRATIONS[scenario]
+	const forkEndTime = Math.floor(Date.now() / 1000) + daysRemaining * 24 * 60 * 60 + 14 * 60 * 60
+
+	const outcomes = [
+		{ index: 0, label: 'Invalid', childUniverse: '0xinvalid000000000000000000000000000000000', migratedRep: invalid },
+		{ index: 1, label: 'No', childUniverse: '0xno0000000000000000000000000000000000000000', migratedRep: no },
+		{ index: 2, label: 'Yes', childUniverse: '0xyes000000000000000000000000000000000000000', migratedRep: yes },
+	]
+
+	return {
+		lastRiskChange: new Date().toISOString(),
+		blockNumber: 25_185_608,
+		riskLevel: 'critical',
+		riskPercentage: 100,
+		metrics: {
+			largestDisputeBond: forkThreshold,
+			forkThresholdPercent: 100,
+			activeDisputes: 0,
+			currentRound: 99,
+			estimatedTotalRounds: null,
+			roundProgress: 100,
+			disputeDetails: [
+				{
+					marketId: 'FORKING',
+					title: 'Universe is currently forking',
+					disputeBondSize: forkThreshold,
+					disputeRound: 99,
+					estimatedTotalRounds: null,
+					roundProgress: 100,
+					weeksRemaining: 0,
+				},
+			],
+		},
+		rpcInfo: {
+			endpoint: 'Demo Mode - Active Fork Simulation',
+			latency: 120,
+			fallbacksAttempted: 0,
+		},
+		calculation: {
+			forkThreshold,
+		},
+		forkActive: {
+			forkingMarket: '0x963eed85778cc23e2d4636cd4f29eecdf9827e9e',
+			forkEndTime,
+			forkReputationGoal,
+			universeRepSupply,
+			outcomes,
+		},
+	}
 }
 
 // Scenario generator functions (development only)

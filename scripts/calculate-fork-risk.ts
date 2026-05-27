@@ -64,6 +64,18 @@ interface ForkRiskData {
 		isHealthy: boolean
 		discrepancy?: string
 	}
+	forkActive?: {
+		forkingMarket: string
+		forkEndTime: number
+		forkReputationGoal: number
+		universeRepSupply: number
+		outcomes: Array<{
+			index: number
+			label: string
+			childUniverse: string | null
+			migratedRep: number
+		}>
+	}
 }
 
 /**
@@ -321,7 +333,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			if (isForking) {
 				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
-				return getForkingResult(blockNumber, connection, forkThresholdRep)
+				return await getForkingResult(blockNumber, connection, forkThresholdRep, contracts.universe)
 			}
 
 			// Calculate key metrics
@@ -1061,7 +1073,100 @@ function determineRiskLevel(roundProgress: number | null): RiskLevel {
 	return 'low'
 }
 
-function getForkingResult(blockNumber: number, connection: RpcConnection, forkThresholdRep: number): ForkRiskData {
+const FORK_ACTIVE_UNIVERSE_ABI = [
+	'function getForkingMarket() view returns (address)',
+	'function getForkEndTime() view returns (uint256)',
+	'function getForkReputationGoal() view returns (uint256)',
+	'function getReputationToken() view returns (address)',
+	'function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)',
+]
+const FORK_ACTIVE_MARKET_ABI = [
+	'function getNumberOfOutcomes() view returns (uint256)',
+	'function getNumTicks() view returns (uint256)',
+]
+const FORK_ACTIVE_ERC20_ABI = [
+	'function totalSupply() view returns (uint256)',
+]
+
+function positionalLabel(index: number, numOutcomes: number): string {
+	if (numOutcomes === 3) {
+		return ['Invalid', 'No', 'Yes'][index] ?? `Outcome ${index}`
+	}
+	return index === 0 ? 'Invalid' : `Outcome ${index}`
+}
+
+async function fetchForkActiveDetails(
+	provider: ethers.JsonRpcProvider,
+	universe: ethers.Contract,
+): Promise<ForkRiskData['forkActive'] | undefined> {
+	try {
+		const u = new ethers.Contract(await universe.getAddress(), FORK_ACTIVE_UNIVERSE_ABI, provider)
+
+		const [forkingMarket, forkEndTimeRaw, forkRepGoalWei, repTokenAddr] = await Promise.all([
+			u.getForkingMarket(),
+			u.getForkEndTime(),
+			u.getForkReputationGoal(),
+			u.getReputationToken(),
+		])
+
+		const repToken = new ethers.Contract(repTokenAddr, FORK_ACTIVE_ERC20_ABI, provider)
+		const universeRepSupplyWei = await repToken.totalSupply()
+
+		const market = new ethers.Contract(forkingMarket, FORK_ACTIVE_MARKET_ABI, provider)
+		const [numOutcomesRaw, numTicksRaw] = await Promise.all([
+			market.getNumberOfOutcomes(),
+			market.getNumTicks(),
+		])
+		const numOutcomes = Number(numOutcomesRaw)
+		const numTicks = BigInt(numTicksRaw)
+
+		const outcomes = await Promise.all(
+			Array.from({ length: numOutcomes }, async (_, k) => {
+				const numerators = Array.from({ length: numOutcomes }, (_, j) => (j === k ? numTicks : 0n))
+				const payoutHash = ethers.keccak256(
+					ethers.AbiCoder.defaultAbiCoder().encode(['uint256[]'], [numerators]),
+				)
+				const childAddr: string = await u.getChildUniverse(payoutHash)
+				const isZero = !childAddr || /^0x0+$/i.test(childAddr)
+				let migratedRep = 0
+				let childRepLabel: string | null = null
+				if (!isZero) {
+					childRepLabel = childAddr
+					const childUniverse = new ethers.Contract(childAddr, FORK_ACTIVE_UNIVERSE_ABI, provider)
+					const childRepAddr = await childUniverse.getReputationToken()
+					const childRep = new ethers.Contract(childRepAddr, FORK_ACTIVE_ERC20_ABI, provider)
+					const supplyWei = await childRep.totalSupply()
+					migratedRep = Number(ethers.formatEther(supplyWei))
+				}
+				return {
+					index: k,
+					label: positionalLabel(k, numOutcomes),
+					childUniverse: childRepLabel,
+					migratedRep,
+				}
+			}),
+		)
+
+		return {
+			forkingMarket,
+			forkEndTime: Number(forkEndTimeRaw),
+			forkReputationGoal: Number(ethers.formatEther(forkRepGoalWei)),
+			universeRepSupply: Number(ethers.formatEther(universeRepSupplyWei)),
+			outcomes,
+		}
+	} catch (e) {
+		console.warn(`⚠️ Failed to fetch forkActive details: ${(e as Error).message}`)
+		return undefined
+	}
+}
+
+async function getForkingResult(
+	blockNumber: number,
+	connection: RpcConnection,
+	forkThresholdRep: number,
+	universe: ethers.Contract,
+): Promise<ForkRiskData> {
+		const forkActive = await fetchForkActiveDetails(connection.provider, universe)
 		return {
 			lastRiskChange: new Date().toISOString(),
 			blockNumber,
@@ -1095,6 +1200,7 @@ function getForkingResult(blockNumber: number, connection: RpcConnection, forkTh
 				forkThreshold: forkThresholdRep,
 			},
 			cacheValidation: { isHealthy: true },
+			forkActive,
 		}
 	}
 
