@@ -315,7 +315,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				)
 				forkThresholdRep = Number(ethers.formatEther(thresholdWei))
 				console.log(`Fork Threshold: ${forkThresholdRep} REP (from chain)`)
-			} catch (e) {
+			} catch (_e) {
 				console.warn(`⚠️ Failed to read fork threshold from chain, using fallback: ${forkThresholdRep} REP`)
 			}
 

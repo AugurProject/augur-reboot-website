@@ -62,7 +62,7 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 	return (
 		<div className="w-full max-w-xl mx-auto px-4 text-left font-mono text-sm">
 			<div className="flex justify-between items-center mb-4">
-				<div className="text-xs uppercase tracking-widest text-primary">FORK // ACTIVE</div>
+				<div className="text-xs uppercase tracking-widest text-primary">{"FORK // ACTIVE"}</div>
 				<a
 					href="/learn/fork/migration/"
 					title="How to migrate REP"
