@@ -42,6 +42,18 @@ export interface ForkRiskData {
 		isHealthy: boolean
 		discrepancy?: string
 	}
+	forkActive?: {
+		forkingMarket: string
+		forkEndTime: number
+		forkReputationGoal: number
+		universeRepSupply: number
+		outcomes: Array<{
+			index: number
+			label: string
+			childUniverse: string | null
+			migratedRep: number
+		}>
+	}
 	error?: string
 }
 

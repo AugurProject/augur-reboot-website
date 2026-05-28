@@ -108,6 +108,38 @@ export const ForkControls = (): React.JSX.Element | null => {
 				>
 					Extreme Risk (75%+)
 				</button>
+
+				<button
+					type="button"
+					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK)}
+					className="block w-full text-left text-xs bg-purple-900/30 hover:bg-purple-900/40 px-2 py-1 rounded"
+				>
+					Active Fork — Early (~30%)
+				</button>
+
+				<button
+					type="button"
+					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK_MID)}
+					className="block w-full text-left text-xs bg-purple-900/30 hover:bg-purple-900/40 px-2 py-1 rounded"
+				>
+					Active Fork — Mid (~57%)
+				</button>
+
+				<button
+					type="button"
+					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL)}
+					className="block w-full text-left text-xs bg-purple-900/30 hover:bg-purple-900/40 px-2 py-1 rounded"
+				>
+					Active Fork — Near Goal (~86%)
+				</button>
+
+				<button
+					type="button"
+					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK_RESOLVED)}
+					className="block w-full text-left text-xs bg-purple-900/40 hover:bg-purple-900/50 px-2 py-1 rounded"
+				>
+					Active Fork — Resolved (Yes &gt; goal)
+				</button>
 			</div>
 
 			<div className="mt-3 text-xs text-muted-foreground">

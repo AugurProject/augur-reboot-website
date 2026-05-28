@@ -47,6 +47,12 @@ const MARKET_ABI = [
 	'function isFinalized() view returns (bool)',
 	'function getEndTime() view returns (uint256)',
 	'function getNumberOfOutcomes() view returns (uint256)',
+	'function getNumTicks() view returns (uint256)',
+]
+
+const ERC20_ABI = [
+	'function totalSupply() view returns (uint256)',
+	'function symbol() view returns (string)',
 ]
 
 const PARTICIPANT_ABI = [
@@ -89,6 +95,7 @@ async function describeUniverse(provider: ethers.JsonRpcProvider, address: strin
 	const forkingMarket = await safeCall('forkingMarket', () => u.getForkingMarket())
 	const forkEnd = await safeCall('forkEndTime', () => u.getForkEndTime())
 	const threshold = await safeCall('threshold', () => u.getDisputeThresholdForFork())
+	const repGoal = await safeCall('repGoal', () => u.getForkReputationGoal())
 	const repToken = await safeCall('repToken', () => u.getReputationToken())
 
 	console.log(`${prefix}  parent:        ${parent ?? '?'}`)
@@ -100,7 +107,17 @@ async function describeUniverse(provider: ethers.JsonRpcProvider, address: strin
 	if (threshold !== null) {
 		console.log(`${prefix}  threshold:     ${ethers.formatEther(threshold)} REP`)
 	}
+	if (repGoal !== null) {
+		console.log(`${prefix}  repGoal(>50%): ${ethers.formatEther(repGoal)} REP`)
+	}
 	console.log(`${prefix}  repToken:      ${repToken ?? '?'}`)
+	if (repToken && repToken !== ethers.ZeroAddress) {
+		const t = new ethers.Contract(repToken, ERC20_ABI, provider)
+		const supply = await safeCall('repToken.totalSupply', () => t.totalSupply())
+		if (supply !== null) {
+			console.log(`${prefix}  repSupply:     ${Number(ethers.formatEther(supply)).toLocaleString()} REP`)
+		}
+	}
 
 	// Try to follow to a winning child (only meaningful post-fork)
 	const winner = await safeCall('winningChild', () => u.getWinningChildUniverse())
@@ -139,6 +156,37 @@ async function describeMarket(provider: ethers.JsonRpcProvider, marketAddress: s
 
 	if (universe) {
 		await describeUniverse(provider, universe, 1)
+	}
+
+	const numTicks = await safeCall('numTicks', () => m.getNumTicks())
+	if (universe && numOutcomes !== null && numTicks !== null) {
+		const nOut = Number(numOutcomes)
+		const ticks = BigInt(numTicks)
+		console.log(`\n  Per-outcome child universes (numTicks=${ticks.toString()}):`)
+		const u = new ethers.Contract(universe, UNIVERSE_ABI, provider)
+		for (let k = 0; k < nOut; k++) {
+			const numerators: bigint[] = Array.from({ length: nOut }, (_, i) =>
+				i === k ? ticks : 0n,
+			)
+			const encoded = ethers.solidityPacked(Array(nOut).fill('uint256'), numerators)
+			const hash = ethers.keccak256(encoded)
+			const child = await safeCall(`getChildUniverse(${k})`, () => u.getChildUniverse(hash))
+			const label = `outcome[${k}] payout=[${numerators.join(',')}]`
+			if (!child || child === ethers.ZeroAddress) {
+				console.log(`    ${label} → child: 0x0 (not created)`)
+				continue
+			}
+			console.log(`    ${label} → child: ${child}`)
+			const childU = new ethers.Contract(child, UNIVERSE_ABI, provider)
+			const childRep = await safeCall('  child.repToken', () => childU.getReputationToken())
+			if (childRep && childRep !== ethers.ZeroAddress) {
+				const t = new ethers.Contract(childRep, ERC20_ABI, provider)
+				const supply = await safeCall('  child.totalSupply', () => t.totalSupply())
+				if (supply !== null) {
+					console.log(`      migrated REP: ${Number(ethers.formatEther(supply)).toLocaleString()}`)
+				}
+			}
+		}
 	}
 
 	if (numParticipants === null) return
