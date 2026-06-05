@@ -1,9 +1,35 @@
 import { useEffect, useState } from 'react'
 import { useForkData } from '../providers/ForkDataProvider'
 
-const OUTCOME_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const
+const TOTAL_SUPPLY = 11_000_000
+const NEW_TOKEN = '0xcf6a0a7826fa124b7705d6f3c675ead76f1e540d'
+const RPC_ENDPOINT = 'https://ethereum-rpc.publicnode.com'
+const TOTAL_SUPPLY_SELECTOR = '0x18160ddd'
 
-const formatRep = (n: number): string => Math.round(n).toLocaleString()
+const fetchMigratedRep = async (): Promise<number> => {
+	try {
+		const res = await fetch(RPC_ENDPOINT, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				jsonrpc: '2.0',
+				method: 'eth_call',
+				params: [{ to: NEW_TOKEN, data: TOTAL_SUPPLY_SELECTOR }, 'latest'],
+				id: 1,
+			}),
+		})
+		const { result } = (await res.json()) as { result?: string }
+		if (!result) return 0
+		return Number(BigInt(result)) / 1e18
+	} catch {
+		return 0
+	}
+}
+
+const formatRep = (n: number): string => {
+	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
+	return Math.round(n).toLocaleString()
+}
 
 const getCountdownParts = (endUnix: number, nowMs: number) => {
 	const secs = Math.max(0, endUnix - Math.floor(nowMs / 1000))
@@ -21,35 +47,22 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 	const { rawData } = useForkData()
 	const fork = rawData.forkActive
 	const [now, setNow] = useState<number>(() => Date.now())
+	const [migratedRep, setMigratedRep] = useState<number>(0)
 
 	useEffect(() => {
 		const id = setInterval(() => setNow(Date.now()), 1000)
 		return () => clearInterval(id)
 	}, [])
 
+	useEffect(() => {
+		fetchMigratedRep().then(setMigratedRep)
+		const id = setInterval(() => fetchMigratedRep().then(setMigratedRep), 60_000)
+		return () => clearInterval(id)
+	}, [])
+
 	if (!fork) return null
 
-	const totalMigrated = fork.outcomes.reduce((s, o) => s + o.migratedRep, 0)
-	const goalPercent = Math.min(100, (fork.forkReputationGoal / fork.universeRepSupply) * 100)
-	const unmigrated = Math.max(0, fork.universeRepSupply - totalMigrated)
-
-	// Each segment is sized as fraction of universe supply (not of migrated total),
-	// so the bar grows as migration progresses and the goal tick remains anchored.
-	// Opacity is ranked by migrated REP — brightest for the leading universe.
-	const SHADES = ['#2ae7a8', '#1f9d72', '#15614a', '#0e3d30', '#0a2620', '#071916']
-	const rankByMigrated = [...fork.outcomes]
-		.map((o, i) => ({ i, m: o.migratedRep }))
-		.sort((a, b) => b.m - a.m)
-		.reduce<Record<number, number>>((acc, { i }, rank) => {
-			acc[i] = rank
-			return acc
-		}, {})
-	const segments = fork.outcomes.map((o, i) => ({
-		...o,
-		letter: OUTCOME_LETTERS[i] ?? '?',
-		widthPercent: (o.migratedRep / fork.universeRepSupply) * 100,
-		color: SHADES[rankByMigrated[i] ?? 0] ?? SHADES[SHADES.length - 1],
-	}))
+	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100)
 
 	const t = getCountdownParts(fork.forkEndTime, now)
 	const timerCells: Array<{ value: string; label: string }> = [
@@ -114,65 +127,33 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 			</div>
 
 			<div className="mb-4 pt-5">
-				<div className="relative">
+				<div className="text-center mb-3">
+					<span className="text-3xl font-display text-primary fx-glow-sm tabular-nums">
+						{migratedPercent.toFixed(1)}%
+					</span>
+					<span className="text-sm uppercase tracking-widest text-muted-foreground ml-2">REP migrated</span>
+				</div>
+
+				<div
+					className="relative h-6 w-full mb-2 overflow-hidden"
+					style={{
+						backgroundImage:
+							'repeating-linear-gradient(-45deg, rgba(255,255,255,0.04) 0 4px, transparent 4px 8px)',
+						backgroundColor: 'rgba(255,255,255,0.02)',
+					}}
+				>
 					<div
-						className="relative h-6 w-full mb-1 overflow-hidden"
+						className="absolute top-0 bottom-0 left-0 transition-all duration-1000 ease-out"
 						style={{
-							backgroundImage:
-								'repeating-linear-gradient(-45deg, rgba(255,255,255,0.04) 0 4px, transparent 4px 8px)',
-							backgroundColor: 'rgba(255,255,255,0.02)',
+							width: `${migratedPercent}%`,
+							background: 'var(--color-foreground)',
 						}}
-					>
-						{segments.reduce<{ nodes: React.ReactNode[]; offset: number }>(
-							(acc, seg) => {
-								acc.nodes.push(
-									<div
-										key={seg.index}
-										className="absolute top-0 bottom-0 border-r border-background/30 text-[10px] text-background flex items-center justify-center"
-										style={{ left: `${acc.offset}%`, width: `${seg.widthPercent}%`, backgroundColor: seg.color }}
-										title={`${seg.label}: ${formatRep(seg.migratedRep)} REP`}
-									>
-										{seg.widthPercent > 3 ? seg.letter : ''}
-									</div>,
-								)
-								acc.offset += seg.widthPercent
-								return acc
-							},
-							{ nodes: [], offset: 0 },
-						).nodes}
-					</div>
-
-					<div
-						className="pointer-events-none absolute -top-2 bottom-1 border-l border-dashed border-primary"
-						style={{ left: `${goalPercent}%` }}
-						title={`Early-resolution goal: ${formatRep(fork.forkReputationGoal)} REP`}
-					>
-						<div className="absolute -top-4 -translate-x-1/2 text-[10px] text-primary whitespace-nowrap">
-							▼ goal
-						</div>
-					</div>
+					/>
 				</div>
 
-				<div className="flex justify-between text-[10px] text-muted-foreground mb-4">
-					<span>0</span>
-					<span>{formatRep(fork.universeRepSupply)} REP</span>
-				</div>
-
-				<ul className="flex flex-wrap justify-center gap-x-3 gap-y-1 mb-3 text-xs text-muted-foreground">
-					{segments.map(seg => (
-						<li key={seg.index} className="tabular-nums flex items-center gap-1.5">
-							<span
-								className="inline-block w-2.5 h-2.5"
-								style={{ backgroundColor: seg.color }}
-							/>
-							<span className="text-primary">{seg.letter}</span>
-							{seg.label} ({seg.widthPercent.toFixed(1)}%)
-						</li>
-					))}
-				</ul>
-
-				<div className="text-xs text-center text-muted-foreground">
-					{((unmigrated / fork.universeRepSupply) * 100).toFixed(1)}% unmigrated
+				<div className="flex justify-between text-[10px] text-muted-foreground">
+					<span>{formatRep(migratedRep)} migrated</span>
+					<span>{formatRep(TOTAL_SUPPLY)} total</span>
 				</div>
 			</div>
 
