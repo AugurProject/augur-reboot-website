@@ -2,29 +2,6 @@ import { useEffect, useState } from 'react'
 import { useForkData } from '../providers/ForkDataProvider'
 
 const TOTAL_SUPPLY = 11_000_000
-const NEW_TOKEN = '0xcf6a0a7826fa124b7705d6f3c675ead76f1e540d'
-const RPC_ENDPOINT = 'https://ethereum-rpc.publicnode.com'
-const TOTAL_SUPPLY_SELECTOR = '0x18160ddd'
-
-const fetchMigratedRep = async (): Promise<number> => {
-	try {
-		const res = await fetch(RPC_ENDPOINT, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				jsonrpc: '2.0',
-				method: 'eth_call',
-				params: [{ to: NEW_TOKEN, data: TOTAL_SUPPLY_SELECTOR }, 'latest'],
-				id: 1,
-			}),
-		})
-		const { result } = (await res.json()) as { result?: string }
-		if (!result) return 0
-		return Number(BigInt(result)) / 1e18
-	} catch {
-		return 0
-	}
-}
 
 const formatRep = (n: number): string => {
 	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
@@ -47,22 +24,17 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 	const { rawData } = useForkData()
 	const fork = rawData.forkActive
 	const [now, setNow] = useState<number>(() => Date.now())
-	const [migratedRep, setMigratedRep] = useState<number>(0)
 
 	useEffect(() => {
 		const id = setInterval(() => setNow(Date.now()), 1000)
 		return () => clearInterval(id)
 	}, [])
 
-	useEffect(() => {
-		fetchMigratedRep().then(setMigratedRep)
-		const id = setInterval(() => fetchMigratedRep().then(setMigratedRep), 60_000)
-		return () => clearInterval(id)
-	}, [])
-
 	if (!fork) return null
 
+	const migratedRep = fork.outcomes.reduce((sum, o) => sum + o.migratedRep, 0)
 	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100)
+	const winningOutcome = fork.outcomes.find((o) => o.childUniverse !== null)
 
 	const t = getCountdownParts(fork.forkEndTime, now)
 	const timerCells: Array<{ value: string; label: string }> = [
@@ -108,7 +80,6 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 								className="flex-1 flex flex-col items-center justify-center py-3 bg-background"
 								style={{
 									clipPath: cellClip,
-									// backgroundImage: 'linear-gradient(rgba(42,231,168,0.04), rgba(42,231,168,0.04))',
 								}}
 							>
 								<div className="text-3xl font-display text-primary tabular-nums leading-none">
@@ -128,10 +99,13 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 
 			<div className="mb-4 pt-5">
 				<div className="text-center mb-3">
-					<span className="text-3xl font-display text-primary fx-glow-sm tabular-nums">
-						{migratedPercent.toFixed(1)}%
+					<span className="text-sm uppercase tracking-widest">
+						<span className="text-primary fx-glow-sm tabular-nums">{migratedPercent.toFixed(1)}%</span>
+						{' '}
+						<span className="text-muted-foreground">
+							of REP migrated{winningOutcome ? <> to <span className="text-primary">{winningOutcome.label}</span></> : ''}
+						</span>
 					</span>
-					<span className="text-sm uppercase tracking-widest text-muted-foreground ml-2">REP migrated</span>
 				</div>
 
 				<div
@@ -152,8 +126,7 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 				</div>
 
 				<div className="flex justify-between text-[10px] text-muted-foreground">
-					<span>{formatRep(migratedRep)} migrated</span>
-					<span>{formatRep(TOTAL_SUPPLY)} total</span>
+					<span>{formatRep(migratedRep)} / {formatRep(TOTAL_SUPPLY)}</span>
 				</div>
 			</div>
 
