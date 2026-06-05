@@ -1086,13 +1086,24 @@ const FORK_ACTIVE_MARKET_ABI = [
 ]
 const FORK_ACTIVE_ERC20_ABI = [
 	'function totalSupply() view returns (uint256)',
+	'function symbol() view returns (string)',
 ]
 
 function positionalLabel(index: number, numOutcomes: number): string {
-	if (numOutcomes === 3) {
-		return ['Invalid', 'No', 'Yes'][index] ?? `Outcome ${index}`
-	}
-	return index === 0 ? 'Invalid' : `Outcome ${index}`
+	// Fallback label — actual outcome names are market-specific and
+	// derived from the child universe's REP token symbol (e.g. REPv2_Yes_1).
+	if (index === 0) return 'Invalid'
+	return `Outcome ${index}`
+}
+
+/**
+ * Parse outcome label from REP token symbol.
+ * Augur V2 child universe REP tokens follow: REPv2_<Label>_<Index>
+ * e.g. "REPv2_Yes_1" → "Yes"
+ */
+function labelFromTokenSymbol(symbol: string): string | null {
+	const match = symbol.match(/^REPv2_(.+)_(\d+)$/)
+	return match ? match[1] : null
 }
 
 async function fetchForkActiveDetails(
@@ -1123,24 +1134,36 @@ async function fetchForkActiveDetails(
 		const outcomes = await Promise.all(
 			Array.from({ length: numOutcomes }, async (_, k) => {
 				const numerators = Array.from({ length: numOutcomes }, (_, j) => (j === k ? numTicks : 0n))
+				// Augur V2 uses keccak256(abi.encodePacked(numerators...)) — each element
+				// packed as a raw uint256, no length prefix. This differs from
+				// keccak256(abi.encode(uint256[])) which includes offset + length.
+				const packedTypes = Array.from({ length: numOutcomes }, () => 'uint256')
 				const payoutHash = ethers.keccak256(
-					ethers.AbiCoder.defaultAbiCoder().encode(['uint256[]'], [numerators]),
+					ethers.solidityPacked(packedTypes, numerators),
 				)
 				const childAddr: string = await u.getChildUniverse(payoutHash)
 				const isZero = !childAddr || /^0x0+$/i.test(childAddr)
 				let migratedRep = 0
 				let childRepLabel: string | null = null
+				let label = positionalLabel(k, numOutcomes)
 				if (!isZero) {
 					childRepLabel = childAddr
 					const childUniverse = new ethers.Contract(childAddr, FORK_ACTIVE_UNIVERSE_ABI, provider)
 					const childRepAddr = await childUniverse.getReputationToken()
 					const childRep = new ethers.Contract(childRepAddr, FORK_ACTIVE_ERC20_ABI, provider)
-					const supplyWei = await childRep.totalSupply()
+					const [supplyWei, symbol] = await Promise.all([
+						childRep.totalSupply(),
+						childRep.symbol().catch(() => null as string | null),
+					])
 					migratedRep = Number(ethers.formatEther(supplyWei))
+					if (symbol) {
+						const parsed = labelFromTokenSymbol(symbol)
+						if (parsed) label = parsed
+					}
 				}
 				return {
 					index: k,
-					label: positionalLabel(k, numOutcomes),
+					label,
 					childUniverse: childRepLabel,
 					migratedRep,
 				}
