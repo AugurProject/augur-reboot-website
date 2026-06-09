@@ -34,7 +34,6 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 
 	const migratedRep = fork.outcomes.reduce((sum, o) => sum + o.migratedRep, 0)
 	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100)
-	const winningOutcome = fork.outcomes.find((o) => o.childUniverse !== null)
 
 	const t = getCountdownParts(fork.forkEndTime, now)
 	const timerCells: Array<{ value: string; label: string }> = [
@@ -102,9 +101,7 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 					<span className="text-sm uppercase tracking-widest">
 						<span className="text-primary fx-glow-sm tabular-nums">{migratedPercent.toFixed(1)}%</span>
 						{' '}
-						<span className="text-muted-foreground">
-							of REP migrated{winningOutcome ? <> to <span className="text-primary">{winningOutcome.label}</span></> : ''}
-						</span>
+						<span className="text-muted-foreground">REP migrated</span>
 					</span>
 				</div>
 
