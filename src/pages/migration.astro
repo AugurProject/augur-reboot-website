@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Footer from "../components/Footer.astro";
+import PageHeader from "../components/PageHeader.tsx";
+import PageTitle from "../components/PageTitle.astro";
+import MigrationDashboard from "../components/migration/MigrationDashboard.tsx";
+import { withBase } from "../lib/utils";
+---
+
+<Layout
+  title="REP Migration — Augur Moon Fork"
+  description="Augur v2 is in a fork. REP holders must migrate to the universe they believe is correct before the deadline, or their REP is expected to become worthless. Live countdown, migration steps, exchange status, and an address checker."
+  ogType="website"
+  keywords={[
+    "augur fork",
+    "rep migration",
+    "moon fork",
+    "augur migrate rep",
+    "repv1 repv2",
+    "augur universe migration",
+  ]}
+>
+  <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+    <PageHeader client:load backHref={withBase('/?intro=false')} />
+
+    <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
+      <div class="max-w-7xl mx-auto">
+        <PageTitle prefix="MIGRATION" title="MOON FORK — MIGRATE YOUR REP" />
+        <!-- client:only — does live on-chain reads (ethers) + a countdown, so no SSR -->
+        <MigrationDashboard client:only="react" />
+      </div>
+    </main>
+
+    <Footer />
+  </div>
+</Layout>
