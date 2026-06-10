@@ -92,7 +92,7 @@ const HeroBanner: React.FC = () => {
         </div>
       </div>
 
-      <ScrollIndicator delay={5000} />
+      <ScrollIndicator delay={3200} />
     </div>
   );
 };

@@ -425,80 +425,43 @@
 }
 
 
-/* Scroll indicator 3D keycap */
-@keyframes keycap-press {
-	0%,
+/* Scroll indicator */
+@keyframes scroll-indicator-slide {
+	0% {
+		transform: translateY(-56px);
+		opacity: 0;
+	}
+	20%,
+	80% {
+		transform: translateY(0);
+		opacity: 0.75;
+	}
 	100% {
-		transform: perspective(200px) rotateX(15deg) translateY(0);
-		filter: brightness(1);
-	}
-	15% {
-		transform: perspective(200px) rotateX(15deg) translateY(8px);
-		filter: brightness(0.85);
-	}
-	25% {
-		transform: perspective(200px) rotateX(15deg) translateY(8px);
-		filter: brightness(0.85);
-	}
-	40%,
-	100% {
-		transform: perspective(200px) rotateX(15deg) translateY(0);
-		filter: brightness(1);
+		transform: translateY(56px);
+		opacity: 0;
 	}
 }
 
-@keyframes keycap-glow {
-	0%,
-	100% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 4px 0 0 #1a1a1a,
-			0 6px 12px rgba(0, 0, 0, 0.4),
-			0 0 20px rgba(42, 231, 168, 0.15);
-	}
-	50% {
-		box-shadow:
-			0 0 0 2px var(--color-primary),
-			0 2px 0 0 #1a1a1a,
-			0 3px 6px rgba(0, 0, 0, 0.3),
-			0 0 30px rgba(42, 231, 168, 0.25);
-	}
-}
-
-.scroll-indicator-keycap {
-	position: relative;
+.scroll-indicator-portal {
 	width: 56px;
-	height: 56px;
-	background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-	border-radius: 8px;
-	animation:
-		keycap-press 1.5s cubic-bezier(0.7, 0, 0.3, 1) infinite,
-		keycap-glow 1.5s ease-in-out infinite;
-}
-
-.scroll-indicator-keycap::before {
-	content: "";
-	position: absolute;
-	inset: 3px;
-	top: 4px;
-	background: linear-gradient(180deg, #222222 0%, #151515 100%);
-	border-radius: 5px;
-	border: 1px solid rgba(42, 231, 168, 0.2);
-}
-
-.scroll-indicator-keycap::after {
-	content: "↓";
-	position: absolute;
-	inset: 0;
+	height: 72px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-family: "SF Mono", "Fira Code", monospace;
-	font-size: 24px;
-	font-weight: bold;
-	color: var(--color-primary);
-	text-shadow: 0 0 8px rgba(42, 231, 168, 0.6);
-	animation: none;
+	overflow: hidden;
+	mask-image: linear-gradient(to bottom, transparent 0%, transparent 12%, black 34%, black 66%, transparent 88%, transparent 100%);
+}
+
+.scroll-indicator-arrow {
+	width: 48px;
+	height: 48px;
+	color: var(--color-foreground);
+	stroke: currentColor;
+	stroke-width: 1;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	filter: drop-shadow(0 0 8px rgba(42, 231, 168, 0.35));
+	animation: scroll-indicator-slide 2.6s ease-in-out infinite;
 }
 
 /* CRT boot overlay: shown only while html.boot is set (pre-paint) */
@@ -619,8 +582,8 @@ html.boot :is(
 		}
 	}
 
-	/* Keycap press and glow animations */
-	.scroll-indicator-keycap {
+	/* Scroll indicator animation */
+	.scroll-indicator-arrow {
 		animation: none;
 	}
 
