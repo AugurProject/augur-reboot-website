@@ -1,1 +1,1 @@
-/Users/jubalm/Workspace/lituus/augur-reboot-website/AGENTS.md
+../AGENTS.md

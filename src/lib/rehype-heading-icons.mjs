@@ -79,7 +79,7 @@ export default function rehypeHeadingIcons() {
 
 			// Find the first text node
 			const firstChild = node.children[0];
-			if (!firstChild || firstChild.type !== "text") return;
+			if (firstChild?.type !== "text") return;
 
 			const text = firstChild.value;
 			const emojiInfo = getLeadingEmoji(text);
