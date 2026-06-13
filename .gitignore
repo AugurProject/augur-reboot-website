@@ -52,7 +52,6 @@ public/cache/
 *.tsbuildinfo
 
 # git worktrees
-.worktree/
 .worktrees/
 
 # LLM settings
