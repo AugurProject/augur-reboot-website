@@ -75,7 +75,7 @@ avg_growth = mean(b[i] / b[i-1] for recent rounds)
 estimated_total = smallest n where b[n] × avg_growth^(n-current) >= fork_threshold
 ```
 
-The projection is conservative — if fewer than 3 rounds exist, or the growth factor diverges (projection exceeds 30 rounds), `estimatedTotalRounds` is `null` and round progress defaults to 0.
+The projection is conservative — if fewer than 3 rounds exist, or the growth factor diverges (projection exceeds 30 rounds), `estimatedTotalRounds` is `null` and `roundProgress` remains `null`. The UI may render that unknown projection at 0% gauge fill, but the data model preserves the unknown state.
 
 ### Why `getSize()` not `getStake()`
 
