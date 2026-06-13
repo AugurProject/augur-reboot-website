@@ -1089,7 +1089,7 @@ const FORK_ACTIVE_ERC20_ABI = [
 	'function symbol() view returns (string)',
 ]
 
-function positionalLabel(index: number, numOutcomes: number): string {
+function positionalLabel(index: number): string {
 	// Fallback label — actual outcome names are market-specific and
 	// derived from the child universe's REP token symbol (e.g. REPv2_Yes_1).
 	if (index === 0) return 'Invalid'
@@ -1145,7 +1145,7 @@ async function fetchForkActiveDetails(
 				const isZero = !childAddr || /^0x0+$/i.test(childAddr)
 				let migratedRep = 0
 				let childRepLabel: string | null = null
-				let label = positionalLabel(k, numOutcomes)
+				let label = positionalLabel(k)
 				if (!isZero) {
 					childRepLabel = childAddr
 					const childUniverse = new ethers.Contract(childAddr, FORK_ACTIVE_UNIVERSE_ABI, provider)
