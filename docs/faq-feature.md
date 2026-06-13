@@ -18,7 +18,7 @@ Static `/faq` page covering the Augur fork for REP holders. Surfaced as the firs
 
 Follows the same `grid grid-rows-[auto_1fr_auto] min-h-screen` shell used by `mission.astro` and `team.astro`:
 
-- **Top:** `PageHeader` component with back link to home and social links. `showCta={false}` suppresses the CTA button.
+- **Top:** `PageHeader` component with back link to home and social links.
 - **Middle:** Content area with max-width constraint, scrollable overflow.
 - **Bottom:** Standard `Footer` component.
 

@@ -13,7 +13,7 @@ The site is built with:
 - **Astro 5.10+** for static site generation with islands architecture
 - **React 19** for interactive client-side components (hydrated islands)
 - **Tailwind CSS v4** (CSS-first configuration via `@theme`/`@utility` directives)
-- **Nanostores** for global reactive state
+- **React Context** for island-scoped fork monitor state
 - **SVG** for gauge visualization
 - **MDX** for blog and learn content collections
 
@@ -21,7 +21,7 @@ The site is built with:
 
 ```
 Layout.astro (Base HTML shell — toggles html.boot class for CSS-driven intro)
-├── Header / Footer / SocialLinks (Astro components)
+├── PageHeader.tsx / Footer.astro (navigation chrome)
 ├── Pages
 │   ├── index.astro (Homepage)
 │   │   ├── Intro.tsx (client:load — CRT boot overlay, removes html.boot on complete)
@@ -66,14 +66,13 @@ When `.boot` is present, the CRT overlay (`#crt-overlay`) is shown and all hero 
 - `ForkMockProvider.tsx` — demo mode data override
 
 ### Data Flow
-1. `ForkDataProvider` fetches `/data/fork-risk.json` on mount
-2. Primary gauge signal: `roundProgress` (current round / estimated total rounds × 100)
-3. `riskPercentage` may be `null` when the round projection is unavailable (fewer than 3 rounds or divergent growth) — the risk level becomes `unknown`
-4. Bond/threshold percentage still computed and stored, but used only for informational display
-5. Auto-refresh every 5 minutes
-6. `ForkMockProvider` wraps for demo scenarios
 
-**Data Source:** `fork-risk.json` is generated hourly by GitHub Actions. See [[fork-monitoring-pipeline]] for the monitoring workflow.
+`ForkDataProvider` fetches `/data/fork-risk.json` for the gauge island and refreshes it on an interval. `ForkMockProvider` wraps the same island for development-only demo scenarios.
+
+The monitor's calculation and CI data pipeline are intentionally documented outside this architecture page:
+
+- [[fork-monitoring-methodology]] — calculation method and risk signal
+- [[fork-monitoring-pipeline]] — GitHub Actions pipeline and artifact flow
 
 ## Content Collections
 
@@ -146,7 +145,5 @@ No non-linear stretching. The gauge is a straightforward half-circle arc where f
 - **Unknown projection**: When round projection is unavailable, shows "PROJECTION UNAVAILABLE"
 
 ### Risk Calculation
-```typescript
-const roundProgress = (currentRound / estimatedTotalRounds) * 100
-```
-Where `currentRound` is the highest non-zero participant index and `estimatedTotalRounds` is projected from the bond growth trajectory. See [[fork-monitoring-methodology]] for the full calculation.
+
+See [[fork-monitoring-methodology]]. This page tracks UI architecture only; calculation details live with the monitor methodology to avoid duplicate drift.
