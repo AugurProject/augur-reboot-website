@@ -1,0 +1,87 @@
+---
+/**
+ * ExchangeSupportCard — prominent container for CEX migration support info.
+ * Beveled corner via gradient (matching ClippedCardGradient technique).
+ * Amber accent signals "pending / pay attention" without red urgency.
+ */
+---
+
+<div class="exchange-card">
+  <div class="exchange-card-content">
+    <div class="exchange-card-heading">
+      <span class="dot pulse" aria-hidden="true"></span>
+      <span>Exchange Support</span>
+    </div>
+    <div class="exchange-card-body">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .exchange-card {
+    display: grid;
+    grid-template-areas: "card";
+    position: relative;
+    margin: 1.5rem 0;
+  }
+
+  /* Border layer — beveled corner via gradient */
+  .exchange-card::before {
+    content: '';
+    grid-area: card;
+    background: linear-gradient(225deg, transparent 10px, var(--color-orange-400) 0);
+  }
+
+  /* Background layer — same bevel, 1px margin reveals the border */
+  .exchange-card::after {
+    content: '';
+    grid-area: card;
+    margin: 1px;
+    background: linear-gradient(225deg, transparent 10px, var(--color-background) 0);
+  }
+
+  /* Content sits above both layers */
+  .exchange-card-content {
+    grid-area: card;
+    position: relative;
+    z-index: 1;
+  }
+
+  .exchange-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: var(--font-display-tracking);
+    text-transform: uppercase;
+    color: var(--color-orange-400);
+    border-bottom: 1px solid color-mix(in oklch, var(--color-orange-400) 20%, transparent);
+  }
+
+  .exchange-card-body {
+    padding: 1.5rem;
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--color-orange-400);
+    flex-shrink: 0;
+  }
+
+  .dot.pulse {
+    animation: dot-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot.pulse { animation: none; }
+  }
+</style>
