@@ -5,6 +5,7 @@ description: "Step-by-step REP migration guide. Migrate before August 1, 2026 or
 
 import { Image } from 'astro:assets'
 import ProseCard from '../../../components/ProseCard.astro'
+import ExchangeSupportCard from '../../../components/ExchangeSupportCard.astro'
 import step01 from '../../../assets/migration/step-01.png'
 import step02 from '../../../assets/migration/step-02.png'
 import step03 from '../../../assets/migration/step-03.png'
@@ -40,9 +41,26 @@ If your REP is not on Ethereum (exchanges, L2s), send it to your Ethereum addres
 Sometimes wallets will not automatically detect your REP. You can manually add tokens by pasting the token address:
 
 - **REPv2** — [`0x221657776846890989a759ba2973e427dff5c9bb`](https://etherscan.io/token/0x221657776846890989a759ba2973e427dff5c9bb)
-- **REPv1** — [`0x1985365e9f78359a9B6AD760e32412f4a445E862`](https://etherscan.io/address/0x1985365e9f78359a9B6AD760e32412f4a445E862)
+- **REPv1** — [`0x1985365e9f78359a9B6AD760e32412f4a445E862`](https://etherscan.io/token/0x1985365e9f78359a9B6AD760e32412f4a445E862)
 
 If you have REP in multiple places, send it all to a single Ethereum address on the original Ethereum. Don't forget REP you might have on Layer 2, Coinbase, or other exchanges. You must own your Ethereum address — an Ethereum address is yours if you have the private key.
+
+<ExchangeSupportCard>
+
+The following exchanges have indicated they plan to support migration, but have not yet officially announced it. **Do not wait** — withdraw to your own wallet and migrate yourself if you can.
+
+| Exchange | Status |
+|----------|--------|
+| [Kraken](https://kraken.com/) | Pending |
+| [Gate.io](https://gate.com/) | Pending |
+| [Upbit](https://upbit.com/) | Pending |
+| [Coinbase](https://coinbase.com/) | Pending |
+| [OKX](https://okx.com/) | Pending |
+| [Bitpanda](https://bitpanda.com/) | Pending |
+
+Any exchange not listed above has not indicated support. If your REP is on an unlisted exchange, withdraw and migrate yourself.
+
+</ExchangeSupportCard>
 
 ### 1. Open the migration site
 
