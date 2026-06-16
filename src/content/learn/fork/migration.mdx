@@ -7,6 +7,7 @@ import { Image } from 'astro:assets'
 import ProseCard from '../../../components/ProseCard.astro'
 import ExchangeSupportCard from '../../../components/ExchangeSupportCard.astro'
 import step01 from '../../../assets/migration/step-01.png'
+import { exchanges } from '../../../../scripts/generate-exchange-support'
 import step02 from '../../../assets/migration/step-02.png'
 import step03 from '../../../assets/migration/step-03.png'
 import step04 from '../../../assets/migration/step-04.png'
@@ -45,22 +46,7 @@ Sometimes wallets will not automatically detect your REP. You can manually add t
 
 If you have REP in multiple places, send it all to a single Ethereum address on the original Ethereum. Don't forget REP you might have on Layer 2, Coinbase, or other exchanges. You must own your Ethereum address — an Ethereum address is yours if you have the private key.
 
-<ExchangeSupportCard>
-
-The following exchanges have indicated they plan to support migration, but have not yet officially announced it. **Do not wait** — withdraw to your own wallet and migrate yourself if you can.
-
-| Exchange | Status |
-|----------|--------|
-| [Kraken](https://kraken.com/) | Pending |
-| [Gate.io](https://gate.com/) | Pending |
-| [Upbit](https://upbit.com/) | Pending |
-| [Coinbase](https://coinbase.com/) | Pending |
-| [OKX](https://okx.com/) | Pending |
-| [Bitpanda](https://bitpanda.com/) | Pending |
-
-Any exchange not listed above has not indicated support. If your REP is on an unlisted exchange, withdraw and migrate yourself.
-
-</ExchangeSupportCard>
+<ExchangeSupportCard exchanges={exchanges} />
 
 ### 1. Open the migration site
 
