@@ -45,6 +45,7 @@ dev-debug.log
 
 # Generated fork risk data and cache
 public/data/fork-risk.json
+public/data/exchange-support.json
 public/cache/
 
 # TypeScript build cache

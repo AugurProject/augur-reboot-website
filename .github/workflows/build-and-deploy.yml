@@ -94,6 +94,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Generate exchange support data
+        run: npm run build:exchange-data
+
       - name: Build site
         run: npm run build
         env:

@@ -3,7 +3,27 @@
  * ExchangeSupportCard — prominent container for CEX migration support info.
  * Beveled corner via gradient (matching ClippedCardGradient technique).
  * Amber accent signals "pending / pay attention" without red urgency.
+ *
+ * Accepts structured exchange data via the `exchanges` prop.
+ * Falls back to `<slot/>` content if no prop is provided (backward compat).
  */
+
+export interface Exchange {
+  name: string
+  url: string
+  status: 'pending' | 'confirmed' | 'supporting' | 'completed' | 'declined'
+  notes?: string
+}
+
+const { exchanges } = Astro.props as { exchanges?: Exchange[] }
+
+const statusLabel: Record<string, string> = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  supporting: 'Supporting',
+  completed: 'Completed',
+  declined: 'Declined',
+}
 ---
 
 <div class="exchange-card">
@@ -13,7 +33,26 @@
       <span>Exchange Support</span>
     </div>
     <div class="exchange-card-body">
-      <slot />
+      {exchanges ? (
+        <>
+          <p class="mb-4">The following exchanges have indicated they plan to support migration, but have not yet officially announced it. <strong>Do not wait</strong> — withdraw to your own wallet and migrate yourself if you can.</p>
+          <div class="exchange-table">
+            <div class="exchange-table-row exchange-table-header">
+              <span>Exchange</span>
+              <span class="status-column">Status</span>
+            </div>
+            {exchanges.map((ex) => (
+              <div class="exchange-table-row">
+                <a href={ex.url} target="_blank" rel="noopener noreferrer">{ex.name}</a>
+                <span class={`status-column status-${ex.status}`}>{statusLabel[ex.status] ?? ex.status}</span>
+              </div>
+            ))}
+          </div>
+          <p class="mt-4 text-sm" style="opacity: 0.7">Any exchange not listed above has not indicated support. If your REP is on an unlisted exchange, withdraw and migrate yourself.</p>
+        </>
+      ) : (
+        <slot />
+      )}
     </div>
   </div>
 </div>
@@ -63,6 +102,57 @@
 
   .exchange-card-body {
     padding: 1.5rem;
+  }
+
+  .exchange-table {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid color-mix(in oklch, var(--color-orange-400) 30%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .exchange-table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid color-mix(in oklch, var(--color-orange-400) 15%, transparent);
+  }
+
+  .exchange-table-row:last-child {
+    border-bottom: none;
+  }
+
+  .exchange-table-header {
+    background: color-mix(in oklch, var(--color-orange-400) 10%, transparent);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: var(--font-display-tracking);
+    text-transform: uppercase;
+    color: var(--color-orange-400);
+  }
+
+  .exchange-table-row a {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: color-mix(in oklch, var(--color-orange-400) 40%, transparent);
+  }
+
+  .exchange-table-row a:hover {
+    color: var(--color-orange-400);
+  }
+
+  .status-column {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: var(--font-display-tracking);
+    text-transform: uppercase;
+  }
+
+  .status-pending {
+    color: var(--color-orange-400);
   }
 
   .dot {
