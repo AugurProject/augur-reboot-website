@@ -8,13 +8,13 @@
     "build": "astro build",
     "build:gh-pages": "GITHUB_ACTIONS=true GITHUB_REPOSITORY=AugurProject/augur-reboot-website astro build",
     "build:fork-data": "node --experimental-strip-types scripts/calculate-fork-risk.ts",
-    "build:exchange-data": "node --experimental-strip-types scripts/generate-exchange-support.ts",
     "preview": "astro build && wrangler dev",
     "astro": "astro",
-    "deploy": "npm run build:exchange-data && astro build && wrangler deploy",
+    "deploy": "astro build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "typecheck": "astro check",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "check": "npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",

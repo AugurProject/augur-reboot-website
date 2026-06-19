@@ -1,6 +1,6 @@
 ---
 title: Public Data Endpoints
-tags: [data, api, external-consumers, fork-risk, exchange-support]
+tags: [data, api, external-consumers, fork-risk]
 ---
 
 # Public Data Endpoints
@@ -17,8 +17,6 @@ Every endpoint carries:
 | `schemaVersion` | `string` | Semantic version of the response shape. Increments on breaking changes. |
 
 Adding a field is safe. Renaming or removing a top-level field is a breaking change — coordinate with known consumers.
-
-Data files that need both public serving and build-time import live in `scripts/` as a TypeScript module, then are written to `public/data/` via a dedicated npm script (`npm run build:exchange-data`). The build-time import pulls the module's exports directly; the CLI mode writes the JSON.
 
 ## Endpoints
 
@@ -85,52 +83,7 @@ Present and non-null only when a fork is live. Absent (`null` or missing) otherw
 
 For pipeline internals, see [[fork-monitoring-pipeline]].
 
----
-
-### `/data/exchange-support.json`
-
-CEX migration support status for the Moon Fork. Manually updated.
-
-```
-GET /data/exchange-support.json
-Refresh: manual
-```
-
-#### Top-level fields
-
-| Field | Type | Description |
-|---|---|---|
-| `generatedAt` | `string` (ISO 8601) | When the data was last manually updated |
-| `schemaVersion` | `string` | Response shape version |
-| `description` | `string` | Human-readable context for the data set |
-| `exchanges` | `array` | Exchange status entries (below) |
-
-#### `exchanges[]`
-
-| Field | Type | Description |
-|---|---|---|
-| `name` | `string` | Exchange display name |
-| `url` | `string` | Exchange website |
-| `status` | `enum` | `pending` \| `confirmed` \| `supporting` \| `completed` \| `declined` |
-| `notes` | `string \| null` | Optional context about the status |
-
-#### Status values
-
-| Value | Meaning |
-|---|---|
-| `pending` | In discussions; no commitment yet |
-| `confirmed` | Exchange has publicly announced support |
-| `supporting` | Exchange is actively processing migrations |
-| `completed` | Migration support is finished |
-| `declined` | Exchange explicitly declined to support |
-
-**Update procedure**: edit the `EXCHANGES` array in `scripts/generate-exchange-support.ts`, then run `npm run build:exchange-data` to regenerate `public/data/exchange-support.json`.
-
----
-
 ## Related
 
 - [[fork-monitoring-pipeline]] — CI pipeline details for fork-risk.json
-- [[migration-guide-feature]] — exchange list consumption in the migration guide
 - `scripts/calculate-fork-risk.ts` — pipeline script (in-repo)
-- `src/components/ExchangeSupportCard.astro` — UI component consuming exchange data
