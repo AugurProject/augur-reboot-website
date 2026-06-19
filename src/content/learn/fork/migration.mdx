@@ -5,9 +5,7 @@ description: "Step-by-step REP migration guide. Migrate before August 1, 2026 or
 
 import { Image } from 'astro:assets'
 import ProseCard from '../../../components/ProseCard.astro'
-import ExchangeSupportCard from '../../../components/ExchangeSupportCard.astro'
 import step01 from '../../../assets/migration/step-01.png'
-import { exchanges } from '../../../../scripts/generate-exchange-support'
 import step02 from '../../../assets/migration/step-02.png'
 import step03 from '../../../assets/migration/step-03.png'
 import step04 from '../../../assets/migration/step-04.png'
@@ -46,7 +44,7 @@ Sometimes wallets will not automatically detect your REP. You can manually add t
 
 If you have REP in multiple places, send it all to a single Ethereum address on the original Ethereum. Don't forget REP you might have on Layer 2, Coinbase, or other exchanges. You must own your Ethereum address — an Ethereum address is yours if you have the private key.
 
-<ExchangeSupportCard exchanges={exchanges} />
+Exchange support status changes frequently — check the latest at [v3.augur.net/#exchange-support](https://v3.augur.net/#exchange-support).
 
 ### 1. Open the migration site
 

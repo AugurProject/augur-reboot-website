@@ -88,14 +88,8 @@ jobs:
       - name: Verify fork-risk data exists
         run: test -f public/data/fork-risk.json
 
-      - name: Type check
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Generate exchange support data
-        run: npm run build:exchange-data
+      - name: Check
+        run: npm run check
 
       - name: Build site
         run: npm run build
