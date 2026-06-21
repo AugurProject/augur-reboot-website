@@ -180,51 +180,11 @@ const ForkActiveHelpDialog = () => (
 				Full Migration Guide
 			</CTAButton>
 
-			<div className="mb-4">
-				<div className="my-4 flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-					<span className="flex-1 border-t border-dashed border-muted-foreground/40" aria-hidden="true" />
-					<span>Official tokens</span>
-					<span className="flex-1 border-t border-dashed border-muted-foreground/40" aria-hidden="true" />
-				</div>
-				<div className="flex items-center gap-2">
-					<TokenButton href="https://etherscan.io/address/0x1985365e9f78359a9B6AD760e32412f4a445E862">
-						REPv1
-					</TokenButton>
-					<TokenButton href="https://etherscan.io/token/0x221657776846890989a759ba2973e427dff5c9bb">
-						REPv2
-					</TokenButton>
-					<TokenButton href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D">
-						REPv2 Yes
-					</TokenButton>
-				</div>
-			</div>
-
 			<CTAButton href="https://6.augurfork.eth.limo/" target="_blank" rel="noopener noreferrer">
 				Migration Tool
 			</CTAButton>
 		</div>
 	</DialogContent>
-)
-
-const TokenButton = ({ href, children }: { href: string; children: React.ReactNode }) => (
-	<Button
-		variant="outline"
-		href={href}
-		target="_blank"
-		rel="noopener noreferrer"
-		className={cn(
-			'w-full px-2',
-			'uppercase text-muted-foreground hover:text-loud-foreground focus:text-loud-foreground',
-			'hover:bg-foreground/5 focus:bg-foreground/5',
-			'border-foreground/20 hover:border-foreground/60 focus:border-foreground/60'
-		)}
-	>
-		{children}
-		<svg className="ml-1 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-			<path d="M7 17 17 7" />
-			<path d="M7 7h10v10" />
-		</svg>
-	</Button>
 )
 
 const CTAButton = ({ href, children, target, rel }: { href: string; children: React.ReactNode; target?: '_blank'; rel?: string }) => (
