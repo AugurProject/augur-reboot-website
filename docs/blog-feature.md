@@ -304,19 +304,32 @@ src/
 <article class="flex flex-col md:flex-row gap-0 md:gap-6">
   {/* Image: full-width on mobile, 384px sidebar on desktop */}
   {featuredImage && (
-    <div class="w-full md:w-64 aspect-191/100">
-      <Image src={featuredImage} alt={title} width={384} height={202} />
+    <div class="w-full md:w-96 shrink-0 self-start aspect-[40/21] overflow-hidden">
+      <Image
+        src={featuredImage}
+        alt={title}
+        width={384}
+        height={202}
+        class="w-full h-full object-contain"
+      />
     </div>
   )}
-  {/* Content: stack vertically */}
-  <div>Title, metadata, description</div>
+  {/* Desktop clamps keep the text column within the image height */}
+  <div class="flex min-w-0 flex-1 flex-col md:p-4">
+    <h3 class="md:line-clamp-2">Title</h3>
+    <p class="md:line-clamp-3">Description</p>
+    <div class="md:mt-auto">Read more</div>
+  </div>
 </article>
 ```
 
 **Why:**
 - Mobile-first approach: content stacks naturally on small screens
 - Responsive without media query complexity
-- Aspect ratio preserved for consistent visual appearance
+- `aspect-[40/21]` exactly matches the required 1200×630 source ratio
+- `object-contain` preserves the complete thumbnail instead of cropping its edges
+- `shrink-0 self-start` prevents the desktop image column from stretching to the text height
+- Desktop title and description clamps prevent tall copy from leaving empty space below the image
 
 #### 4. Astro Native Image Optimization
 
@@ -464,10 +477,14 @@ Posts are pre-rendered into static HTML at build time. RSS feed is generated in 
 
 #### Modifying Featured Image Dimensions
 
-Featured images render at 384×202px. To change dimensions:
-1. Update `width` and `height` props in `BlogPostCard.astro`
-2. Update `aspect-191/100` Tailwind class to match new ratio (191:100 = 384:202)
-3. Rebuild to regenerate optimized images
+Featured image source files are 1200×630 (40:21). On the `/blog` listing, they render full-width on mobile and at 384×202px on desktop. The homepage cards use the same 40:21 ratio at responsive widths.
+
+To change the image dimensions or ratio:
+1. Update the `width` and `height` props in `BlogPostCard.astro` and `PostCard.astro`
+2. Update `aspect-[40/21]` in both components to match the new source ratio
+3. Keep `object-contain` when the complete artwork must remain visible; use `object-cover` only when intentional cropping is acceptable
+4. Revisit the desktop title and description clamps if the new image height changes card proportions
+5. Rebuild and visually verify both `/blog` and the homepage at desktop and mobile widths
 
 #### Image Optimization
 
@@ -493,6 +510,18 @@ Astro automatically generates optimized WebP versions for all images during buil
 - Verify image file exists at `[post-dir]/featured-image.webp`
 - Check image dimensions are 1200×630 (1.91:1 aspect ratio)
 - Try clearing browser cache
+
+**Featured image is cropped**
+- Confirm the source file is exactly 1200×630
+- Keep the card wrapper at `aspect-[40/21]`
+- Use `object-contain` on the Astro `<Image>` element
+- Check both `BlogPostCard.astro` (`/blog`) and `PostCard.astro` (homepage), since they are separate card implementations
+
+**Desktop card has empty space below the image**
+- Do not stretch the image to match a taller text column
+- Keep `shrink-0 self-start` on the `/blog` image wrapper
+- Clamp desktop titles to two lines and descriptions to three lines
+- Keep the “Read more” action bottom-aligned with `md:mt-auto`
 
 **Images broken in post content**
 - Use relative paths: `./image-name.webp` not `/image-name.webp`

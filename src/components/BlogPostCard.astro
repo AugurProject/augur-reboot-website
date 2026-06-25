@@ -25,28 +25,28 @@ function formatDate(date: Date): string {
 <article class="blog-post-card border border-foreground/20 bg-background/70 hover:border-primary/50 transition-colors flex flex-col md:flex-row gap-0 md:gap-6">
   {/* Featured Image - OG ratio (1.91:1 = 1200×630) */}
   {featuredImage && (
-    <div class="w-full md:w-64 aspect-191/100">
+    <div class="w-full md:w-96 shrink-0 self-start aspect-[40/21] overflow-hidden">
       <Image
         src={featuredImage}
         alt={title}
         width={384}
         height={202}
         loading="lazy"
-        class="w-full h-full object-cover"
+        class="w-full h-full object-contain"
       />
     </div>
   )}
 
   {/* Content */}
-  <a href={`/blog/${slug}`} class="block flex-1">
-    <div class="flex flex-col gap-3 p-6">
+  <a href={`/blog/${slug}`} class="flex min-w-0 flex-1">
+    <div class="flex min-w-0 flex-1 flex-col gap-3 p-6 md:gap-2 md:p-4">
       {/* Post Title */}
-      <h3 class="text-xl font-display font-bold text-loud-foreground tracking-wider uppercase hover:fx-glow transition-all duration-200">
+      <h3 class="text-xl font-display font-bold text-loud-foreground tracking-wider uppercase hover:fx-glow transition-all duration-200 md:line-clamp-2 md:leading-tight">
         {title}
       </h3>
 
       {/* Metadata */}
-      <div class="flex gap-3 text-xs text-muted-foreground font-display uppercase tracking-wider">
+      <div class="flex gap-3 text-xs text-muted-foreground font-display uppercase tracking-wider md:gap-2">
         <span>{formatDate(publishDate)}</span>
         <span>•</span>
         <span>BY {author}</span>
@@ -54,13 +54,13 @@ function formatDate(date: Date): string {
 
       {/* Description */}
       {description && (
-        <p class="text-sm tracking-prose text-foreground">
+        <p class="text-sm tracking-prose text-foreground md:line-clamp-3 md:leading-snug">
           {description}
         </p>
       )}
 
       {/* Read More */}
-      <div class="text-primary text-sm font-display font-bold uppercase tracking-wider mt-2">
+      <div class="text-primary text-sm font-display font-bold uppercase tracking-wider mt-2 md:mt-auto">
         READ MORE →
       </div>
     </div>

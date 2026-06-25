@@ -22,14 +22,14 @@ const descClass = `tracking-prose text-sm leading-tight text-muted-foreground li
   <a href={href} class="flex flex-col flex-1 no-underline text-inherit outline-none">
     <div class="absolute inset-0 pointer-events-none before:content-[''] before:block before:absolute before:size-8 before:border-l-2 before:border-t-2 before:border-foreground before:-translate-x-4 before:-translate-y-4 before:opacity-0 before:transition-all group-hover:before:translate-x-0 group-hover:before:translate-y-0 group-hover:before:opacity-100 group-focus:before:translate-x-0 group-focus:before:translate-y-0 group-focus:before:opacity-100 after:content-[''] after:block after:absolute after:bottom-0 after:right-0 after:size-8 after:border-r-2 after:border-b-2 after:border-foreground after:translate-x-4 after:translate-y-4 after:opacity-0 after:transition-all group-hover:after:translate-x-0 group-hover:after:translate-y-0 group-hover:after:opacity-100 group-focus:after:translate-x-0 group-focus:after:translate-y-0 group-focus:after:opacity-100"></div>
     <div class="absolute inset-0 pointer-events-none before:content-[''] before:block before:absolute before:bottom-0 before:left-0 before:size-8 before:border-l-2 before:border-b-2 before:border-foreground before:-translate-x-4 before:translate-y-4 before:opacity-0 before:transition-all group-hover:before:translate-x-0 group-hover:before:translate-y-0 group-hover:before:opacity-100 group-focus:before:translate-x-0 group-focus:before:translate-y-0 group-focus:before:opacity-100 after:content-[''] after:block after:absolute after:top-0 after:right-0 after:size-8 after:border-r-2 after:border-t-2 after:border-foreground after:translate-x-4 after:-translate-y-4 after:opacity-0 after:transition-all group-hover:after:translate-x-0 group-hover:after:translate-y-0 group-hover:after:opacity-100 group-focus:after:translate-x-0 group-focus:after:translate-y-0 group-focus:after:opacity-100"></div>
-    <div class="overflow-hidden w-full aspect-video">
+    <div class="overflow-hidden w-full aspect-[40/21]">
       {image && (
         <Image
           src={image}
           alt={title}
           width={featured ? 1200 : 600}
-          height={featured ? 630 : 338}
-          class="w-full h-full object-cover"
+          height={featured ? 630 : 315}
+          class="w-full h-full object-contain"
         />
       )}
     </div>
