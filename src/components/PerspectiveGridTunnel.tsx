@@ -494,7 +494,32 @@ const PerspectiveGridTunnel: React.FC<PerspectiveGridTunnelProps> = ({
 
 		animate();
 
+		// Pause render loop when tab is hidden or window loses focus (battery/GPU savings)
+		const startLoop = () => {
+			if (!animationFrameId.current) animate();
+		};
+		const stopLoop = () => {
+			if (animationFrameId.current) {
+				cancelAnimationFrame(animationFrameId.current);
+				animationFrameId.current = null;
+			}
+		};
+
+		const handleVisibility = () => {
+			if (document.hidden) stopLoop();
+			else startLoop();
+		};
+		const handleBlur = () => stopLoop();
+		const handleFocus = () => startLoop();
+
+		document.addEventListener("visibilitychange", handleVisibility);
+		window.addEventListener("blur", handleBlur);
+		window.addEventListener("focus", handleFocus);
+
 		return () => {
+			document.removeEventListener("visibilitychange", handleVisibility);
+			window.removeEventListener("blur", handleBlur);
+			window.removeEventListener("focus", handleFocus);
 			window.removeEventListener("resize", resizeCanvas);
 			if (animationFrameId.current) {
 				cancelAnimationFrame(animationFrameId.current);
