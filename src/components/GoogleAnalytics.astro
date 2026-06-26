@@ -53,16 +53,7 @@ if (!gaId) {
         });
       });
 
-      // Fallback: Also track on visibility change to catch edge cases
-      // This ensures GA knows the current page if the user returns to tab
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          gtag('event', 'page_view', {
-            'page_path': window.location.pathname + window.location.search,
-            'page_title': document.title,
-          });
-        }
-      });
+
     </script>
   </>
 )}
