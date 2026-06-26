@@ -1,12 +1,11 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import FaqItem from "../components/FaqItem.astro";
 import Footer from "../components/Footer.astro";
+import MigrationCta from "../components/MigrationCta.tsx";
 import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
 import SectionHeading from "../components/SectionHeading.astro";
-import FaqItem from "../components/FaqItem.astro";
-import MigrationCta from "../components/MigrationCta.tsx";
-import { withBase } from "../lib/utils";
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
@@ -25,7 +24,7 @@ import { withBase } from "../lib/utils";
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     <!-- Top Section: Navigation -->
-    <PageHeader client:load backHref={withBase('/')} />
+    <PageHeader client:load backHref="/" />
 
     <!-- Middle Section: Content -->
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
@@ -156,7 +155,7 @@ import { withBase } from "../lib/utils";
         <!-- Closing -->
         <div class="mt-8 border-foreground/10 text-foreground">
           <p class="mb-3">Still have questions? Come find us in the community:</p>
-          <p class="mb-1">→ <a class="text-loud-foreground" href="https://discord.gg/aNBTq55" target="_blank">Join the Discord</a></p>
+          <p class="mb-1">→ <a class="text-loud-foreground" href="https://discord.gg/Y3tCZsSmz3" target="_blank">Join the Discord</a></p>
           <p>→ Follow <a class="text-loud-foreground" href="https://x.com/AugurProject" target="_blank">@AugurProject</a> on X</p>
         </div>
 

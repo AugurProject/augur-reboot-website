@@ -1,53 +1,53 @@
 {
-  "name": "augur-website-teaser",
-  "description": "A teaser website for the upcoming Augur project.",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "build:gh-pages": "GITHUB_ACTIONS=true GITHUB_REPOSITORY=AugurProject/augur-reboot-website astro build",
-    "build:fork-data": "node --experimental-strip-types scripts/calculate-fork-risk.ts",
-    "preview": "astro build && wrangler dev",
-    "astro": "astro",
-    "deploy": "astro build && wrangler deploy",
-    "cf-typegen": "wrangler types",
-    "typecheck": "astro check",
-    "lint": "biome lint",
-    "check": "npm run typecheck && npm run lint"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@astrojs/rss": "^4.0.15",
-    "@nanostores/persistent": "^1.1.0",
-    "@nanostores/react": "^1.0.0",
-    "@phosphor-icons/react": "^2.1.10",
-    "@radix-ui/react-dialog": "^1.1.15",
-    "clsx": "^2.1.1",
-    "ethers": "^6.15.0",
-    "nanostores": "^1.0.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "tailwind-merge": "^3.3.1",
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
-    "@astrojs/cloudflare": "^12.6.0",
-    "@astrojs/mdx": "^4.3.10",
-    "@astrojs/react": "^4.3.0",
-    "@astrojs/sitemap": "^3.6.0",
-    "@biomejs/biome": "^2.5.0",
-    "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.17",
-    "@types/node": "^24.0.4",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "astro": "^5.16.11",
-    "tailwindcss": "^4.1.11",
-    "tw-animate-css": "^1.4.0",
-    "wrangler": "^4.22.0"
-  },
-  "overrides": {
-    "vite": "^7.3.1"
-  }
+	"name": "augur-reboot-website",
+	"description": "Augur protocol reboot — prediction markets, fork migration, and ecosystem hub.",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"build:gh-pages": "GITHUB_ACTIONS=true GITHUB_REPOSITORY=AugurProject/augur-reboot-website astro build",
+		"build:fork-data": "node --experimental-strip-types scripts/calculate-fork-risk.ts",
+		"preview": "astro build && wrangler dev",
+		"astro": "astro",
+		"deploy": "astro build && wrangler deploy",
+		"cf-typegen": "wrangler types",
+		"typecheck": "astro check",
+		"lint": "biome lint",
+		"check": "npm run typecheck && npm run lint"
+	},
+	"dependencies": {
+		"@astrojs/rss": "^4.0.15",
+		"@nanostores/persistent": "^1.1.0",
+		"@nanostores/react": "^1.0.0",
+		"@phosphor-icons/react": "^2.1.10",
+		"@radix-ui/react-dialog": "^1.1.15",
+		"clsx": "^2.1.1",
+		"nanostores": "^1.0.1",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"tailwind-merge": "^3.3.1",
+		"typescript": "^5.9.3"
+	},
+	"devDependencies": {
+		"@astrojs/cloudflare": "^12.6.0",
+		"@astrojs/mdx": "^4.3.10",
+		"@astrojs/react": "^4.3.0",
+		"@astrojs/sitemap": "^3.6.0",
+		"@biomejs/biome": "^2.5.0",
+		"@tailwindcss/typography": "^0.5.19",
+		"@tailwindcss/vite": "^4.1.17",
+		"@types/node": "^24.0.4",
+		"@types/react": "^19.1.8",
+		"@types/react-dom": "^19.1.6",
+		"@astrojs/check": "^0.9.6",
+		"ethers": "^6.15.0",
+		"astro": "^5.16.11",
+		"tailwindcss": "^4.1.11",
+		"tw-animate-css": "^1.4.0",
+		"wrangler": "^4.22.0"
+	},
+	"overrides": {
+		"vite": "^7.3.1"
+	}
 }

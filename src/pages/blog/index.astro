@@ -1,33 +1,35 @@
 ---
-import { getCollection } from 'astro:content';
-import type { ImageMetadata } from 'astro';
-import Layout from '../../layouts/Layout.astro';
-import Footer from '../../components/Footer.astro';
-import PageHeader from '../../components/PageHeader.tsx';
-import PageTitle from '../../components/PageTitle.astro';
-import BlogPostCard from '../../components/BlogPostCard.astro';
-import { withBase } from '../../lib/utils';
+import { getCollection } from "astro:content";
+import type { ImageMetadata } from "astro";
+import BlogPostCard from "../../components/BlogPostCard.astro";
+import Footer from "../../components/Footer.astro";
+import PageHeader from "../../components/PageHeader.tsx";
+import PageTitle from "../../components/PageTitle.astro";
+import Layout from "../../layouts/Layout.astro";
 
 // Import featured images from all blog posts
 const images: Record<string, { default: ImageMetadata }> = import.meta.glob(
-  '/src/content/blog/*/featured-image.webp',
-  { eager: true }
+	"/src/content/blog/*/featured-image.webp",
+	{ eager: true },
 );
 
 // Create a map from slug to image object
-const imageMap = Object.entries(images).reduce((acc, [path, { default: image }]) => {
-  const slug = path.split('/').at(-2);
-  if (slug) {
-    acc[slug] = image;
-  }
-  return acc;
-}, {} as Record<string, ImageMetadata>);
+const imageMap = Object.entries(images).reduce(
+	(acc, [path, { default: image }]) => {
+		const slug = path.split("/").at(-2);
+		if (slug) {
+			acc[slug] = image;
+		}
+		return acc;
+	},
+	{} as Record<string, ImageMetadata>,
+);
 
-const blogPosts = await getCollection('blog');
+const blogPosts = await getCollection("blog");
 
 // Sort posts by publish date (newest first)
 const sortedPosts = blogPosts.sort(
-  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+	(a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
 );
 ---
 
@@ -38,7 +40,7 @@ const sortedPosts = blogPosts.sort(
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     {/* Top Section: Navigation */}
-    <PageHeader client:load backHref={withBase('/')} />
+    <PageHeader client:load backHref="/" />
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 mb-12">

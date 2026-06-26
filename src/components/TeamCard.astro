@@ -1,11 +1,11 @@
 ---
-import type React from 'react'
+import type React from "react";
 
 interface Props {
-  name: string;
-  description: string;
-  SvgLogo?: React.ComponentType<{ class?: string }>;
-  url?: string;
+	name: string;
+	description: string;
+	SvgLogo?: React.ComponentType<{ class?: string }>;
+	url?: string;
 }
 
 const { name, description, SvgLogo, url } = Astro.props;

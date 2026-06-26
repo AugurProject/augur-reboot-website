@@ -1,31 +1,40 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import ArticleContent from "../components/ArticleContent.astro";
 import Footer from "../components/Footer.astro";
 import LearnNavigation from "../components/LearnNavigation.tsx";
 import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
-import { withBase } from "../lib/utils";
+import Layout from "../layouts/Layout.astro";
 
 interface Props {
-	title: string
-	description?: string
+	title: string;
+	description?: string;
 }
 
-const { title, description } = Astro.props
+const { title, description } = Astro.props;
 
 // Topic navigation data
 const topics = [
-	{ title: 'MIGRATION GUIDE', slug: 'fork/migration', path: '/learn/fork/migration/', critical: true },
-	{ title: 'WHAT IS A FORK?', slug: 'fork/index', path: '/learn/fork/' },
 	{
-		title: 'HOW DISPUTES & BONDS WORK',
-		slug: 'fork/disputes-and-bonds',
-		path: '/learn/fork/disputes-and-bonds/',
+		title: "MIGRATION GUIDE",
+		slug: "fork/migration",
+		path: "/learn/fork/migration/",
+		critical: true,
 	},
-	{ title: 'WHAT TO DO', slug: 'fork/what-to-do', path: '/learn/fork/what-to-do/' },
-]
+	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
+	{
+		title: "HOW DISPUTES & BONDS WORK",
+		slug: "fork/disputes-and-bonds",
+		path: "/learn/fork/disputes-and-bonds/",
+	},
+	{
+		title: "WHAT TO DO",
+		slug: "fork/what-to-do",
+		path: "/learn/fork/what-to-do/",
+	},
+];
 
-const currentPath = Astro.url.pathname
+const currentPath = Astro.url.pathname;
 ---
 
 <Layout
@@ -35,7 +44,7 @@ const currentPath = Astro.url.pathname
 >
 	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
 		{/* Top Section: Navigation */}
-		<PageHeader client:load backHref={withBase('/')} />
+		<PageHeader client:load backHref="/" />
 
 		{/* Middle Section: Scrollable Content */}
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
@@ -43,9 +52,9 @@ const currentPath = Astro.url.pathname
 				<PageTitle prefix="LEARN" title={title} />
 
 				{/* Main Content */}
-				<article class="prose prose-invert max-w-none pt-6 px-4 prose-headings:font-display prose-headings:uppercase prose-headings:tracking-wide prose-p:leading-snug prose-li:leading-snug prose-ul:list-[square] prose-li:marker:text-muted-foreground prose-ol:marker:text-muted-foreground prose-blockquote:border-l-muted-foreground prose-blockquote:text-foreground prose-img:border prose-img:border-muted-foreground/30 prose-img:shadow-[0_0_2em_oklch(from_var(--color-primary)_l_c_h_/0.1)]">
+				<ArticleContent>
 					<slot />
-				</article>
+				</ArticleContent>
 			</div>
 		</main>
 

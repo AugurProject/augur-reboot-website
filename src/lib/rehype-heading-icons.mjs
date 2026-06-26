@@ -2,43 +2,70 @@
  * Rehype plugin that replaces leading emojis in headings with Phosphor SVG icons.
  * If no emoji is found, a default "plus" icon is used.
  */
+
+import {
+	ArrowRightIcon,
+	ArrowsClockwiseIcon,
+	BankIcon,
+	BrainIcon,
+	BridgeIcon,
+	BriefcaseIcon,
+	CalendarIcon,
+	CastleTurretIcon,
+	ChartLineUpIcon,
+	CoinsIcon,
+	CurrencyCircleDollarIcon,
+	DotsSixVerticalIcon,
+	EqualsIcon,
+	FireIcon,
+	FlaskIcon,
+	GearIcon,
+	GlobeIcon,
+	LightbulbIcon,
+	MagicWandIcon,
+	MegaphoneIcon,
+	PlusIcon,
+	PuzzlePieceIcon,
+	ScalesIcon,
+	SpiralIcon,
+	UserGearIcon,
+} from "@phosphor-icons/react";
+import { fromHtml } from "hast-util-from-html";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import * as Icons from "@phosphor-icons/react";
-import { fromHtml } from "hast-util-from-html";
 import { visit } from "unist-util-visit";
 
 // Emoji → Phosphor icon component mapping
 const EMOJI_MAP = {
-	"🔮": Icons.MagicWandIcon,
-	"⚖️": Icons.ScalesIcon,
-	"🧪": Icons.FlaskIcon,
-	"📈": Icons.ChartLineUpIcon,
-	"🌍": Icons.GlobeIcon,
-	"🔥": Icons.FireIcon,
-	"⚙️": Icons.GearIcon,
-	"💡": Icons.LightbulbIcon,
-	"🏛️": Icons.BankIcon,
-	"💸": Icons.CurrencyCircleDollarIcon,
-	"🌀": Icons.SpiralIcon,
-	"🧠": Icons.BrainIcon,
-	"🔄": Icons.ArrowsClockwiseIcon,
-	"🌉": Icons.BridgeIcon,
-	"💼": Icons.BriefcaseIcon,
-	"🧩": Icons.PuzzlePieceIcon,
-	"💰": Icons.CoinsIcon,
-	"📅": Icons.CalendarIcon,
-	"👉": Icons.ArrowRightIcon,
-	"👨‍💻": Icons.UserGearIcon,
-	"⛩️": Icons.CastleTurretIcon,
-	"📣": Icons.MegaphoneIcon,
+	"🔮": MagicWandIcon,
+	"⚖️": ScalesIcon,
+	"🧪": FlaskIcon,
+	"📈": ChartLineUpIcon,
+	"🌍": GlobeIcon,
+	"🔥": FireIcon,
+	"⚙️": GearIcon,
+	"💡": LightbulbIcon,
+	"🏛️": BankIcon,
+	"💸": CurrencyCircleDollarIcon,
+	"🌀": SpiralIcon,
+	"🧠": BrainIcon,
+	"🔄": ArrowsClockwiseIcon,
+	"🌉": BridgeIcon,
+	"💼": BriefcaseIcon,
+	"🧩": PuzzlePieceIcon,
+	"💰": CoinsIcon,
+	"📅": CalendarIcon,
+	"👉": ArrowRightIcon,
+	"👨‍💻": UserGearIcon,
+	"⛩️": CastleTurretIcon,
+	"📣": MegaphoneIcon,
 };
 
 // Fallback icons by heading level (when no emoji is present)
 const FALLBACK_ICONS_BY_LEVEL = {
-	2: Icons.PlusIcon,
-	3: Icons.DotsSixVerticalIcon,
-	4: Icons.EqualsIcon,
+	2: PlusIcon,
+	3: DotsSixVerticalIcon,
+	4: EqualsIcon,
 };
 
 // Cache loaded SVG HAST nodes
@@ -86,11 +113,11 @@ export default function rehypeHeadingIcons() {
 
 			let IconComponent;
 			if (emojiInfo) {
-				IconComponent = EMOJI_MAP[emojiInfo.emoji] ?? Icons.PlusIcon;
+				IconComponent = EMOJI_MAP[emojiInfo.emoji] ?? PlusIcon;
 				// Strip emoji from text
 				firstChild.value = text.slice(emojiInfo.length);
 			} else {
-				IconComponent = FALLBACK_ICONS_BY_LEVEL[headingLevel] ?? Icons.PlusIcon;
+				IconComponent = FALLBACK_ICONS_BY_LEVEL[headingLevel] ?? PlusIcon;
 			}
 
 			const svgNode = loadSvgNode(IconComponent);

@@ -1,9 +1,8 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import LearnNavigation from "../components/LearnNavigation.tsx";
 import PageHeader from "../components/PageHeader.tsx";
-import { withBase } from "../lib/utils";
+import Layout from "../layouts/Layout.astro";
 
 interface Props {
 	title: string;
@@ -14,14 +13,23 @@ interface Props {
 const { title, description, deadline = "AUGUST 1, 2026" } = Astro.props;
 
 const topics = [
-	{ title: "MIGRATION GUIDE", slug: "fork/migration", path: "/learn/fork/migration/", critical: true },
+	{
+		title: "MIGRATION GUIDE",
+		slug: "fork/migration",
+		path: "/learn/fork/migration/",
+		critical: true,
+	},
 	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
 	{
 		title: "HOW DISPUTES & BONDS WORK",
 		slug: "fork/disputes-and-bonds",
 		path: "/learn/fork/disputes-and-bonds/",
 	},
-	{ title: "WHAT TO DO", slug: "fork/what-to-do", path: "/learn/fork/what-to-do/" },
+	{
+		title: "WHAT TO DO",
+		slug: "fork/what-to-do",
+		path: "/learn/fork/what-to-do/",
+	},
 ];
 
 const currentPath = Astro.url.pathname;
@@ -33,7 +41,7 @@ const currentPath = Astro.url.pathname;
 	ogType="article"
 >
 	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
-		<PageHeader client:load backHref={withBase("/")} />
+		<PageHeader client:load backHref="/" />
 
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
 			<div class="max-w-3xl mx-auto">

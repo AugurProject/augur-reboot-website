@@ -7,10 +7,7 @@
 	"name": "tease",
 	"main": "./dist/_worker.js/index.js",
 	"compatibility_date": "2025-06-20",
-	"compatibility_flags": [
-		"nodejs_compat",
-		"global_fetch_strictly_public"
-	],
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist"

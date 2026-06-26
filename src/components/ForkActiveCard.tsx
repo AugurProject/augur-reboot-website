@@ -1,51 +1,51 @@
-import { useEffect, useState } from 'react'
-import { cn } from '../lib/utils'
-import { useForkData } from '../providers/ForkDataProvider'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog'
-import Button from './ui/Button'
+import { useEffect, useState } from "react";
+import { cn } from "../lib/utils";
+import { useForkData } from "../providers/ForkDataProvider";
+import Button from "./ui/Button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 
-const TOTAL_SUPPLY = 11_000_000
+const TOTAL_SUPPLY = 11_000_000;
 
 const formatRep = (n: number): string => {
-	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
-	return Math.round(n).toLocaleString()
-}
+	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+	return Math.round(n).toLocaleString();
+};
 
 const getCountdownParts = (endUnix: number, nowMs: number) => {
-	const secs = Math.max(0, endUnix - Math.floor(nowMs / 1000))
+	const secs = Math.max(0, endUnix - Math.floor(nowMs / 1000));
 	return {
 		d: Math.floor(secs / 86400),
 		h: Math.floor((secs % 86400) / 3600),
 		m: Math.floor((secs % 3600) / 60),
 		s: Math.floor(secs % 60),
-	}
-}
+	};
+};
 
-const pad = (n: number, w = 2) => String(n).padStart(w, '0')
+const pad = (n: number, w = 2) => String(n).padStart(w, "0");
 
 export const ForkActiveCard = (): React.JSX.Element | null => {
-	const { rawData } = useForkData()
-	const fork = rawData.forkActive
-	const [now, setNow] = useState<number>(() => Date.now())
-	const [isHelpOpen, setIsHelpOpen] = useState(false)
+	const { rawData } = useForkData();
+	const fork = rawData.forkActive;
+	const [now, setNow] = useState<number>(() => Date.now());
+	const [isHelpOpen, setIsHelpOpen] = useState(false);
 
 	useEffect(() => {
-		const id = setInterval(() => setNow(Date.now()), 1000)
-		return () => clearInterval(id)
-	}, [])
+		const id = setInterval(() => setNow(Date.now()), 1000);
+		return () => clearInterval(id);
+	}, []);
 
-	if (!fork) return null
+	if (!fork) return null;
 
-	const migratedRep = fork.outcomes.reduce((sum, o) => sum + o.migratedRep, 0)
-	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100)
+	const migratedRep = fork.outcomes.reduce((sum, o) => sum + o.migratedRep, 0);
+	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100);
 
-	const t = getCountdownParts(fork.forkEndTime, now)
+	const t = getCountdownParts(fork.forkEndTime, now);
 	const timerCells: Array<{ value: string; label: string }> = [
-		{ value: pad(t.d, 2), label: 'DAYS' },
-		{ value: pad(t.h), label: 'HRS' },
-		{ value: pad(t.m), label: 'MIN' },
-		{ value: pad(t.s), label: 'SEC' },
-	]
+		{ value: pad(t.d, 2), label: "DAYS" },
+		{ value: pad(t.h), label: "HRS" },
+		{ value: pad(t.m), label: "MIN" },
+		{ value: pad(t.s), label: "SEC" },
+	];
 
 	return (
 		<Dialog open={isHelpOpen} onOpenChange={setIsHelpOpen}>
@@ -59,12 +59,16 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 					>
 						<div className="flex justify-between items-center mb-4">
 							<div className="text-xs uppercase tracking-widest">
-								<span className="text-muted-foreground">{'FORK ACTIVE //'}</span>{' '}
+								<span className="text-muted-foreground">
+									{"FORK ACTIVE //"}
+								</span>{" "}
 								<span className="text-foreground">MIGRATING</span>
 							</div>
 							<div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground group-hover:text-primary group-focus:text-primary transition">
 								what's happening
-								<span className="inline-flex items-center justify-center w-5 h-5 tracking-tight leading-none rounded-full border border-current group-hover:fx-glow-sm group-focus:fx-glow-sm">?</span>
+								<span className="inline-flex items-center justify-center w-5 h-5 tracking-tight leading-none rounded-full border border-current group-hover:fx-glow-sm group-focus:fx-glow-sm">
+									?
+								</span>
 							</div>
 						</div>
 
@@ -76,13 +80,13 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 						>
 							<div className="flex gap-px p-px">
 								{timerCells.map((cell, i) => {
-									const isFirst = i === 0
-									const isLast = i === timerCells.length - 1
+									const isFirst = i === 0;
+									const isLast = i === timerCells.length - 1;
 									const cellClip = isFirst
-										? 'polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px)'
+										? "polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px)"
 										: isLast
-											? 'polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)'
-											: undefined
+											? "polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)"
+											: undefined;
 									return (
 										<div
 											key={cell.label}
@@ -98,12 +102,13 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 												{cell.label}
 											</div>
 										</div>
-									)
+									);
 								})}
 							</div>
 						</div>
 						<div className="text-center text-muted-foreground">
-							remaining in <span className="text-foreground">60-day</span> migration window
+							remaining in <span className="text-foreground">60-day</span>{" "}
+							migration window
 						</div>
 					</button>
 				</DialogTrigger>
@@ -111,38 +116,41 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 				<div className="mb-4 pt-5">
 					<div className="text-center mb-3">
 						<span className="text-sm uppercase">
-							<span className="text-primary fx-glow-sm tabular-nums">{migratedPercent.toFixed(1)}%</span>
-							{' '}
+							<span className="text-primary fx-glow-sm tabular-nums">
+								{migratedPercent.toFixed(1)}%
+							</span>{" "}
 							<span className="text-muted-foreground">REP migrated</span>
 						</span>
 					</div>
 
-				<div
-					className="relative h-2 w-full mb-2 overflow-hidden bg-muted-foreground/30"
-					// style={{
-					// 	backgroundImage:
-					// 		'repeating-linear-gradient(-45deg, oklch(from var(--color-primary) l c h / 0.05) 0 4px, transparent 4px 8px)',
-					// 	backgroundColor: 'rgba(255,255,255,0.02)',
-					// }}
-				>
 					<div
-						className="absolute top-0 bottom-0 left-0 transition-all duration-1000 ease-out"
-						style={{
-							width: `${migratedPercent}%`,
-							background: 'var(--color-foreground)',
-						}}
-					/>
-				</div>
+						className="relative h-2 w-full mb-2 overflow-hidden bg-muted-foreground/30"
+						// style={{
+						// 	backgroundImage:
+						// 		'repeating-linear-gradient(-45deg, oklch(from var(--color-primary) l c h / 0.05) 0 4px, transparent 4px 8px)',
+						// 	backgroundColor: 'rgba(255,255,255,0.02)',
+						// }}
+					>
+						<div
+							className="absolute top-0 bottom-0 left-0 transition-all duration-1000 ease-out"
+							style={{
+								width: `${migratedPercent}%`,
+								background: "var(--color-foreground)",
+							}}
+						/>
+					</div>
 
-				<div className="flex justify-between text-xs text-muted-foreground">
-					<span>{formatRep(migratedRep)} / {formatRep(TOTAL_SUPPLY)}</span>
-				</div>
+					<div className="flex justify-between text-xs text-muted-foreground">
+						<span>
+							{formatRep(migratedRep)} / {formatRep(TOTAL_SUPPLY)}
+						</span>
+					</div>
 				</div>
 			</div>
 			<ForkActiveHelpDialog />
 		</Dialog>
-	)
-}
+	);
+};
 
 const ForkActiveHelpDialog = () => (
 	<DialogContent className="bg-background border border-foreground/10 backdrop-blur-sm overflow-y-auto">
@@ -157,49 +165,80 @@ const ForkActiveHelpDialog = () => (
 
 		<div className="p-4 border border-red-500/20 bg-red-800/5 flex items-center gap-4 text-lg tracking-wider">
 			<div className="border border-red-500/30 aspect-square h-12 flex items-center justify-center rounded-full">
-				<svg className="h-6 w-6 shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+				<svg
+					className="h-6 w-6 shrink-0 text-red-400"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					aria-hidden="true"
+				>
 					<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
 					<path d="M12 9v4" />
 					<path d="M12 17h.01" />
 				</svg>
 			</div>
 			<div>
-				<span className="uppercase font-display text-red-400 font-bold text-2xl tracking-wide">Migration window closing</span>
-				<p className="text-base text-red-400/70 leading-5 tracking-tight">Act now or risk permanently losing your REP!</p>
+				<span className="uppercase font-display text-red-400 font-bold text-2xl tracking-wide">
+					Migration window closing
+				</span>
+				<p className="text-base text-red-400/70 leading-5 tracking-tight">
+					Act now or risk permanently losing your REP!
+				</p>
 			</div>
 		</div>
 
 		<p className="font-prose text-sm text-balance text-muted-foreground">
-			The fork is live and Augur has split into competing universes. Confirm the correct outcome, then use the migration guide to <span className="text-foreground">migrate your REP before the window closes.</span>
+			The fork is live and Augur has split into competing universes. Confirm the
+			correct outcome, then use the migration guide to{" "}
+			<span className="text-foreground">
+				migrate your REP before the window closes.
+			</span>
 		</p>
 
 		<hr className="border-muted-foreground/40 my-2 border-dashed" />
 
 		<div className="space-y-2">
-			<CTAButton href="/learn/fork/migration/">
-				Full Migration Guide
-			</CTAButton>
+			<CTAButton href="/learn/fork/migration/">Full Migration Guide</CTAButton>
 
-			<CTAButton href="https://6.augurfork.eth.limo/" target="_blank" rel="noopener noreferrer">
+			<CTAButton
+				href="https://6.augurfork.eth.limo/"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
 				Migration Tool
 			</CTAButton>
 		</div>
 	</DialogContent>
-)
+);
 
-const CTAButton = ({ href, children, target, rel }: { href: string; children: React.ReactNode; target?: '_blank'; rel?: string }) => (
+const CTAButton = ({
+	href,
+	children,
+	target,
+	rel,
+}: {
+	href: string;
+	children: React.ReactNode;
+	target?: "_blank";
+	rel?: string;
+}) => (
 	<Button
 		variant="outline"
 		href={href}
 		target={target}
 		rel={rel}
 		className={cn(
-			'w-full',
-			'uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
-			'hover:bg-foreground/5 focus:bg-foreground/5',
-			'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+			"w-full",
+			"uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground",
+			"hover:bg-foreground/5 focus:bg-foreground/5",
+			"border-foreground/30 hover:border-foreground/60 focus:border-foreground/60",
 		)}
-	>{children}</Button>
-)
+	>
+		{children}
+	</Button>
+);
 
-export default ForkActiveCard
+export default ForkActiveCard;

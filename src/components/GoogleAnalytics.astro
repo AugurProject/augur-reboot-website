@@ -10,17 +10,19 @@
  */
 
 interface Props {
-  /**
-   * Google Analytics 4 Measurement ID (e.g., "G-XXXXXXXXXX")
-   * Get this from your GA4 property settings
-   */
-  gaId?: string;
+	/**
+	 * Google Analytics 4 Measurement ID (e.g., "G-XXXXXXXXXX")
+	 * Get this from your GA4 property settings
+	 */
+	gaId?: string;
 }
 
-const { gaId = '' } = Astro.props as Props;
+const { gaId = "" } = Astro.props as Props;
 
 if (!gaId) {
-  console.warn('GoogleAnalytics: gaId prop is required. Analytics will not be initialized.');
+	console.warn(
+		"GoogleAnalytics: gaId prop is required. Analytics will not be initialized.",
+	);
 }
 ---
 
@@ -53,16 +55,7 @@ if (!gaId) {
         });
       });
 
-      // Fallback: Also track on visibility change to catch edge cases
-      // This ensures GA knows the current page if the user returns to tab
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          gtag('event', 'page_view', {
-            'page_path': window.location.pathname + window.location.search,
-            'page_title': document.title,
-          });
-        }
-      });
+
     </script>
   </>
 )}

@@ -1,63 +1,89 @@
-import React, { useMemo } from 'react'
-import { cn } from '../lib/utils'
-import type { GaugeDisplayProps } from '../types/gauge'
+import React, { useEffect, useMemo, useState } from "react";
+import { cn } from "../lib/utils";
+import type { GaugeDisplayProps } from "../types/gauge";
 
 /**
  * Calculate arc path endpoint for a given fill percentage (0-100).
  * Maps percentage to angle from 180° to 0° (π to 0 radians).
  */
 const updateArc = (percentage: number): string => {
-	const angle = Math.PI - (percentage / 100) * Math.PI
-	const centerX = 200
-	const centerY = 200
-	const radius = 120
+	const angle = Math.PI - (percentage / 100) * Math.PI;
+	const centerX = 200;
+	const centerY = 200;
+	const radius = 120;
 
-	const endX = centerX + radius * Math.cos(angle)
-	const endY = centerY - radius * Math.sin(angle)
+	const endX = centerX + radius * Math.cos(angle);
+	const endY = centerY - radius * Math.sin(angle);
 
-	return `M 80 200 A 120 120 0 0 1 ${endX} ${endY}`
-}
+	return `M 80 200 A 120 120 0 0 1 ${endX} ${endY}`;
+};
 
 const RISK_COLORS: Record<string, string> = {
-	none: 'var(--color-green-400)',
-	low: 'var(--color-green-400)',
-	moderate: 'var(--color-yellow-400)',
-	high: 'var(--color-orange-400)',
-	critical: 'var(--color-red-500)',
-	unknown: 'var(--color-green-400)',
-}
+	none: "var(--color-green-400)",
+	low: "var(--color-green-400)",
+	moderate: "var(--color-yellow-400)",
+	high: "var(--color-orange-400)",
+	critical: "var(--color-red-500)",
+	unknown: "var(--color-green-400)",
+};
 
 const getRiskColor = (riskLevel: string): string => {
-	return RISK_COLORS[riskLevel] || 'var(--color-green-400)'
-}
+	return RISK_COLORS[riskLevel] || "var(--color-green-400)";
+};
 
 const getNeedleEndpoint = (percentage: number): { x: number; y: number } => {
-	const angle = Math.PI - (percentage / 100) * Math.PI
-	const centerX = 200
-	const centerY = 200
-	const radius = 100
+	const angle = Math.PI - (percentage / 100) * Math.PI;
+	const centerX = 200;
+	const centerY = 200;
+	const radius = 100;
 
 	return {
 		x: centerX + radius * Math.cos(angle),
 		y: centerY - radius * Math.sin(angle),
-	}
+	};
+};
+
+interface ForkGaugeComponentProps extends GaugeDisplayProps {
+	animated?: boolean;
 }
 
 const ForkGaugeComponent = ({
 	percentage,
 	riskLevel: riskLevelProp,
-}: GaugeDisplayProps): React.JSX.Element => {
-	const arcPath = useMemo(() => updateArc(percentage), [percentage])
-	const riskLevel = riskLevelProp ?? 'none'
-	const riskColor = useMemo(() => getRiskColor(riskLevel), [riskLevel])
-	const needleEndpoint = useMemo(() => getNeedleEndpoint(percentage), [percentage])
+	animated = true,
+}: ForkGaugeComponentProps): React.JSX.Element => {
+	const arcPath = useMemo(() => updateArc(percentage), [percentage]);
+	const riskLevel = riskLevelProp ?? "none";
+	const riskColor = useMemo(() => getRiskColor(riskLevel), [riskLevel]);
+	const needleEndpoint = useMemo(
+		() => getNeedleEndpoint(percentage),
+		[percentage],
+	);
 
-	const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-	const needleTransition = prefersReducedMotion ? 'none' : 'all 0.3s ease-in-out'
+	const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+		typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+	);
+
+	useEffect(() => {
+		const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const handler = (e: MediaQueryListEvent) =>
+			setPrefersReducedMotion(e.matches);
+		mq.addEventListener("change", handler);
+		return () => mq.removeEventListener("change", handler);
+	}, []);
+
+	const needleTransition =
+		!animated || prefersReducedMotion ? "none" : "all 0.3s ease-in-out";
 
 	return (
-		<div className={cn('relative flex flex-col items-center')}>
-			<svg className="max-w-45 w-full" viewBox="60 60 280 160" role="img" aria-label="Fork risk gauge">
+		<div className={cn("relative flex flex-col items-center")}>
+			<svg
+				className="max-w-45 w-full"
+				viewBox="60 60 280 160"
+				role="img"
+				aria-label="Fork risk gauge"
+			>
 				<defs>
 					<linearGradient
 						id="forkMeterGradient"
@@ -67,26 +93,20 @@ const ForkGaugeComponent = ({
 						y2="200"
 						gradientUnits="userSpaceOnUse"
 					>
-						<stop
-							offset="0%"
-							style={{ stopColor: 'var(--color-green-400)' }}
-						/>
+						<stop offset="0%" style={{ stopColor: "var(--color-green-400)" }} />
 						<stop
 							offset="35%"
-							style={{ stopColor: 'var(--color-green-500)' }}
+							style={{ stopColor: "var(--color-green-500)" }}
 						/>
 						<stop
 							offset="55%"
-							style={{ stopColor: 'var(--color-yellow-400)' }}
+							style={{ stopColor: "var(--color-yellow-400)" }}
 						/>
 						<stop
 							offset="80%"
-							style={{ stopColor: 'var(--color-orange-400)' }}
+							style={{ stopColor: "var(--color-orange-400)" }}
 						/>
-						<stop
-							offset="100%"
-							style={{ stopColor: 'var(--color-red-500)' }}
-						/>
+						<stop offset="100%" style={{ stopColor: "var(--color-red-500)" }} />
 					</linearGradient>
 				</defs>
 
@@ -159,9 +179,12 @@ const ForkGaugeComponent = ({
 					textAnchor="middle"
 					fill={riskColor}
 					fontWeight="bold"
-					className={cn('text-4xl font-display fx-glow-sm', `fx-glow-[${riskColor}]`)}
+					className={cn(
+						"text-4xl font-display fx-glow-sm",
+						`fx-glow-[${riskColor}]`,
+					)}
 				>
-					{riskLevel === 'none' ? 'NO RISK' : riskLevel.toUpperCase()}
+					{riskLevel === "none" ? "NO RISK" : riskLevel.toUpperCase()}
 				</text>
 			</svg>
 
@@ -169,7 +192,7 @@ const ForkGaugeComponent = ({
 				FORK RISK
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export const ForkGauge = React.memo(ForkGaugeComponent)
+export const ForkGauge = React.memo(ForkGaugeComponent);
