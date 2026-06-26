@@ -1,7 +1,6 @@
 ---
 import { AugurLogo } from "./icons.tsx";
 import Button from "./ui/Button.tsx";
-import { withBase } from "../lib/utils";
 ---
 
 <footer class="relative px-4 md:px-8 mt-4">
@@ -13,7 +12,7 @@ import { withBase } from "../lib/utils";
         <!-- Column 1: Logo & Tagline -->
         <div class="md:col-span-2 lg:col-span-1 lg:place-content-end">
             <div class="text-center lg:w-max">
-                <Button variant="link" href={withBase('/')} className="flex flex-col gap-y-2 group">
+                <Button variant="link" href="/" className="flex flex-col gap-y-2 group">
                     <!-- Footer Logo (White) -->
                     <AugurLogo className="text-8xl" />
                     <span class:list={[
@@ -115,7 +114,7 @@ import { withBase } from "../lib/utils";
           <h4 class="text-muted-foreground mb-4 font-display">&gt;_ KB</h4>
           <ul class="space-y-2">
             <li>
-              <Button variant="link" href={withBase('/faq')}>
+              <Button variant="link" href="/faq">
                 FORK & MIGRATION FAQ
               </Button>
             </li>
@@ -133,10 +132,10 @@ import { withBase } from "../lib/utils";
     >
       <p class="font-display text-foreground">© 2026 AUGUR. ALL RIGHTS RESERVED.</p>
       <nav class="flex gap-8">
-        <Button variant="link" href={withBase('/terms')}>
+        <Button variant="link" href="/terms">
           TERMS OF SERVICE
         </Button>
-        <Button variant="link" href={withBase('/privacy')}>PRIVACY POLICY</Button>
+        <Button variant="link" href="/privacy">PRIVACY POLICY</Button>
       </nav>
     </div>
   </div>

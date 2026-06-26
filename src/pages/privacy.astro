@@ -3,13 +3,12 @@ import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
-import { withBase } from "../lib/utils";
 ---
 
 <Layout title="Privacy Policy - Augur">
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     <!-- Top Section: Navigation -->
-    <PageHeader client:load backHref={withBase('/')} />
+    <PageHeader client:load backHref="/" />
 
     <!-- Middle Section: Scrollable Content -->
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">

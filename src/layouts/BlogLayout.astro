@@ -5,7 +5,6 @@ import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
 import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
-import { withBase } from "../lib/utils";
 
 interface Post {
   title: string;
@@ -35,7 +34,7 @@ const { title, description, author, publishDate, updatedDate, ogImage, prevPost,
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     {/* Top Section: Navigation */}
-    <PageHeader client:load backHref={withBase('/')} />
+    <PageHeader client:load backHref="/" />
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">

@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import type { ImageMetadata } from 'astro';
-import { withBase } from '../lib/utils';
 import PostCard from './PostCard.astro';
 import { BlogCTA } from './BlogCTA';
 
@@ -53,7 +52,7 @@ const secondaryWithImages = secondaryPosts.map(post => ({
             day: '2-digit'
           })}
           image={featuredImage}
-          href={withBase(`/blog/${featuredPost.slug}`)}
+          href={`/blog/${featuredPost.slug}`}
           featured
         />
       )}
@@ -70,13 +69,13 @@ const secondaryWithImages = secondaryPosts.map(post => ({
                 day: '2-digit'
               })}
               image={image}
-              href={withBase(`/blog/${post.slug}`)}
+              href={`/blog/${post.slug}`}
             />
           ))}
         </div>
       )}
 
       <div class="flex justify-center pt-4 md:pt-6">
-          <BlogCTA client:idle href={withBase('/blog')}>View all posts</BlogCTA>
+          <BlogCTA client:idle href="/blog">View all posts</BlogCTA>
       </div>
 </section>
