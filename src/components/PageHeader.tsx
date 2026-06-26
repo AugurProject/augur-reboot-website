@@ -33,7 +33,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
 			{/* Right slot: social links */}
 			<div className="flex md:justify-end">
-				<div className="flex gap-x-8">
+				<nav aria-label="Social media links" className="flex gap-x-8">
 					<a
 						href="https://x.com/AugurProject"
 						className="header-social text-foreground hover:text-loud-foreground focus:text-loud-foreground hover:fx-glow focus:fx-glow focus:outline-none no-underline text-3xl"
@@ -52,7 +52,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 					>
 						<GithubIcon className="text-3xl" />
 					</a>
-				</div>
+				</nav>
 			</div>
 		</header>
 	);

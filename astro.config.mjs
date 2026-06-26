@@ -35,14 +35,6 @@ export default defineConfig({
 	...(process.env.SITE_URL && { site: process.env.SITE_URL }),
 	vite: {
 		plugins: [tailwindcss()],
-		resolve: {
-			alias:
-				process.env.NODE_ENV === "production"
-					? {
-							"react-dom/server": "react-dom/server.edge",
-						}
-					: undefined,
-		},
 	},
 	integrations: [
 		react(),

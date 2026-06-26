@@ -1,4 +1,5 @@
 ---
+import ArticleContent from "../components/ArticleContent.astro";
 import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
 import Footer from "../components/Footer.astro";
@@ -56,9 +57,9 @@ const {
         />
 
         {/* Main Content */}
-        <article class="prose prose-invert max-w-none pt-6 px-4 prose-headings:font-display prose-headings:uppercase prose-headings:tracking-wide prose-p:leading-snug prose-li:leading-snug prose-ul:list-[square] prose-li:marker:text-muted-foreground prose-ol:marker:text-muted-foreground prose-blockquote:border-l-muted-foreground prose-blockquote:text-foreground prose-img:border prose-img:border-muted-foreground/30 prose-img:shadow-[0_0_2em_oklch(from_var(--color-primary)_l_c_h_/0.1)]">
+        <ArticleContent>
           <slot />
-        </article>
+        </ArticleContent>
       </div>
     </main>
 
