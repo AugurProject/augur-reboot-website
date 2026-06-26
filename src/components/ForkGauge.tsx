@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "../lib/utils";
 import type { GaugeDisplayProps } from "../types/gauge";
 
@@ -43,10 +43,15 @@ const getNeedleEndpoint = (percentage: number): { x: number; y: number } => {
 	};
 };
 
+interface ForkGaugeComponentProps extends GaugeDisplayProps {
+	animated?: boolean;
+}
+
 const ForkGaugeComponent = ({
 	percentage,
 	riskLevel: riskLevelProp,
-}: GaugeDisplayProps): React.JSX.Element => {
+	animated = true,
+}: ForkGaugeComponentProps): React.JSX.Element => {
 	const arcPath = useMemo(() => updateArc(percentage), [percentage]);
 	const riskLevel = riskLevelProp ?? "none";
 	const riskColor = useMemo(() => getRiskColor(riskLevel), [riskLevel]);
@@ -55,12 +60,21 @@ const ForkGaugeComponent = ({
 		[percentage],
 	);
 
-	const prefersReducedMotion =
+	const [prefersReducedMotion, setPrefersReducedMotion] = useState(
 		typeof window !== "undefined" &&
-		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-	const needleTransition = prefersReducedMotion
-		? "none"
-		: "all 0.3s ease-in-out";
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+	);
+
+	useEffect(() => {
+		const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const handler = (e: MediaQueryListEvent) =>
+			setPrefersReducedMotion(e.matches);
+		mq.addEventListener("change", handler);
+		return () => mq.removeEventListener("change", handler);
+	}, []);
+
+	const needleTransition =
+		!animated || prefersReducedMotion ? "none" : "all 0.3s ease-in-out";
 
 	return (
 		<div className={cn("relative flex flex-col items-center")}>
