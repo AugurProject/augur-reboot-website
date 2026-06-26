@@ -1,24 +1,25 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
-  title: string;
-  description?: string;
-  author: string;
-  publishDate: Date;
-  slug: string;
-  featuredImage?: ImageMetadata;
+	title: string;
+	description?: string;
+	author: string;
+	publishDate: Date;
+	slug: string;
+	featuredImage?: ImageMetadata;
 }
 
-const { title, description, author, publishDate, slug, featuredImage } = Astro.props;
+const { title, description, author, publishDate, slug, featuredImage } =
+	Astro.props;
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  }).format(date);
+	return new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	}).format(date);
 }
 ---
 

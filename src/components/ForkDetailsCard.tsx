@@ -1,37 +1,37 @@
-import { useState, type HTMLAttributes } from 'react'
-import { cn } from '../lib/utils'
-import { useForkData } from '../providers/ForkDataProvider'
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
-import { ForkAsciiArt } from './ForkAsciiArt'
-import Button from './ui/Button'
+import { type HTMLAttributes, useState } from "react";
+import { cn } from "../lib/utils";
+import { useForkData } from "../providers/ForkDataProvider";
+import { ForkAsciiArt } from "./ForkAsciiArt";
+import Button from "./ui/Button";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 
 interface ForkDetailsCardProps {
-	gauge: React.ReactNode
+	gauge: React.ReactNode;
 }
 
 export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
-	const { rawData } = useForkData()
-	const [isOpen, setIsOpen] = useState(false)
+	const { rawData } = useForkData();
+	const [isOpen, setIsOpen] = useState(false);
 
 	// Format large numbers with commas
 	const formatNumber = (num: number): string => {
-		return Math.round(num).toLocaleString()
-	}
+		return Math.round(num).toLocaleString();
+	};
 
 	// Format timestamp
 	const formatTime = (isoString: string): string => {
 		try {
-			const date = new Date(isoString)
+			const date = new Date(isoString);
 			return date.toLocaleString([], {
-				month: 'short',
-				day: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-			})
+				month: "short",
+				day: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+			});
 		} catch {
-			return 'Unknown'
+			return "Unknown";
 		}
-	}
+	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -44,7 +44,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 					title="Click for more information"
 				>
 					{/* Gauge */}
-          {gauge}
+					{gauge}
 
 					{/* Info Icon - Top Right */}
 					<InfoIcon className="absolute -top-2 -right-2 p-2 rounded-full" />
@@ -72,14 +72,11 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 								Largest Bond
 							</span>
 							<span className="text-foreground tracking-wider">
-								{formatNumber(
-									rawData.metrics.largestDisputeBond,
-								)}{' '}
-								REP
+								{formatNumber(rawData.metrics.largestDisputeBond)} REP
 							</span>
 						</div>
 						<div className="flex justify-between">
-  						<span className="text-muted-foreground tracking-wide">
+							<span className="text-muted-foreground tracking-wide">
 								Active Disputes
 							</span>
 							<span className="text-foreground tracking-wider">
@@ -87,14 +84,11 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 							</span>
 						</div>
 						<div className="flex justify-between">
-  						<span className="text-muted-foreground tracking-wide">
+							<span className="text-muted-foreground tracking-wide">
 								Fork Threshold
 							</span>
 							<span className="text-foreground tracking-wider">
-								{formatNumber(
-									rawData.calculation.forkThreshold,
-								)}{' '}
-								REP
+								{formatNumber(rawData.calculation.forkThreshold)} REP
 							</span>
 						</div>
 						<div className="flex justify-between">
@@ -114,16 +108,19 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 						<ForkAsciiArt />
 					</div>
 					<div className="text-left uppercase font-display">
-						<div className="pb-2 mb-2 border-b text-lg tracking-wider text-loud-foreground border-muted-foreground border-dashed font-bold">What's a fork?</div>
-						<p className="font-prose normal-case text-sm leading-tight">Forking is the last market resolution method. It is a very disruptive process and is intended to be a rare occurrence.</p>
+						<div className="pb-2 mb-2 border-b text-lg tracking-wider text-loud-foreground border-muted-foreground border-dashed font-bold">
+							What's a fork?
+						</div>
+						<p className="font-prose normal-case text-sm leading-tight">
+							Forking is the last market resolution method. It is a very
+							disruptive process and is intended to be a rare occurrence.
+						</p>
 					</div>
 				</div>
 
 				{/* CTA Links */}
 				<div className="space-y-2">
-					<CTAButton href="/learn/fork">
-						Learn More About Forking
-					</CTAButton>
+					<CTAButton href="/learn/fork">Learn More About Forking</CTAButton>
 					<CTAButton
 						href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
 						target="_blank"
@@ -134,52 +131,84 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 				</div>
 			</DialogContent>
 		</Dialog>
-	)
-}
+	);
+};
 
-const CTAButton = ({ href, children, target, rel }: { href: string; children: React.ReactNode; target?: '_blank'; rel?: string }) => (
+const CTAButton = ({
+	href,
+	children,
+	target,
+	rel,
+}: {
+	href: string;
+	children: React.ReactNode;
+	target?: "_blank";
+	rel?: string;
+}) => (
 	<Button
 		variant="outline"
 		href={href}
 		target={target}
 		rel={rel}
 		className={cn(
-			'w-full',
-			'uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground',
-			'hover:bg-foreground/5 focus:bg-foreground/5',
-			'border-foreground/30 hover:border-foreground/60 focus:border-foreground/60'
+			"w-full",
+			"uppercase text-foreground hover:text-loud-foreground focus:text-loud-foreground",
+			"hover:bg-foreground/5 focus:bg-foreground/5",
+			"border-foreground/30 hover:border-foreground/60 focus:border-foreground/60",
 		)}
-	>{ children }
+	>
+		{children}
 	</Button>
-)
+);
 
 const DocumentIcon = () => (
-	<svg width="16" height="16" className="mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
-		<path d="M14 2v4a2 2 0 0 0 2 2h4"/>
-		<path d="M10 9H8"/>
-		<path d="M16 13H8"/>
-		<path d="M16 17H8"/>
+	<svg
+		width="16"
+		height="16"
+		className="mr-1"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+		<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+		<path d="M10 9H8" />
+		<path d="M16 13H8" />
+		<path d="M16 17H8" />
 	</svg>
-)
+);
 
 const InfoIcon = ({ className }: HTMLAttributes<HTMLDivElement>) => {
 	return (
 		<div
 			className={cn(
-				'pointer-events-none transition-all duration-200',
-				'group-hover:fx-glow group-focus-within:fx-glow',
-				'group-hover:scale-125 group-focus-within:scale-125',
-				'text-muted-foreground group-focus-within:text-loud-foreground group-hover:text-loud-foreground',
-				className
+				"pointer-events-none transition-all duration-200",
+				"group-hover:fx-glow group-focus-within:fx-glow",
+				"group-hover:scale-125 group-focus-within:scale-125",
+				"text-muted-foreground group-focus-within:text-loud-foreground group-hover:text-loud-foreground",
+				className,
 			)}
 		>
 			{/* Info Icon SVG */}
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				aria-hidden="true"
+			>
 				<circle cx="12" cy="12" r="10" />
 				<line x1="12" y1="16" x2="12" y2="12" />
 				<line x1="12" y1="8" x2="12.01" y2="8" />
 			</svg>
 		</div>
-	)
-}
+	);
+};

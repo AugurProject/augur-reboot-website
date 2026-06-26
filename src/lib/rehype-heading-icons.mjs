@@ -2,10 +2,11 @@
  * Rehype plugin that replaces leading emojis in headings with Phosphor SVG icons.
  * If no emoji is found, a default "plus" icon is used.
  */
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+
 import * as Icons from "@phosphor-icons/react";
 import { fromHtml } from "hast-util-from-html";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { visit } from "unist-util-visit";
 
 // Emoji → Phosphor icon component mapping

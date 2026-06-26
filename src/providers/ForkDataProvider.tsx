@@ -1,75 +1,75 @@
-import type React from 'react'
+import type React from "react";
 import {
 	createContext,
-	useContext,
-	useState,
-	useEffect,
 	useCallback,
+	useContext,
+	useEffect,
 	useMemo,
-} from 'react'
-import type { ForkRiskData, GaugeData, RiskLevel } from '../types/gauge'
+	useState,
+} from "react";
+import type { ForkRiskData, GaugeData, RiskLevel } from "../types/gauge";
 
 interface ForkDataContextValue {
-	gaugeData: GaugeData
-	riskLevel: RiskLevel
-	lastUpdated: string
-	isLoading: boolean
-	error?: string
-	rawData: ForkRiskData
-	setData: (data: ForkRiskData) => void
-	refetch: () => void
+	gaugeData: GaugeData;
+	riskLevel: RiskLevel;
+	lastUpdated: string;
+	isLoading: boolean;
+	error?: string;
+	rawData: ForkRiskData;
+	setData: (data: ForkRiskData) => void;
+	refetch: () => void;
 }
 
 const ForkDataContext = createContext<ForkDataContextValue | undefined>(
 	undefined,
-)
+);
 
 const convertToGaugeData = (data: ForkRiskData): GaugeData => ({
 	percentage: data.riskPercentage ?? 0,
 	repStaked: data.metrics.largestDisputeBond,
 	activeDisputes: data.metrics.activeDisputes,
-})
+});
 
 const convertToRiskLevel = (data: ForkRiskData): RiskLevel => {
-	let level: RiskLevel['level']
+	let level: RiskLevel["level"];
 
 	switch (data.riskLevel) {
-		case 'none':
-			level = 'No Risk'
-			break
-		case 'low':
-			level = 'Low'
-			break
-		case 'moderate':
-			level = 'Moderate'
-			break
-		case 'high':
-			level = 'High'
-			break
-		case 'critical':
-			level = 'Critical'
-			break
-		case 'unknown':
-			level = 'Unknown'
-			break
+		case "none":
+			level = "No Risk";
+			break;
+		case "low":
+			level = "Low";
+			break;
+		case "moderate":
+			level = "Moderate";
+			break;
+		case "high":
+			level = "High";
+			break;
+		case "critical":
+			level = "Critical";
+			break;
+		case "unknown":
+			level = "Unknown";
+			break;
 		default:
-			level = 'Unknown'
+			level = "Unknown";
 	}
 
-	return { level }
-}
+	return { level };
+};
 
 const formatLastUpdated = (data: ForkRiskData): string => {
 	try {
-		return new Date(data.lastRiskChange).toLocaleString()
+		return new Date(data.lastRiskChange).toLocaleString();
 	} catch {
-		return 'Unknown'
+		return "Unknown";
 	}
-}
+};
 
 interface ForkDataProviderProps {
-	children: React.ReactNode
-	updateInterval?: number // in milliseconds, defaults to 5 minutes
+	children: React.ReactNode;
+	updateInterval?: number; // in milliseconds, defaults to 5 minutes
 }
 
 export const ForkDataProvider = ({
@@ -80,7 +80,7 @@ export const ForkDataProvider = ({
 	const [defaultData] = useState<ForkRiskData>(() => ({
 		lastRiskChange: new Date().toISOString(),
 		blockNumber: 0,
-		riskLevel: 'none',
+		riskLevel: "none",
 		riskPercentage: 0,
 		metrics: {
 			largestDisputeBond: 0,
@@ -94,87 +94,92 @@ export const ForkDataProvider = ({
 		calculation: {
 			forkThreshold: 275000,
 		},
-	}))
+	}));
 
-	const [forkRiskData, setForkRiskData] = useState<ForkRiskData | null>(null)
-	const [isLoading, setIsLoading] = useState(false) // Start as false to prevent hydration mismatch
-	const [error, setError] = useState<string>()
-	const [hasHydrated, setHasHydrated] = useState(false)
+	const [forkRiskData, setForkRiskData] = useState<ForkRiskData | null>(null);
+	const [isLoading, setIsLoading] = useState(false); // Start as false to prevent hydration mismatch
+	const [error, setError] = useState<string>();
+	const [hasHydrated, setHasHydrated] = useState(false);
 
 	const loadForkRiskData = useCallback(async () => {
 		try {
-			setIsLoading(true)
-			setError(undefined)
+			setIsLoading(true);
+			setError(undefined);
 
 			// Try to load from static JSON file first
-			const baseUrl = import.meta.env.BASE_URL || '/'
-			const dataUrl = baseUrl.endsWith('/') ? `${baseUrl}data/fork-risk.json` : `${baseUrl}/data/fork-risk.json`
-			const response = await fetch(dataUrl)
+			const baseUrl = import.meta.env.BASE_URL || "/";
+			const dataUrl = baseUrl.endsWith("/")
+				? `${baseUrl}data/fork-risk.json`
+				: `${baseUrl}/data/fork-risk.json`;
+			const response = await fetch(dataUrl);
 
 			if (!response.ok) {
-				throw new Error(`Failed to load fork risk data: ${response.status}`)
+				throw new Error(`Failed to load fork risk data: ${response.status}`);
 			}
 
-			const data: ForkRiskData = await response.json()
-			setForkRiskData(data)
+			const data: ForkRiskData = await response.json();
+			setForkRiskData(data);
 		} catch (err) {
-			console.error('Error loading fork risk data:', err)
-			setError(err instanceof Error ? err.message : 'Failed to load data')
+			console.error("Error loading fork risk data:", err);
+			setError(err instanceof Error ? err.message : "Failed to load data");
 
 			// Fallback to default data if file doesn't exist
-			setForkRiskData(defaultData)
+			setForkRiskData(defaultData);
 		} finally {
-			setIsLoading(false)
+			setIsLoading(false);
 		}
-	}, [defaultData])
+	}, [defaultData]);
 
 	// Handle hydration
 	useEffect(() => {
-		setHasHydrated(true)
-	}, [])
+		setHasHydrated(true);
+	}, []);
 
 	// Load data on mount and set up refresh interval
 	useEffect(() => {
 		if (hasHydrated) {
-			loadForkRiskData()
+			loadForkRiskData();
 
 			// Refresh at the specified interval (data updates hourly, so 5min default is reasonable)
-			const interval = setInterval(loadForkRiskData, updateInterval)
-			return () => clearInterval(interval)
+			const interval = setInterval(loadForkRiskData, updateInterval);
+			return () => clearInterval(interval);
 		}
-	}, [loadForkRiskData, updateInterval, hasHydrated])
+	}, [loadForkRiskData, updateInterval, hasHydrated]);
 
-	const currentData = forkRiskData || defaultData
+	const currentData = forkRiskData || defaultData;
 
 	// Allow external updates to the data (for demo usage)
 	const updateData = useCallback((data: ForkRiskData) => {
-		setForkRiskData(data)
-	}, [])
+		setForkRiskData(data);
+	}, []);
 
-	const contextValue = useMemo<ForkDataContextValue>(() => ({
-		gaugeData: convertToGaugeData(currentData),
-		riskLevel: convertToRiskLevel(currentData),
-		lastUpdated: formatLastUpdated(currentData),
-		isLoading,
-		error: error || currentData.error,
-		rawData: currentData,
-		setData: updateData,
-		refetch: loadForkRiskData,
-	}), [currentData, isLoading, error, updateData, loadForkRiskData])
+	const contextValue = useMemo<ForkDataContextValue>(
+		() => ({
+			gaugeData: convertToGaugeData(currentData),
+			riskLevel: convertToRiskLevel(currentData),
+			lastUpdated: formatLastUpdated(currentData),
+			isLoading,
+			error: error || currentData.error,
+			rawData: currentData,
+			setData: updateData,
+			refetch: loadForkRiskData,
+		}),
+		[currentData, isLoading, error, updateData, loadForkRiskData],
+	);
 
 	return (
 		<ForkDataContext.Provider value={contextValue}>
 			{children}
 		</ForkDataContext.Provider>
-	)
-}
+	);
+};
 
 export const useForkData = (): ForkDataContextValue => {
-	const context = useContext(ForkDataContext)
+	const context = useContext(ForkDataContext);
 
 	if (!context) {
-		throw new Error('useForkData must be used within a ForkDataProvider')
+		throw new Error("useForkData must be used within a ForkDataProvider");
 	}
 
-	return context
-}
+	return context;
+};

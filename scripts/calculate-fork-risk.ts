@@ -10,72 +10,72 @@
  * All calculations are transparent and auditable.
  */
 
-import { ethers } from 'ethers'
-import { promises as fs } from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { ethers } from "ethers";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // TypeScript interfaces
 interface DisputeDetails {
-	marketId: string
-	title: string
-	disputeBondSize: number
-	disputeRound: number
-	estimatedTotalRounds: number | null
-	roundProgress: number | null
-	weeksRemaining: number
+	marketId: string;
+	title: string;
+	disputeBondSize: number;
+	disputeRound: number;
+	estimatedTotalRounds: number | null;
+	roundProgress: number | null;
+	weeksRemaining: number;
 }
 
 interface RpcInfo {
-	endpoint: string | null
-	latency: number | null
-	fallbacksAttempted: number
+	endpoint: string | null;
+	latency: number | null;
+	fallbacksAttempted: number;
 }
 
 interface Metrics {
-	largestDisputeBond: number
-	forkThresholdPercent: number
-	activeDisputes: number
-	disputeDetails: DisputeDetails[]
-	currentRound: number
-	estimatedTotalRounds: number | null
-	roundProgress: number | null
+	largestDisputeBond: number;
+	forkThresholdPercent: number;
+	activeDisputes: number;
+	disputeDetails: DisputeDetails[];
+	currentRound: number;
+	estimatedTotalRounds: number | null;
+	roundProgress: number | null;
 }
 
 interface Calculation {
-	forkThreshold: number
+	forkThreshold: number;
 }
 
-type RiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
+type RiskLevel = "none" | "low" | "moderate" | "high" | "critical" | "unknown";
 
 interface ForkRiskData {
-	lastRiskChange: string
-	blockNumber?: number
-	riskLevel: RiskLevel
-	riskPercentage: number | null
-	metrics: Metrics
-	rpcInfo: RpcInfo
-	calculation: Calculation
-	error?: string
+	lastRiskChange: string;
+	blockNumber?: number;
+	riskLevel: RiskLevel;
+	riskPercentage: number | null;
+	metrics: Metrics;
+	rpcInfo: RpcInfo;
+	calculation: Calculation;
+	error?: string;
 	cacheValidation?: {
-		isHealthy: boolean
-		discrepancy?: string
-	}
+		isHealthy: boolean;
+		discrepancy?: string;
+	};
 	forkActive?: {
-		forkingMarket: string
-		forkEndTime: number
-		forkReputationGoal: number
-		universeRepSupply: number
+		forkingMarket: string;
+		forkEndTime: number;
+		forkReputationGoal: number;
+		universeRepSupply: number;
 		outcomes: Array<{
-			index: number
-			label: string
-			childUniverse: string | null
-			migratedRep: number
-		}>
-	}
+			index: number;
+			label: string;
+			childUniverse: string | null;
+			migratedRep: number;
+		}>;
+	};
 }
 
 /**
@@ -87,94 +87,96 @@ function projectTotalRounds(
 	participantBonds: number[],
 	threshold: number,
 ): { estimatedTotalRounds: number; growthFactor: number } | null {
-	if (participantBonds.length < 3) return null
+	if (participantBonds.length < 3) return null;
 
 	// Use last 3-4 rounds for stable growth factor
-	const recentBonds = participantBonds.slice(-4)
-	const growthFactors: number[] = []
+	const recentBonds = participantBonds.slice(-4);
+	const growthFactors: number[] = [];
 	for (let i = 1; i < recentBonds.length; i++) {
 		if (recentBonds[i - 1] > 0) {
-			growthFactors.push(recentBonds[i] / recentBonds[i - 1])
+			growthFactors.push(recentBonds[i] / recentBonds[i - 1]);
 		}
 	}
-	if (growthFactors.length === 0) return null
+	if (growthFactors.length === 0) return null;
 
-	const avgGrowth = growthFactors.reduce((a, b) => a + b, 0) / growthFactors.length
-	let bond = recentBonds[recentBonds.length - 1]
-	let round = participantBonds.length - 1
+	const avgGrowth =
+		growthFactors.reduce((a, b) => a + b, 0) / growthFactors.length;
+	let bond = recentBonds[recentBonds.length - 1];
+	let round = participantBonds.length - 1;
 
 	while (bond < threshold) {
-		bond *= avgGrowth
-		round++
-		if (round > 30) return null // diverging
+		bond *= avgGrowth;
+		round++;
+		if (round > 30) return null; // diverging
 	}
 
-	return { estimatedTotalRounds: round, growthFactor: Math.round(avgGrowth * 100) / 100 }
+	return {
+		estimatedTotalRounds: round,
+		growthFactor: Math.round(avgGrowth * 100) / 100,
+	};
 }
 
 // Cache interfaces for incremental event caching
 interface SerializedEventLog {
-	blockNumber: number
-	transactionHash: string
-	disputeCrowdsourcerAddress: string
-	marketAddress: string
-	args: Array<string | number>
-	eventType: 'created' | 'contribution' | 'completed'
+	blockNumber: number;
+	transactionHash: string;
+	disputeCrowdsourcerAddress: string;
+	marketAddress: string;
+	args: Array<string | number>;
+	eventType: "created" | "contribution" | "completed";
 }
 
 interface TrackedMarket {
-	marketId: string
-	title?: string
-	discoveredAtBlock: number
-	lastVerifiedBlock: number
-	source: 'event' | 'seed'
+	marketId: string;
+	title?: string;
+	discoveredAtBlock: number;
+	lastVerifiedBlock: number;
+	source: "event" | "seed";
 }
 
 interface EventCache {
-	version: string
-	lastQueriedBlock: number
-	lastQueriedTimestamp: string
-	oldestEventBlock: number
-	trackedMarkets: TrackedMarket[]
+	version: string;
+	lastQueriedBlock: number;
+	lastQueriedTimestamp: string;
+	oldestEventBlock: number;
+	trackedMarkets: TrackedMarket[];
 	events: {
-		created: SerializedEventLog[]
-		contributions: SerializedEventLog[]
-		completed: SerializedEventLog[]
-	}
+		created: SerializedEventLog[];
+		contributions: SerializedEventLog[];
+		completed: SerializedEventLog[];
+	};
 	metadata: {
-		totalEventsTracked: number
-		cacheGeneratedAt: string
-		blockchainSyncStatus: 'complete' | 'partial' | 'stale'
-	}
+		totalEventsTracked: number;
+		cacheGeneratedAt: string;
+		blockchainSyncStatus: "complete" | "partial" | "stale";
+	};
 }
 
 interface CacheValidationResult {
-	isHealthy: boolean
-	discrepancy?: string
+	isHealthy: boolean;
+	discrepancy?: string;
 }
 
 // Configuration
-const CACHE_VERSION = '1.0.0'
-const FINALITY_DEPTH = 32 // Ethereum finality depth (~6.4 minutes)
-const VALIDATION_DEPTH = 8 // blocks (detects corruption within ~2 minutes)
+const CACHE_VERSION = "1.0.0";
+const FINALITY_DEPTH = 32; // Ethereum finality depth (~6.4 minutes)
+const VALIDATION_DEPTH = 8; // blocks (detects corruption within ~2 minutes)
 
 // Public RPC endpoints (no API keys required!)
 // ETH_RPC_URL env var is prepended as primary when set
 const PUBLIC_RPC_ENDPOINTS = [
 	...(process.env.ETH_RPC_URL ? [process.env.ETH_RPC_URL] : []),
-	'https://ethereum-rpc.publicnode.com', // PublicNode (Allnodes)
-	'https://eth.drpc.org', // dRPC
-	'https://1rpc.io/eth', // 1RPC (Automata)
-]
+	"https://ethereum-rpc.publicnode.com", // PublicNode (Allnodes)
+	"https://eth.drpc.org", // dRPC
+	"https://1rpc.io/eth", // 1RPC (Automata)
+];
 
 interface RpcConnection {
-	provider: ethers.JsonRpcProvider
-	endpoint: string
-	latency: number
-	fallbacksAttempted: number
+	provider: ethers.JsonRpcProvider;
+	endpoint: string;
+	latency: number;
+	fallbacksAttempted: number;
 }
-
-
 
 /**
  * Retry wrapper for contract calls with exponential backoff
@@ -182,35 +184,42 @@ interface RpcConnection {
 async function retryContractCall<T>(
 	operation: () => Promise<T>,
 	methodName: string,
-	maxRetries = 3
+	maxRetries = 3,
 ): Promise<T> {
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
 		try {
-			return await operation()
+			return await operation();
 		} catch (error) {
-			const isLastAttempt = attempt === maxRetries
-			const errorMessage = error instanceof Error ? error.message : String(error)
+			const isLastAttempt = attempt === maxRetries;
+			const errorMessage =
+				error instanceof Error ? error.message : String(error);
 
 			if (isLastAttempt) {
-				console.error(`✗ ${methodName} failed after ${maxRetries} attempts: ${errorMessage}`)
-				throw error
+				console.error(
+					`✗ ${methodName} failed after ${maxRetries} attempts: ${errorMessage}`,
+				);
+				throw error;
 			}
 
-			const delay = 2 ** (attempt - 1) * 1000 // 1s, 2s, 4s
-			console.warn(`⚠️ ${methodName} failed (attempt ${attempt}/${maxRetries}): ${errorMessage}`)
-			console.log(`Retrying in ${delay}ms...`)
+			const delay = 2 ** (attempt - 1) * 1000; // 1s, 2s, 4s
+			console.warn(
+				`⚠️ ${methodName} failed (attempt ${attempt}/${maxRetries}): ${errorMessage}`,
+			);
+			console.log(`Retrying in ${delay}ms...`);
 
-			await new Promise(resolve => setTimeout(resolve, delay))
+			await new Promise((resolve) => setTimeout(resolve, delay));
 		}
 	}
 
-	throw new Error(`Unexpected retry flow for ${methodName}`)
+	throw new Error(`Unexpected retry flow for ${methodName}`);
 }
 
-async function loadContracts(provider: ethers.JsonRpcProvider): Promise<Record<string, ethers.Contract>> {
-	const abiPath = path.join(__dirname, '../contracts/augur-abis.json')
-	const abiData = await fs.readFile(abiPath, 'utf8')
-	const abis = JSON.parse(abiData)
+async function loadContracts(
+	provider: ethers.JsonRpcProvider,
+): Promise<Record<string, ethers.Contract>> {
+	const abiPath = path.join(__dirname, "../contracts/augur-abis.json");
+	const abiData = await fs.readFile(abiPath, "utf8");
+	const abis = JSON.parse(abiData);
 
 	// Initialize contract instances with correct names
 	const contracts = {
@@ -219,170 +228,201 @@ async function loadContracts(provider: ethers.JsonRpcProvider): Promise<Record<s
 			abis.universe.abi,
 			provider,
 		),
-		augur: new ethers.Contract(
-			abis.augur.address,
-			abis.augur.abi,
-			provider,
-		),
+		augur: new ethers.Contract(abis.augur.address, abis.augur.abi, provider),
 		repV2Token: new ethers.Contract(
 			abis.repV2Token.address,
 			abis.repV2Token.abi,
 			provider,
 		),
-		cash: new ethers.Contract(
-			abis.cash.address,
-			abis.cash.abi,
-			provider,
-		),
-	}
+		cash: new ethers.Contract(abis.cash.address, abis.cash.abi, provider),
+	};
 
-	console.log('✓ Loaded contracts:')
-	console.log(`  Universe: ${abis.universe.address}`)
-	console.log(`  Augur: ${abis.augur.address}`)
-	console.log(`  REPv2: ${abis.repV2Token.address}`)
-	console.log(`  Cash: ${abis.cash.address}`)
+	console.log("✓ Loaded contracts:");
+	console.log(`  Universe: ${abis.universe.address}`);
+	console.log(`  Augur: ${abis.augur.address}`);
+	console.log(`  REPv2: ${abis.repV2Token.address}`);
+	console.log(`  Cash: ${abis.cash.address}`);
 
-	return contracts
+	return contracts;
 }
 
 /**
  * Execute contract operations with RPC fallback support
  */
 async function executeWithRpcFallback<T>(
-	operation: (connection: RpcConnection, contracts: Record<string, ethers.Contract>) => Promise<T>
+	operation: (
+		connection: RpcConnection,
+		contracts: Record<string, ethers.Contract>,
+	) => Promise<T>,
 ): Promise<T> {
-	let lastError: Error | null = null
-	let fallbacksAttempted = 0
+	let lastError: Error | null = null;
+	let fallbacksAttempted = 0;
 
 	// Try each RPC endpoint
 	for (const rpc of PUBLIC_RPC_ENDPOINTS) {
 		try {
-			console.log(`Attempting operation with RPC: ${rpc}`)
-			const startTime = Date.now()
-			const provider = new ethers.JsonRpcProvider(rpc, 'mainnet')
+			console.log(`Attempting operation with RPC: ${rpc}`);
+			const startTime = Date.now();
+			const provider = new ethers.JsonRpcProvider(rpc, "mainnet");
 
 			// Test connection
-			await provider.getBlockNumber()
-			const latency = Date.now() - startTime
-			console.log(`✓ Connected to: ${rpc} (${latency}ms)`)
+			await provider.getBlockNumber();
+			const latency = Date.now() - startTime;
+			console.log(`✓ Connected to: ${rpc} (${latency}ms)`);
 
 			// Warn if using fallback endpoint
 			if (fallbacksAttempted > 0) {
-				console.log(`::warning::Using RPC fallback endpoint (${fallbacksAttempted} previous failures)`)
+				console.log(
+					`::warning::Using RPC fallback endpoint (${fallbacksAttempted} previous failures)`,
+				);
 			}
 
 			const connection: RpcConnection = {
 				provider,
 				endpoint: rpc,
 				latency,
-				fallbacksAttempted
-			}
+				fallbacksAttempted,
+			};
 
-			const contracts = await loadContracts(connection.provider)
-			return await operation(connection, contracts)
-
+			const contracts = await loadContracts(connection.provider);
+			return await operation(connection, contracts);
 		} catch (error) {
-			lastError = error instanceof Error ? error : new Error(String(error))
-			console.log(`✗ Operation failed with ${rpc}: ${lastError.message}`)
-			fallbacksAttempted++
+			lastError = error instanceof Error ? error : new Error(String(error));
+			console.log(`✗ Operation failed with ${rpc}: ${lastError.message}`);
+			fallbacksAttempted++;
 		}
 	}
 
-	const errorMsg = `All RPC endpoints failed (attempted ${fallbacksAttempted})`
-	console.log(`::error::${errorMsg}`)
-	throw lastError || new Error(errorMsg)
+	const errorMsg = `All RPC endpoints failed (attempted ${fallbacksAttempted})`;
+	console.log(`::error::${errorMsg}`);
+	throw lastError || new Error(errorMsg);
 }
 
 async function calculateForkRisk(): Promise<ForkRiskData> {
 	try {
 		// Detect calculation mode from environment
-		const mode = process.env.CALCULATION_MODE || 'incremental'
-		console.log(`[Mode] ${mode === 'full-rebuild' ? 'FULL REBUILD' : 'INCREMENTAL'} mode`)
+		const mode = process.env.CALCULATION_MODE || "incremental";
+		console.log(
+			`[Mode] ${mode === "full-rebuild" ? "FULL REBUILD" : "INCREMENTAL"} mode`,
+		);
 
-		console.log('Starting fork risk calculation...')
+		console.log("Starting fork risk calculation...");
 
 		return await executeWithRpcFallback(async (connection, contracts) => {
 			// Get current blockchain state
-			const blockNumber = await connection.provider.getBlockNumber()
-			console.log(`Block Number: ${blockNumber}`)
+			const blockNumber = await connection.provider.getBlockNumber();
+			console.log(`Block Number: ${blockNumber}`);
 
 			// Read fork threshold from chain (varies per universe)
-			let forkThresholdRep = 275000 // fallback constant
+			let forkThresholdRep = 275000; // fallback constant
 			try {
 				const thresholdWei = await retryContractCall(
 					() => contracts.universe.getDisputeThresholdForFork(),
-					'universe.getDisputeThresholdForFork()'
-				)
-				forkThresholdRep = Number(ethers.formatEther(thresholdWei))
-				console.log(`Fork Threshold: ${forkThresholdRep} REP (from chain)`)
+					"universe.getDisputeThresholdForFork()",
+				);
+				forkThresholdRep = Number(ethers.formatEther(thresholdWei));
+				console.log(`Fork Threshold: ${forkThresholdRep} REP (from chain)`);
 			} catch (_e) {
-				console.warn(`⚠️ Failed to read fork threshold from chain, using fallback: ${forkThresholdRep} REP`)
+				console.warn(
+					`⚠️ Failed to read fork threshold from chain, using fallback: ${forkThresholdRep} REP`,
+				);
 			}
 
 			// Check if universe is already forking with retry logic
-			let isForking = false
+			let isForking = false;
 			try {
 				isForking = await retryContractCall(
 					() => contracts.universe.isForking(),
-					'universe.isForking()'
-				)
+					"universe.isForking()",
+				);
 			} catch {
-				console.warn('⚠️ Failed to check forking status, continuing with dispute calculation')
+				console.warn(
+					"⚠️ Failed to check forking status, continuing with dispute calculation",
+				);
 				// Continue with graceful degradation
 			}
 
 			if (isForking) {
-				console.log('⚠️ UNIVERSE IS FORKING! Setting maximum risk level')
-				return await getForkingResult(blockNumber, connection, forkThresholdRep, contracts.universe)
+				console.log("⚠️ UNIVERSE IS FORKING! Setting maximum risk level");
+				return await getForkingResult(
+					blockNumber,
+					connection,
+					forkThresholdRep,
+					contracts.universe,
+				);
 			}
 
 			// Calculate key metrics
 			// Read dispute round duration from chain (for ETA calculation)
-			let disputeRoundDurationSeconds = 7 * 24 * 60 * 60 // fallback: 7 days
+			let disputeRoundDurationSeconds = 7 * 24 * 60 * 60; // fallback: 7 days
 			try {
 				const duration = await retryContractCall(
 					() => contracts.universe.getDisputeRoundDurationInSeconds(),
-					'universe.getDisputeRoundDurationInSeconds()'
-				)
-				disputeRoundDurationSeconds = Number(duration)
-				console.log(`Dispute Round Duration: ${disputeRoundDurationSeconds}s (${Math.round(disputeRoundDurationSeconds / 86400)} days)`)
+					"universe.getDisputeRoundDurationInSeconds()",
+				);
+				disputeRoundDurationSeconds = Number(duration);
+				console.log(
+					`Dispute Round Duration: ${disputeRoundDurationSeconds}s (${Math.round(disputeRoundDurationSeconds / 86400)} days)`,
+				);
 			} catch {
-				console.warn(`⚠️ Failed to read round duration, using fallback: ${disputeRoundDurationSeconds}s`)
+				console.warn(
+					`⚠️ Failed to read round duration, using fallback: ${disputeRoundDurationSeconds}s`,
+				);
 			}
 
-			const activeDisputes = await getActiveDisputes(connection.provider, contracts, mode, forkThresholdRep, disputeRoundDurationSeconds)
-			const largestDisputeBond = getLargestDisputeBond(activeDisputes)
+			const activeDisputes = await getActiveDisputes(
+				connection.provider,
+				contracts,
+				mode,
+				forkThresholdRep,
+				disputeRoundDurationSeconds,
+			);
+			const largestDisputeBond = getLargestDisputeBond(activeDisputes);
 
 			// Derive round-based metrics from the largest dispute
-			const topDispute = activeDisputes.length > 0
-				? activeDisputes.reduce((a, b) => a.disputeBondSize > b.disputeBondSize ? a : b)
-				: null
-			const currentRound = topDispute?.disputeRound ?? 0
-			const estimatedTotalRounds = topDispute?.estimatedTotalRounds ?? null
+			const topDispute =
+				activeDisputes.length > 0
+					? activeDisputes.reduce((a, b) =>
+							a.disputeBondSize > b.disputeBondSize ? a : b,
+						)
+					: null;
+			const currentRound = topDispute?.disputeRound ?? 0;
+			const estimatedTotalRounds = topDispute?.estimatedTotalRounds ?? null;
 			// null means projection unavailable — active dispute but can't estimate progress
-			const roundProgress: number | null = topDispute?.roundProgress ?? null
+			const roundProgress: number | null = topDispute?.roundProgress ?? null;
 
 			// Validate cache health
-			const cache = await loadEventCache()
-			const cacheValidation = await validateCacheHealth(connection.provider, contracts, cache)
+			const cache = await loadEventCache();
+			const cacheValidation = await validateCacheHealth(
+				connection.provider,
+				contracts,
+				cache,
+			);
 
 			if (!cacheValidation.isHealthy) {
-				console.error(`❌ Cache validation failed: ${cacheValidation.discrepancy}`)
-				console.error('⚠️  Consider triggering Cache Rebuild job to repair the cache')
+				console.error(
+					`❌ Cache validation failed: ${cacheValidation.discrepancy}`,
+				);
+				console.error(
+					"⚠️  Consider triggering Cache Rebuild job to repair the cache",
+				);
 			}
 
 			// Calculate risk level based on round progress
 			const forkThresholdPercent =
-				(largestDisputeBond / forkThresholdRep) * 100
-			const riskLevel = determineRiskLevel(roundProgress)
-			const riskPercentage = roundProgress
+				(largestDisputeBond / forkThresholdRep) * 100;
+			const riskLevel = determineRiskLevel(roundProgress);
+			const riskPercentage = roundProgress;
 
 			// Prepare results
 			const results: ForkRiskData = {
 				lastRiskChange: new Date().toISOString(),
 				blockNumber,
 				riskLevel,
-				riskPercentage: riskPercentage !== null ? Math.min(100, Math.max(0, riskPercentage)) : null,
+				riskPercentage:
+					riskPercentage !== null
+						? Math.min(100, Math.max(0, riskPercentage))
+						: null,
 				metrics: {
 					largestDisputeBond,
 					forkThresholdPercent: Math.round(forkThresholdPercent * 100) / 100,
@@ -390,7 +430,8 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					disputeDetails: activeDisputes.slice(0, 5),
 					currentRound,
 					estimatedTotalRounds,
-					roundProgress: roundProgress !== null ? Math.round(roundProgress * 10) / 10 : null,
+					roundProgress:
+						roundProgress !== null ? Math.round(roundProgress * 10) / 10 : null,
 				},
 				rpcInfo: {
 					endpoint: connection.endpoint,
@@ -401,21 +442,23 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					forkThreshold: forkThresholdRep,
 				},
 				cacheValidation,
-			}
+			};
 
-			console.log('Calculation completed successfully')
-			console.log(`Risk Level: ${riskLevel}`)
-			console.log(`Round Progress: ${currentRound}/${estimatedTotalRounds ?? '?'} (${roundProgress !== null ? `${roundProgress.toFixed(1)}%` : 'projection unavailable'})`)
-			console.log(`Largest Dispute Bond: ${largestDisputeBond} REP`)
-			console.log(`Bond/Threshold: ${forkThresholdPercent.toFixed(2)}%`)
-			console.log(`RPC Used: ${connection.endpoint} (${connection.latency}ms)`)
-			console.log(`Block Number: ${blockNumber}`)
+			console.log("Calculation completed successfully");
+			console.log(`Risk Level: ${riskLevel}`);
+			console.log(
+				`Round Progress: ${currentRound}/${estimatedTotalRounds ?? "?"} (${roundProgress !== null ? `${roundProgress.toFixed(1)}%` : "projection unavailable"})`,
+			);
+			console.log(`Largest Dispute Bond: ${largestDisputeBond} REP`);
+			console.log(`Bond/Threshold: ${forkThresholdPercent.toFixed(2)}%`);
+			console.log(`RPC Used: ${connection.endpoint} (${connection.latency}ms)`);
+			console.log(`Block Number: ${blockNumber}`);
 
-			return results
-		})  // Close executeWithRpcFallback
+			return results;
+		}); // Close executeWithRpcFallback
 	} catch (error) {
-		console.error('Error calculating fork risk:', error)
-		throw error // Don't return mock data - let the error bubble up
+		console.error("Error calculating fork risk:", error);
+		throw error; // Don't return mock data - let the error bubble up
 	}
 }
 
@@ -423,14 +466,14 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
  * Detect if error is due to rate limiting
  */
 function isRateLimitError(error: unknown): boolean {
-	const errorMessage = error instanceof Error ? error.message : String(error)
+	const errorMessage = error instanceof Error ? error.message : String(error);
 	return (
-		errorMessage.includes('429') ||
-		errorMessage.includes('Too Many Requests') ||
-		errorMessage.includes('error code: 1015') ||
-		errorMessage.includes('rate limit') ||
-		errorMessage.includes('exceeded maximum retry limit')
-	)
+		errorMessage.includes("429") ||
+		errorMessage.includes("Too Many Requests") ||
+		errorMessage.includes("error code: 1015") ||
+		errorMessage.includes("rate limit") ||
+		errorMessage.includes("exceeded maximum retry limit")
+	);
 }
 
 /**
@@ -442,26 +485,30 @@ function isRateLimitError(error: unknown): boolean {
  * Load event cache from disk or create empty cache
  */
 async function loadEventCache(): Promise<EventCache> {
-	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
+	const cachePath = path.join(__dirname, "../public/cache/event-cache.json");
 
 	try {
-		const cacheData = await fs.readFile(cachePath, 'utf8')
-		const cache: EventCache = JSON.parse(cacheData)
+		const cacheData = await fs.readFile(cachePath, "utf8");
+		const cache: EventCache = JSON.parse(cacheData);
 
 		if (!validateCache(cache)) {
-			console.warn('Cache validation failed, creating new cache')
-			return createEmptyCache()
+			console.warn("Cache validation failed, creating new cache");
+			return createEmptyCache();
 		}
 
-		console.log(`✓ Cache loaded: ${cache.metadata.totalEventsTracked} events tracked`)
-		return cache
+		console.log(
+			`✓ Cache loaded: ${cache.metadata.totalEventsTracked} events tracked`,
+		);
+		return cache;
 	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-			console.log('No cache found, will perform full query')
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+			console.log("No cache found, will perform full query");
 		} else {
-			console.warn(`Cache load error: ${error instanceof Error ? error.message : String(error)}`)
+			console.warn(
+				`Cache load error: ${error instanceof Error ? error.message : String(error)}`,
+			);
 		}
-		return createEmptyCache()
+		return createEmptyCache();
 	}
 }
 
@@ -478,39 +525,41 @@ function createEmptyCache(): EventCache {
 		events: {
 			created: [],
 			contributions: [],
-			completed: []
+			completed: [],
 		},
 		metadata: {
 			totalEventsTracked: 0,
 			cacheGeneratedAt: new Date().toISOString(),
-			blockchainSyncStatus: 'stale'
-		}
-	}
+			blockchainSyncStatus: "stale",
+		},
+	};
 }
 
 /**
  * Save event cache to disk
  */
 async function saveEventCache(cache: EventCache): Promise<void> {
-	const cachePath = path.join(__dirname, '../public/cache/event-cache.json')
+	const cachePath = path.join(__dirname, "../public/cache/event-cache.json");
 
 	try {
 		// Ensure cache directory exists
-		await fs.mkdir(path.dirname(cachePath), { recursive: true })
+		await fs.mkdir(path.dirname(cachePath), { recursive: true });
 
 		// Update metadata
-		cache.metadata.cacheGeneratedAt = new Date().toISOString()
+		cache.metadata.cacheGeneratedAt = new Date().toISOString();
 		cache.metadata.totalEventsTracked =
 			cache.events.created.length +
 			cache.events.contributions.length +
-			cache.events.completed.length
+			cache.events.completed.length;
 
 		// Write cache with pretty formatting for readability
-		await fs.writeFile(cachePath, JSON.stringify(cache, null, 2))
+		await fs.writeFile(cachePath, JSON.stringify(cache, null, 2));
 
-		console.log(`✓ Cache saved: ${cache.metadata.totalEventsTracked} events`)
+		console.log(`✓ Cache saved: ${cache.metadata.totalEventsTracked} events`);
 	} catch (error) {
-		console.error(`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`)
+		console.error(
+			`Failed to save cache: ${error instanceof Error ? error.message : String(error)}`,
+		);
 		// Non-fatal error - script can continue without cache
 	}
 }
@@ -521,40 +570,42 @@ async function saveEventCache(cache: EventCache): Promise<void> {
 function validateCache(cache: EventCache): boolean {
 	// Check version compatibility
 	if (cache.version !== CACHE_VERSION) {
-		console.warn(`Cache version mismatch: ${cache.version} (expected ${CACHE_VERSION})`)
-		return false
+		console.warn(
+			`Cache version mismatch: ${cache.version} (expected ${CACHE_VERSION})`,
+		);
+		return false;
 	}
 
 	// Check required fields
 	if (!cache.lastQueriedBlock || !cache.events) {
-		console.warn('Cache missing required fields')
-		return false
+		console.warn("Cache missing required fields");
+		return false;
 	}
 
 	// Migrate caches missing trackedMarkets
 	if (!cache.trackedMarkets) {
-		cache.trackedMarkets = []
-		console.log('Migrated cache: added empty trackedMarkets')
+		cache.trackedMarkets = [];
+		console.log("Migrated cache: added empty trackedMarkets");
 	}
 
 	// Check block number sanity
 	if (cache.lastQueriedBlock < 0 || cache.lastQueriedBlock > 999999999) {
-		console.warn('Cache has invalid block number')
-		return false
+		console.warn("Cache has invalid block number");
+		return false;
 	}
 
 	// Check event array integrity
 	const totalEvents =
 		cache.events.created.length +
 		cache.events.contributions.length +
-		cache.events.completed.length
+		cache.events.completed.length;
 
 	if (totalEvents !== cache.metadata.totalEventsTracked) {
-		console.warn('Cache event count mismatch')
-		return false
+		console.warn("Cache event count mismatch");
+		return false;
 	}
 
-	return true
+	return true;
 }
 
 /**
@@ -562,29 +613,29 @@ function validateCache(cache: EventCache): boolean {
  */
 function serializeEvent(
 	event: ethers.EventLog,
-	eventType: 'created' | 'contribution' | 'completed'
+	eventType: "created" | "contribution" | "completed",
 ): SerializedEventLog {
 	// Args layout differs per event type:
 	//   Created:     universe(args[0]), market(args[1]), crowdsourcer(args[2])
 	//   Contribution: universe(args[0]), reporter(args[1]), market(args[2]), crowdsourcer(args[3])
 	//   Completed:   universe(args[0]), market(args[1]), crowdsourcer(args[2])
-	let marketAddr = ''
-	let crowdAddr = ''
-	if (eventType === 'contribution') {
-		marketAddr = event.args?.[2] || ''
-		crowdAddr = event.args?.[3] || ''
+	let marketAddr = "";
+	let crowdAddr = "";
+	if (eventType === "contribution") {
+		marketAddr = event.args?.[2] || "";
+		crowdAddr = event.args?.[3] || "";
 	} else {
-		marketAddr = event.args?.[1] || ''
-		crowdAddr = event.args?.[2] || ''
+		marketAddr = event.args?.[1] || "";
+		crowdAddr = event.args?.[2] || "";
 	}
 	return {
 		blockNumber: event.blockNumber,
 		transactionHash: event.transactionHash,
 		disputeCrowdsourcerAddress: crowdAddr,
 		marketAddress: marketAddr,
-		args: event.args ? event.args.map(arg => String(arg)) : [],
-		eventType
-	}
+		args: event.args ? event.args.map((arg) => String(arg)) : [],
+		eventType,
+	};
 }
 
 /**
@@ -593,33 +644,39 @@ function serializeEvent(
  * confirms the market is finalized.
  */
 function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
-	const blocksPerDay = 7200
-	const searchPeriod = 7 * blocksPerDay
-	const cutoffBlock = currentBlock - searchPeriod
+	const blocksPerDay = 7200;
+	const searchPeriod = 7 * blocksPerDay;
+	const cutoffBlock = currentBlock - searchPeriod;
 
 	const prunedCache: EventCache = {
 		...cache,
 		trackedMarkets: cache.trackedMarkets, // never prune
 		events: {
-			created: cache.events.created.filter(e => e.blockNumber >= cutoffBlock),
-			contributions: cache.events.contributions.filter(e => e.blockNumber >= cutoffBlock),
-			completed: cache.events.completed.filter(e => e.blockNumber >= cutoffBlock)
+			created: cache.events.created.filter((e) => e.blockNumber >= cutoffBlock),
+			contributions: cache.events.contributions.filter(
+				(e) => e.blockNumber >= cutoffBlock,
+			),
+			completed: cache.events.completed.filter(
+				(e) => e.blockNumber >= cutoffBlock,
+			),
 		},
-		oldestEventBlock: cutoffBlock
-	}
+		oldestEventBlock: cutoffBlock,
+	};
 
-	const eventsRemoved = cache.metadata.totalEventsTracked -
+	const eventsRemoved =
+		cache.metadata.totalEventsTracked -
 		(prunedCache.events.created.length +
-		 prunedCache.events.contributions.length +
-		 prunedCache.events.completed.length)
+			prunedCache.events.contributions.length +
+			prunedCache.events.completed.length);
 
 	if (eventsRemoved > 0) {
-		console.log(`Pruned ${eventsRemoved} old events (older than block ${cutoffBlock})`)
+		console.log(
+			`Pruned ${eventsRemoved} old events (older than block ${cutoffBlock})`,
+		);
 	}
 
-	return prunedCache
+	return prunedCache;
 }
-
 
 /**
  * Load dispute-markets-seed.json from the repo.
@@ -627,37 +684,42 @@ function pruneOldEvents(cache: EventCache, currentBlock: number): EventCache {
  * that survive total cache loss.
  */
 async function loadSeedMarkets(): Promise<TrackedMarket[]> {
-	const seedPath = path.join(__dirname, '../public/data/dispute-markets-seed.json')
+	const seedPath = path.join(
+		__dirname,
+		"../public/data/dispute-markets-seed.json",
+	);
 	try {
-		const data = await fs.readFile(seedPath, 'utf8')
-		const markets: TrackedMarket[] = JSON.parse(data)
+		const data = await fs.readFile(seedPath, "utf8");
+		const markets: TrackedMarket[] = JSON.parse(data);
 		if (Array.isArray(markets) && markets.length > 0) {
-			console.log(`🌱 Loaded ${markets.length} seed markets from repo`)
-			return markets
+			console.log(`🌱 Loaded ${markets.length} seed markets from repo`);
+			return markets;
 		}
 	} catch {
 		// No seed file — that's fine, events + cache handle discovery
 	}
-	return []
+	return [];
 }
 
 /**
  * Extract market address from a serialized event, handling the
  * different args layouts per event type.
  */
-function extractMarketFromSerializedEvent(event: SerializedEventLog): string | null {
+function extractMarketFromSerializedEvent(
+	event: SerializedEventLog,
+): string | null {
 	try {
-		if (event.eventType === 'contribution') {
-			const marketAddr = event.args?.[2]
-			if (marketAddr) return String(marketAddr).toLowerCase()
+		if (event.eventType === "contribution") {
+			const marketAddr = event.args?.[2];
+			if (marketAddr) return String(marketAddr).toLowerCase();
 		} else {
-			const marketAddr = event.args?.[1]
-			if (marketAddr) return String(marketAddr).toLowerCase()
+			const marketAddr = event.args?.[1];
+			if (marketAddr) return String(marketAddr).toLowerCase();
 		}
 	} catch {
 		// skip
 	}
-	return null
+	return null;
 }
 
 /**
@@ -665,136 +727,200 @@ function extractMarketFromSerializedEvent(event: SerializedEventLog): string | n
  * Contribution: market is args[2]
  * Created/Completed: market is args[1]
  */
-function extractMarketFromEventLog(event: ethers.EventLog, eventType: 'created' | 'contribution' | 'completed'): string | null {
+function extractMarketFromEventLog(
+	event: ethers.EventLog,
+	eventType: "created" | "contribution" | "completed",
+): string | null {
 	try {
-		if (!event.args || !Array.isArray(event.args)) return null
-		if (eventType === 'contribution') {
-			const addr = event.args[2]
-			if (addr) return String(addr).toLowerCase()
+		if (!event.args || !Array.isArray(event.args)) return null;
+		if (eventType === "contribution") {
+			const addr = event.args[2];
+			if (addr) return String(addr).toLowerCase();
 		} else {
-			const addr = event.args[1]
-			if (addr) return String(addr).toLowerCase()
+			const addr = event.args[1];
+			if (addr) return String(addr).toLowerCase();
 		}
 	} catch {
 		// skip
 	}
-	return null
+	return null;
 }
 
-async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Record<string, ethers.Contract>, mode: string = 'incremental', forkThresholdRep: number = 275000, roundDurationSeconds: number = 7 * 24 * 60 * 60): Promise<DisputeDetails[]> {
+async function getActiveDisputes(
+	provider: ethers.JsonRpcProvider,
+	contracts: Record<string, ethers.Contract>,
+	mode: string = "incremental",
+	forkThresholdRep: number = 275000,
+	roundDurationSeconds: number = 7 * 24 * 60 * 60,
+): Promise<DisputeDetails[]> {
 	try {
-		console.log('Querying dispute events for accurate stake calculation...')
+		console.log("Querying dispute events for accurate stake calculation...");
 
 		// Load event cache for incremental queries
-		const cache = await loadEventCache()
+		const cache = await loadEventCache();
 
 		// Query events in smaller chunks due to RPC block limit (1000 blocks max)
-		const currentBlock = await provider.getBlockNumber()
-		const blocksPerDay = 7200 // Approximate blocks per day (12 second blocks)
-		const discoveryPeriod = 30 * blocksPerDay // 30-day initial scan for market discovery
-		const incrementalPeriod = 7 * blocksPerDay // 7-day for incremental event queries
-		const fullSearchStartBlock = currentBlock - discoveryPeriod
+		const currentBlock = await provider.getBlockNumber();
+		const blocksPerDay = 7200; // Approximate blocks per day (12 second blocks)
+		const discoveryPeriod = 30 * blocksPerDay; // 30-day initial scan for market discovery
+		const incrementalPeriod = 7 * blocksPerDay; // 7-day for incremental event queries
+		const fullSearchStartBlock = currentBlock - discoveryPeriod;
 
 		// Determine query range based on mode and cache
-		let fromBlock: number
-		let newEventsOnly = false
+		let fromBlock: number;
+		let newEventsOnly = false;
 
-		if (mode === 'full-rebuild' || !cache.lastQueriedBlock || cache.lastQueriedBlock === 0) {
+		if (
+			mode === "full-rebuild" ||
+			!cache.lastQueriedBlock ||
+			cache.lastQueriedBlock === 0
+		) {
 			// Full 30-day rescan for market discovery
-			fromBlock = Math.max(currentBlock - discoveryPeriod, 0)
-			console.log(`[Query] Full 30-day rescan: blocks ${fromBlock} to ${currentBlock}`)
+			fromBlock = Math.max(currentBlock - discoveryPeriod, 0);
+			console.log(
+				`[Query] Full 30-day rescan: blocks ${fromBlock} to ${currentBlock}`,
+			);
 		} else {
 			// Incremental: only new blocks since last query
-			fromBlock = Math.max(cache.lastQueriedBlock - FINALITY_DEPTH, 0)
-			newEventsOnly = true
-			const blocksToQuery = currentBlock - fromBlock
-			console.log(`[Query] Incremental: blocks ${fromBlock} to ${currentBlock} (~${blocksToQuery} blocks)`)
-			console.log(`💾 Cache contains ${cache.metadata.totalEventsTracked} events, ${cache.trackedMarkets.length} tracked markets`)
+			fromBlock = Math.max(cache.lastQueriedBlock - FINALITY_DEPTH, 0);
+			newEventsOnly = true;
+			const blocksToQuery = currentBlock - fromBlock;
+			console.log(
+				`[Query] Incremental: blocks ${fromBlock} to ${currentBlock} (~${blocksToQuery} blocks)`,
+			);
+			console.log(
+				`💾 Cache contains ${cache.metadata.totalEventsTracked} events, ${cache.trackedMarkets.length} tracked markets`,
+			);
 		}
 
 		// Initialize event arrays
-		const allCreatedEvents: ethers.EventLog[] = []
-		const allContributionEvents: ethers.EventLog[] = []
-		const allCompletedEvents: ethers.EventLog[] = []
-		const chunkSize = 1000 // Max blocks per query for most RPC providers
+		const allCreatedEvents: ethers.EventLog[] = [];
+		const allContributionEvents: ethers.EventLog[] = [];
+		const allCompletedEvents: ethers.EventLog[] = [];
+		const chunkSize = 1000; // Max blocks per query for most RPC providers
 
-		let consecutiveFailures = 0
-		let totalChunks = 0
-		let successfulChunks = 0
-		let newEventsFound = 0
+		let consecutiveFailures = 0;
+		let totalChunks = 0;
+		let successfulChunks = 0;
+		let newEventsFound = 0;
 
 		// Query all relevant events in chunks
 		for (let start = fromBlock; start < currentBlock; start += chunkSize) {
-			const end = Math.min(start + chunkSize - 1, currentBlock)
-			totalChunks++
+			const end = Math.min(start + chunkSize - 1, currentBlock);
+			totalChunks++;
 
 			try {
 				// Add small delay between chunks to avoid rate limiting (100ms)
 				if (totalChunks > 1) {
-					await new Promise(resolve => setTimeout(resolve, 100))
+					await new Promise((resolve) => setTimeout(resolve, 100));
 				}
 
 				// Query Created events (for dispute initialization)
-				const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
-				const createdEvents = await contracts.augur.queryFilter(createdFilter, start, end)
-				allCreatedEvents.push(...(createdEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+				const createdFilter =
+					contracts.augur.filters.DisputeCrowdsourcerCreated();
+				const createdEvents = await contracts.augur.queryFilter(
+					createdFilter,
+					start,
+					end,
+				);
+				allCreatedEvents.push(
+					...(createdEvents.filter(
+						(e) => e instanceof ethers.EventLog,
+					) as ethers.EventLog[]),
+				);
 
 				// Query Contribution events (for actual stake amounts - MOST IMPORTANT)
-				const contributionFilter = contracts.augur.filters.DisputeCrowdsourcerContribution()
-				const contributionEvents = await contracts.augur.queryFilter(contributionFilter, start, end)
-				allContributionEvents.push(...(contributionEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+				const contributionFilter =
+					contracts.augur.filters.DisputeCrowdsourcerContribution();
+				const contributionEvents = await contracts.augur.queryFilter(
+					contributionFilter,
+					start,
+					end,
+				);
+				allContributionEvents.push(
+					...(contributionEvents.filter(
+						(e) => e instanceof ethers.EventLog,
+					) as ethers.EventLog[]),
+				);
 
 				// Query Completed events (for finalized disputes)
-				const completedFilter = contracts.augur.filters.DisputeCrowdsourcerCompleted()
-				const completedEvents = await contracts.augur.queryFilter(completedFilter, start, end)
-				allCompletedEvents.push(...(completedEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+				const completedFilter =
+					contracts.augur.filters.DisputeCrowdsourcerCompleted();
+				const completedEvents = await contracts.augur.queryFilter(
+					completedFilter,
+					start,
+					end,
+				);
+				allCompletedEvents.push(
+					...(completedEvents.filter(
+						(e) => e instanceof ethers.EventLog,
+					) as ethers.EventLog[]),
+				);
 
-				const totalEvents = createdEvents.length + contributionEvents.length + completedEvents.length
-				newEventsFound += totalEvents
+				const totalEvents =
+					createdEvents.length +
+					contributionEvents.length +
+					completedEvents.length;
+				newEventsFound += totalEvents;
 				if (totalEvents > 0) {
-					console.log(`Found ${totalEvents} dispute events in blocks ${start}-${end} (${createdEvents.length} created, ${contributionEvents.length} contributions, ${completedEvents.length} completed)`)
+					console.log(
+						`Found ${totalEvents} dispute events in blocks ${start}-${end} (${createdEvents.length} created, ${contributionEvents.length} contributions, ${completedEvents.length} completed)`,
+					);
 				}
 
-				consecutiveFailures = 0
-				successfulChunks++
+				consecutiveFailures = 0;
+				successfulChunks++;
 			} catch (chunkError) {
-				consecutiveFailures++
-				const errorMessage = chunkError instanceof Error ? chunkError.message : String(chunkError)
+				consecutiveFailures++;
+				const errorMessage =
+					chunkError instanceof Error ? chunkError.message : String(chunkError);
 
 				// Detect rate limiting
 				if (isRateLimitError(chunkError)) {
-					console.warn(`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`)
-					const backoffDelay = Math.min(2 ** consecutiveFailures * 1000, 10000)
-					console.log(`Waiting ${backoffDelay}ms before continuing...`)
-					await new Promise(resolve => setTimeout(resolve, backoffDelay))
+					console.warn(
+						`⚠️ Rate limit detected on blocks ${start}-${end}, backing off...`,
+					);
+					const backoffDelay = Math.min(2 ** consecutiveFailures * 1000, 10000);
+					console.log(`Waiting ${backoffDelay}ms before continuing...`);
+					await new Promise((resolve) => setTimeout(resolve, backoffDelay));
 				} else {
-					console.warn(`Failed to query blocks ${start}-${end}: ${errorMessage}`)
+					console.warn(
+						`Failed to query blocks ${start}-${end}: ${errorMessage}`,
+					);
 				}
 
 				// If we've had too many consecutive failures, stop to avoid wasting time
 				if (consecutiveFailures >= 5) {
-					console.warn(`⚠️ Too many consecutive failures (${consecutiveFailures}), stopping chunk queries early`)
-					console.log(`Successfully queried ${successfulChunks}/${totalChunks} chunks so far, using partial data`)
-					break
+					console.warn(
+						`⚠️ Too many consecutive failures (${consecutiveFailures}), stopping chunk queries early`,
+					);
+					console.log(
+						`Successfully queried ${successfulChunks}/${totalChunks} chunks so far, using partial data`,
+					);
+					break;
 				}
 			}
 		}
 
-		console.log(`Chunk query complete: ${successfulChunks}/${totalChunks} successful`)
-		console.log(`New events found: ${newEventsFound} (${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed)`)
+		console.log(
+			`Chunk query complete: ${successfulChunks}/${totalChunks} successful`,
+		);
+		console.log(
+			`New events found: ${newEventsFound} (${allCreatedEvents.length} created, ${allContributionEvents.length} contributions, ${allCompletedEvents.length} completed)`,
+		);
 
 		// Merge with cached events if this was an incremental query
 		if (newEventsOnly && cache.lastQueriedBlock > 0) {
-			const finalityStartBlock = cache.lastQueriedBlock - FINALITY_DEPTH
+			const finalityStartBlock = cache.lastQueriedBlock - FINALITY_DEPTH;
 
 			for (const cachedEvent of cache.events.created) {
 				if (cachedEvent.blockNumber < finalityStartBlock) {
 					const reconstructed = {
 						blockNumber: cachedEvent.blockNumber,
 						transactionHash: cachedEvent.transactionHash,
-						args: cachedEvent.args
-					} as ethers.EventLog
-					allCreatedEvents.push(reconstructed)
+						args: cachedEvent.args,
+					} as ethers.EventLog;
+					allCreatedEvents.push(reconstructed);
 				}
 			}
 
@@ -803,9 +929,9 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 					const reconstructed = {
 						blockNumber: cachedEvent.blockNumber,
 						transactionHash: cachedEvent.transactionHash,
-						args: cachedEvent.args
-					} as ethers.EventLog
-					allContributionEvents.push(reconstructed)
+						args: cachedEvent.args,
+					} as ethers.EventLog;
+					allContributionEvents.push(reconstructed);
 				}
 			}
 
@@ -814,13 +940,15 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 					const reconstructed = {
 						blockNumber: cachedEvent.blockNumber,
 						transactionHash: cachedEvent.transactionHash,
-						args: cachedEvent.args
-					} as ethers.EventLog
-					allCompletedEvents.push(reconstructed)
+						args: cachedEvent.args,
+					} as ethers.EventLog;
+					allCompletedEvents.push(reconstructed);
 				}
 			}
 
-			console.log(`📦 Merged with cached events: total ${allCreatedEvents.length + allContributionEvents.length + allCompletedEvents.length} events`)
+			console.log(
+				`📦 Merged with cached events: total ${allCreatedEvents.length + allContributionEvents.length + allCompletedEvents.length} events`,
+			);
 		}
 
 		// Update cache with newly queried events
@@ -831,74 +959,82 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 			oldestEventBlock: fullSearchStartBlock,
 			trackedMarkets: cache.trackedMarkets || [], // preserve tracked markets
 			events: {
-				created: allCreatedEvents.map(e => serializeEvent(e, 'created')),
-				contributions: allContributionEvents.map(e => serializeEvent(e, 'contribution')),
-				completed: allCompletedEvents.map(e => serializeEvent(e, 'completed'))
+				created: allCreatedEvents.map((e) => serializeEvent(e, "created")),
+				contributions: allContributionEvents.map((e) =>
+					serializeEvent(e, "contribution"),
+				),
+				completed: allCompletedEvents.map((e) =>
+					serializeEvent(e, "completed"),
+				),
 			},
 			metadata: {
-				totalEventsTracked: allCreatedEvents.length + allContributionEvents.length + allCompletedEvents.length,
+				totalEventsTracked:
+					allCreatedEvents.length +
+					allContributionEvents.length +
+					allCompletedEvents.length,
 				cacheGeneratedAt: new Date().toISOString(),
-				blockchainSyncStatus: successfulChunks === totalChunks ? 'complete' : 'partial'
-			}
-		}
+				blockchainSyncStatus:
+					successfulChunks === totalChunks ? "complete" : "partial",
+			},
+		};
 
 		// Prune old events (older than 7 days) — trackedMarkets preserved by pruneOldEvents
-		const prunedCache = pruneOldEvents(updatedCache, currentBlock)
+		const prunedCache = pruneOldEvents(updatedCache, currentBlock);
 
 		// === MARKET DISCOVERY ===
 		// Three sources: seed file, cached tracked markets, and fresh events.
 
 		// 1. Load seed markets (git-committed safety net)
-		const seedMarkets = await loadSeedMarkets()
+		const seedMarkets = await loadSeedMarkets();
 
 		// 2. Merge all sources into a single tracked markets map
-		const trackedMap = new Map<string, TrackedMarket>()
+		const trackedMap = new Map<string, TrackedMarket>();
 
 		// Add seed markets
 		for (const sm of seedMarkets) {
-			trackedMap.set(sm.marketId.toLowerCase(), sm)
+			trackedMap.set(sm.marketId.toLowerCase(), sm);
 		}
 
 		// Add cached tracked markets (may override seed with newer lastVerifiedBlock)
 		for (const tm of prunedCache.trackedMarkets) {
-			const key = tm.marketId.toLowerCase()
-			const existing = trackedMap.get(key)
+			const key = tm.marketId.toLowerCase();
+			const existing = trackedMap.get(key);
 			if (!existing || tm.lastVerifiedBlock > existing.lastVerifiedBlock) {
 				// Preserve seed title if cached entry doesn't have one
 				if (existing?.title && !tm.title) {
-					tm.title = existing.title
+					tm.title = existing.title;
 				}
-				trackedMap.set(key, tm)
+				trackedMap.set(key, tm);
 			}
 		}
 
 		// 3. Discover markets from events (fresh + previously cached)
-		const eventMarketIds = new Set<string>()
+		const eventMarketIds = new Set<string>();
 		for (const event of allCreatedEvents) {
-			const m = extractMarketFromEventLog(event, 'created')
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromEventLog(event, "created");
+			if (m) eventMarketIds.add(m);
 		}
 		for (const event of allContributionEvents) {
-			const m = extractMarketFromEventLog(event, 'contribution')
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromEventLog(event, "contribution");
+			if (m) eventMarketIds.add(m);
 		}
 		for (const event of allCompletedEvents) {
-			const m = extractMarketFromEventLog(event, 'completed')
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromEventLog(event, "completed");
+			if (m) eventMarketIds.add(m);
 		}
 		// Also extract from cached serialized events (may have been pruned
 		// but their markets should still be tracked)
 		for (const event of cache.events.contributions) {
-			const m = extractMarketFromSerializedEvent(event)
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromSerializedEvent(event);
+			if (m) eventMarketIds.add(m);
 		}
 		for (const event of cache.events.completed) {
-			const m = extractMarketFromSerializedEvent(event)
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromSerializedEvent(event);
+			if (m) eventMarketIds.add(m);
 		}
 		for (const event of cache.events.created) {
-			const m = extractMarketFromSerializedEvent(event)
-			if (m) eventMarketIds.add(m)
+			const m = extractMarketFromSerializedEvent(event);
+			if (m) eventMarketIds.add(m);
 		}
 
 		// Add event-discovered markets to tracking
@@ -908,97 +1044,113 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 					marketId,
 					discoveredAtBlock: currentBlock,
 					lastVerifiedBlock: 0,
-					source: 'event'
-				})
+					source: "event",
+				});
 			}
 		}
 
-		console.log(`Market discovery: ${seedMarkets.length} seed + ${prunedCache.trackedMarkets.length} cached + ${eventMarketIds.size} from events → ${trackedMap.size} unique markets`)
+		console.log(
+			`Market discovery: ${seedMarkets.length} seed + ${prunedCache.trackedMarkets.length} cached + ${eventMarketIds.size} from events → ${trackedMap.size} unique markets`,
+		);
 
 		// === ON-CHAIN VERIFICATION & BOND READOUT ===
-		const disputes: DisputeDetails[] = []
+		const disputes: DisputeDetails[] = [];
 		const marketAbi = [
-			'function getNumParticipants() view returns (uint256)',
-			'function participants(uint256) view returns (address)',
-			'function isFinalized() view returns (bool)',
-		]
-		const participantAbi = [
-			'function getSize() view returns (uint256)',
-		]
+			"function getNumParticipants() view returns (uint256)",
+			"function participants(uint256) view returns (address)",
+			"function isFinalized() view returns (bool)",
+		];
+		const participantAbi = ["function getSize() view returns (uint256)"];
 
-		const verifiedMarkets: TrackedMarket[] = []
+		const verifiedMarkets: TrackedMarket[] = [];
 
 		for (const [marketId, tracked] of trackedMap) {
 			try {
-				const market = new ethers.Contract(marketId, marketAbi, provider)
+				const market = new ethers.Contract(marketId, marketAbi, provider);
 
 				// Check if market is finalized
-				let isFinalized = false
+				let isFinalized = false;
 				try {
-					isFinalized = await market.isFinalized()
+					isFinalized = await market.isFinalized();
 				} catch (_err) {
 					// Assume active if we can't check
 				}
 
 				if (isFinalized) {
-					console.log(`  ✗ ${marketId.slice(0, 10)}... finalized — removed from tracking`)
-					continue
+					console.log(
+						`  ✗ ${marketId.slice(0, 10)}... finalized — removed from tracking`,
+					);
+					continue;
 				}
 
-				const numParticipants = Number(await market.getNumParticipants())
+				const numParticipants = Number(await market.getNumParticipants());
 				if (numParticipants === 0) {
-					console.log(`  ✗ ${marketId.slice(0, 10)}... no participants — removed from tracking`)
-					continue
+					console.log(
+						`  ✗ ${marketId.slice(0, 10)}... no participants — removed from tracking`,
+					);
+					continue;
 				}
 
 				// Read ALL participants to build bond trajectory for projection
-				const allBonds: number[] = []
-				let largestSize = 0
-				let latestRound = 0
+				const allBonds: number[] = [];
+				let largestSize = 0;
+				let latestRound = 0;
 
 				for (let i = 0; i < numParticipants; i++) {
 					try {
-						const participantAddr = await market.participants(i)
+						const participantAddr = await market.participants(i);
 						if (!participantAddr || participantAddr === ethers.ZeroAddress) {
-							allBonds.push(0)
-							continue
+							allBonds.push(0);
+							continue;
 						}
 
-						const participant = new ethers.Contract(participantAddr, participantAbi, provider)
-						const sizeWei = await participant.getSize()
-						const sizeRep = Number(ethers.formatEther(sizeWei))
-						allBonds.push(sizeRep)
+						const participant = new ethers.Contract(
+							participantAddr,
+							participantAbi,
+							provider,
+						);
+						const sizeWei = await participant.getSize();
+						const sizeRep = Number(ethers.formatEther(sizeWei));
+						allBonds.push(sizeRep);
 
 						if (sizeRep > largestSize) {
-							largestSize = sizeRep
-							latestRound = i
+							largestSize = sizeRep;
+							latestRound = i;
 						}
 					} catch (_err) {
-						allBonds.push(0)
+						allBonds.push(0);
 					}
 				}
 
 				// Keep tracking this market (verified alive)
 				verifiedMarkets.push({
 					...tracked,
-					lastVerifiedBlock: currentBlock
-				})
+					lastVerifiedBlock: currentBlock,
+				});
 
 				if (largestSize > 0) {
 					// Run projection for this market
-					const projection = projectTotalRounds(allBonds, forkThresholdRep)
-					const estimatedTotalRounds = projection?.estimatedTotalRounds ?? null
+					const projection = projectTotalRounds(allBonds, forkThresholdRep);
+					const estimatedTotalRounds = projection?.estimatedTotalRounds ?? null;
 					const roundProgress = estimatedTotalRounds
 						? (latestRound / estimatedTotalRounds) * 100
-						: 0
+						: 0;
 
 					// Use title from seed data, or fallback to truncated address
-					const marketTitle = tracked.title ?? `Market ${marketId.substring(0, 10)}...`
+					const marketTitle =
+						tracked.title ?? `Market ${marketId.substring(0, 10)}...`;
 
-					const roundsRemaining = estimatedTotalRounds ? Math.max(0, estimatedTotalRounds - latestRound) : null
-					const weeksRemaining = roundsRemaining !== null
-						? Math.round(roundsRemaining * roundDurationSeconds / (7 * 24 * 60 * 60) * 10) / 10
-						: 0
+					const roundsRemaining = estimatedTotalRounds
+						? Math.max(0, estimatedTotalRounds - latestRound)
+						: null;
+					const weeksRemaining =
+						roundsRemaining !== null
+							? Math.round(
+									((roundsRemaining * roundDurationSeconds) /
+										(7 * 24 * 60 * 60)) *
+										10,
+								) / 10
+							: 0;
 
 					disputes.push({
 						marketId,
@@ -1008,92 +1160,109 @@ async function getActiveDisputes(provider: ethers.JsonRpcProvider, contracts: Re
 						estimatedTotalRounds,
 						roundProgress,
 						weeksRemaining,
-					})
-					console.log(`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}/${estimatedTotalRounds ?? '?'} (${roundProgress.toFixed(1)}%) ~${weeksRemaining}w to fork`)
+					});
+					console.log(
+						`  ✓ ${marketId.slice(0, 10)}... bond=${largestSize.toLocaleString()} REP round=${latestRound}/${estimatedTotalRounds ?? "?"} (${roundProgress.toFixed(1)}%) ~${weeksRemaining}w to fork`,
+					);
 				}
 			} catch (error) {
 				// Market read failed — keep tracking but don't add to disputes
 				verifiedMarkets.push({
 					...tracked,
-					lastVerifiedBlock: currentBlock
-				})
-				console.warn(`  ⚠ ${marketId.slice(0, 10)}... read error:`, error instanceof Error ? error.message.slice(0, 60) : String(error).slice(0, 60))
+					lastVerifiedBlock: currentBlock,
+				});
+				console.warn(
+					`  ⚠ ${marketId.slice(0, 10)}... read error:`,
+					error instanceof Error
+						? error.message.slice(0, 60)
+						: String(error).slice(0, 60),
+				);
 			}
 		}
 
 		// Save verified markets back to cache
-		prunedCache.trackedMarkets = verifiedMarkets
-		console.log(`Tracked markets: ${verifiedMarkets.length} verified alive, ${trackedMap.size - verifiedMarkets.length} pruned (finalized/empty)`)
+		prunedCache.trackedMarkets = verifiedMarkets;
+		console.log(
+			`Tracked markets: ${verifiedMarkets.length} verified alive, ${trackedMap.size - verifiedMarkets.length} pruned (finalized/empty)`,
+		);
 
 		// Save cache for next run
-		await saveEventCache(prunedCache)
+		await saveEventCache(prunedCache);
 
 		// Log cache efficiency metrics
 		if (newEventsOnly) {
-			const incrementalBlocks = currentBlock - fromBlock
-			const fullQueryBlocks = incrementalPeriod
-			const queriesSaved = Math.floor(fullQueryBlocks / 1000) - Math.floor(incrementalBlocks / 1000)
-			console.log(`💰 RPC queries saved: ~${queriesSaved} queries (queried ${incrementalBlocks} blocks instead of ${fullQueryBlocks})`)
+			const incrementalBlocks = currentBlock - fromBlock;
+			const fullQueryBlocks = incrementalPeriod;
+			const queriesSaved =
+				Math.floor(fullQueryBlocks / 1000) -
+				Math.floor(incrementalBlocks / 1000);
+			console.log(
+				`💰 RPC queries saved: ~${queriesSaved} queries (queried ${incrementalBlocks} blocks instead of ${fullQueryBlocks})`,
+			);
 		}
 
-		console.log(`Total events after pruning: ${prunedCache.metadata.totalEventsTracked}`)
+		console.log(
+			`Total events after pruning: ${prunedCache.metadata.totalEventsTracked}`,
+		);
 
 		// Sort by bond size (largest first) and return top 10
 		const sortedDisputes = disputes.sort(
 			(a, b) => b.disputeBondSize - a.disputeBondSize,
-		)
+		);
 
-		console.log(`Processed ${sortedDisputes.length} active markets with disputes`)
+		console.log(
+			`Processed ${sortedDisputes.length} active markets with disputes`,
+		);
 		if (sortedDisputes.length > 0) {
-			console.log(`Largest dispute bond: ${sortedDisputes[0].disputeBondSize.toLocaleString()} REP`)
+			console.log(
+				`Largest dispute bond: ${sortedDisputes[0].disputeBondSize.toLocaleString()} REP`,
+			);
 		}
 
-		return sortedDisputes.slice(0, 10)
+		return sortedDisputes.slice(0, 10);
 	} catch (error) {
 		console.warn(
-			'Failed to query dispute events (contribution/completed), using empty array:',
+			"Failed to query dispute events (contribution/completed), using empty array:",
 			error instanceof Error ? error.message : String(error),
-		)
-		return []
+		);
+		return [];
 	}
 }
 function getLargestDisputeBond(disputes: DisputeDetails[]): number {
-	if (disputes.length === 0) return 0
-	return Math.max(...disputes.map((d) => d.disputeBondSize))
+	if (disputes.length === 0) return 0;
+	return Math.max(...disputes.map((d) => d.disputeBondSize));
 }
 
-
-
 function determineRiskLevel(roundProgress: number | null): RiskLevel {
-	if (roundProgress === null) return 'unknown'
-	if (roundProgress === 0) return 'none'
-	if (roundProgress >= 75) return 'critical'
-	if (roundProgress >= 50) return 'high'
-	if (roundProgress >= 25) return 'moderate'
-	return 'low'
+	if (roundProgress === null) return "unknown";
+	if (roundProgress === 0) return "none";
+	if (roundProgress >= 75) return "critical";
+	if (roundProgress >= 50) return "high";
+	if (roundProgress >= 25) return "moderate";
+	return "low";
 }
 
 const FORK_ACTIVE_UNIVERSE_ABI = [
-	'function getForkingMarket() view returns (address)',
-	'function getForkEndTime() view returns (uint256)',
-	'function getForkReputationGoal() view returns (uint256)',
-	'function getReputationToken() view returns (address)',
-	'function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)',
-]
+	"function getForkingMarket() view returns (address)",
+	"function getForkEndTime() view returns (uint256)",
+	"function getForkReputationGoal() view returns (uint256)",
+	"function getReputationToken() view returns (address)",
+	"function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)",
+];
 const FORK_ACTIVE_MARKET_ABI = [
-	'function getNumberOfOutcomes() view returns (uint256)',
-	'function getNumTicks() view returns (uint256)',
-]
+	"function getNumberOfOutcomes() view returns (uint256)",
+	"function getNumTicks() view returns (uint256)",
+];
 const FORK_ACTIVE_ERC20_ABI = [
-	'function totalSupply() view returns (uint256)',
-	'function symbol() view returns (string)',
-]
+	"function totalSupply() view returns (uint256)",
+	"function symbol() view returns (string)",
+];
 
 function positionalLabel(index: number): string {
 	// Fallback label — actual outcome names are market-specific and
 	// derived from the child universe's REP token symbol (e.g. REPv2_Yes_1).
-	if (index === 0) return 'Invalid'
-	return `Outcome ${index}`
+	if (index === 0) return "Invalid";
+	return `Outcome ${index}`;
 }
 
 /**
@@ -1102,63 +1271,89 @@ function positionalLabel(index: number): string {
  * e.g. "REPv2_Yes_1" → "Yes"
  */
 function labelFromTokenSymbol(symbol: string): string | null {
-	const match = symbol.match(/^REPv2_(.+)_(\d+)$/)
-	return match ? match[1] : null
+	const match = symbol.match(/^REPv2_(.+)_(\d+)$/);
+	return match ? match[1] : null;
 }
 
 async function fetchForkActiveDetails(
 	provider: ethers.JsonRpcProvider,
 	universe: ethers.Contract,
-): Promise<ForkRiskData['forkActive'] | undefined> {
+): Promise<ForkRiskData["forkActive"] | undefined> {
 	try {
-		const u = new ethers.Contract(await universe.getAddress(), FORK_ACTIVE_UNIVERSE_ABI, provider)
+		const u = new ethers.Contract(
+			await universe.getAddress(),
+			FORK_ACTIVE_UNIVERSE_ABI,
+			provider,
+		);
 
-		const [forkingMarket, forkEndTimeRaw, forkRepGoalWei, repTokenAddr] = await Promise.all([
-			u.getForkingMarket(),
-			u.getForkEndTime(),
-			u.getForkReputationGoal(),
-			u.getReputationToken(),
-		])
+		const [forkingMarket, forkEndTimeRaw, forkRepGoalWei, repTokenAddr] =
+			await Promise.all([
+				u.getForkingMarket(),
+				u.getForkEndTime(),
+				u.getForkReputationGoal(),
+				u.getReputationToken(),
+			]);
 
-		const repToken = new ethers.Contract(repTokenAddr, FORK_ACTIVE_ERC20_ABI, provider)
-		const universeRepSupplyWei = await repToken.totalSupply()
+		const repToken = new ethers.Contract(
+			repTokenAddr,
+			FORK_ACTIVE_ERC20_ABI,
+			provider,
+		);
+		const universeRepSupplyWei = await repToken.totalSupply();
 
-		const market = new ethers.Contract(forkingMarket, FORK_ACTIVE_MARKET_ABI, provider)
+		const market = new ethers.Contract(
+			forkingMarket,
+			FORK_ACTIVE_MARKET_ABI,
+			provider,
+		);
 		const [numOutcomesRaw, numTicksRaw] = await Promise.all([
 			market.getNumberOfOutcomes(),
 			market.getNumTicks(),
-		])
-		const numOutcomes = Number(numOutcomesRaw)
-		const numTicks = BigInt(numTicksRaw)
+		]);
+		const numOutcomes = Number(numOutcomesRaw);
+		const numTicks = BigInt(numTicksRaw);
 
 		const outcomes = await Promise.all(
 			Array.from({ length: numOutcomes }, async (_, k) => {
-				const numerators = Array.from({ length: numOutcomes }, (_, j) => (j === k ? numTicks : 0n))
+				const numerators = Array.from({ length: numOutcomes }, (_, j) =>
+					j === k ? numTicks : 0n,
+				);
 				// Augur V2 uses keccak256(abi.encodePacked(numerators...)) — each element
 				// packed as a raw uint256, no length prefix. This differs from
 				// keccak256(abi.encode(uint256[])) which includes offset + length.
-				const packedTypes = Array.from({ length: numOutcomes }, () => 'uint256')
+				const packedTypes = Array.from(
+					{ length: numOutcomes },
+					() => "uint256",
+				);
 				const payoutHash = ethers.keccak256(
 					ethers.solidityPacked(packedTypes, numerators),
-				)
-				const childAddr: string = await u.getChildUniverse(payoutHash)
-				const isZero = !childAddr || /^0x0+$/i.test(childAddr)
-				let migratedRep = 0
-				let childRepLabel: string | null = null
-				let label = positionalLabel(k)
+				);
+				const childAddr: string = await u.getChildUniverse(payoutHash);
+				const isZero = !childAddr || /^0x0+$/i.test(childAddr);
+				let migratedRep = 0;
+				let childRepLabel: string | null = null;
+				let label = positionalLabel(k);
 				if (!isZero) {
-					childRepLabel = childAddr
-					const childUniverse = new ethers.Contract(childAddr, FORK_ACTIVE_UNIVERSE_ABI, provider)
-					const childRepAddr = await childUniverse.getReputationToken()
-					const childRep = new ethers.Contract(childRepAddr, FORK_ACTIVE_ERC20_ABI, provider)
+					childRepLabel = childAddr;
+					const childUniverse = new ethers.Contract(
+						childAddr,
+						FORK_ACTIVE_UNIVERSE_ABI,
+						provider,
+					);
+					const childRepAddr = await childUniverse.getReputationToken();
+					const childRep = new ethers.Contract(
+						childRepAddr,
+						FORK_ACTIVE_ERC20_ABI,
+						provider,
+					);
 					const [supplyWei, symbol] = await Promise.all([
 						childRep.totalSupply(),
 						childRep.symbol().catch(() => null as string | null),
-					])
-					migratedRep = Number(ethers.formatEther(supplyWei))
+					]);
+					migratedRep = Number(ethers.formatEther(supplyWei));
 					if (symbol) {
-						const parsed = labelFromTokenSymbol(symbol)
-						if (parsed) label = parsed
+						const parsed = labelFromTokenSymbol(symbol);
+						if (parsed) label = parsed;
 					}
 				}
 				return {
@@ -1166,9 +1361,9 @@ async function fetchForkActiveDetails(
 					label,
 					childUniverse: childRepLabel,
 					migratedRep,
-				}
+				};
 			}),
-		)
+		);
 
 		return {
 			forkingMarket,
@@ -1176,10 +1371,12 @@ async function fetchForkActiveDetails(
 			forkReputationGoal: Number(ethers.formatEther(forkRepGoalWei)),
 			universeRepSupply: Number(ethers.formatEther(universeRepSupplyWei)),
 			outcomes,
-		}
+		};
 	} catch (e) {
-		console.warn(`⚠️ Failed to fetch forkActive details: ${(e as Error).message}`)
-		return undefined
+		console.warn(
+			`⚠️ Failed to fetch forkActive details: ${(e as Error).message}`,
+		);
+		return undefined;
 	}
 }
 
@@ -1189,81 +1386,84 @@ async function getForkingResult(
 	forkThresholdRep: number,
 	universe: ethers.Contract,
 ): Promise<ForkRiskData> {
-		const forkActive = await fetchForkActiveDetails(connection.provider, universe)
-		return {
-			lastRiskChange: new Date().toISOString(),
-			blockNumber,
-			riskLevel: 'critical',
-			riskPercentage: 100,
-			metrics: {
-				largestDisputeBond: forkThresholdRep,
-				forkThresholdPercent: 100,
-				activeDisputes: 0,
-				disputeDetails: [
-					{
-						marketId: 'FORKING',
-						title: 'Universe is currently forking',
-						disputeBondSize: forkThresholdRep,
-						disputeRound: 99,
-						estimatedTotalRounds: null,
-						roundProgress: 100,
-						weeksRemaining: 0,
-					},
-				],
-				currentRound: 99,
-				estimatedTotalRounds: null,
-				roundProgress: 100,
-			},
-			rpcInfo: {
-				endpoint: connection.endpoint,
-				latency: connection.latency,
-				fallbacksAttempted: connection.fallbacksAttempted,
-			},
-			calculation: {
-				forkThreshold: forkThresholdRep,
-			},
-			cacheValidation: { isHealthy: true },
-			forkActive,
-		}
-	}
+	const forkActive = await fetchForkActiveDetails(
+		connection.provider,
+		universe,
+	);
+	return {
+		lastRiskChange: new Date().toISOString(),
+		blockNumber,
+		riskLevel: "critical",
+		riskPercentage: 100,
+		metrics: {
+			largestDisputeBond: forkThresholdRep,
+			forkThresholdPercent: 100,
+			activeDisputes: 0,
+			disputeDetails: [
+				{
+					marketId: "FORKING",
+					title: "Universe is currently forking",
+					disputeBondSize: forkThresholdRep,
+					disputeRound: 99,
+					estimatedTotalRounds: null,
+					roundProgress: 100,
+					weeksRemaining: 0,
+				},
+			],
+			currentRound: 99,
+			estimatedTotalRounds: null,
+			roundProgress: 100,
+		},
+		rpcInfo: {
+			endpoint: connection.endpoint,
+			latency: connection.latency,
+			fallbacksAttempted: connection.fallbacksAttempted,
+		},
+		calculation: {
+			forkThreshold: forkThresholdRep,
+		},
+		cacheValidation: { isHealthy: true },
+		forkActive,
+	};
+}
 
 function getErrorResult(errorMessage: string): ForkRiskData {
-		return {
-			lastRiskChange: new Date().toISOString(),
-			riskLevel: 'unknown',
-			riskPercentage: 0,
-			error: errorMessage,
-			metrics: {
-				largestDisputeBond: 0,
-				forkThresholdPercent: 0,
-				activeDisputes: 0,
-				disputeDetails: [],
-				currentRound: 0,
-				estimatedTotalRounds: null,
-				roundProgress: 0,
-			},
-				rpcInfo: {
-				endpoint: null,
-				latency: null,
-				fallbacksAttempted: 0,
-			},
-			calculation: {
-					forkThreshold: 275000,
-			},
+	return {
+		lastRiskChange: new Date().toISOString(),
+		riskLevel: "unknown",
+		riskPercentage: 0,
+		error: errorMessage,
+		metrics: {
+			largestDisputeBond: 0,
+			forkThresholdPercent: 0,
+			activeDisputes: 0,
+			disputeDetails: [],
+			currentRound: 0,
+			estimatedTotalRounds: null,
+			roundProgress: 0,
+		},
+		rpcInfo: {
+			endpoint: null,
+			latency: null,
+			fallbacksAttempted: 0,
+		},
+		calculation: {
+			forkThreshold: 275000,
+		},
 		cacheValidation: { isHealthy: false, discrepancy: errorMessage },
-		}
-	}
+	};
+}
 
 async function saveResults(results: ForkRiskData): Promise<void> {
-		const outputPath = path.join(__dirname, '../public/data/fork-risk.json')
+	const outputPath = path.join(__dirname, "../public/data/fork-risk.json");
 
-		// Ensure data directory exists
-		await fs.mkdir(path.dirname(outputPath), { recursive: true })
+	// Ensure data directory exists
+	await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
-		// Write results with pretty formatting
-		await fs.writeFile(outputPath, JSON.stringify(results, null, 2))
+	// Write results with pretty formatting
+	await fs.writeFile(outputPath, JSON.stringify(results, null, 2));
 
-		console.log(`Results saved to ${outputPath}`)
+	console.log(`Results saved to ${outputPath}`);
 }
 
 /**
@@ -1273,151 +1473,206 @@ async function saveResults(results: ForkRiskData): Promise<void> {
 async function validateCacheHealth(
 	provider: ethers.JsonRpcProvider,
 	contracts: Record<string, ethers.Contract>,
-	cache: EventCache
+	cache: EventCache,
 ): Promise<CacheValidationResult> {
 	try {
 		// Return early if no cached data
-		if (cache.lastQueriedBlock === 0 || cache.metadata.totalEventsTracked === 0) {
-			console.log('ℹ️  Cache validation skipped: no cached data to validate')
-			return { isHealthy: true }
+		if (
+			cache.lastQueriedBlock === 0 ||
+			cache.metadata.totalEventsTracked === 0
+		) {
+			console.log("ℹ️  Cache validation skipped: no cached data to validate");
+			return { isHealthy: true };
 		}
 
-		const currentBlock = await provider.getBlockNumber()
+		const currentBlock = await provider.getBlockNumber();
 		const validationStartBlock = Math.max(
 			currentBlock - VALIDATION_DEPTH,
-			cache.oldestEventBlock
-		)
+			cache.oldestEventBlock,
+		);
 
-		console.log(`🔍 Validating cache health: re-querying blocks ${validationStartBlock}-${currentBlock}`)
+		console.log(
+			`🔍 Validating cache health: re-querying blocks ${validationStartBlock}-${currentBlock}`,
+		);
 
 		// Re-query last N blocks fresh (without cache)
-		const freshCreatedEvents: ethers.EventLog[] = []
-		const freshContributionEvents: ethers.EventLog[] = []
-		const freshCompletedEvents: ethers.EventLog[] = []
+		const freshCreatedEvents: ethers.EventLog[] = [];
+		const freshContributionEvents: ethers.EventLog[] = [];
+		const freshCompletedEvents: ethers.EventLog[] = [];
 
 		try {
 			// Query Created events fresh
-			const createdFilter = contracts.augur.filters.DisputeCrowdsourcerCreated()
-			const createdEvents = await contracts.augur.queryFilter(createdFilter, validationStartBlock, currentBlock)
-			freshCreatedEvents.push(...(createdEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+			const createdFilter =
+				contracts.augur.filters.DisputeCrowdsourcerCreated();
+			const createdEvents = await contracts.augur.queryFilter(
+				createdFilter,
+				validationStartBlock,
+				currentBlock,
+			);
+			freshCreatedEvents.push(
+				...(createdEvents.filter(
+					(e) => e instanceof ethers.EventLog,
+				) as ethers.EventLog[]),
+			);
 
 			// Query Contribution events fresh
-			const contributionFilter = contracts.augur.filters.DisputeCrowdsourcerContribution()
-			const contributionEvents = await contracts.augur.queryFilter(contributionFilter, validationStartBlock, currentBlock)
-			freshContributionEvents.push(...(contributionEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+			const contributionFilter =
+				contracts.augur.filters.DisputeCrowdsourcerContribution();
+			const contributionEvents = await contracts.augur.queryFilter(
+				contributionFilter,
+				validationStartBlock,
+				currentBlock,
+			);
+			freshContributionEvents.push(
+				...(contributionEvents.filter(
+					(e) => e instanceof ethers.EventLog,
+				) as ethers.EventLog[]),
+			);
 
 			// Query Completed events fresh
-			const completedFilter = contracts.augur.filters.DisputeCrowdsourcerCompleted()
-			const completedEvents = await contracts.augur.queryFilter(completedFilter, validationStartBlock, currentBlock)
-			freshCompletedEvents.push(...(completedEvents.filter(e => e instanceof ethers.EventLog) as ethers.EventLog[]))
+			const completedFilter =
+				contracts.augur.filters.DisputeCrowdsourcerCompleted();
+			const completedEvents = await contracts.augur.queryFilter(
+				completedFilter,
+				validationStartBlock,
+				currentBlock,
+			);
+			freshCompletedEvents.push(
+				...(completedEvents.filter(
+					(e) => e instanceof ethers.EventLog,
+				) as ethers.EventLog[]),
+			);
 
-			console.log(`Found ${freshCreatedEvents.length + freshContributionEvents.length + freshCompletedEvents.length} fresh events in validation window`)
+			console.log(
+				`Found ${freshCreatedEvents.length + freshContributionEvents.length + freshCompletedEvents.length} fresh events in validation window`,
+			);
 		} catch (queryError) {
-			const errorMessage = queryError instanceof Error ? queryError.message : String(queryError)
-			console.warn(`⚠️  Validation query failed: ${errorMessage}`)
-			return { isHealthy: false, discrepancy: `Query failed: ${errorMessage}` }
+			const errorMessage =
+				queryError instanceof Error ? queryError.message : String(queryError);
+			console.warn(`⚠️  Validation query failed: ${errorMessage}`);
+			return { isHealthy: false, discrepancy: `Query failed: ${errorMessage}` };
 		}
 
 		// Extract dispute IDs from fresh events
-		const freshDisputeIds = new Set<string>()
+		const freshDisputeIds = new Set<string>();
 
 		for (const event of freshCreatedEvents) {
 			if (event.args?.[2]) {
-				freshDisputeIds.add(String(event.args[2]))
+				freshDisputeIds.add(String(event.args[2]));
 			}
 		}
 
 		for (const event of freshContributionEvents) {
 			if (event.args?.[3]) {
-				freshDisputeIds.add(String(event.args[3]))
+				freshDisputeIds.add(String(event.args[3]));
 			}
 		}
 
 		for (const event of freshCompletedEvents) {
 			if (event.args?.[2]) {
-				freshDisputeIds.add(String(event.args[2]))
+				freshDisputeIds.add(String(event.args[2]));
 			}
 		}
 
 		// Extract dispute IDs from cached events in validation window
-		const cachedDisputeIds = new Set<string>()
+		const cachedDisputeIds = new Set<string>();
 
 		for (const event of cache.events.created) {
-			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
-				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			if (
+				event.blockNumber >= validationStartBlock &&
+				event.blockNumber <= currentBlock
+			) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress);
 			}
 		}
 
 		for (const event of cache.events.contributions) {
-			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
-				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			if (
+				event.blockNumber >= validationStartBlock &&
+				event.blockNumber <= currentBlock
+			) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress);
 			}
 		}
 
 		for (const event of cache.events.completed) {
-			if (event.blockNumber >= validationStartBlock && event.blockNumber <= currentBlock) {
-				cachedDisputeIds.add(event.disputeCrowdsourcerAddress)
+			if (
+				event.blockNumber >= validationStartBlock &&
+				event.blockNumber <= currentBlock
+			) {
+				cachedDisputeIds.add(event.disputeCrowdsourcerAddress);
 			}
 		}
 
 		// Compare fresh vs cached dispute sets
-		const freshOnly = Array.from(freshDisputeIds).filter(id => !cachedDisputeIds.has(id))
-		const cachedOnly = Array.from(cachedDisputeIds).filter(id => !freshDisputeIds.has(id))
+		const freshOnly = Array.from(freshDisputeIds).filter(
+			(id) => !cachedDisputeIds.has(id),
+		);
+		const cachedOnly = Array.from(cachedDisputeIds).filter(
+			(id) => !freshDisputeIds.has(id),
+		);
 
 		if (freshOnly.length > 0 || cachedOnly.length > 0) {
-			const discrepancy = `Fresh: ${freshOnly.length} missing from cache, Cached: ${cachedOnly.length} not in fresh data`
-			console.warn(`⚠️  Cache discrepancy detected: ${discrepancy}`)
-			console.warn(`   Fresh disputes: ${freshDisputeIds.size}, Cached disputes: ${cachedDisputeIds.size}`)
-			return { isHealthy: false, discrepancy }
+			const discrepancy = `Fresh: ${freshOnly.length} missing from cache, Cached: ${cachedOnly.length} not in fresh data`;
+			console.warn(`⚠️  Cache discrepancy detected: ${discrepancy}`);
+			console.warn(
+				`   Fresh disputes: ${freshDisputeIds.size}, Cached disputes: ${cachedDisputeIds.size}`,
+			);
+			return { isHealthy: false, discrepancy };
 		}
 
-		console.log(`✓ Cache validation passed: fresh and cached disputes match in blocks ${validationStartBlock}-${currentBlock}`)
-		return { isHealthy: true }
+		console.log(
+			`✓ Cache validation passed: fresh and cached disputes match in blocks ${validationStartBlock}-${currentBlock}`,
+		);
+		return { isHealthy: true };
 	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : String(error)
-		console.warn(`⚠️  Unexpected error during cache validation: ${errorMessage}`)
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.warn(
+			`⚠️  Unexpected error during cache validation: ${errorMessage}`,
+		);
 		// Return unhealthy but don't crash - validation errors shouldn't block the script
-		return { isHealthy: false, discrepancy: `Validation error: ${errorMessage}` }
+		return {
+			isHealthy: false,
+			discrepancy: `Validation error: ${errorMessage}`,
+		};
 	}
 }
 
 // Main execution
 async function main(): Promise<void> {
 	try {
-		const results = await calculateForkRisk()
-		await saveResults(results)
+		const results = await calculateForkRisk();
+		await saveResults(results);
 
-		console.log('\n✓ Fork risk calculation completed successfully')
-		console.log(
-			`Results saved using PUBLIC RPC: ${results.rpcInfo.endpoint}`,
-		)
-		process.exit(0)
+		console.log("\n✓ Fork risk calculation completed successfully");
+		console.log(`Results saved using PUBLIC RPC: ${results.rpcInfo.endpoint}`);
+		process.exit(0);
 	} catch (error) {
-		console.error('\n✗ Fatal error during fork risk calculation:')
+		console.error("\n✗ Fatal error during fork risk calculation:");
 		console.error(
 			`Error: ${error instanceof Error ? error.message : String(error)}`,
-		)
+		);
 
 		// Create an error result to save
 		const errorResult: ForkRiskData = getErrorResult(
-			error instanceof Error ? error.message : String(error)
-		)
+			error instanceof Error ? error.message : String(error),
+		);
 
 		try {
-			await saveResults(errorResult)
-			console.log('Error state saved to JSON file')
+			await saveResults(errorResult);
+			console.log("Error state saved to JSON file");
 		} catch (saveError) {
 			console.error(
-				'Failed to save error state:',
+				"Failed to save error state:",
 				saveError instanceof Error ? saveError.message : String(saveError),
-			)
+			);
 		}
 
-		process.exit(1)
+		process.exit(1);
 	}
 }
 
 // Run if called directly (TypeScript/Node compatible)
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-	main()
+	main();
 }

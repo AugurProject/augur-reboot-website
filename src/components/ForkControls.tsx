@@ -1,43 +1,44 @@
-import type React from 'react'
-import { useState, useEffect } from 'react'
-import ReactDOM from 'react-dom'
-import { useForkMock } from '../providers/ForkMockProvider'
-import { DisputeBondScenario } from '../utils/demoDataGenerator'
+import type React from "react";
+import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+import { useForkMock } from "../providers/ForkMockProvider";
+import { DisputeBondScenario } from "../utils/demoDataGenerator";
 
 export const ForkControls = (): React.JSX.Element | null => {
-	const { isDemo, isDemoAvailable, generateScenario, resetToLive } = useForkMock()
-	const [isVisible, setIsVisible] = useState(false)
-	const [mounted, setMounted] = useState(false)
+	const { isDemo, isDemoAvailable, generateScenario, resetToLive } =
+		useForkMock();
+	const [isVisible, setIsVisible] = useState(false);
+	const [mounted, setMounted] = useState(false);
 
 	// Defer rendering until after mount so SSR and client first render
 	// both produce null — avoids a hydration mismatch on the dev-only
 	// portal.
 	useEffect(() => {
-		setMounted(true)
-	}, [])
+		setMounted(true);
+	}, []);
 
 	// Keyboard shortcut to toggle demo overlay (F2)
 	useEffect(() => {
 		const handleKeydown = (e: KeyboardEvent) => {
-			if (e.key === 'F2') {
-				e.preventDefault()
-				setIsVisible(prev => !prev)
+			if (e.key === "F2") {
+				e.preventDefault();
+				setIsVisible((prev) => !prev);
 			}
-		}
+		};
 
-		window.addEventListener('keydown', handleKeydown)
-		return () => window.removeEventListener('keydown', handleKeydown)
-	}, [])
+		window.addEventListener("keydown", handleKeydown);
+		return () => window.removeEventListener("keydown", handleKeydown);
+	}, []);
 
-	if (!mounted || !isDemoAvailable) return null
+	if (!mounted || !isDemoAvailable) return null;
 
 	if (!isVisible) {
 		return ReactDOM.createPortal(
 			<div className="fixed top-4 left-4 z-50 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded">
 				DEV: F2 for demo
 			</div>,
-			document.body
-		)
+			document.body,
+		);
 	}
 
 	return ReactDOM.createPortal(
@@ -55,7 +56,9 @@ export const ForkControls = (): React.JSX.Element | null => {
 
 			{isDemo && (
 				<div className="mb-3 p-2 bg-orange-900/20 border border-orange-500/30 rounded">
-					<div className="text-orange-400 text-xs font-bold mb-1">DEMO MODE ACTIVE</div>
+					<div className="text-orange-400 text-xs font-bold mb-1">
+						DEMO MODE ACTIVE
+					</div>
 					<button
 						type="button"
 						onClick={resetToLive}
@@ -67,7 +70,9 @@ export const ForkControls = (): React.JSX.Element | null => {
 			)}
 
 			<div className="space-y-2">
-				<div className="text-xs text-muted-foreground mb-2">Generate Scenarios:</div>
+				<div className="text-xs text-muted-foreground mb-2">
+					Generate Scenarios:
+				</div>
 
 				<button
 					type="button"
@@ -127,7 +132,9 @@ export const ForkControls = (): React.JSX.Element | null => {
 
 				<button
 					type="button"
-					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL)}
+					onClick={() =>
+						generateScenario(DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL)
+					}
 					className="block w-full text-left text-xs bg-purple-900/30 hover:bg-purple-900/40 px-2 py-1 rounded"
 				>
 					Active Fork — Near Goal (~86%)
@@ -135,7 +142,9 @@ export const ForkControls = (): React.JSX.Element | null => {
 
 				<button
 					type="button"
-					onClick={() => generateScenario(DisputeBondScenario.ACTIVE_FORK_RESOLVED)}
+					onClick={() =>
+						generateScenario(DisputeBondScenario.ACTIVE_FORK_RESOLVED)
+					}
 					className="block w-full text-left text-xs bg-purple-900/40 hover:bg-purple-900/50 px-2 py-1 rounded"
 				>
 					Active Fork — Resolved (Yes &gt; goal)
@@ -143,9 +152,10 @@ export const ForkControls = (): React.JSX.Element | null => {
 			</div>
 
 			<div className="mt-3 text-xs text-muted-foreground">
-				Demo data shows different dispute bond scenarios for testing UI behavior.
+				Demo data shows different dispute bond scenarios for testing UI
+				behavior.
 			</div>
 		</div>,
-		document.body
-	)
-}
+		document.body,
+	);
+};

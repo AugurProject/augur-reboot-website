@@ -14,224 +14,277 @@
  * Default market: 0x963eed85778cc23e2d4636cd4f29eecdf9827e9e (Artemis II, per blog).
  */
 
-import { ethers } from 'ethers'
+import { ethers } from "ethers";
 
-const GENESIS_UNIVERSE = '0xe991247b78f937d7b69cfc00f1a487a293557677'
-const DEFAULT_MARKETS = ['0x963eed85778cc23e2d4636cd4f29eecdf9827e9e']
+const GENESIS_UNIVERSE = "0xe991247b78f937d7b69cfc00f1a487a293557677";
+const DEFAULT_MARKETS = ["0x963eed85778cc23e2d4636cd4f29eecdf9827e9e"];
 
 const RPCS = [
 	process.env.ETH_RPC_URL,
-	'https://ethereum-rpc.publicnode.com',
-	'https://eth.drpc.org',
-	'https://1rpc.io/eth',
-].filter((x): x is string => !!x)
+	"https://ethereum-rpc.publicnode.com",
+	"https://eth.drpc.org",
+	"https://1rpc.io/eth",
+].filter((x): x is string => !!x);
 
 const UNIVERSE_ABI = [
-	'function isForking() view returns (bool)',
-	'function getForkingMarket() view returns (address)',
-	'function getForkEndTime() view returns (uint256)',
-	'function getParentUniverse() view returns (address)',
-	'function getWinningChildUniverse() view returns (address)',
-	'function getDisputeThresholdForFork() view returns (uint256)',
-	'function getForkReputationGoal() view returns (uint256)',
-	'function getReputationToken() view returns (address)',
-	'function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)',
-]
+	"function isForking() view returns (bool)",
+	"function getForkingMarket() view returns (address)",
+	"function getForkEndTime() view returns (uint256)",
+	"function getParentUniverse() view returns (address)",
+	"function getWinningChildUniverse() view returns (address)",
+	"function getDisputeThresholdForFork() view returns (uint256)",
+	"function getForkReputationGoal() view returns (uint256)",
+	"function getReputationToken() view returns (address)",
+	"function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)",
+];
 
 const MARKET_ABI = [
-	'function getUniverse() view returns (address)',
-	'function getNumParticipants() view returns (uint256)',
-	'function participants(uint256 index) view returns (address)',
-	'function getInitialReporter() view returns (address)',
-	'function getWinningReportingParticipant() view returns (address)',
-	'function isFinalized() view returns (bool)',
-	'function getEndTime() view returns (uint256)',
-	'function getNumberOfOutcomes() view returns (uint256)',
-	'function getNumTicks() view returns (uint256)',
-]
+	"function getUniverse() view returns (address)",
+	"function getNumParticipants() view returns (uint256)",
+	"function participants(uint256 index) view returns (address)",
+	"function getInitialReporter() view returns (address)",
+	"function getWinningReportingParticipant() view returns (address)",
+	"function isFinalized() view returns (bool)",
+	"function getEndTime() view returns (uint256)",
+	"function getNumberOfOutcomes() view returns (uint256)",
+	"function getNumTicks() view returns (uint256)",
+];
 
 const ERC20_ABI = [
-	'function totalSupply() view returns (uint256)',
-	'function symbol() view returns (string)',
-]
+	"function totalSupply() view returns (uint256)",
+	"function symbol() view returns (string)",
+];
 
 const PARTICIPANT_ABI = [
-	'function getStake() view returns (uint256)',
-	'function getSize() view returns (uint256)',
-	'function getPayoutDistributionHash() view returns (bytes32)',
-	'function getPayoutNumerator(uint256 index) view returns (uint256)',
-]
+	"function getStake() view returns (uint256)",
+	"function getSize() view returns (uint256)",
+	"function getPayoutDistributionHash() view returns (bytes32)",
+	"function getPayoutNumerator(uint256 index) view returns (uint256)",
+];
 
 async function connect(): Promise<ethers.JsonRpcProvider> {
 	for (const rpc of RPCS) {
 		try {
-			const p = new ethers.JsonRpcProvider(rpc, 'mainnet')
-			await p.getBlockNumber()
-			console.log(`✓ RPC: ${rpc}`)
-			return p
+			const p = new ethers.JsonRpcProvider(rpc, "mainnet");
+			await p.getBlockNumber();
+			console.log(`✓ RPC: ${rpc}`);
+			return p;
 		} catch (e) {
-			console.log(`✗ ${rpc}: ${(e as Error).message.slice(0, 80)}`)
+			console.log(`✗ ${rpc}: ${(e as Error).message.slice(0, 80)}`);
 		}
 	}
-	throw new Error('All RPCs failed')
+	throw new Error("All RPCs failed");
 }
 
-async function safeCall<T>(label: string, fn: () => Promise<T>): Promise<T | null> {
+async function safeCall<T>(
+	label: string,
+	fn: () => Promise<T>,
+): Promise<T | null> {
 	try {
-		return await fn()
+		return await fn();
 	} catch (e) {
-		console.log(`    ${label}: reverted (${(e as Error).message.slice(0, 60)})`)
-		return null
+		console.log(
+			`    ${label}: reverted (${(e as Error).message.slice(0, 60)})`,
+		);
+		return null;
 	}
 }
 
-async function describeUniverse(provider: ethers.JsonRpcProvider, address: string, depth = 0) {
-	const prefix = '  '.repeat(depth)
-	const u = new ethers.Contract(address, UNIVERSE_ABI, provider)
-	console.log(`\n${prefix}▶ Universe ${address}`)
+async function describeUniverse(
+	provider: ethers.JsonRpcProvider,
+	address: string,
+	depth = 0,
+) {
+	const prefix = "  ".repeat(depth);
+	const u = new ethers.Contract(address, UNIVERSE_ABI, provider);
+	console.log(`\n${prefix}▶ Universe ${address}`);
 
-	const parent = await safeCall('parent', () => u.getParentUniverse())
-	const isForking = await safeCall('isForking', () => u.isForking())
-	const forkingMarket = await safeCall('forkingMarket', () => u.getForkingMarket())
-	const forkEnd = await safeCall('forkEndTime', () => u.getForkEndTime())
-	const threshold = await safeCall('threshold', () => u.getDisputeThresholdForFork())
-	const repGoal = await safeCall('repGoal', () => u.getForkReputationGoal())
-	const repToken = await safeCall('repToken', () => u.getReputationToken())
+	const parent = await safeCall("parent", () => u.getParentUniverse());
+	const isForking = await safeCall("isForking", () => u.isForking());
+	const forkingMarket = await safeCall("forkingMarket", () =>
+		u.getForkingMarket(),
+	);
+	const forkEnd = await safeCall("forkEndTime", () => u.getForkEndTime());
+	const threshold = await safeCall("threshold", () =>
+		u.getDisputeThresholdForFork(),
+	);
+	const repGoal = await safeCall("repGoal", () => u.getForkReputationGoal());
+	const repToken = await safeCall("repToken", () => u.getReputationToken());
 
-	console.log(`${prefix}  parent:        ${parent ?? '?'}`)
-	console.log(`${prefix}  isForking:     ${isForking}`)
-	console.log(`${prefix}  forkingMarket: ${forkingMarket}`)
+	console.log(`${prefix}  parent:        ${parent ?? "?"}`);
+	console.log(`${prefix}  isForking:     ${isForking}`);
+	console.log(`${prefix}  forkingMarket: ${forkingMarket}`);
 	if (forkEnd !== null && Number(forkEnd) > 0) {
-		console.log(`${prefix}  forkEndTime:   ${new Date(Number(forkEnd) * 1000).toISOString()}`)
+		console.log(
+			`${prefix}  forkEndTime:   ${new Date(Number(forkEnd) * 1000).toISOString()}`,
+		);
 	}
 	if (threshold !== null) {
-		console.log(`${prefix}  threshold:     ${ethers.formatEther(threshold)} REP`)
+		console.log(
+			`${prefix}  threshold:     ${ethers.formatEther(threshold)} REP`,
+		);
 	}
 	if (repGoal !== null) {
-		console.log(`${prefix}  repGoal(>50%): ${ethers.formatEther(repGoal)} REP`)
+		console.log(`${prefix}  repGoal(>50%): ${ethers.formatEther(repGoal)} REP`);
 	}
-	console.log(`${prefix}  repToken:      ${repToken ?? '?'}`)
+	console.log(`${prefix}  repToken:      ${repToken ?? "?"}`);
 	if (repToken && repToken !== ethers.ZeroAddress) {
-		const t = new ethers.Contract(repToken, ERC20_ABI, provider)
-		const supply = await safeCall('repToken.totalSupply', () => t.totalSupply())
+		const t = new ethers.Contract(repToken, ERC20_ABI, provider);
+		const supply = await safeCall("repToken.totalSupply", () =>
+			t.totalSupply(),
+		);
 		if (supply !== null) {
-			console.log(`${prefix}  repSupply:     ${Number(ethers.formatEther(supply)).toLocaleString()} REP`)
+			console.log(
+				`${prefix}  repSupply:     ${Number(ethers.formatEther(supply)).toLocaleString()} REP`,
+			);
 		}
 	}
 
 	// Try to follow to a winning child (only meaningful post-fork)
-	const winner = await safeCall('winningChild', () => u.getWinningChildUniverse())
+	const winner = await safeCall("winningChild", () =>
+		u.getWinningChildUniverse(),
+	);
 	if (winner && winner !== ethers.ZeroAddress) {
-		console.log(`${prefix}  → winningChildUniverse: ${winner}`)
-		await describeUniverse(provider, winner, depth + 1)
+		console.log(`${prefix}  → winningChildUniverse: ${winner}`);
+		await describeUniverse(provider, winner, depth + 1);
 	}
-	return { address, isForking, forkingMarket, threshold, winner }
+	return { address, isForking, forkingMarket, threshold, winner };
 }
 
-async function describeMarket(provider: ethers.JsonRpcProvider, marketAddress: string) {
-	console.log(`\n━━━ Market ${marketAddress} ━━━`)
-	const m = new ethers.Contract(marketAddress, MARKET_ABI, provider)
+async function describeMarket(
+	provider: ethers.JsonRpcProvider,
+	marketAddress: string,
+) {
+	console.log(`\n━━━ Market ${marketAddress} ━━━`);
+	const m = new ethers.Contract(marketAddress, MARKET_ABI, provider);
 
-	const code = await provider.getCode(marketAddress)
-	if (code === '0x') {
-		console.log('  (no contract deployed at this address)')
-		return
+	const code = await provider.getCode(marketAddress);
+	if (code === "0x") {
+		console.log("  (no contract deployed at this address)");
+		return;
 	}
 
-	const universe = await safeCall('universe', () => m.getUniverse())
-	const numParticipants = await safeCall('numParticipants', () => m.getNumParticipants())
-	const numOutcomes = await safeCall('numOutcomes', () => m.getNumberOfOutcomes())
-	const isFinalized = await safeCall('isFinalized', () => m.isFinalized())
-	const endTime = await safeCall('endTime', () => m.getEndTime())
-	const winning = await safeCall('winningParticipant', () => m.getWinningReportingParticipant())
+	const universe = await safeCall("universe", () => m.getUniverse());
+	const numParticipants = await safeCall("numParticipants", () =>
+		m.getNumParticipants(),
+	);
+	const numOutcomes = await safeCall("numOutcomes", () =>
+		m.getNumberOfOutcomes(),
+	);
+	const isFinalized = await safeCall("isFinalized", () => m.isFinalized());
+	const endTime = await safeCall("endTime", () => m.getEndTime());
+	const winning = await safeCall("winningParticipant", () =>
+		m.getWinningReportingParticipant(),
+	);
 
-	console.log(`  universe:          ${universe}`)
-	console.log(`  numOutcomes:       ${numOutcomes}`)
-	console.log(`  numParticipants:   ${numParticipants}`)
-	console.log(`  isFinalized:       ${isFinalized}`)
+	console.log(`  universe:          ${universe}`);
+	console.log(`  numOutcomes:       ${numOutcomes}`);
+	console.log(`  numParticipants:   ${numParticipants}`);
+	console.log(`  isFinalized:       ${isFinalized}`);
 	if (endTime !== null) {
-		console.log(`  endTime:           ${new Date(Number(endTime) * 1000).toISOString()}`)
+		console.log(
+			`  endTime:           ${new Date(Number(endTime) * 1000).toISOString()}`,
+		);
 	}
-	console.log(`  winningParticipant:${winning ?? 'n/a'}`)
+	console.log(`  winningParticipant:${winning ?? "n/a"}`);
 
 	if (universe) {
-		await describeUniverse(provider, universe, 1)
+		await describeUniverse(provider, universe, 1);
 	}
 
-	const numTicks = await safeCall('numTicks', () => m.getNumTicks())
+	const numTicks = await safeCall("numTicks", () => m.getNumTicks());
 	if (universe && numOutcomes !== null && numTicks !== null) {
-		const nOut = Number(numOutcomes)
-		const ticks = BigInt(numTicks)
-		console.log(`\n  Per-outcome child universes (numTicks=${ticks.toString()}):`)
-		const u = new ethers.Contract(universe, UNIVERSE_ABI, provider)
+		const nOut = Number(numOutcomes);
+		const ticks = BigInt(numTicks);
+		console.log(
+			`\n  Per-outcome child universes (numTicks=${ticks.toString()}):`,
+		);
+		const u = new ethers.Contract(universe, UNIVERSE_ABI, provider);
 		for (let k = 0; k < nOut; k++) {
 			const numerators: bigint[] = Array.from({ length: nOut }, (_, i) =>
 				i === k ? ticks : 0n,
-			)
-			const encoded = ethers.solidityPacked(Array(nOut).fill('uint256'), numerators)
-			const hash = ethers.keccak256(encoded)
-			const child = await safeCall(`getChildUniverse(${k})`, () => u.getChildUniverse(hash))
-			const label = `outcome[${k}] payout=[${numerators.join(',')}]`
+			);
+			const encoded = ethers.solidityPacked(
+				Array(nOut).fill("uint256"),
+				numerators,
+			);
+			const hash = ethers.keccak256(encoded);
+			const child = await safeCall(`getChildUniverse(${k})`, () =>
+				u.getChildUniverse(hash),
+			);
+			const label = `outcome[${k}] payout=[${numerators.join(",")}]`;
 			if (!child || child === ethers.ZeroAddress) {
-				console.log(`    ${label} → child: 0x0 (not created)`)
-				continue
+				console.log(`    ${label} → child: 0x0 (not created)`);
+				continue;
 			}
-			console.log(`    ${label} → child: ${child}`)
-			const childU = new ethers.Contract(child, UNIVERSE_ABI, provider)
-			const childRep = await safeCall('  child.repToken', () => childU.getReputationToken())
+			console.log(`    ${label} → child: ${child}`);
+			const childU = new ethers.Contract(child, UNIVERSE_ABI, provider);
+			const childRep = await safeCall("  child.repToken", () =>
+				childU.getReputationToken(),
+			);
 			if (childRep && childRep !== ethers.ZeroAddress) {
-				const t = new ethers.Contract(childRep, ERC20_ABI, provider)
-				const supply = await safeCall('  child.totalSupply', () => t.totalSupply())
+				const t = new ethers.Contract(childRep, ERC20_ABI, provider);
+				const supply = await safeCall("  child.totalSupply", () =>
+					t.totalSupply(),
+				);
 				if (supply !== null) {
-					console.log(`      migrated REP: ${Number(ethers.formatEther(supply)).toLocaleString()}`)
+					console.log(
+						`      migrated REP: ${Number(ethers.formatEther(supply)).toLocaleString()}`,
+					);
 				}
 			}
 		}
 	}
 
-	if (numParticipants === null) return
-	const n = Number(numParticipants)
-	console.log(`\n  Dispute participants (${n}):`)
-	let largestStake = 0n
+	if (numParticipants === null) return;
+	const n = Number(numParticipants);
+	console.log(`\n  Dispute participants (${n}):`);
+	let largestStake = 0n;
 	for (let i = 0; i < n; i++) {
-		const pAddr = await safeCall(`participants(${i})`, () => m.participants(i))
-		if (!pAddr) continue
-		const c = new ethers.Contract(pAddr, PARTICIPANT_ABI, provider)
-		const stake = (await safeCall('getStake', () => c.getStake())) ?? 0n
-		const size = (await safeCall('getSize', () => c.getSize())) ?? 0n
-		const hash = await safeCall('payoutHash', () => c.getPayoutDistributionHash())
-		const nOut = numOutcomes !== null ? Number(numOutcomes) : 0
-		const numerators: string[] = []
+		const pAddr = await safeCall(`participants(${i})`, () => m.participants(i));
+		if (!pAddr) continue;
+		const c = new ethers.Contract(pAddr, PARTICIPANT_ABI, provider);
+		const stake = (await safeCall("getStake", () => c.getStake())) ?? 0n;
+		const size = (await safeCall("getSize", () => c.getSize())) ?? 0n;
+		const hash = await safeCall("payoutHash", () =>
+			c.getPayoutDistributionHash(),
+		);
+		const nOut = numOutcomes !== null ? Number(numOutcomes) : 0;
+		const numerators: string[] = [];
 		for (let k = 0; k < nOut; k++) {
-			const v = await safeCall(`num[${k}]`, () => c.getPayoutNumerator(k))
-			numerators.push(v === null ? '?' : String(v))
+			const v = await safeCall(`num[${k}]`, () => c.getPayoutNumerator(k));
+			numerators.push(v === null ? "?" : String(v));
 		}
-		const stakeRep = Number(ethers.formatEther(stake))
-		if (stake > largestStake) largestStake = stake
+		const stakeRep = Number(ethers.formatEther(stake));
+		if (stake > largestStake) largestStake = stake;
 		console.log(
 			`    [${i}] ${pAddr}  stake=${stakeRep.toLocaleString()} REP  size=${Number(
 				ethers.formatEther(size),
-			).toLocaleString()}  payout=[${numerators.join(',')}]  hash=${String(hash).slice(0, 12)}…`,
-		)
+			).toLocaleString()}  payout=[${numerators.join(",")}]  hash=${String(hash).slice(0, 12)}…`,
+		);
 	}
-	console.log(`\n  ▶ largest participant stake: ${Number(ethers.formatEther(largestStake)).toLocaleString()} REP`)
+	console.log(
+		`\n  ▶ largest participant stake: ${Number(ethers.formatEther(largestStake)).toLocaleString()} REP`,
+	);
 }
 
 async function main() {
-	const markets = process.argv.slice(2).length ? process.argv.slice(2) : DEFAULT_MARKETS
-	const provider = await connect()
-	const block = await provider.getBlockNumber()
-	console.log(`Block: ${block}`)
+	const markets = process.argv.slice(2).length
+		? process.argv.slice(2)
+		: DEFAULT_MARKETS;
+	const provider = await connect();
+	const block = await provider.getBlockNumber();
+	console.log(`Block: ${block}`);
 
-	console.log('\n=============== GENESIS UNIVERSE ===============')
-	await describeUniverse(provider, GENESIS_UNIVERSE)
+	console.log("\n=============== GENESIS UNIVERSE ===============");
+	await describeUniverse(provider, GENESIS_UNIVERSE);
 
 	for (const market of markets) {
-		await describeMarket(provider, market)
+		await describeMarket(provider, market);
 	}
 }
 
 main().catch((e) => {
-	console.error(e)
-	process.exit(1)
-})
+	console.error(e);
+	process.exit(1);
+});
