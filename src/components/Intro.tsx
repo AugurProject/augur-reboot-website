@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CrtDisplay from "./CrtDisplay";
 import Pointer from "./Pointer";
 import TypewriterSequence from "./TypewriterSequence";
@@ -20,13 +20,22 @@ function exitBoot() {
 
 const Intro: React.FC = () => {
 	const [isPoweredOn, setIsPoweredOn] = useState(true);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const clearTimeouts = useCallback(() => {
+		if (timeoutRef.current !== null) {
+			clearTimeout(timeoutRef.current);
+			timeoutRef.current = null;
+		}
+	}, []);
 
 	const handleSequenceComplete = () => {
-		setTimeout(() => {
+		timeoutRef.current = setTimeout(() => {
 			setIsPoweredOn(false);
-			setTimeout(() => {
+			timeoutRef.current = setTimeout(() => {
 				setIsPoweredOn(true);
-				setTimeout(() => {
+				timeoutRef.current = setTimeout(() => {
+					timeoutRef.current = null;
 					exitBoot();
 				}, 500);
 			}, 200);
@@ -34,8 +43,9 @@ const Intro: React.FC = () => {
 	};
 
 	const handleSkipClick = useCallback(() => {
+		clearTimeouts();
 		exitBoot();
-	}, []);
+	}, [clearTimeouts]);
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -48,8 +58,9 @@ const Intro: React.FC = () => {
 
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
+			clearTimeouts();
 		};
-	}, [handleSkipClick]);
+	}, [handleSkipClick, clearTimeouts]);
 
 	return (
 		<div id="crt-overlay">
