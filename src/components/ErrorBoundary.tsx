@@ -1,26 +1,26 @@
-import { Component } from 'react'
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
+import { Component } from "react";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+	children: ReactNode;
+	fallback?: ReactNode;
 }
 
 interface State {
-  hasError: boolean
+	hasError: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false }
+	state: State = { hasError: false };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true }
-  }
+	static getDerivedStateFromError(): State {
+		return { hasError: true };
+	}
 
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback ?? null
-    }
-    return this.props.children
-  }
+	render() {
+		if (this.state.hasError) {
+			return this.props.fallback ?? null;
+		}
+		return this.props.children;
+	}
 }

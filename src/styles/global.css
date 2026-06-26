@@ -61,20 +61,24 @@
 	--animate-gradient-animation: gradient-animation 2s linear infinite;
 
 	@keyframes gradient-animation {
-		0% { background-position: 0% 0% }
-		100% { background-position: 0% 200% }
-    }
+		0% {
+			background-position: 0% 0%;
+		}
+		100% {
+			background-position: 0% 200%;
+		}
+	}
 
-    --animate-wiggle: wiggle 1s ease-in-out infinite;
-    @keyframes wiggle {
-      0%,
-      100% {
-        transform: rotate(-3deg);
-      }
-      50% {
-        transform: rotate(3deg);
-      }
-    }
+	--animate-wiggle: wiggle 1s ease-in-out infinite;
+	@keyframes wiggle {
+		0%,
+		100% {
+			transform: rotate(-3deg);
+		}
+		50% {
+			transform: rotate(3deg);
+		}
+	}
 }
 
 @utility fx-glow {
@@ -267,8 +271,13 @@
 }
 
 @keyframes bob {
-	0%, 100% { transform: translateY(0); }
-	50% { transform: translateY(-5px); }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
 }
 
 @keyframes gradient-animation {
@@ -309,7 +318,6 @@
 	vertical-align: middle;
 }
 
-
 /* rehype-callout plugin: inline callout blocks */
 .prose .callout {
 	display: flex;
@@ -324,7 +332,6 @@
 .prose .callout + .callout {
 	margin-top: -0.25em;
 }
-
 
 .crt {
 	background: linear-gradient(to top, #000000, #000000, #222222, #222222);
@@ -409,7 +416,7 @@
 	position: relative;
 
 	&::before {
-		content: '>';
+		content: ">";
 		opacity: 0;
 		color: var(--color-foreground);
 		display: inline-block;
@@ -423,7 +430,6 @@
 		animation: bounce-horizontal 1s ease-in-out infinite;
 	}
 }
-
 
 /* Scroll indicator */
 @keyframes scroll-indicator-slide {
@@ -449,7 +455,15 @@
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
-	mask-image: linear-gradient(to bottom, transparent 0%, transparent 12%, black 34%, black 66%, transparent 88%, transparent 100%);
+	mask-image: linear-gradient(
+		to bottom,
+		transparent 0%,
+		transparent 12%,
+		black 34%,
+		black 66%,
+		transparent 88%,
+		transparent 100%
+	);
 }
 
 .scroll-indicator-arrow {
@@ -544,13 +558,20 @@ html.boot .grid-tunnel {
 	animation: fade-in-down 0.5s ease-out forwards;
 }
 
-.header-social:nth-child(1) { animation-delay: 0.5s; }
-.header-social:nth-child(2) { animation-delay: 0.7s; }
-.header-social:nth-child(3) { animation-delay: 0.9s; }
+.header-social:nth-child(1) {
+	animation-delay: 0.5s;
+}
+.header-social:nth-child(2) {
+	animation-delay: 0.7s;
+}
+.header-social:nth-child(3) {
+	animation-delay: 0.9s;
+}
 
 /* During boot, suppress all hero/header animations so they fire fresh
    when .boot is removed. */
-html.boot :is(
+html.boot
+:is(
 	.hero-logo,
 	.hero-prediction-market,
 	.hero-line-left,

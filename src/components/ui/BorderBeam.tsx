@@ -1,12 +1,12 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from "react";
 
 interface BorderBeamProps {
-  children: ReactNode;
-  className?: string;
-  duration?: number;       // seconds for one rotation
-  beamWidth?: number;      // px spread of the glow
-  colorFrom?: string;
-  colorTo?: string;
+	children: ReactNode;
+	className?: string;
+	duration?: number; // seconds for one rotation
+	beamWidth?: number; // px spread of the glow
+	colorFrom?: string;
+	colorTo?: string;
 }
 
 /**
@@ -14,24 +14,22 @@ interface BorderBeamProps {
  * Pure CSS – no external animation library required.
  */
 const BorderBeam: React.FC<BorderBeamProps> = ({
-  children,
-  className = '',
-  duration = 3,
-  colorFrom = 'transparent',
-  colorTo = 'var(--color-primary)',
+	children,
+	className = "",
+	duration = 3,
+	colorFrom = "transparent",
+	colorTo = "var(--color-primary)",
 }) => {
-  const style: CSSProperties = {
-    '--beam-duration': `${duration}s`,
-    '--beam-color-from': colorFrom,
-    '--beam-color-to': colorTo,
-  } as CSSProperties;
+	const style: CSSProperties = {
+		"--beam-duration": `${duration}s`,
+		"--beam-color-from": colorFrom,
+		"--beam-color-to": colorTo,
+	} as CSSProperties;
 
-  return (
-    <span className={`border-beam-wrapper ${className}`} style={style}>
-      <span className="border-beam-inner">
-        {children}
-      </span>
-      <style>{`
+	return (
+		<span className={`border-beam-wrapper ${className}`} style={style}>
+			<span className="border-beam-inner">{children}</span>
+			<style>{`
         .border-beam-wrapper {
           position: relative;
           display: inline-block;
@@ -80,8 +78,8 @@ const BorderBeam: React.FC<BorderBeamProps> = ({
           z-index: 1;
         }
       `}</style>
-    </span>
-  );
+		</span>
+	);
 };
 
 export default BorderBeam;

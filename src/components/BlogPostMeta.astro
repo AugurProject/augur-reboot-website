@@ -1,18 +1,18 @@
 ---
 interface Props {
-  author?: string;
-  publishDate: Date;
-  updatedDate?: Date;
+	author?: string;
+	publishDate: Date;
+	updatedDate?: Date;
 }
 
 const { publishDate } = Astro.props;
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date);
+	return new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	}).format(date);
 }
 ---
 

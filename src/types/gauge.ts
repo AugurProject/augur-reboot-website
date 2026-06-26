@@ -1,70 +1,70 @@
 export interface GaugeData {
-	percentage: number
-	repStaked: number
-	activeDisputes: number
+	percentage: number;
+	repStaked: number;
+	activeDisputes: number;
 }
 
 export interface RiskLevel {
-	level: 'No Risk' | 'Low' | 'Moderate' | 'High' | 'Critical' | 'Unknown'
+	level: "No Risk" | "Low" | "Moderate" | "High" | "Critical" | "Unknown";
 }
 
 export interface ForkRiskData {
-	lastRiskChange: string
-	blockNumber?: number
-	riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'critical' | 'unknown'
-	riskPercentage: number | null
+	lastRiskChange: string;
+	blockNumber?: number;
+	riskLevel: "none" | "low" | "moderate" | "high" | "critical" | "unknown";
+	riskPercentage: number | null;
 	metrics: {
-		largestDisputeBond: number
-		forkThresholdPercent: number
-		activeDisputes: number
-		currentRound: number
-		estimatedTotalRounds: number | null
-		roundProgress: number | null
+		largestDisputeBond: number;
+		forkThresholdPercent: number;
+		activeDisputes: number;
+		currentRound: number;
+		estimatedTotalRounds: number | null;
+		roundProgress: number | null;
 		disputeDetails: Array<{
-			marketId: string
-			title: string
-			disputeBondSize: number
-			disputeRound: number
-			estimatedTotalRounds: number | null
-			roundProgress: number | null
-			weeksRemaining: number
-		}>
-	}
+			marketId: string;
+			title: string;
+			disputeBondSize: number;
+			disputeRound: number;
+			estimatedTotalRounds: number | null;
+			roundProgress: number | null;
+			weeksRemaining: number;
+		}>;
+	};
 	rpcInfo?: {
-		endpoint: string | null
-		latency: number | null
-		fallbacksAttempted: number
-	}
+		endpoint: string | null;
+		latency: number | null;
+		fallbacksAttempted: number;
+	};
 	calculation: {
-		forkThreshold: number
-	}
+		forkThreshold: number;
+	};
 	cacheValidation?: {
-		isHealthy: boolean
-		discrepancy?: string
-	}
+		isHealthy: boolean;
+		discrepancy?: string;
+	};
 	forkActive?: {
-		forkingMarket: string
-		forkEndTime: number
-		forkReputationGoal: number
-		universeRepSupply: number
+		forkingMarket: string;
+		forkEndTime: number;
+		forkReputationGoal: number;
+		universeRepSupply: number;
 		outcomes: Array<{
-			index: number
-			label: string
-			childUniverse: string | null
-			migratedRep: number
-		}>
-	}
-	error?: string
+			index: number;
+			label: string;
+			childUniverse: string | null;
+			migratedRep: number;
+		}>;
+	};
+	error?: string;
 }
 
 export interface GaugeDisplayProps {
-	percentage: number
-	riskLevel?: string
-	onPercentageChange?: (percentage: number) => void
+	percentage: number;
+	riskLevel?: string;
+	onPercentageChange?: (percentage: number) => void;
 }
 
 export interface DataPanelsProps {
-	riskLevel: RiskLevel
-	repStaked: number
-	activeDisputes: number
+	riskLevel: RiskLevel;
+	repStaked: number;
+	activeDisputes: number;
 }

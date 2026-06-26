@@ -52,7 +52,12 @@ export const ScrollIndicator = ({ delay = 0 }: ScrollIndicatorProps) => {
 			className={`fixed bottom-6 right-8 z-10 hidden transition-opacity duration-500 md:block ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
 		>
 			<div className="scroll-indicator-portal" aria-hidden="true">
-				<svg className="scroll-indicator-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<svg
+					className="scroll-indicator-arrow"
+					viewBox="0 0 24 24"
+					fill="none"
+					aria-hidden="true"
+				>
 					<path d="M12 4v15" />
 					<path d="m6 13 6 6 6-6" />
 				</svg>

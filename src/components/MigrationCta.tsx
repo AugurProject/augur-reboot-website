@@ -1,17 +1,17 @@
 interface MigrationCtaProps {
-	href?: string
-	eyebrow: string
-	title: string
-	description: string
-	className?: string
+	href?: string;
+	eyebrow: string;
+	title: string;
+	description: string;
+	className?: string;
 }
 
 export default function MigrationCta({
-	href = '/learn/fork/migration/',
+	href = "/learn/fork/migration/",
 	eyebrow,
 	title,
 	description,
-	className = '',
+	className = "",
 }: MigrationCtaProps) {
 	return (
 		<a
@@ -27,5 +27,5 @@ export default function MigrationCta({
 			</div>
 			<div className="text-muted-foreground text-sm mt-1">{description}</div>
 		</a>
-	)
+	);
 }

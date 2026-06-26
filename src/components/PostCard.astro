@@ -1,21 +1,28 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
-  title: string;
-  description: string;
-  date: string;
-  image?: ImageMetadata;
-  featured?: boolean;
-  href?: string;
+	title: string;
+	description: string;
+	date: string;
+	image?: ImageMetadata;
+	featured?: boolean;
+	href?: string;
 }
 
-const { title, description, date, image, featured = false, href = '#' } = Astro.props;
+const {
+	title,
+	description,
+	date,
+	image,
+	featured = false,
+	href = "#",
+} = Astro.props;
 
-const containerClass = `flex flex-col justify-between flex-1 border-t border-foreground/30 p-4 ${featured ? 'md:p-6' : ''}`;
-const titleClass = `text-xl font-display font-bold mb-2 uppercase ${featured ? 'md:text-2xl' : ''}`;
-const descClass = `tracking-prose text-sm leading-tight text-muted-foreground line-clamp-2 mb-4 ${featured ? 'md:text-[1rem]' : ''}`;
+const containerClass = `flex flex-col justify-between flex-1 border-t border-foreground/30 p-4 ${featured ? "md:p-6" : ""}`;
+const titleClass = `text-xl font-display font-bold mb-2 uppercase ${featured ? "md:text-2xl" : ""}`;
+const descClass = `tracking-prose text-sm leading-tight text-muted-foreground line-clamp-2 mb-4 ${featured ? "md:text-[1rem]" : ""}`;
 ---
 
 <article class="group flex flex-col border border-foreground/30 bg-background/70 relative overflow-visible transition-all hover:shadow-xl shadow-foreground/10">

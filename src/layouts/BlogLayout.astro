@@ -1,29 +1,38 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Footer from "../components/Footer.astro";
 import BlogNavigation from "../components/BlogNavigation.tsx";
 import BlogPostMeta from "../components/BlogPostMeta.astro";
+import Footer from "../components/Footer.astro";
 import PageHeader from "../components/PageHeader.tsx";
 import PageTitle from "../components/PageTitle.astro";
+import Layout from "../layouts/Layout.astro";
 
 interface Post {
-  title: string;
-  path: string;
+	title: string;
+	path: string;
 }
 
 interface Props {
-  title: string;
-  description?: string;
-  author: string;
-  publishDate: Date;
-  updatedDate?: Date;
-  ogImage?: string;
-  postUrl?: string;
-  prevPost?: Post;
-  nextPost?: Post;
+	title: string;
+	description?: string;
+	author: string;
+	publishDate: Date;
+	updatedDate?: Date;
+	ogImage?: string;
+	postUrl?: string;
+	prevPost?: Post;
+	nextPost?: Post;
 }
 
-const { title, description, author, publishDate, updatedDate, ogImage, prevPost, nextPost } = Astro.props;
+const {
+	title,
+	description,
+	author,
+	publishDate,
+	updatedDate,
+	ogImage,
+	prevPost,
+	nextPost,
+} = Astro.props;
 ---
 
 <Layout

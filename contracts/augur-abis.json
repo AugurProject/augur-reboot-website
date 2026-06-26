@@ -112,7 +112,11 @@
 					{ "indexed": true, "name": "universe", "type": "address" },
 					{ "indexed": true, "name": "reporter", "type": "address" },
 					{ "indexed": true, "name": "market", "type": "address" },
-					{ "indexed": false, "name": "disputeCrowdsourcer", "type": "address" },
+					{
+						"indexed": false,
+						"name": "disputeCrowdsourcer",
+						"type": "address"
+					},
 					{ "indexed": false, "name": "amountStaked", "type": "uint256" },
 					{ "indexed": false, "name": "description", "type": "string" },
 					{ "indexed": false, "name": "payoutNumerators", "type": "uint256[]" },
@@ -129,13 +133,29 @@
 				"inputs": [
 					{ "indexed": true, "name": "universe", "type": "address" },
 					{ "indexed": true, "name": "market", "type": "address" },
-					{ "indexed": false, "name": "disputeCrowdsourcer", "type": "address" },
+					{
+						"indexed": false,
+						"name": "disputeCrowdsourcer",
+						"type": "address"
+					},
 					{ "indexed": false, "name": "payoutNumerators", "type": "uint256[]" },
-					{ "indexed": false, "name": "nextWindowStartTime", "type": "uint256" },
+					{
+						"indexed": false,
+						"name": "nextWindowStartTime",
+						"type": "uint256"
+					},
 					{ "indexed": false, "name": "nextWindowEndTime", "type": "uint256" },
 					{ "indexed": false, "name": "pacingOn", "type": "bool" },
-					{ "indexed": false, "name": "totalRepStakedInPayout", "type": "uint256" },
-					{ "indexed": false, "name": "totalRepStakedInMarket", "type": "uint256" },
+					{
+						"indexed": false,
+						"name": "totalRepStakedInPayout",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"name": "totalRepStakedInMarket",
+						"type": "uint256"
+					},
 					{ "indexed": false, "name": "disputeRound", "type": "uint256" },
 					{ "indexed": false, "name": "timestamp", "type": "uint256" }
 				],

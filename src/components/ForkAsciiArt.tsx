@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils"
-import type { HTMLAttributes } from "react"
+import type { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-type ForkAsciiArtProps = HTMLAttributes<HTMLPreElement>
+type ForkAsciiArtProps = HTMLAttributes<HTMLPreElement>;
 
 export const ForkAsciiArt = ({ className, ...props }: ForkAsciiArtProps) => {
-  const asciiArt = `
+	const asciiArt = `
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -37,12 +37,17 @@ export const ForkAsciiArt = ({ className, ...props }: ForkAsciiArtProps) => {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-`
+`;
 
-  return (
-    <pre
-      className={cn('text-[clamp(0.2rem,100%,0.25rem)] leading-tight tracking-[-0.025em]', className)} {...props}>
-      {asciiArt}
-    </pre>
-  )
-}
+	return (
+		<pre
+			className={cn(
+				"text-[clamp(0.2rem,100%,0.25rem)] leading-tight tracking-[-0.025em]",
+				className,
+			)}
+			{...props}
+		>
+			{asciiArt}
+		</pre>
+	);
+};

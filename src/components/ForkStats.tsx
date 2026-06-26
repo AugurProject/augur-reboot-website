@@ -1,22 +1,29 @@
-import type React from 'react'
-import { useForkData } from '../providers/ForkDataProvider'
+import type React from "react";
+import { useForkData } from "../providers/ForkDataProvider";
 
 export const ForkStats = (): React.JSX.Element => {
-	const { rawData, riskLevel } = useForkData()
+	const { rawData, riskLevel } = useForkData();
 
-	const isStable = rawData.metrics.largestDisputeBond === 0
-	const largestDispute = rawData.metrics.disputeDetails?.length > 0
-		? rawData.metrics.disputeDetails.reduce((largest, current) =>
-				current.disputeBondSize > largest.disputeBondSize ? current : largest
-			)
-		: null
+	const isStable = rawData.metrics.largestDisputeBond === 0;
+	const largestDispute =
+		rawData.metrics.disputeDetails?.length > 0
+			? rawData.metrics.disputeDetails.reduce((largest, current) =>
+					current.disputeBondSize > largest.disputeBondSize ? current : largest,
+				)
+			: null;
 
-	const riskLabel = riskLevel.level === 'No Risk' ? 'NONE' : riskLevel.level === 'Unknown' ? 'PROJECTION UNAVAILABLE' : riskLevel.level.toUpperCase()
-	const roundDisplay = rawData.metrics.roundProgress === null
-		? `${rawData.metrics.currentRound}/?`
-		: rawData.metrics.estimatedTotalRounds
-			? `${rawData.metrics.currentRound}/~${rawData.metrics.estimatedTotalRounds}`
-			: `${rawData.metrics.currentRound}`
+	const riskLabel =
+		riskLevel.level === "No Risk"
+			? "NONE"
+			: riskLevel.level === "Unknown"
+				? "PROJECTION UNAVAILABLE"
+				: riskLevel.level.toUpperCase();
+	const roundDisplay =
+		rawData.metrics.roundProgress === null
+			? `${rawData.metrics.currentRound}/?`
+			: rawData.metrics.estimatedTotalRounds
+				? `${rawData.metrics.currentRound}/~${rawData.metrics.estimatedTotalRounds}`
+				: `${rawData.metrics.currentRound}`;
 
 	return (
 		<div className="w-full mb-1">
@@ -47,7 +54,8 @@ export const ForkStats = (): React.JSX.Element => {
 							className="uppercase text-primary fx-glow-sm"
 							title={`${rawData.metrics.largestDisputeBond.toLocaleString(undefined, { maximumFractionDigits: 3 })} REP`}
 						>
-							~{Math.round(rawData.metrics.largestDisputeBond).toLocaleString()} REP
+							~{Math.round(rawData.metrics.largestDisputeBond).toLocaleString()}{" "}
+							REP
 						</div>
 					</div>
 
@@ -78,5 +86,5 @@ export const ForkStats = (): React.JSX.Element => {
 				</div>
 			)}
 		</div>
-	)
-}
+	);
+};
