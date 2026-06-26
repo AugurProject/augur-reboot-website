@@ -9,7 +9,7 @@ interface ForkMonitorProps {
 }
 
 export const ForkMonitor: React.FC<ForkMonitorProps> = ({
-	animated: _animated = true,
+	animated = true,
 }) => {
 	return (
 		<ErrorBoundary
@@ -19,7 +19,7 @@ export const ForkMonitor: React.FC<ForkMonitorProps> = ({
 		>
 			<ForkDataProvider>
 				<ForkMockProvider>
-					<ForkDisplay />
+					<ForkDisplay animated={animated} />
 				</ForkMockProvider>
 			</ForkDataProvider>
 		</ErrorBoundary>

@@ -25,7 +25,11 @@ function formatRelativeTime(isoTimestamp: string): string {
 	return date.toLocaleDateString();
 }
 
-const ForkDisplay: React.FC = () => {
+interface ForkDisplayProps {
+	animated?: boolean;
+}
+
+const ForkDisplay: React.FC<ForkDisplayProps> = ({ animated = true }) => {
 	const { gaugeData, riskLevel, lastUpdated, isLoading, error, rawData } =
 		useForkData();
 	const isForking = rawData.metrics.disputeDetails[0]?.marketId === "FORKING";
@@ -51,6 +55,7 @@ const ForkDisplay: React.FC = () => {
 								<ForkGauge
 									percentage={gaugeData.percentage}
 									riskLevel={riskLevel.level.toLowerCase()}
+									animated={animated}
 								/>
 							}
 						/>
