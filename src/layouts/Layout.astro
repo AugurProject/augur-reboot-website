@@ -3,7 +3,6 @@ import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import PerspectiveGridTunnel from "../components/PerspectiveGridTunnel.tsx";
 import GoogleAnalytics from "../components/GoogleAnalytics.astro";
-import { withBase } from "../lib/utils";
 
 interface Props {
 	title: string;
@@ -82,8 +81,8 @@ const {
 		<meta name="application-name" content="Augur" />
 
 		<!-- Icons and manifest -->
-		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
-		<link rel="apple-touch-icon" href={withBase('/favicon.svg')} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/favicon.svg" />
 
 		<!-- DNS prefetch for external resources -->
 		<link rel="dns-prefetch" href="//github.com" />

@@ -6,7 +6,6 @@ import { ScrollIndicator } from '@/components/ScrollIndicator';
 import BorderBeam from '@/components/ui/BorderBeam';
 import { SirenIcon } from '@phosphor-icons/react';
 import { AugurLogo } from '@/components/icons';
-import { withBase } from '@/lib/utils';
 
 const ASCII_ART = `██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
 ██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝
@@ -57,13 +56,13 @@ const HeroBanner: React.FC = () => {
           <div className="flex flex-col place-items-center text-left w-full max-w-3xl mx-auto mb-3">
             <a
               ref={menuItem1Ref}
-              href={withBase('/mission')}
+              href="/mission"
               className="hero-menu-1 menu-link font-display text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none uppercase"
             >
               THE NEXT GENERATION OF ORACLES
             </a>
             <a
-              href={withBase('/team')}
+              href="/team"
               className="hero-menu-2 menu-link font-display text-xl sm:text-3xl font-bold text-foreground hover:text-loud-foreground focus:text-loud-foreground block hover:fx-glow focus:fx-glow focus:outline-none uppercase"
             >
               THE MINDS BEHIND THE REBOOT
@@ -75,7 +74,7 @@ const HeroBanner: React.FC = () => {
             <div className="animate-[bob_2s_ease-in-out_infinite]">
               <BorderBeam duration={2.5}>
                 <a
-                  href={withBase('/faq')}
+                  href="/faq"
                   className="font-display bg-foreground/5 tracking-wide flex items-center px-4 py-2 sm:text-xl font-semibold text-loud-foreground uppercase shadow-[0_0_10px_oklch(from_var(--color-foreground)_l_c_h/_0.4)] hover:fx-glow-sm focus:fx-glow-sm focus:outline-none whitespace-nowrap"
                 >
                   <SirenIcon className="w-6 h-6 border-muted-foreground/80 rounded-full p-1 mr-3" />

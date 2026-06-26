@@ -6,7 +6,6 @@ import Footer from '../../components/Footer.astro';
 import PageHeader from '../../components/PageHeader.tsx';
 import PageTitle from '../../components/PageTitle.astro';
 import BlogPostCard from '../../components/BlogPostCard.astro';
-import { withBase } from '../../lib/utils';
 
 // Import featured images from all blog posts
 const images: Record<string, { default: ImageMetadata }> = import.meta.glob(
@@ -38,7 +37,7 @@ const sortedPosts = blogPosts.sort(
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
     {/* Top Section: Navigation */}
-    <PageHeader client:load backHref={withBase('/')} />
+    <PageHeader client:load backHref="/" />
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 mb-12">

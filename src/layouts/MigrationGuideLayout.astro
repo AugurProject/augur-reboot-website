@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Footer from "../components/Footer.astro";
 import LearnNavigation from "../components/LearnNavigation.tsx";
 import PageHeader from "../components/PageHeader.tsx";
-import { withBase } from "../lib/utils";
+
 
 interface Props {
 	title: string;
@@ -33,7 +33,7 @@ const currentPath = Astro.url.pathname;
 	ogType="article"
 >
 	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
-		<PageHeader client:load backHref={withBase("/")} />
+		<PageHeader client:load backHref="/" />
 
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
 			<div class="max-w-3xl mx-auto">
