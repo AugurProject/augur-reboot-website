@@ -44,15 +44,15 @@ const sortedPosts = blogPosts.sort(
 
     {/* Middle Section: Scrollable Content */}
     <main class="overflow-y-auto px-4 md:px-8 mb-12">
-      <div class="max-w-screen-lg mx-auto">
+      <div class="max-w-5xl mx-auto pt-8 md:pt-12">
         <PageTitle prefix="BLOG" title="THE AUGUR ARC" />
 
-        <p class="text-sm tracking-prose text-center mb-12 max-w-2xl mx-auto text-foreground">
+        <p class="text-sm tracking-prose text-center mb-12 md:mb-16 max-w-2xl mx-auto text-foreground">
           News, updates, and progress from the Augur reboot. Follow our journey as we rebuild decentralized prediction markets.
         </p>
 
         {/* Blog Posts Grid */}
-        <div class="grid grid-cols-1 gap-6 max-w-3xl mx-auto">
+        <div class="grid grid-cols-1 gap-y-12 lg:gap-y-8 mx-auto">
           {sortedPosts.map((post) => (
             <BlogPostCard
               title={post.data.title}
