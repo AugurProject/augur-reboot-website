@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import CrtDisplay from "./CrtDisplay";
-import Pointer from "./Pointer";
-import TypewriterSequence from "./TypewriterSequence";
-import Button from "./ui/Button";
+import Pointer from "@/components/ui/pointer";
+import Button from "@/components/ui/button";
+import CrtDisplay from "./crt-display";
+import TypewriterSequence from "./typewriter-sequence";
 
 const bootSentences: string[] = [
 	"", // Start with a blank line for the "warm-up"

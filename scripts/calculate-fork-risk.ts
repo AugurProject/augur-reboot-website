@@ -217,7 +217,7 @@ async function retryContractCall<T>(
 async function loadContracts(
 	provider: ethers.JsonRpcProvider,
 ): Promise<Record<string, ethers.Contract>> {
-	const abiPath = path.join(__dirname, "../contracts/augur-abis.json");
+	const abiPath = path.join(__dirname, "augur-contracts.json");
 	const abiData = await fs.readFile(abiPath, "utf8");
 	const abis = JSON.parse(abiData);
 

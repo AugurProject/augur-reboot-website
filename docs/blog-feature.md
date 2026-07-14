@@ -81,7 +81,7 @@ After the frontmatter, write your post in Markdown/MDX:
 ```
 
 **MDX Features:**
-- Import React components: `import MyComponent from '@/components/MyComponent'`
+- Import a component from its feature or shared-component path when needed, for example `import MyComponent from '@/features/<feature>/my-component'`
 - Use JSX: `<MyComponent prop="value" />`
 - Code blocks with syntax highlighting
 - Relative image paths for inline images
@@ -182,7 +182,7 @@ publishDate: 2026-01-20
 tags: ["technical", "protocol"]
 ---
 
-import { CodeBlock } from '@/components/CodeBlock'
+import { CodeBlock } from '@/features/<feature>/code-block'
 
 # Technical Deep Dive
 
@@ -262,11 +262,11 @@ src/
 │           └── featured-image.webp
 ├── layouts/
 │   └── BlogLayout.astro
-├── components/
-│   ├── BlogNavigation.tsx
-│   ├── BlogPostCard.astro
-│   ├── BlogPostMeta.astro
-│   └── SocialShareButtons.astro
+├── features/
+│   └── blog/
+│       ├── navigation.tsx
+│       ├── post-card.astro
+│       └── post-meta.astro
 ├── pages/
 │   └── blog/
 │       ├── index.astro (blog listing)
@@ -370,7 +370,7 @@ The featured image is automatically optimized for Open Graph meta tags at build 
 
 #### BlogPostCard Component
 
-`src/components/BlogPostCard.astro` accepts an optional `featuredImage` prop:
+`src/features/blog/post-card.astro` accepts an optional `featuredImage` prop:
 
 ```astro
 interface Props {

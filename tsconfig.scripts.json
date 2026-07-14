@@ -11,6 +11,6 @@
 		"strict": true,
 		"forceConsistentCasingInFileNames": true
 	},
-	"include": ["scripts/**/*", "contracts/**/*"],
+	"include": ["scripts/**/*"],
 	"exclude": ["src", "dist"]
 }

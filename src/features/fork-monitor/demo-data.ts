@@ -1,4 +1,4 @@
-import type { ForkRiskData } from "../types/gauge";
+import type { ForkRiskData } from "./types";
 
 type ForkRiskLevel = ForkRiskData["riskLevel"];
 

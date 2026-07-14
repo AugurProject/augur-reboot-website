@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Typewriter from "./Typewriter";
+import Typewriter from "./typewriter";
 
 interface Segment {
 	value: string;

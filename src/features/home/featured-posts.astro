@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 import type { ImageMetadata } from "astro";
-import { BlogCTA } from "./BlogCTA";
-import PostCard from "./PostCard.astro";
+import { BlogCTA } from "./blog-cta";
+import PostCard from "./post-card.astro";
 
 const images = import.meta.glob("/src/content/blog/*/featured-image.webp", {
 	eager: true,

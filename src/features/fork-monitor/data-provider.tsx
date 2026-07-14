@@ -7,7 +7,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import type { ForkRiskData, GaugeData, RiskLevel } from "../types/gauge";
+import type { ForkRiskData, GaugeData, RiskLevel } from "./types";
 
 interface ForkDataContextValue {
 	gaugeData: GaugeData;

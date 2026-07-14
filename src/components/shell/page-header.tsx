@@ -1,5 +1,5 @@
-import { DiscordIcon, GithubIcon, XIcon } from "./icons";
-import Pointer from "./Pointer";
+import { DiscordIcon, GithubIcon, XIcon } from "../ui/icons";
+import Pointer from "../ui/pointer";
 
 interface PageHeaderProps {
 	backHref?: string;

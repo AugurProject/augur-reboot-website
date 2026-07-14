@@ -1,8 +1,8 @@
 import type React from "react";
-import { ForkDataProvider } from "../providers/ForkDataProvider";
-import { ForkMockProvider } from "../providers/ForkMockProvider";
-import { ErrorBoundary } from "./ErrorBoundary";
-import ForkDisplay from "./ForkDisplay";
+import { ForkDataProvider } from "./data-provider";
+import { ErrorBoundary } from "./error-boundary";
+import ForkDisplay from "./display";
+import { ForkMockProvider } from "./mock-provider";
 
 interface ForkMonitorProps {
 	animated?: boolean;

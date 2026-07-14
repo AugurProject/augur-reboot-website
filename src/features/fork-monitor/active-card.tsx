@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { cn } from "../lib/utils";
-import { useForkData } from "../providers/ForkDataProvider";
-import Button from "./ui/Button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { cn } from "@/lib/utils";
+import Button from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useForkData } from "./data-provider";
 
 const TOTAL_SUPPLY = 11_000_000;
 
