@@ -10,7 +10,7 @@
  * Ad-hoc / read-only. No cache writes, no JSON outputs.
  *
  * Usage:
- *   bun scripts/probe-fork-state.ts [marketAddress ...]
+ *   node --experimental-strip-types scripts/probe-fork-state.ts [marketAddress ...]
  * Default market: 0x963eed85778cc23e2d4636cd4f29eecdf9827e9e (Artemis II, per blog).
  */
 

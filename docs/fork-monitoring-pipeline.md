@@ -146,8 +146,9 @@ Top-level group for the entire workflow. Prevents:
 | Calculation script | `scripts/calculate-fork-risk.ts` |
 | Diagnostic probe | `scripts/probe-fork-state.ts` |
 | Seed file | `public/data/dispute-markets-seed.json` |
-| Data provider | `src/providers/ForkDataProvider.tsx` |
-| Gauge display | `src/components/ForkGauge.tsx` |
+| Contract configuration | `scripts/augur-contracts.json` |
+| Data provider | `src/features/fork-monitor/data-provider.tsx` |
+| Gauge display | `src/features/fork-monitor/gauge.tsx` |
 
 ---
 

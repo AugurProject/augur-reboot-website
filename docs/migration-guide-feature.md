@@ -17,8 +17,8 @@ The migration guide lives at `/learn/fork/migration/` and uses a dedicated **Mig
 |-----------|----------|
 | Content (MDX) | `src/content/learn/fork/migration.mdx` |
 | Layout | `src/layouts/MigrationGuideLayout.astro` |
-| Step images | `src/assets/migration/step-01.png` through `step-06.png` |
-| CTA component | `src/components/MigrationCta.tsx` |
+| Step images | `src/assets/learn/migration/step-01.png` through `step-06.png` |
+| CTA component | `src/features/learn/migration-cta.tsx` |
 | Route handler | `src/pages/learn/[...slug].astro` (conditional layout switch) |
 
 ## Layout Selection
@@ -47,7 +47,7 @@ A dedicated layout distinct from [[technical-architecture]]'s standard LearnLayo
 
 ## MigrationCta Component
 
-`src/components/MigrationCta.tsx` — a reusable red-bordered CTA block that links to `/learn/fork/migration/` by default. Props:
+`src/features/learn/migration-cta.tsx` — a reusable red-bordered CTA block that links to `/learn/fork/migration/` by default. Props:
 
 | Prop | Type | Default | Purpose |
 |------|------|---------|---------|

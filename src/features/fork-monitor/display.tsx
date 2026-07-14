@@ -1,10 +1,10 @@
 import type React from "react";
-import { useForkData } from "../providers/ForkDataProvider";
-import { ForkActiveCard } from "./ForkActiveCard";
-import { ForkControls } from "./ForkControls";
-import { ForkDetailsCard } from "./ForkDetailsCard";
-import { ForkGauge } from "./ForkGauge";
-import { ForkStats } from "./ForkStats";
+import { useForkData } from "./data-provider";
+import { ForkActiveCard } from "./active-card";
+import { ForkControls } from "./controls";
+import { ForkDetailsCard } from "./details-card";
+import { ForkGauge } from "./gauge";
+import { ForkStats } from "./stats";
 
 // Helper function to format timestamps as relative time
 function formatRelativeTime(isoTimestamp: string): string {

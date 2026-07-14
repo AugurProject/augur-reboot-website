@@ -21,34 +21,29 @@ The site is built with:
 
 ```
 Layout.astro (Base HTML shell — toggles html.boot class for CSS-driven intro)
-├── PageHeader.tsx / Footer.astro (navigation chrome)
+├── components/shell/page-header.tsx + footer.astro (navigation chrome)
 ├── Pages
 │   ├── index.astro (Homepage)
-│   │   ├── Intro.tsx (client:load — CRT boot overlay, removes html.boot on complete)
-│   │   ├── HeroBanner.tsx (client:load — CSS-animated entrance via .hero-* classes)
-│   │   │   ├── PerspectiveGridTunnel.tsx (client:load)
-│   │   │   ├── PageHeader.tsx (social links + back nav)
-│   │   │   └── ForkMonitor.tsx (client:load — Fork Gauge island)
-│   │   │       ├── ForkDataProvider.tsx (data fetching)
-│   │   │       ├── ForkGauge.tsx (SVG visualization)
-│   │   │       ├── ForkStats.tsx (progressive disclosure)
-│   │   │       ├── ForkDisplay.tsx (layout)
-│   │   │       ├── ForkDetailsCard.tsx (dialog with expanded metrics + ForkAsciiArt)
-│   │   │       └── ForkControls.tsx (demo mode, F2 toggle)
-│   │   └── FeaturedBlogs.astro
-│   │       └── BlogPostCard.astro
-│   ├── blog/index.astro → BlogPostCard.astro
+│   │   ├── features/home/intro.tsx (client:load — CRT boot overlay, removes html.boot on complete)
+│   │   ├── features/home/hero-banner.tsx (client:load — CSS-animated entrance)
+│   │   │   └── features/fork-monitor/monitor.tsx (client:load — Fork Gauge island)
+│   │   │       ├── data-provider.tsx (data fetching)
+│   │   │       ├── gauge.tsx (SVG visualization)
+│   │   │       ├── stats.tsx (progressive disclosure)
+│   │   │       ├── display.tsx (layout)
+│   │   │       ├── details-card.tsx (expanded metrics + ascii-art)
+│   │   │       └── controls.tsx (demo mode, F2 toggle)
+│   │   └── features/home/featured-posts.astro → post-card.astro
+│   ├── blog/index.astro → features/blog/post-card.astro
 │   ├── blog/[...slug].astro → BlogLayout.astro
-│   │   ├── BlogPostMeta.astro
-│   │   ├── BlogNavigation.tsx (client:load)
-│   │   ├── BlogCTA.tsx (client:load)
-│   │   └── SocialShareButtons.astro
+│   │   ├── features/blog/post-meta.astro
+│   │   └── features/blog/navigation.tsx (client:load)
 │   ├── learn/[...slug].astro → LearnLayout.astro or MigrationGuideLayout.astro
-│   │   ├── ProseCard.astro
-│   │   ├── MigrationCta.tsx (fork/migration CTA block)
-│   │   └── LearnNavigation.tsx (client:load)
-│   ├── mission.astro → TimelineSection.astro
-│   └── team.astro → TeamCard.astro
+│   │   ├── components/content/prose-card.astro
+│   │   ├── features/learn/migration-cta.tsx
+│   │   └── features/learn/navigation.tsx (client:load)
+│   ├── mission.astro → features/mission/timeline-section.astro
+│   └── team.astro → features/team/card.astro
 ```
 
 ## State Management
@@ -62,8 +57,8 @@ The hero/intro animation sequence is CSS-driven — no JavaScript state machine.
 When `.boot` is present, the CRT overlay (`#crt-overlay`) is shown and all hero entrance animations are suppressed via `html.boot .hero-* { animation: none; opacity: 0 }`. When **Intro.tsx** completes (or skip is pressed), it removes `.boot`, which triggers all CSS `animation` declarations from delay 0.
 
 ### React Context (Island-scoped)
-- `ForkDataProvider.tsx` — provides fork risk data to the gauge island
-- `ForkMockProvider.tsx` — demo mode data override
+- `features/fork-monitor/data-provider.tsx` — provides fork risk data to the gauge island
+- `features/fork-monitor/mock-provider.tsx` — demo mode data override
 
 ### Data Flow
 
@@ -111,17 +106,16 @@ Risk level colors for ForkGauge:
 
 ```
 src/
-├── assets/           # Bundled images (migration step screenshots)
-├── components/       # Astro + React components
+├── assets/learn/     # Bundled learn-content images
+├── components/       # Cross-feature shell, content, and UI components
 ├── content/          # MDX content collections (blog, learn)
+├── features/         # Route/domain-owned UI and state
 ├── layouts/          # Layout.astro, BlogLayout.astro, LearnLayout.astro, MigrationGuideLayout.astro
 ├── lib/              # Shared utilities
 ├── pages/            # Astro file-based routing
-├── providers/        # React context providers
 ├── styles/           # global.css (single source of truth for theme)
-├── types/            # TypeScript type definitions
-└── utils/            # Helper functions
-scripts/              # Node.js scripts (fork monitor calculation)
+└── env.d.ts
+scripts/              # Node.js fork-monitor scripts and contract configuration
 docs/                 # Project documentation
 public/               # Static assets (fonts, images, data)
 ```

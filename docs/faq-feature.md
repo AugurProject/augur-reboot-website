@@ -59,13 +59,13 @@ The FAQ page is linked from two places on the landing page:
 
 1. **`MigrationCta.tsx`** — a red-bordered CTA block that links to `/learn/fork/migration/` (the migration guide). This is rendered in the FAQ page itself as an inline call-to-action.
 
-2. **`src/components/Footer.astro`** — FAQ link in the `>_ KB` section.
+2. **`src/components/shell/footer.astro`** — FAQ link in the `>_ KB` section.
 
 The hero no longer contains a direct FAQ link. The original urgent hero item (`THE FORK IS HERE! OWN REP? ACT NOW.`) was removed when the hero was refactored to CSS-driven animation. The migration guide in `learn/fork/migration/` now serves as the primary entry point for fork/migration content.
 
 ## Footer Integration
 
-`src/components/Footer.astro` — FAQ link added to `>_ KB` section as the **first item**, above the Augur Whitepaper link:
+`src/components/shell/footer.astro` — FAQ link added to `>_ KB` section as the **first item**, above the Augur Whitepaper link:
 
 ```
 FORK & MIGRATION FAQ → /faq

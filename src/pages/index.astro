@@ -1,8 +1,8 @@
 ---
-import FeaturedBlogs from "../components/FeaturedBlogs.astro";
-import Footer from "../components/Footer.astro";
-import HeroBanner from "../components/HeroBanner.tsx";
-import Intro from "../components/Intro.tsx";
+import FeaturedPosts from "../features/home/featured-posts.astro";
+import HeroBanner from "../features/home/hero-banner.tsx";
+import Intro from "../features/home/intro.tsx";
+import Footer from "../components/shell/footer.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
@@ -28,6 +28,6 @@ import Layout from "../layouts/Layout.astro";
 >
   <Intro client:load />
   <HeroBanner client:load />
-  <FeaturedBlogs />
+  <FeaturedPosts />
   <Footer />
 </Layout>

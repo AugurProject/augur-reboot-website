@@ -1,5 +1,5 @@
 import type React from "react";
-import { useForkData } from "../providers/ForkDataProvider";
+import { useForkData } from "./data-provider";
 
 export const ForkStats = (): React.JSX.Element => {
 	const { rawData, riskLevel } = useForkData();

@@ -1,11 +1,11 @@
 import { SirenIcon } from "@phosphor-icons/react";
 import { useEffect, useRef } from "react";
-import AsciiText from "@/components/AsciiText";
-import { ForkMonitor } from "@/components/ForkMonitor";
-import { AugurLogo } from "@/components/icons";
-import PageHeader from "@/components/PageHeader";
-import { ScrollIndicator } from "@/components/ScrollIndicator";
-import BorderBeam from "@/components/ui/BorderBeam";
+import AsciiText from "@/components/ui/ascii-text";
+import { AugurLogo } from "@/components/ui/icons";
+import PageHeader from "@/components/shell/page-header";
+import BorderBeam from "@/components/ui/border-beam";
+import { ForkMonitor } from "@/features/fork-monitor/monitor";
+import { ScrollIndicator } from "./scroll-indicator";
 
 const ASCII_ART = `██╗ ███████╗     ██████╗  ███████╗ ██████╗   ██████╗   ██████╗  ████████╗ ██╗ ███╗   ██╗  ██████╗
 ██║ ██╔════╝     ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔═══██╗ ██╔═══██╗ ╚══██╔══╝ ██║ ████╗  ██║ ██╔════╝

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { cn } from "../lib/utils";
-import type { GaugeDisplayProps } from "../types/gauge";
+import { cn } from "@/lib/utils";
+import type { GaugeDisplayProps } from "./types";
 
 /**
  * Calculate arc path endpoint for a given fill percentage (0-100).

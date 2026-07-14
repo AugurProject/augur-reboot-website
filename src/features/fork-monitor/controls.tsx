@@ -1,8 +1,8 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { useForkMock } from "../providers/ForkMockProvider";
-import { DisputeBondScenario } from "../utils/demoDataGenerator";
+import { DisputeBondScenario } from "./demo-data";
+import { useForkMock } from "./mock-provider";
 
 export const ForkControls = (): React.JSX.Element | null => {
 	const { isDemo, isDemoAvailable, generateScenario, resetToLive } =

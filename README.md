@@ -19,17 +19,18 @@ The site is an Astro + React frontend for Augur reboot content, blog/learn pages
 
 ```text
 src/
-├── components/          # Astro + React UI components
+├── assets/learn/        # Bundled learn-content images
+├── components/          # Cross-feature shell, content, and UI components
 ├── content/             # Blog and Learn content collections
+├── features/            # Route/domain-owned UI and state
 ├── layouts/             # Page/content layouts
 ├── lib/                 # Shared utilities and rehype plugins
 ├── pages/               # Astro routes
-├── providers/           # React context providers for fork monitor data/demo state
 ├── styles/              # Tailwind v4 CSS-first global stylesheet
-├── types/               # Shared TypeScript types
-└── utils/               # Client-side helpers and demo data
+└── env.d.ts
 
 scripts/
+├── augur-contracts.json
 ├── calculate-fork-risk.ts
 └── probe-fork-state.ts
 

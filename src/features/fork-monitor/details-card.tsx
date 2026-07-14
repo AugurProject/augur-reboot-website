@@ -1,9 +1,9 @@
 import { type HTMLAttributes, useState } from "react";
-import { cn } from "../lib/utils";
-import { useForkData } from "../providers/ForkDataProvider";
-import { ForkAsciiArt } from "./ForkAsciiArt";
-import Button from "./ui/Button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { cn } from "@/lib/utils";
+import Button from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useForkData } from "./data-provider";
+import { ForkAsciiArt } from "./ascii-art";
 
 interface ForkDetailsCardProps {
 	gauge: React.ReactNode;

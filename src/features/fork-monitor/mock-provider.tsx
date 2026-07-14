@@ -1,11 +1,11 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useState } from "react";
-import type { ForkRiskData } from "../types/gauge";
+import type { ForkRiskData } from "./types";
 import {
 	DisputeBondScenario,
 	generateDemoForkRiskData,
-} from "../utils/demoDataGenerator";
-import { useForkData } from "./ForkDataProvider";
+} from "./demo-data";
+import { useForkData } from "./data-provider";
 
 interface ForkMockContextValue {
 	isDemo: boolean;
