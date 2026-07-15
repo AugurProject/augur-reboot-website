@@ -42,11 +42,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Event cache
-        uses: actions/cache@v5
+      - name: Restore event cache
+        uses: actions/cache/restore@v5
         with:
           path: public/cache/event-cache.json
-          key: event-cache-v1
+          key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            event-cache-v2-
+
+      - name: Record cache update boundary
+        id: cache-update-boundary
+        run: echo "started-at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
       - name: Run fork risk calculation
         run: npm run build:fork-data
@@ -54,12 +60,33 @@ jobs:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
           CALCULATION_MODE: 'incremental'
 
+      - name: Verify updated event cache
+        env:
+          CACHE_UPDATE_STARTED_AT: ${{ steps.cache-update-boundary.outputs.started-at }}
+        run: |
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            const cache = JSON.parse(readFileSync("public/cache/event-cache.json", "utf8"));
+            const generatedAt = Date.parse(cache.metadata?.cacheGeneratedAt ?? "");
+            const updateStartedAt = Date.parse(process.env.CACHE_UPDATE_STARTED_AT ?? "");
+            if (!cache.lastQueriedBlock || !Number.isFinite(generatedAt) || generatedAt < updateStartedAt) {
+              throw new Error("Event cache was not updated during this run");
+            }
+          '
+
       - name: Upload fork-risk data
         uses: actions/upload-artifact@v7
         with:
           name: fork-risk-data
           path: public/data/fork-risk.json
           retention-days: 1
+
+      - name: Save updated event cache
+        if: github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v5
+        with:
+          path: public/cache/event-cache.json
+          key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
 
   build:
     needs: risk-monitor

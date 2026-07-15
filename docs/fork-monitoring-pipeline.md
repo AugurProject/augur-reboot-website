@@ -39,10 +39,11 @@ risk-monitor          →  build              →  deploy
 ### risk-monitor (always runs)
 
 1. Shallow checkout (`fetch-depth: 1`)
-2. Restore event cache from `actions/cache`
+2. Restore the newest `event-cache-v2-*` checkpoint from `actions/cache`
 3. Run `scripts/calculate-fork-risk.ts`
-4. On a cache miss, save the resulting cache under `event-cache-v1`
+4. Verify that the script updated the cache during the current run
 5. Upload `fork-risk.json` as artifact (`fork-risk-data`)
+6. On `main`, save the updated cache under a unique key for the next run
 
 ### build (always runs, needs: risk-monitor)
 
@@ -83,21 +84,35 @@ For first-ever deploys, the site doesn't exist until `risk-monitor` succeeds at 
 ## Cache Strategy
 
 ```yaml
-- uses: actions/cache@v5
+- uses: actions/cache/restore@v5
   with:
     path: public/cache/event-cache.json
-    key: event-cache-v1
+    key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
+    restore-keys: |
+      event-cache-v2-
+
+# calculate and validate the updated cache
+
+- if: github.ref == 'refs/heads/main'
+  uses: actions/cache/save@v5
+  with:
+    path: public/cache/event-cache.json
+    key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
 ```
 
-**Current limitation:** GitHub Actions cache entries are immutable. Once `event-cache-v1` exists for a ref, later exact-key hits restore that snapshot but do not replace it with the file updated by the script. Repository cache metadata confirms that the `main` cache was created on April 22, 2026 and has only been accessed since. The workflow remains functional, but it does not persist incremental cache updates across runs as intended.
+GitHub Actions cache entries are immutable, so every successful `main` run saves its updated checkpoint under a key unique to the workflow run and attempt. The stable `event-cache-v2-` restore prefix selects the most recently created matching checkpoint. Pull requests can restore the default-branch checkpoint, but only trusted `main` runs save an update.
 
 ### Why not `hashFiles`
 
-The previous workflow used `event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}`. Since the script updates tracked markets every run, the file hash changed every run and created a new cache entry each time. The static key stopped that proliferation, but it also stopped updated state from being saved. A future workflow fix should use unique save keys with a stable restore prefix, or explicitly replace the existing cache.
+The previous workflow used `event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}`. Since the script updates tracked markets every run, the file hash changed every run and created a new cache entry each time. It was replaced by the static `event-cache-v1` key, but that key froze the first saved snapshot because existing GitHub Actions caches cannot be changed. The `event-cache-v2-<run-id>-<attempt>` strategy makes that rotation intentional and restores the newest checkpoint through a stable prefix.
 
 ### Cold start (cache evicted)
 
-When the cache is missing, the script performs a 30-day event scan (~7 minutes, ~835 RPC calls). The seed file supplies the known-market baseline. With the current static key, the first successful result becomes the immutable snapshot restored by later runs.
+When the cache is missing, the script performs a 30-day event scan (~7 minutes, ~835 RPC calls). The seed file supplies the known-market baseline. A successful `main` run saves the resulting warm checkpoint for later runs.
+
+### Retention
+
+The hourly schedule creates about 168 checkpoints per week, plus any successful `main` push or manual runs. GitHub removes cache entries that have not been accessed in over seven days and evicts least-recently-accessed entries when the repository reaches its cache storage limit. Because restoration selects only the newest matching checkpoint, older event-cache entries naturally age out.
 
 ---
 
@@ -122,7 +137,8 @@ Top-level group for the entire workflow. Prevents:
 |----------|--------|
 | RPC endpoint down | Script auto-falls back to next endpoint |
 | All RPC endpoints fail | Script fails → pipeline stops → retry next hour |
-| Cache missing | 30-day scan + seed file; successful job creates the static cache snapshot |
+| Cache missing | 30-day scan + seed file; successful `main` job saves a warm checkpoint |
+| Cache not updated during calculation | Validation fails → no artifact upload, cache save, build, or deploy |
 | Artifact missing in build | Build fails → no deploy → site stays on last good version |
 | Workflow failure | No deploy; retry on the next scheduled run |
 
