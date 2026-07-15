@@ -41,7 +41,7 @@ risk-monitor          →  build              →  deploy
 1. Shallow checkout (`fetch-depth: 1`)
 2. Restore event cache from `actions/cache`
 3. Run `scripts/calculate-fork-risk.ts`
-4. Cache auto-saves after the step
+4. On a cache miss, save the resulting cache under `event-cache-v1`
 5. Upload `fork-risk.json` as artifact (`fork-risk-data`)
 
 ### build (always runs, needs: risk-monitor)
@@ -89,15 +89,15 @@ For first-ever deploys, the site doesn't exist until `risk-monitor` succeeds at 
     key: event-cache-v1
 ```
 
-**Static key**: always overwrites the same entry. No proliferation of cache entries.
+**Current limitation:** GitHub Actions cache entries are immutable. Once `event-cache-v1` exists for a ref, later exact-key hits restore that snapshot but do not replace it with the file updated by the script. Repository cache metadata confirms that the `main` cache was created on April 22, 2026 and has only been accessed since. The workflow remains functional, but it does not persist incremental cache updates across runs as intended.
 
 ### Why not `hashFiles`
 
-The previous workflow used `event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}`. Since the script updates tracked markets every run, the file hash changes every run, creating a new cache entry each time. The repo accumulated 148+ entries. A static key keeps it to one.
+The previous workflow used `event-cache-${{ runner.os }}-${{ hashFiles('public/cache/event-cache.json') }}`. Since the script updates tracked markets every run, the file hash changed every run and created a new cache entry each time. The static key stopped that proliferation, but it also stopped updated state from being saved. A future workflow fix should use unique save keys with a stable restore prefix, or explicitly replace the existing cache.
 
 ### Cold start (cache evicted)
 
-When the cache is missing, the script performs a 30-day event scan (~7 minutes, ~835 RPC calls). The seed file ensures no markets are missed. The cache is warm for the next run.
+When the cache is missing, the script performs a 30-day event scan (~7 minutes, ~835 RPC calls). The seed file supplies the known-market baseline. With the current static key, the first successful result becomes the immutable snapshot restored by later runs.
 
 ---
 
@@ -122,9 +122,9 @@ Top-level group for the entire workflow. Prevents:
 |----------|--------|
 | RPC endpoint down | Script auto-falls back to next endpoint |
 | All RPC endpoints fail | Script fails → pipeline stops → retry next hour |
-| Cache missing | 30-day scan + seed file, warm cache for next run |
+| Cache missing | 30-day scan + seed file; successful job creates the static cache snapshot |
 | Artifact missing in build | Build fails → no deploy → site stays on last good version |
-| Workflow failure | Cache unchanged from last successful save, retry next hour |
+| Workflow failure | No deploy; retry on the next scheduled run |
 
 ---
 
@@ -134,7 +134,7 @@ Top-level group for the entire workflow. Prevents:
 |------|-------|------|
 | Incremental (warm cache) | ~175 | ~30 seconds |
 | Cold start (cache evicted) | ~835 | ~7 minutes |
-| Daily (24 incremental runs) | ~670 | Well within free tier |
+| Daily (24 incremental runs) | ~4,200 at ~175 calls/run | Estimate; actual usage varies with block range and tracked markets |
 
 ---
 

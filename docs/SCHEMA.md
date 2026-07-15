@@ -27,7 +27,9 @@ docs/
 ## Writing conventions
 
 - **Filenames:** lowercase, hyphenated. Must match the wikilink reference. Exception: `INDEX.md` is capitalized as the docs entry point.
-- **Frontmatter:** light YAML — `title` (required), `tags` (list, optional). Placed at the top of every doc.
+- **Frontmatter:** light YAML — `title` (required), `tags` (list, optional). Placed at the top of every knowledge page.
+
+  `INDEX.md` and `SCHEMA.md` are operating instructions for the documentation block, not knowledge pages. They intentionally do not use frontmatter.
 
   ```yaml
   ---
