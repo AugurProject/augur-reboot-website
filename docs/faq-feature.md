@@ -53,15 +53,15 @@ Collapsible Q&A styled to match the terminal aesthetic via `.faq-item` and `.faq
 - **Answer content:** Indented, `font-prose` (IBM Plex Mono) font family, `text-foreground`, `text-transform: none` (no uppercase override)
 - **Browser markers:** WebKit and standard `::marker` hidden with `display: none`
 
-## Landing Page Integration
+## Site Integration
 
-The FAQ page is linked from two places on the landing page:
+The FAQ is linked from two site-level entry points:
 
-1. **`MigrationCta.tsx`** — a red-bordered CTA block that links to `/learn/fork/migration/` (the migration guide). This is rendered in the FAQ page itself as an inline call-to-action.
+1. **`src/features/home/hero-banner.tsx`** — direct `/faq` link in the landing-page menu.
 
 2. **`src/components/shell/footer.astro`** — FAQ link in the `>_ KB` section.
 
-The hero no longer contains a direct FAQ link. The original urgent hero item (`THE FORK IS HERE! OWN REP? ACT NOW.`) was removed when the hero was refactored to CSS-driven animation. The migration guide in `learn/fork/migration/` now serves as the primary entry point for fork/migration content.
+The FAQ page also renders `src/features/learn/migration-cta.tsx`, a red-bordered inline CTA linking to `/learn/fork/migration/`.
 
 ## Footer Integration
 

@@ -25,6 +25,8 @@ Astro 5.10+ static site with React 19 islands. Deployed to GitHub Pages at `www.
 ## Constraints
 
 - **Dual tsconfig** — `tsconfig.app.json` (frontend) and `tsconfig.scripts.json` (scripts). Do not merge.
+- **File naming** — use lowercase kebab-case filenames; keep component symbols PascalCase inside files.
+- **Component cleanup** — audit imports and content usages before moving or deleting components; remove only confirmed-unused modules.
 - **No auto-commit** unless instructed.
 - `.worktrees/` (gitignored) for git worktrees
 

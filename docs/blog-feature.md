@@ -5,7 +5,7 @@ tags: [blog, feature, mdx, content]
 
 # Blog Feature Documentation
 
-The blog is built on Astro's content collections, allowing you to write posts as Markdown/MDX files with YAML frontmatter. Posts are automatically routed to `/blog/[slug]` with featured images, social sharing, and RSS feed support.
+The blog is built on Astro's content collections, allowing you to write posts as Markdown/MDX files with YAML frontmatter. Posts are automatically routed to `/blog/[slug]` with featured images, social-preview metadata, and RSS feed support.
 
 ---
 
@@ -92,7 +92,7 @@ Create a featured image for your post:
 
 **Image Requirements:**
 - **Size**: 1200 × 630 pixels (1.91:1 aspect ratio - standard OG image size)
-- **Format**: WebP (preferred), PNG, or JPG
+- **Format**: WebP, named exactly `featured-image.webp` so the route glob can import it
 - **File size**: Less than 1MB recommended
 
 **Save the image:**
@@ -123,7 +123,7 @@ Use kebab-case for directory names:
 - ✗ `MyPostTitle/` or `my post title/`
 
 The directory name becomes the URL slug:
-- `generalizing-augur/index.mdx` → `/blog/generalizing-augur`
+- `generalized-augur/index.mdx` → `/blog/generalized-augur`
 
 ### Post Metadata Display
 
@@ -133,7 +133,7 @@ Posts automatically display:
 - **Publish Date**: From `publishDate` frontmatter
 - **Updated Date**: From `updatedDate` (if present)
 - **Featured Image**: On blog listing cards (desktop: left sidebar, mobile: top)
-- **Social Sharing**: Buttons to share on Twitter, LinkedIn, and via email
+- **Social Preview Metadata**: Open Graph and Twitter card metadata derived from the post
 - **Navigation**: Links to next/previous posts
 
 **Note:** Tags are included in frontmatter for RSS categorization but are not displayed on the page.
@@ -210,7 +210,7 @@ src/content/blog/technical-deep-dive/
 └── timeline.webp
 ```
 
-### Social Sharing
+### Social Previews
 
 When you share a blog post on social media (Twitter, LinkedIn, Facebook), the platform automatically:
 1. Pulls the post title from the page
@@ -220,10 +220,7 @@ When you share a blog post on social media (Twitter, LinkedIn, Facebook), the pl
 
 **No extra steps needed**: Your `featured-image.webp` in the post directory is automatically optimized for Open Graph (1200×630, WebP format) at build time and used for social sharing previews.
 
-Each blog post has three share buttons:
-- **Twitter**: Opens Twitter with pre-filled text
-- **LinkedIn**: Opens LinkedIn share dialog
-- **Email**: Opens email composer with post link and description
+The site does not render dedicated share buttons. Sharing is handled by the browser or destination platform using the page metadata.
 
 ### RSS Feed
 
@@ -244,7 +241,7 @@ The RSS feed includes:
 The blog feature provides a listing page (`/blog`) that displays blog posts with featured images and metadata. Blog posts are stored as Markdown/MDX files with co-located assets.
 
 **What was built:**
-- **Featured Images on Listing** - Blog post cards on `/blog` display featured images responsively (mobile: full-width top, desktop: 384×202px left sidebar)
+- **Featured Images on Listing** - Blog post cards on `/blog` display featured images in a responsive grid
 - **Tags Removal** - Tags were removed from blog listing cards to simplify the display
 - **Per-Directory Structure** - Blog posts reorganized from flat files to directories with co-located assets
 
@@ -254,7 +251,7 @@ The blog feature provides a listing page (`/blog`) that displays blog posts with
 src/
 ├── content/
 │   └── blog/
-│       ├── generalizing-augur/
+│       ├── generalized-augur/
 │       │   ├── index.mdx
 │       │   └── featured-image.webp
 │       └── [new-post-name]/
@@ -270,8 +267,8 @@ src/
 ├── pages/
 │   └── blog/
 │       ├── index.astro (blog listing)
-│       ├── [...slug].astro (individual post)
-│       └── rss.xml.ts (RSS feed)
+│       └── [...slug].astro (individual post)
+└── rss.xml.ts (RSS feed)
 ```
 
 ### Design Decisions
@@ -298,24 +295,22 @@ src/
 
 #### 3. Responsive Layout with Tailwind
 
-**Decision:** Use flexbox with breakpoint-driven direction change
+**Decision:** Use a responsive CSS grid for overlapping card regions at medium widths and a two-column layout at large widths
 
 ```astro
-<article class="flex flex-col md:flex-row gap-0 md:gap-6">
-  {/* Image: full-width on mobile, 384px sidebar on desktop */}
+<article class="grid md:grid-cols-[4fr_5fr_3fr] lg:grid-cols-2">
   {featuredImage && (
-    <div class="w-full md:w-64 aspect-191/100">
-      <Image src={featuredImage} alt={title} width={384} height={202} />
+    <div class="md:col-[1/3] lg:col-auto">
+      <Image src={featuredImage} alt={title} class="aspect-191/100" />
     </div>
   )}
-  {/* Content: stack vertically */}
-  <div>Title, metadata, description</div>
+  <a class="md:col-[2/4] lg:col-auto">Title, metadata, description</a>
 </article>
 ```
 
 **Why:**
 - Mobile-first approach: content stacks naturally on small screens
-- Responsive without media query complexity
+- Grid regions create the overlapping card treatment at medium widths
 - Aspect ratio preserved for consistent visual appearance
 
 #### 4. Astro Native Image Optimization
@@ -362,7 +357,7 @@ import { getImage } from 'astro:assets';
 
 // Generate OG image from featured image at build time
 const ogImage = featuredImage
-  ? (await getImage({ src: featuredImage }, { width: 1200, height: 630, format: 'webp' })).src
+  ? (await getImage({ src: featuredImage, width: 1200, height: 630, format: 'webp' })).src
   : undefined;
 ```
 
@@ -464,9 +459,9 @@ Posts are pre-rendered into static HTML at build time. RSS feed is generated in 
 
 #### Modifying Featured Image Dimensions
 
-Featured images render at 384×202px. To change dimensions:
-1. Update `width` and `height` props in `BlogPostCard.astro`
-2. Update `aspect-191/100` Tailwind class to match new ratio (191:100 = 384:202)
+Featured images use a 191:100 display ratio. To change it:
+1. Update the `aspect-191/100` class in `src/features/blog/post-card.astro`
+2. Review the responsive grid treatment at mobile, medium, and large breakpoints
 3. Rebuild to regenerate optimized images
 
 #### Image Optimization

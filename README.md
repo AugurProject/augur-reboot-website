@@ -35,8 +35,8 @@ scripts/
 └── probe-fork-state.ts
 
 public/
-├── cache/event-cache.json
-└── data/fork-risk.json
+├── cache/event-cache.json  # Generated and gitignored
+└── data/fork-risk.json     # Generated and gitignored
 
 docs/
 ├── INDEX.md
