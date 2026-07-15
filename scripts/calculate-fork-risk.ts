@@ -344,6 +344,8 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 
 			if (isForking) {
 				console.log("⚠️ UNIVERSE IS FORKING! Setting maximum risk level");
+				const cache = await loadEventCache();
+				await saveEventCache(cache);
 				return await getForkingResult(
 					blockNumber,
 					connection,

@@ -49,6 +49,7 @@ jobs:
           key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             event-cache-v2-
+            event-cache-v1
 
       - name: Record cache update boundary
         id: cache-update-boundary

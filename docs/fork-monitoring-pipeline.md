@@ -90,6 +90,7 @@ For first-ever deploys, the site doesn't exist until `risk-monitor` succeeds at 
     key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
     restore-keys: |
       event-cache-v2-
+      event-cache-v1
 
 # calculate and validate the updated cache
 
@@ -100,7 +101,7 @@ For first-ever deploys, the site doesn't exist until `risk-monitor` succeeds at 
     key: event-cache-v2-${{ github.run_id }}-${{ github.run_attempt }}
 ```
 
-GitHub Actions cache entries are immutable, so every successful `main` run saves its updated checkpoint under a key unique to the workflow run and attempt. The stable `event-cache-v2-` restore prefix selects the most recently created matching checkpoint. Pull requests can restore the default-branch checkpoint, but only trusted `main` runs save an update.
+GitHub Actions cache entries are immutable, so every successful `main` run saves its updated checkpoint under a key unique to the workflow run and attempt. The stable `event-cache-v2-` restore prefix selects the most recently created matching checkpoint. The legacy `event-cache-v1` restore key bootstraps the first v2 run without discarding its tracked history. Pull requests can restore the default-branch checkpoint, but only trusted `main` runs save an update.
 
 ### Why not `hashFiles`
 
@@ -109,6 +110,8 @@ The previous workflow used `event-cache-${{ runner.os }}-${{ hashFiles('public/c
 ### Cold start (cache evicted)
 
 When the cache is missing, the script performs a 30-day event scan (~7 minutes, ~835 RPC calls). The seed file supplies the known-market baseline. A successful `main` run saves the resulting warm checkpoint for later runs.
+
+When the universe is already forking, the calculation does not need to scan dispute events. It still refreshes and writes the restored checkpoint so the workflow can validate and carry that state forward without replacing it with an empty cache.
 
 ### Retention
 
