@@ -1,112 +1,62 @@
 ---
 name: blogging
-description: This skill should be used when the user asks to "add a blog post", "create a new post", "write a learn article", "publish an update", "add content to the learn section", "update the blog", or needs help with MDX content, frontmatter, or the content collection structure.
+description: Use when creating, editing, reviewing, integrating, validating, or handling publication requests for blog posts under src/content/blog, including MDX, frontmatter, assets, and diagnostics.
 ---
 
-# Blogging
+# Blog Content Integration and Validation
 
-The site has two content collections: `blog` for Augur project updates and `learn` for educational fork content. Both use MDX with frontmatter, stored as files in `src/content/`.
+Use repository mechanics to integrate and validate human-owned blog content. This skill does not supply editorial voice or authorize publication.
 
-## Content Structure
+## Authority
 
-```
-src/content/
-├── config.ts           # Zod schemas for both collections
-├── blog/
-│   └── {slug}/
-│       ├── index.mdx   # Post content
-│       └── *.webp      # Images (featured-image.webp, content-image.webp)
-└── learn/
-    └── {topic}/
-        └── {slug}.mdx  # Article content (or index.mdx for topic root)
-```
+- Humans own copy, facts, tone, metadata choices, approval, and publication decisions.
+- `src/content/config.ts` defines accepted content data.
+- `npm run lint:blog` defines mechanical blog requirements. This skill explains the workflow rather than restating its rules.
+- `publishDate` is metadata only; it does not schedule, hide, or publish a post.
 
-Each blog post gets its own directory named by slug. Images live alongside the MDX file and are referenced with relative paths.
+## Workflow
 
-## Blog Frontmatter
+1. Inspect the current schema and the supplied post, metadata, and assets.
+2. Place the post at `src/content/blog/<lowercase-kebab-case-slug>/index.mdx` with its assets co-located and referenced relatively.
+3. Preserve supplied copy unless the human explicitly requests editorial changes. Follow bounded requests using standalone instructions or supplied sources; do not read neighboring prose to infer a house voice.
+4. Run focused diagnostics:
 
-Defined in `src/content/config.ts`:
+   ```bash
+   npm run lint:blog -- --changed
+   ```
 
-```yaml
----
-title: "Post Title"          # required
-description: "Short summary" # required
-author: "Lituus Foundation"  # required
-publishDate: 2026-02-21      # required, YYYY-MM-DD
-updatedDate: 2026-02-21      # optional
-tags: ["augur", "update"]    # optional
----
-```
+5. Resolve blocking errors. Report observations with their measurements. An observation alone does not authorize rewriting; apply editorial changes only when explicitly requested.
+6. Verify affected routes, assets, metadata, and RSS behavior when the requested work touches those surfaces.
 
-## Learn Frontmatter
+## Verification
 
-```yaml
----
-title: "Article Title"       # required
-description: "Optional summary" # optional
----
-```
+Run every command in the matching suite. For mixed content and tooling changes, use the diagnostics or skill suite.
 
-## Add a Blog Post
-
-1. Create the directory: `src/content/blog/{post-slug}/`
-2. Create `index.mdx` with required frontmatter
-3. Add `featured-image.webp` (used in post cards and og:image)
-4. Optionally add `content-image.webp` for in-post images
-5. Reference images with relative paths: `![Alt text](./featured-image.webp)`
-
-Example structure for a new post:
-```
-src/content/blog/augur-q1-update/
-├── index.mdx
-└── featured-image.webp
-```
-
-## Add a Learn Article
-
-1. Identify the topic directory under `src/content/learn/` (e.g., `fork/`)
-2. Create the MDX file at `src/content/learn/{topic}/{slug}.mdx`
-3. Add frontmatter with at minimum a `title`
-4. Content is educational — link to relevant docs, protocol reference, or blog posts
-
-## MDX Content
-
-Standard Markdown applies. MDX also allows importing Astro/React components if needed, but most posts use plain Markdown with images.
-
-Image syntax with relative path:
-```mdx
-![Augur Roadmap](./content-image.webp)
-```
-
-External links:
-```mdx
-[Discord](https://discord.com/invite/Y3tCZsSmz3)
-```
-
-## RSS Feed
-
-The RSS feed is auto-generated from the blog collection via `@astrojs/rss`. No manual steps needed — publishing a post (adding to `src/content/blog/`) is sufficient for it to appear in the feed after the next build.
-
-## Verify the Post
-
-After adding content, run the dev server to check rendering:
+For blog content changes:
 
 ```bash
-npm run dev
-```
-
-Navigate to `/blog/{slug}` to verify the post renders correctly. Check that:
-- Frontmatter fields display (title, date, author, tags)
-- Images load with correct paths
-- MDX content renders properly
-
-Run type checking to catch frontmatter schema errors:
-
-```bash
+npm run lint:blog -- --changed
 npm run typecheck
+npm run lint
+npm run build
 ```
 
-## Additional Resources
+For diagnostics or skill changes:
 
-- **`references/content-schema.md`** — Full Zod schema, field types, validation rules
-- **`references/mdx-patterns.md`** — MDX syntax, component usage, image handling patterns
+```bash
+npm run test:blog-lint
+npm run lint:blog
+npm run typecheck:scripts
+npm run typecheck
+npm run lint
+npm run build
+```
+
+## Boundaries
+
+- Ask when required content, metadata, assets, sources, or editorial instructions are missing. Do not invent editorial decisions; explicit bounded edits are allowed.
+- Learn content is outside this skill.
+- Passing diagnostics or builds validates integration only. It does not approve publication.
+- Do not introduce draft state, scheduling, publication filtering, deployment, or automatic publishing as part of content integration.
+
+For architecture and rule details, read `docs/blog-feature.md`.

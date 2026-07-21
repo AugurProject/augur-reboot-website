@@ -52,7 +52,7 @@ tags: ["tag1", "tag2", "tag3"]
 - `title` (required): Post title, appears in page title and listings
 - `description` (required): Brief summary, used in meta tags and previews
 - `author` (required): Author name, displayed in post metadata
-- `publishDate` (required): Publication date in YYYY-MM-DD format
+- `publishDate` (required): Publication date metadata in YYYY-MM-DD format. Future dates are allowed; this field does not schedule, hide, or automatically publish a post.
 - `updatedDate` (optional): Last update date, shows when post was modified
 - `tags` (optional): Array of topic tags for RSS categorization (not displayed on page)
 
@@ -398,6 +398,44 @@ const blogCollection = defineCollection({
 });
 ```
 
+### Blog Publishing Diagnostics
+
+The repository-local TypeScript linter lives under `scripts/blog-lint/`. It supplements Astro with fast, stable diagnostics for blog integration; Astro remains authoritative for full MDX, content-schema, and build behavior.
+
+```bash
+# Collection-wide integrity and observations for every post
+npm run lint:blog
+
+# Collection-wide integrity, but observations only for changed blog posts
+npm run lint:blog -- --changed
+
+# Test the linter and its skill/command integration
+npm run test:blog-lint
+```
+
+The changed-post selector maps changed blog entries and co-located assets back to their post directory. It accounts for working-tree and untracked files; CI additionally uses `--base <pull-request-base-sha>` so additions, modifications, deletions, and renames from the PR base are considered. Learn content is never scanned.
+
+Diagnostics have stable rule IDs and source locations. Errors are mechanical blockers and exit nonzero: directory/entry convention with regular nonsymlinked MDX files, parseable and typed required frontmatter, strict real dates and date ordering, tag shape/uniqueness, a regular nonsymlinked 1200×630 WebP `featured-image.webp`, contained and existing relative image targets after symlink resolution, nonempty and mechanically verifiable image attributes, parseable MDX for AST-based integrity checks, and duplicate post identifiers where the filesystem permits them. Future `publishDate` values are not errors.
+
+Featured-image validation detects the WebP format, checks RIFF's declared container size, verifies chunk boundaries plus required zero padding against the actual file length, and reads dimension metadata. It does not perform a full pixel decode.
+
+Warnings are nonblocking factual observations: paragraphs over 90 words, sections over 500 words without a subheading, images over 1 MiB, and external HTTP URLs. The linter does not assess writing quality or rewrite content. Humans retain ownership of prose, facts, tone, approval, and publication.
+
+| Rule IDs | Contract |
+|---|---|
+| `BLOG001`–`BLOG002` | Regular nonsymlinked post entry convention and parseable YAML frontmatter |
+| `BLOG003`–`BLOG006` | Required strings, strict dates and ordering, and tags |
+| `BLOG007`–`BLOG008` | Required regular-file WebP featured image with complete RIFF/chunk structure and 1200×630 metadata |
+| `BLOG009`–`BLOG010` | Contained/existing relative image targets after realpath resolution and nonempty alt text |
+| `BLOG011` | Duplicate case-insensitive post identifiers where supported by the filesystem |
+| `BLOG012` | MDX parse failure preventing AST integrity checks |
+| `BLOG013` | Missing or mechanically unverifiable MDX JSX image attributes |
+| `BLOG101`–`BLOG104` | Nonblocking paragraph, section, image-size, and HTTP observations |
+
+The dedicated `.github/workflows/blog-lint.yml` pull-request workflow is path-filtered to blog/schema/linter/skill integration files. It has read-only repository permission, uses Node 22, does not receive deployment secrets, and does not modify or publish content. With `GITHUB_ACTIONS=true`, the normal human-readable output is accompanied by escaped native GitHub annotations.
+
+> `publishDate` is metadata only. Neither the blog diagnostics linter nor its dedicated pull-request workflow implements draft state, scheduling, publication filtering, deployment, or automatic publishing behavior.
+
 ### Important: Cloudflare Image Service Issue
 
 #### What Happened
@@ -430,6 +468,14 @@ Removed the `imageService: "cloudflare"` configuration. Astro now handles optimi
 ## Development & Maintenance
 
 ### For Authors
+
+#### Validate blog diagnostics
+
+```bash
+npm run lint:blog
+```
+
+Errors identify mechanical integration failures. Warnings report measurements and thresholds without making editorial judgments.
 
 #### Preview locally
 
