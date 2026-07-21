@@ -1,66 +1,62 @@
 ---
 name: blogging
-description: Use when creating, editing, reviewing, integrating, or validating blog posts under src/content/blog, including blog MDX, frontmatter, and post assets.
+description: Use when creating, editing, reviewing, integrating, validating, or handling publication requests for blog posts under src/content/blog, including MDX, frontmatter, assets, and diagnostics.
 ---
 
-# Blog Integration
+# Blog Content Integration and Validation
 
-Use this skill only for blog posts under `src/content/blog/`. Learn content is outside this workflow.
+Use repository mechanics to integrate and validate human-owned blog content. This skill does not supply editorial voice or authorize publication.
 
-## Authority and boundaries
+## Authority
 
-- Humans own prose, facts, tone, approval, and publication decisions.
-- Preserve human-supplied copy. Editorial writing and corpus style imitation are outside this integration skill.
-- Never read neighboring posts to derive or imitate tone, including when asked for an “Augur voice.” Require human-supplied copy or standalone explicit instructions that do not depend on corpus style mining.
-- Explicitly requested factual verification or bounded wording edits remain allowed when the human supplies the facts, sources, or standalone editing instructions; they do not authorize reading neighboring prose for tone.
-- If copy or standalone instructions are insufficient, ask the human rather than inventing prose or deriving a house style.
-- `src/content/config.ts` is the runtime schema authority.
-- `npm run lint:blog` is the mechanical diagnostics authority. This skill is workflow guidance, not a second schema or rules definition.
-- `publishDate` is ordinary metadata. A future date does not schedule, hide, publish, or otherwise change post availability.
-- Diagnostics observations are nonblocking measurements and never authorize automatic rewriting.
-- Passing diagnostics, typechecks, previews, or builds validates integration only; it never approves or authorizes publication.
-- Do not add draft state, scheduling, publication filtering, deployment steps, or automatic publishing behavior.
+- Humans own copy, facts, tone, metadata choices, approval, and publication decisions.
+- `src/content/config.ts` defines accepted content data.
+- `npm run lint:blog` defines mechanical blog requirements. This skill explains the workflow rather than restating its rules.
+- `publishDate` is metadata only; it does not schedule, hide, or publish a post.
 
-## Integrate a blog post
+## Workflow
 
-1. Keep each post in `src/content/blog/<lowercase-kebab-case-slug>/index.mdx`.
-2. Preserve the copy and metadata supplied by the human. Ask when required information or standalone editing instructions are missing rather than inventing prose or mining neighboring posts.
-3. Add the required `featured-image.webp` in the same post directory. Keep other post images co-located and use relative references with meaningful supplied alt text.
-4. Check the current runtime schema in `src/content/config.ts`; do not rely on copied schema text in this skill.
-5. Run blog diagnostics before broader project validation:
+1. Inspect the current schema and the supplied post, metadata, and assets.
+2. Place the post at `src/content/blog/<lowercase-kebab-case-slug>/index.mdx` with its assets co-located and referenced relatively.
+3. Preserve supplied copy unless the human explicitly requests editorial changes. Follow bounded requests using standalone instructions or supplied sources; do not read neighboring prose to infer a house voice.
+4. Run focused diagnostics:
 
    ```bash
-   npm run lint:blog
+   npm run lint:blog -- --changed
    ```
 
-6. Preview or build only when the requested integration needs rendering verification. Diagnostics do not replace Astro's MDX/schema/build checks.
+5. Resolve blocking errors. Report observations with their measurements. An observation alone does not authorize rewriting; apply editorial changes only when explicitly requested.
+6. Verify affected routes, assets, metadata, and RSS behavior when the requested work touches those surfaces.
 
-## Edit or review a blog post
+## Verification
 
-- Limit changes to the requested post and assets.
-- Preserve existing prose and metadata outside the requested edit.
-- Report mechanical diagnostics as facts with rule IDs and thresholds. Do not characterize prose as good or bad, and do not automatically rewrite it.
-- Use changed-post mode for focused local observations while retaining collection-wide integrity checks:
+Run every command in the matching suite. For mixed content and tooling changes, use the diagnostics or skill suite.
 
-  ```bash
-  npm run lint:blog -- --changed
-  ```
-
-## Validate
-
-Run:
+For blog content changes:
 
 ```bash
-npm run test:blog-lint
-npm run lint:blog
+npm run lint:blog -- --changed
 npm run typecheck
 npm run lint
 npm run build
 ```
 
-- Errors from `lint:blog` are blocking mechanical failures.
-- Warnings are nonblocking measurements or observations.
-- Astro remains authoritative for full MDX, content schema, and build behavior.
-- A human remains responsible for editorial approval and the decision to publish.
+For diagnostics or skill changes:
 
-For architecture and command details, read `docs/blog-feature.md`.
+```bash
+npm run test:blog-lint
+npm run lint:blog
+npm run typecheck:scripts
+npm run typecheck
+npm run lint
+npm run build
+```
+
+## Boundaries
+
+- Ask when required content, metadata, assets, sources, or editorial instructions are missing. Do not invent editorial decisions; explicit bounded edits are allowed.
+- Learn content is outside this skill.
+- Passing diagnostics or builds validates integration only. It does not approve publication.
+- Do not introduce draft state, scheduling, publication filtering, deployment, or automatic publishing as part of content integration.
+
+For architecture and rule details, read `docs/blog-feature.md`.
