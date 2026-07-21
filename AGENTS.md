@@ -6,6 +6,7 @@ Astro 5.10+ static site with React 19 islands. Deployed to GitHub Pages at `www.
 
 - Start at `docs/INDEX.md` for any task.
 - Read `docs/SCHEMA.md` before writing to docs.
+- For blog content work, follow `.agents/skills/blogging/SKILL.md`.
 
 ## Stack
 

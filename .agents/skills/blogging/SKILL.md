@@ -1,112 +1,66 @@
 ---
 name: blogging
-description: This skill should be used when the user asks to "add a blog post", "create a new post", "write a learn article", "publish an update", "add content to the learn section", "update the blog", or needs help with MDX content, frontmatter, or the content collection structure.
+description: Use when creating, editing, reviewing, integrating, or validating blog posts under src/content/blog, including blog MDX, frontmatter, and post assets.
 ---
 
-# Blogging
+# Blog Integration
 
-The site has two content collections: `blog` for Augur project updates and `learn` for educational fork content. Both use MDX with frontmatter, stored as files in `src/content/`.
+Use this skill only for blog posts under `src/content/blog/`. Learn content is outside this workflow.
 
-## Content Structure
+## Authority and boundaries
 
-```
-src/content/
-├── config.ts           # Zod schemas for both collections
-├── blog/
-│   └── {slug}/
-│       ├── index.mdx   # Post content
-│       └── *.webp      # Images (featured-image.webp, content-image.webp)
-└── learn/
-    └── {topic}/
-        └── {slug}.mdx  # Article content (or index.mdx for topic root)
-```
+- Humans own prose, facts, tone, approval, and publication decisions.
+- Preserve human-supplied copy. Editorial writing and corpus style imitation are outside this integration skill.
+- Never read neighboring posts to derive or imitate tone, including when asked for an “Augur voice.” Require human-supplied copy or standalone explicit instructions that do not depend on corpus style mining.
+- Explicitly requested factual verification or bounded wording edits remain allowed when the human supplies the facts, sources, or standalone editing instructions; they do not authorize reading neighboring prose for tone.
+- If copy or standalone instructions are insufficient, ask the human rather than inventing prose or deriving a house style.
+- `src/content/config.ts` is the runtime schema authority.
+- `npm run lint:blog` is the mechanical diagnostics authority. This skill is workflow guidance, not a second schema or rules definition.
+- `publishDate` is ordinary metadata. A future date does not schedule, hide, publish, or otherwise change post availability.
+- Diagnostics observations are nonblocking measurements and never authorize automatic rewriting.
+- Passing diagnostics, typechecks, previews, or builds validates integration only; it never approves or authorizes publication.
+- Do not add draft state, scheduling, publication filtering, deployment steps, or automatic publishing behavior.
 
-Each blog post gets its own directory named by slug. Images live alongside the MDX file and are referenced with relative paths.
+## Integrate a blog post
 
-## Blog Frontmatter
+1. Keep each post in `src/content/blog/<lowercase-kebab-case-slug>/index.mdx`.
+2. Preserve the copy and metadata supplied by the human. Ask when required information or standalone editing instructions are missing rather than inventing prose or mining neighboring posts.
+3. Add the required `featured-image.webp` in the same post directory. Keep other post images co-located and use relative references with meaningful supplied alt text.
+4. Check the current runtime schema in `src/content/config.ts`; do not rely on copied schema text in this skill.
+5. Run blog diagnostics before broader project validation:
 
-Defined in `src/content/config.ts`:
+   ```bash
+   npm run lint:blog
+   ```
 
-```yaml
----
-title: "Post Title"          # required
-description: "Short summary" # required
-author: "Lituus Foundation"  # required
-publishDate: 2026-02-21      # required, YYYY-MM-DD
-updatedDate: 2026-02-21      # optional
-tags: ["augur", "update"]    # optional
----
-```
+6. Preview or build only when the requested integration needs rendering verification. Diagnostics do not replace Astro's MDX/schema/build checks.
 
-## Learn Frontmatter
+## Edit or review a blog post
 
-```yaml
----
-title: "Article Title"       # required
-description: "Optional summary" # optional
----
-```
+- Limit changes to the requested post and assets.
+- Preserve existing prose and metadata outside the requested edit.
+- Report mechanical diagnostics as facts with rule IDs and thresholds. Do not characterize prose as good or bad, and do not automatically rewrite it.
+- Use changed-post mode for focused local observations while retaining collection-wide integrity checks:
 
-## Add a Blog Post
+  ```bash
+  npm run lint:blog -- --changed
+  ```
 
-1. Create the directory: `src/content/blog/{post-slug}/`
-2. Create `index.mdx` with required frontmatter
-3. Add `featured-image.webp` (used in post cards and og:image)
-4. Optionally add `content-image.webp` for in-post images
-5. Reference images with relative paths: `![Alt text](./featured-image.webp)`
+## Validate
 
-Example structure for a new post:
-```
-src/content/blog/augur-q1-update/
-├── index.mdx
-└── featured-image.webp
-```
-
-## Add a Learn Article
-
-1. Identify the topic directory under `src/content/learn/` (e.g., `fork/`)
-2. Create the MDX file at `src/content/learn/{topic}/{slug}.mdx`
-3. Add frontmatter with at minimum a `title`
-4. Content is educational — link to relevant docs, protocol reference, or blog posts
-
-## MDX Content
-
-Standard Markdown applies. MDX also allows importing Astro/React components if needed, but most posts use plain Markdown with images.
-
-Image syntax with relative path:
-```mdx
-![Augur Roadmap](./content-image.webp)
-```
-
-External links:
-```mdx
-[Discord](https://discord.com/invite/Y3tCZsSmz3)
-```
-
-## RSS Feed
-
-The RSS feed is auto-generated from the blog collection via `@astrojs/rss`. No manual steps needed — publishing a post (adding to `src/content/blog/`) is sufficient for it to appear in the feed after the next build.
-
-## Verify the Post
-
-After adding content, run the dev server to check rendering:
+Run:
 
 ```bash
-npm run dev
-```
-
-Navigate to `/blog/{slug}` to verify the post renders correctly. Check that:
-- Frontmatter fields display (title, date, author, tags)
-- Images load with correct paths
-- MDX content renders properly
-
-Run type checking to catch frontmatter schema errors:
-
-```bash
+npm run test:blog-lint
+npm run lint:blog
 npm run typecheck
+npm run lint
+npm run build
 ```
 
-## Additional Resources
+- Errors from `lint:blog` are blocking mechanical failures.
+- Warnings are nonblocking measurements or observations.
+- Astro remains authoritative for full MDX, content schema, and build behavior.
+- A human remains responsible for editorial approval and the decision to publish.
 
-- **`references/content-schema.md`** — Full Zod schema, field types, validation rules
-- **`references/mdx-patterns.md`** — MDX syntax, component usage, image handling patterns
+For architecture and command details, read `docs/blog-feature.md`.
