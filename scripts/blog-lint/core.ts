@@ -1,9 +1,7 @@
 import { type Dirent, promises as fs } from "node:fs";
 import path from "node:path";
+import { createProcessor } from "@mdx-js/mdx";
 import { imageSize } from "image-size";
-import remarkMdx from "remark-mdx";
-import remarkParse from "remark-parse";
-import { unified } from "unified";
 import { isMap, isScalar, LineCounter, parseDocument } from "yaml";
 
 export type Severity = "error" | "warning";
@@ -556,10 +554,7 @@ async function validateAst(
 ): Promise<void> {
 	let tree: AstNode;
 	try {
-		tree = unified()
-			.use(remarkParse)
-			.use(remarkMdx)
-			.parse(post.body) as AstNode;
+		tree = createProcessor({ format: "mdx" }).parse(post.body) as AstNode;
 	} catch (error) {
 		const parseError = error as Error & {
 			line?: number;
