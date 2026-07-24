@@ -55,11 +55,12 @@ import Layout from "../layouts/Layout.astro";
         <SectionHeading text="What is happening?" />
         <div class="faq-group mb-12">
           <FaqItem question="I OWN REPV2. WHAT IS HAPPENING?">
-              <p>Micah Zoltu, an Augur community member, has raised funds to trigger a fork over whether the Artemis II mission successfully lifted off (it did). As part of this fork, Augur will create new tokens for each outcome, and REP holders must choose which token to migrate their REP to.</p>
+              <p>Micah Zoltu, an Augur community member, raised funds to trigger a fork over whether the Artemis II mission successfully lifted off (it did). The fork is now live: Augur has split into universes, one for each outcome, and REP holders must migrate their REP to the universe they believe is correct before August 1, 2026.</p>
               <p><strong>Learn more:</strong></p>
               <ul>
-                <li><a href="/blog/micahs-augur-fork/" target="_blank">Micah's Augur Fork</a></li>
-                <li><a href="/blog/augur-cryptos-first-algorithmic-fork/" target="_blank">Augur Crypto's First Algorithmic Fork</a></li>
+                <li><a href="/blog/the-augur-fork-is-here/" target="_blank">The Augur Fork is Here</a></li>
+                <li><a href="/blog/phase-1-the-escalation-game/" target="_blank">Phase 1: The Escalation Game</a></li>
+                <li><a href="/blog/phase-2-the-fork-migration/" target="_blank">Phase 2: The Fork Migration</a></li>
               </ul>
             </FaqItem>
           <FaqItem question="WHY IS AUGUR FORKING?">
@@ -74,21 +75,21 @@ import Layout from "../layouts/Layout.astro";
         <SectionHeading text="Timeline" />
         <div class="faq-group mb-12">
           <FaqItem question="WHEN DOES THE FORK START AND END?">
-              <p><strong>Start:</strong> April 8</p>
-              <p><strong>Escalation Game (Phase 1):</strong> ~2 months</p>
-              <p><strong>Migration Window (Phase 2):</strong> ~2 months</p>
-              <p><strong>Total duration:</strong> ~4 months</p>
+              <p><strong>Start:</strong> April 8, 2026</p>
+              <p><strong>Escalation Game (Phase 1):</strong> April - early June. Complete.</p>
+              <p><strong>Migration Window (Phase 2):</strong> early June - early August. Open now.</p>
             </FaqItem>
           <FaqItem question="WHEN DO I NEED TO TAKE ACTION?">
-              <p>Action is only required during the Migration Window (Phase 2). Participation in the Escalation Game (Phase 1) is optional.</p>
+              <p>If you hold REP, you need to migrate before August 1, 2026. Early migration has already ended, so the remaining action is to complete the migration before the deadline.</p>
             </FaqItem>
         </div>
 
         <!-- REQUIRED ACTION -->
         <SectionHeading text="Required Action" />
         <div class="faq-group mb-12">
-          <FaqItem question="WHAT HAPPENS DURING THE ESCALATION GAME (PHASE 1)?">
-              <p>People can dispute outcomes by staking REP in an escalation game, where each round requires a larger stake on opposing sides. If you back the correct outcome, you earn a return from those on the losing side (up to ~40% in this test). Participation is optional.</p>
+          <FaqItem question="WHAT HAPPENED DURING THE ESCALATION GAME (PHASE 1)?">
+              <p>People could dispute outcomes by staking REP in an escalation game, where each round requires a larger stake on opposing sides. If they backed the correct outcome, they could earn a return from those on the losing side (up to ~40% in this test). Participation was optional.</p>
+              <p>Phase 1 is complete: enough REP was staked to reach the fork threshold.</p>
             </FaqItem>
           <FaqItem question="WHAT HAPPENS DURING THE MIGRATION WINDOW (PHASE 2)?">
               <p>The fork occurs, splitting Augur into multiple universes, one for each outcome. REP holders must migrate their tokens 1:1 to the universe they believe is correct, receiving the new token that reflects where they believe future usage and value will remain. The true universe retains value, while the others become worthless — this is to make attacks economically costly.</p>
@@ -100,7 +101,7 @@ import Layout from "../layouts/Layout.astro";
               <p>Your REP will likely become worthless, since that universe will not be used going forward.</p>
             </FaqItem>
           <FaqItem question="HOW DO I MIGRATE?">
-              <p>You will use the tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>.</p>
+              <p>You will use the official tool at <a href="https://6.augurfork.eth.limo/#/migration" target="_blank">6.augurfork.eth.limo/#/migration</a>.</p>
               <p><strong><a href="/learn/fork/migration/">→ Read the full step-by-step migration guide</a></strong> for wallet setup, token addresses, and every step in order.</p>
             </FaqItem>
         </div>
@@ -108,8 +109,9 @@ import Layout from "../layouts/Layout.astro";
         <!-- TOKENS -->
         <SectionHeading text="Tokens" />
         <div class="faq-group mb-12">
-          <FaqItem question="WILL THERE BE A NEW REP TOKEN?">
-              <p>Yes. Future Augur development will continue on the token corresponding to the truthful outcome.</p>
+          <FaqItem question="IS THERE A NEW REP TOKEN?">
+              <p>Yes. The fork created a new REP token for each universe; you receive the token of the universe you migrate to, 1:1.</p>
+              <p>Augur development will continue on the token corresponding to the truthful outcome. The Lituus Foundation has already migrated its own holdings and added liquidity.</p>
             </FaqItem>
           <FaqItem question="WILL THE OLD REP TOKEN STILL EXIST?">
               <p>Yes, but it will likely have no value or use.</p>
@@ -117,13 +119,17 @@ import Layout from "../layouts/Layout.astro";
           <FaqItem question="WILL MY TOKEN BALANCE CHANGE?">
               <p>No. You will have the same number of REP tokens after migration. However, tokens that are not migrated will be left behind, so active holders will represent a larger share of the total supply.</p>
             </FaqItem>
+          <FaqItem question="THE NEW TOKEN DOESN'T APPEAR IN MY WALLET YET. IS SOMETHING WRONG?">
+              <p>Usually nothing is wrong. The fork tokens are new, so most wallets don't detect them automatically yet. We are in contact with most platforms and wallets to add support. Most wallets also let you add tokens manually via an "import token" or "add custom token" feature; check your wallet's guide for the steps.</p>
+              <p>After migrating, double-check that the new token shows up in your wallet: reconnect to the <a href="https://6.augurfork.eth.limo/#/migration" target="_blank">migration tool</a> and confirm no REPv2 is left, or look up your address on a block explorer like Etherscan.</p>
+            </FaqItem>
         </div>
 
         <!-- REPV1 HOLDERS -->
         <SectionHeading text="REPv1 Holders" />
         <div class="faq-group mb-12">
           <FaqItem question="I OWN REPV1. WHAT SHOULD I DO?">
-              <p>Convert it to REPv2 using the migration tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>. Then follow the fork migration steps.</p>
+              <p>Convert it to REPv2 first, then complete the migration like any other REP holder. The <a href="/learn/fork/migration/">migration guide</a> walks you through both steps with the official tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>.</p>
             </FaqItem>
           <FaqItem question="CAN I SKIP REPV2 AND GO DIRECTLY TO THE NEW TOKEN?">
               <p>No. You must go through REPv2 first.</p>
@@ -152,7 +158,10 @@ import Layout from "../layouts/Layout.astro";
               <p>No. Once you migrate, it cannot be undone.</p>
             </FaqItem>
           <FaqItem question="IS THERE A DEADLINE?">
-              <p>Yes. You only have the ~2-month migration window.</p>
+              <p>Yes. You have until August 1, 2026 to migrate. REP that is not migrated before the deadline will remain in the parent universe and is expected to become worthless.</p>
+            </FaqItem>
+          <FaqItem question="WHERE CAN I TRACK THE FORK AND MIGRATION STATUS?">
+              <p><a href="https://v3.augur.net/" target="_blank">ForkWatch</a> is the official support page for the migration window. It shows live fork status, the deadline, migration progress, the exchange-support list, and a REP checker that shows whether an address holds REPv1 or REPv2.</p>
             </FaqItem>
         </div>
 
