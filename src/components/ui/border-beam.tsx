@@ -77,6 +77,12 @@ const BorderBeam: React.FC<BorderBeamProps> = ({
           position: relative;
           z-index: 1;
         }
+
+        @media (prefers-reduced-motion: reduce) {
+          .border-beam-wrapper::before {
+            animation: none;
+          }
+        }
       `}</style>
 		</span>
 	);

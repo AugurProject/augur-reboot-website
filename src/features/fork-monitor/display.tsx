@@ -1,9 +1,12 @@
 import type React from "react";
-import { useForkData } from "./data-provider";
 import { ForkActiveCard } from "./active-card";
+import { useForkClock } from "./clock";
 import { ForkControls } from "./controls";
+import { useForkData } from "./data-provider";
+import { deriveForkLifecycle } from "./derive-fork-lifecycle";
 import { ForkDetailsCard } from "./details-card";
 import { ForkGauge } from "./gauge";
+import { ForkRecord, ForkResolutionPending } from "./post-fork-record";
 import { ForkStats } from "./stats";
 
 // Helper function to format timestamps as relative time
@@ -32,7 +35,8 @@ interface ForkDisplayProps {
 const ForkDisplay: React.FC<ForkDisplayProps> = ({ animated = true }) => {
 	const { gaugeData, riskLevel, lastUpdated, isLoading, error, rawData } =
 		useForkData();
-	const isForking = rawData.metrics.disputeDetails[0]?.marketId === "FORKING";
+	const now = useForkClock();
+	const lifecycle = deriveForkLifecycle(rawData, Math.floor(now / 1000));
 
 	return (
 		<>
@@ -45,9 +49,28 @@ const ForkDisplay: React.FC<ForkDisplayProps> = ({ animated = true }) => {
 
 				{error && <div className="mb-4 text-orange-400">Warning: {error}</div>}
 
-				{isForking ? (
-					<ForkActiveCard />
-				) : (
+				{(lifecycle.state === "migration-open" ||
+					lifecycle.state === "migration-open-resolved") && <ForkActiveCard />}
+
+				{lifecycle.state === "migration-closed-resolved" && <ForkRecord />}
+
+				{lifecycle.state === "migration-closed-unverified" && (
+					<ForkResolutionPending />
+				)}
+
+				{lifecycle.state === "data-unavailable" && (
+					<div className="mx-auto max-w-xl border border-orange-500/30 bg-orange-500/5 p-5 text-left font-mono text-sm text-orange-300">
+						<div className="text-xs uppercase tracking-widest">
+							Fork data unavailable
+						</div>
+						<p className="mt-2 font-prose text-muted-foreground">
+							The site is withholding a fork status claim until the fork JSON
+							data can be verified.
+						</p>
+					</div>
+				)}
+
+				{lifecycle.state === "monitoring" && (
 					<>
 						{/* Gauge with Details Card - ForkDetailsCard wraps the gauge */}
 						<ForkDetailsCard

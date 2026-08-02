@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Typewriter from "./typewriter";
 
 interface Segment {
@@ -11,6 +11,7 @@ interface TypewriterSequenceProps {
 	defaultTypingSpeed?: number;
 	delayBetweenSentences?: number;
 	holdDuration?: number;
+	loop?: boolean;
 	onSequenceComplete?: () => void;
 }
 
@@ -19,10 +20,17 @@ const TypewriterSequence: React.FC<TypewriterSequenceProps> = ({
 	defaultTypingSpeed = 60,
 	delayBetweenSentences = 300,
 	holdDuration = 2500,
+	loop = false,
 	onSequenceComplete,
 }) => {
 	const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
 	const [showTypewriter, setShowTypewriter] = useState(true);
+	const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
+	const nextSentenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
 
 	const getSegmentsForSentence = (sentence: string): Segment[] => {
 		const parts = sentence.split(/(\.\.\.)/);
@@ -40,15 +48,33 @@ const TypewriterSequence: React.FC<TypewriterSequenceProps> = ({
 	};
 
 	const handleComplete = () => {
+		if (transitionTimeoutRef.current !== null) return;
+
 		// Keep the current sentence visible for holdDuration
-		setTimeout(() => {
+		transitionTimeoutRef.current = setTimeout(() => {
+			transitionTimeoutRef.current = null;
 			setShowTypewriter(false); // Hide current Typewriter
-			setTimeout(() => {
-				setCurrentSentenceIndex((prevIndex) => prevIndex + 1);
+			nextSentenceTimeoutRef.current = setTimeout(() => {
+				nextSentenceTimeoutRef.current = null;
+				setCurrentSentenceIndex((prevIndex) => {
+					const nextIndex = prevIndex + 1;
+					return loop && nextIndex >= sentences.length ? 0 : nextIndex;
+				});
 				setShowTypewriter(true); // Show next Typewriter
 			}, delayBetweenSentences);
 		}, holdDuration);
 	};
+
+	useEffect(() => {
+		return () => {
+			if (transitionTimeoutRef.current !== null) {
+				clearTimeout(transitionTimeoutRef.current);
+			}
+			if (nextSentenceTimeoutRef.current !== null) {
+				clearTimeout(nextSentenceTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		if (currentSentenceIndex >= sentences.length) {

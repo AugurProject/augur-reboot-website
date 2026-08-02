@@ -34,9 +34,14 @@ export const ForkControls = (): React.JSX.Element | null => {
 
 	if (!isVisible) {
 		return ReactDOM.createPortal(
-			<div className="fixed top-4 left-4 z-50 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded">
+			<button
+				type="button"
+				onClick={() => setIsVisible(true)}
+				className="fixed top-4 left-4 z-50 text-xs text-muted-foreground bg-background/90 px-2 py-1 rounded hover:text-primary hover:fx-glow-sm focus:text-primary focus:fx-glow-sm focus:outline-none"
+				aria-label="Open fork demo controls"
+			>
 				DEV: F2 for demo
-			</div>,
+			</button>,
 			document.body,
 		);
 	}
@@ -64,7 +69,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 						onClick={resetToLive}
 						className="text-xs bg-primary/20 hover:bg-primary/30 px-2 py-1 rounded"
 					>
-						Return to Live Data
+						Return to Fork JSON Data
 					</button>
 				</div>
 			)}
@@ -109,7 +114,7 @@ export const ForkControls = (): React.JSX.Element | null => {
 				<button
 					type="button"
 					onClick={() => generateScenario(DisputeBondScenario.ELEVATED_RISK)}
-					className="block w-full text-left text-xs bg-red-800/30 hover:bg-red-800/40 px-2 py-1 rounded animate-pulse"
+					className="block w-full text-left text-xs bg-red-800/30 hover:bg-red-800/40 px-2 py-1 rounded motion-safe:animate-pulse"
 				>
 					Extreme Risk (75%+)
 				</button>
@@ -147,7 +152,37 @@ export const ForkControls = (): React.JSX.Element | null => {
 					}
 					className="block w-full text-left text-xs bg-purple-900/40 hover:bg-purple-900/50 px-2 py-1 rounded"
 				>
-					Active Fork — Resolved (Yes &gt; goal)
+					Winner Known — Migration Still Open
+				</button>
+
+				<button
+					type="button"
+					onClick={() =>
+						generateScenario(DisputeBondScenario.ACTIVE_FORK_CLOSING)
+					}
+					className="block w-full text-left text-xs bg-red-900/40 hover:bg-red-900/50 px-2 py-1 rounded"
+				>
+					Winner Known — Closing (~1 Day)
+				</button>
+
+				<button
+					type="button"
+					onClick={() =>
+						generateScenario(DisputeBondScenario.ACTIVE_FORK_CLOSED)
+					}
+					className="block w-full text-left text-xs bg-green-900/30 hover:bg-green-900/40 px-2 py-1 rounded"
+				>
+					Migration Closed — Fork Record
+				</button>
+
+				<button
+					type="button"
+					onClick={() =>
+						generateScenario(DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED)
+					}
+					className="block w-full text-left text-xs bg-orange-900/30 hover:bg-orange-900/40 px-2 py-1 rounded"
+				>
+					Migration Closed — Winner Pending
 				</button>
 			</div>
 

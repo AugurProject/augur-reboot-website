@@ -1,4 +1,4 @@
-import type { ForkRiskData } from "./types";
+import type { ForkRecordData, ForkRiskData } from "./types";
 
 type ForkRiskLevel = ForkRiskData["riskLevel"];
 
@@ -16,6 +16,9 @@ export enum DisputeBondScenario {
 	ACTIVE_FORK_MID = "active_fork_mid",
 	ACTIVE_FORK_NEAR_GOAL = "active_fork_near_goal",
 	ACTIVE_FORK_RESOLVED = "active_fork_resolved",
+	ACTIVE_FORK_CLOSING = "active_fork_closing",
+	ACTIVE_FORK_CLOSED = "active_fork_closed",
+	ACTIVE_FORK_CLOSED_UNVERIFIED = "active_fork_closed_unverified",
 }
 
 // Representative round data per scenario
@@ -27,6 +30,9 @@ const SCENARIO_ROUNDS: Record<
 		| DisputeBondScenario.ACTIVE_FORK_MID
 		| DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL
 		| DisputeBondScenario.ACTIVE_FORK_RESOLVED
+		| DisputeBondScenario.ACTIVE_FORK_CLOSING
+		| DisputeBondScenario.ACTIVE_FORK_CLOSED
+		| DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED
 	>,
 	{
 		currentRound: number;
@@ -66,7 +72,10 @@ export const generateDemoForkRiskData = (
 		scenario === DisputeBondScenario.ACTIVE_FORK ||
 		scenario === DisputeBondScenario.ACTIVE_FORK_MID ||
 		scenario === DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL ||
-		scenario === DisputeBondScenario.ACTIVE_FORK_RESOLVED
+		scenario === DisputeBondScenario.ACTIVE_FORK_RESOLVED ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSING ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSED ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED
 	) {
 		return generateActiveForkDemo(scenario);
 	}
@@ -235,7 +244,10 @@ const ACTIVE_FORK_MIGRATIONS: Record<
 	| DisputeBondScenario.ACTIVE_FORK
 	| DisputeBondScenario.ACTIVE_FORK_MID
 	| DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL
-	| DisputeBondScenario.ACTIVE_FORK_RESOLVED,
+	| DisputeBondScenario.ACTIVE_FORK_RESOLVED
+	| DisputeBondScenario.ACTIVE_FORK_CLOSING
+	| DisputeBondScenario.ACTIVE_FORK_CLOSED
+	| DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED,
 	{ invalid: number; no: number; yes: number; daysRemaining: number }
 > = {
 	[DisputeBondScenario.ACTIVE_FORK]: {
@@ -262,6 +274,24 @@ const ACTIVE_FORK_MIGRATIONS: Record<
 		yes: 5_620_000,
 		daysRemaining: 12,
 	},
+	[DisputeBondScenario.ACTIVE_FORK_CLOSING]: {
+		invalid: 0,
+		no: 1_786,
+		yes: 6_454_838,
+		daysRemaining: 1,
+	},
+	[DisputeBondScenario.ACTIVE_FORK_CLOSED]: {
+		invalid: 0,
+		no: 1_786,
+		yes: 6_461_666,
+		daysRemaining: -1,
+	},
+	[DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED]: {
+		invalid: 198_000,
+		no: 940_000,
+		yes: 5_620_000,
+		daysRemaining: -1,
+	},
 };
 
 const generateActiveForkDemo = (
@@ -269,7 +299,10 @@ const generateActiveForkDemo = (
 		| DisputeBondScenario.ACTIVE_FORK
 		| DisputeBondScenario.ACTIVE_FORK_MID
 		| DisputeBondScenario.ACTIVE_FORK_NEAR_GOAL
-		| DisputeBondScenario.ACTIVE_FORK_RESOLVED = DisputeBondScenario.ACTIVE_FORK,
+		| DisputeBondScenario.ACTIVE_FORK_RESOLVED
+		| DisputeBondScenario.ACTIVE_FORK_CLOSING
+		| DisputeBondScenario.ACTIVE_FORK_CLOSED
+		| DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED = DisputeBondScenario.ACTIVE_FORK,
 ): ForkRiskData => {
 	const universeRepSupply = 8_174_577;
 	const forkReputationGoal = 5_497_186;
@@ -282,25 +315,55 @@ const generateActiveForkDemo = (
 		{
 			index: 0,
 			label: "Invalid",
-			childUniverse: "0xinvalid000000000000000000000000000000000",
+			childUniverse: "0x0000000000000000000000000000000000000100",
 			migratedRep: invalid,
 		},
 		{
 			index: 1,
-			label: "No",
-			childUniverse: "0xno0000000000000000000000000000000000000000",
-			migratedRep: no,
+			label: "Yes",
+			childUniverse: "0x0000000000000000000000000000000000000101",
+			migratedRep: yes,
 		},
 		{
 			index: 2,
-			label: "Yes",
-			childUniverse: "0xyes000000000000000000000000000000000000000",
-			migratedRep: yes,
+			label: "No",
+			childUniverse: "0x0000000000000000000000000000000000000102",
+			migratedRep: no,
 		},
 	];
+	const winnerKnown =
+		scenario === DisputeBondScenario.ACTIVE_FORK_RESOLVED ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSING ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSED;
+	const migrationClosed =
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSED ||
+		scenario === DisputeBondScenario.ACTIVE_FORK_CLOSED_UNVERIFIED;
+	const winningChildUniverse = winnerKnown ? outcomes[1].childUniverse : null;
+	const generatedAt = new Date().toISOString();
+	const forkRecord: ForkRecordData = {
+		status: migrationClosed
+			? winnerKnown
+				? "migration-closed-resolved"
+				: "migration-closed-unverified"
+			: winnerKnown
+				? "migration-open-resolved"
+				: "migration-open",
+		parentUniverse: "0x0000000000000000000000000000000000000200",
+		forkingMarket: "0x0000000000000000000000000000000000000201",
+		migrationDeadline: forkEndTime,
+		reputationGoal: forkReputationGoal,
+		winningChildUniverse,
+		outcomes: outcomes.map((outcome) => ({
+			...outcome,
+			isWinner: outcome.childUniverse === winningChildUniverse,
+		})),
+		observedBlock: 25_185_608,
+	};
 
 	return {
-		lastRiskChange: new Date().toISOString(),
+		schemaVersion: 2,
+		generatedAt,
+		lastRiskChange: generatedAt,
 		blockNumber: 25_185_608,
 		riskLevel: "critical",
 		riskPercentage: 100,
@@ -332,12 +395,14 @@ const generateActiveForkDemo = (
 			forkThreshold,
 		},
 		forkActive: {
-			forkingMarket: "0x963eed85778cc23e2d4636cd4f29eecdf9827e9e",
+			forkingMarket: forkRecord.forkingMarket,
 			forkEndTime,
+			winningChildUniverse,
 			forkReputationGoal,
 			universeRepSupply,
-			outcomes,
+			outcomes: forkRecord.outcomes,
 		},
+		fork: forkRecord,
 	};
 };
 

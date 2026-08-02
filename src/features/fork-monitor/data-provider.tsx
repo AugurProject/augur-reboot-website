@@ -8,6 +8,7 @@ import {
 	useState,
 } from "react";
 import type { ForkRiskData, GaugeData, RiskLevel } from "./types";
+import { validateForkRiskData } from "./validate-fork-data";
 
 interface ForkDataContextValue {
 	gaugeData: GaugeData;
@@ -118,13 +119,23 @@ export const ForkDataProvider = ({
 			}
 
 			const data: ForkRiskData = await response.json();
+			const validation = validateForkRiskData(data);
+			if (!validation.valid) {
+				const message = `Fork data validation failed: ${validation.errors.join("; ")}`;
+				console.error(message);
+				setError(message);
+				setForkRiskData({ ...defaultData, error: message });
+				return;
+			}
 			setForkRiskData(data);
 		} catch (err) {
 			console.error("Error loading fork risk data:", err);
-			setError(err instanceof Error ? err.message : "Failed to load data");
+			const message =
+				err instanceof Error ? err.message : "Failed to load data";
+			setError(message);
 
 			// Fallback to default data if file doesn't exist
-			setForkRiskData(defaultData);
+			setForkRiskData({ ...defaultData, error: message });
 		} finally {
 			setIsLoading(false);
 		}

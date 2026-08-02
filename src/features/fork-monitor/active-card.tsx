@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import Button from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { useForkClock } from "./clock";
 import { useForkData } from "./data-provider";
+import { deriveForkLifecycle, getForkRecord } from "./derive-fork-lifecycle";
 
 const TOTAL_SUPPLY = 11_000_000;
 
@@ -25,21 +32,20 @@ const pad = (n: number, w = 2) => String(n).padStart(w, "0");
 
 export const ForkActiveCard = (): React.JSX.Element | null => {
 	const { rawData } = useForkData();
-	const fork = rawData.forkActive;
-	const [now, setNow] = useState<number>(() => Date.now());
+	const record = getForkRecord(rawData);
+	const now = useForkClock();
 	const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-	useEffect(() => {
-		const id = setInterval(() => setNow(Date.now()), 1000);
-		return () => clearInterval(id);
-	}, []);
+	if (!record) return null;
 
-	if (!fork) return null;
-
-	const migratedRep = fork.outcomes.reduce((sum, o) => sum + o.migratedRep, 0);
+	const migratedRep = record.outcomes.reduce(
+		(sum, o) => sum + o.migratedRep,
+		0,
+	);
 	const migratedPercent = Math.min(100, (migratedRep / TOTAL_SUPPLY) * 100);
+	const winnerKnown = deriveForkLifecycle(rawData).winnerKnown;
 
-	const t = getCountdownParts(fork.forkEndTime, now);
+	const t = getCountdownParts(record.migrationDeadline, now);
 	const timerCells: Array<{ value: string; label: string }> = [
 		{ value: pad(t.d, 2), label: "DAYS" },
 		{ value: pad(t.h), label: "HRS" },
@@ -59,9 +65,7 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 					>
 						<div className="flex justify-between items-center mb-4">
 							<div className="text-xs uppercase tracking-widest">
-								<span className="text-muted-foreground">
-									{"FORK ACTIVE //"}
-								</span>{" "}
+								<span className="text-muted-foreground">{"FORK ACTIVE // "}</span>
 								<span className="text-foreground">MIGRATING</span>
 							</div>
 							<div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground group-hover:text-primary group-focus:text-primary transition">
@@ -107,8 +111,7 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 							</div>
 						</div>
 						<div className="text-center text-muted-foreground">
-							remaining in <span className="text-foreground">60-day</span>{" "}
-							migration window
+							time remaining to migrate
 						</div>
 					</button>
 				</DialogTrigger>
@@ -147,12 +150,12 @@ export const ForkActiveCard = (): React.JSX.Element | null => {
 					</div>
 				</div>
 			</div>
-			<ForkActiveHelpDialog />
+			<ForkActiveHelpDialog winnerKnown={winnerKnown} />
 		</Dialog>
 	);
 };
 
-const ForkActiveHelpDialog = () => (
+const ForkActiveHelpDialog = ({ winnerKnown }: { winnerKnown: boolean }) => (
 	<DialogContent className="bg-background border border-foreground/10 backdrop-blur-sm overflow-y-auto">
 		<DialogTitle className="sr-only">Fork migration help</DialogTitle>
 		<div className="mb-4">
@@ -182,10 +185,12 @@ const ForkActiveHelpDialog = () => (
 			</div>
 			<div>
 				<span className="uppercase font-display text-red-400 font-bold text-2xl tracking-wide">
-					Migration window closing
+					{winnerKnown ? "Migration window closing" : "The fork is here"}
 				</span>
 				<p className="text-base text-red-400/70 leading-5 tracking-tight">
-					Act now or risk permanently losing your REP!
+					{winnerKnown
+						? "Act now or risk permanently losing your REP!"
+						: "Own REP? Act now."}
 				</p>
 			</div>
 		</div>
