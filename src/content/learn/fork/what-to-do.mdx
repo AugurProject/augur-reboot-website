@@ -4,10 +4,19 @@ description: "Action items to take at different fork risk levels."
 ---
 
 import ProseCard from '../../../components/content/prose-card.astro'
+import { getForkLifecycleAtBuild, isMigrationOpen } from '../../../lib/fork-data'
 
-# What To Do During Rising Fork Risk
+export const migrationOpen = isMigrationOpen(getForkLifecycleAtBuild().state)
 
-**TL;DR** — Fork risk is manageable at low levels. Monitor more closely as it rises. At high levels, take concrete action to protect your positions.
+{!migrationOpen && (
+<ProseCard>
+**MIGRATION CLOSED** — The Moon Fork migration window has closed. The guidance below explains the fork process and its historical decision points; it is not a current instruction to migrate.
+</ProseCard>
+)}
+
+# What To Do Around Fork Risk
+
+**TL;DR** — Fork risk is manageable at low levels. Monitor more closely as it rises. During an active migration window, follow the current state and deadline shown on the landing page. {!migrationOpen && 'The current Moon Fork guidance is now historical.'}
 
 ## Risk Overview
 
@@ -18,10 +27,10 @@ import ProseCard from '../../../components/content/prose-card.astro'
 | Low (&lt;25%) | Early disputes | Identify which markets are disputed. Understand the disagreement. |
 | Moderate (25-50%) | Disputes escalating | Calculate your exposure. Think about exit strategies if needed. |
 | High (50-75%) | Large bonds active | Monitor daily. Consider reducing exposure. Prepare for fork governance. |
-| Critical (≥75%) | Fork imminent | Take action now. Prepare to choose a fork. Engage with community. |
+| Critical (≥75%) | Fork imminent or active | Check the landing page for the current fork state and deadline. |
 </ProseCard>
 
-## High Risk (50-75%) — Take Action
+## High Risk (50-75%) — Prepare
 
 The dispute has passed the halfway point. Fork is increasingly likely with continued escalation.
 
@@ -34,11 +43,11 @@ The dispute has passed the halfway point. Fork is increasingly likely with conti
 - **Avoid new large bets** — Don't enter high-risk markets during escalation
 - **Know your positions** — Understand exactly how a fork would affect you
 
-## Critical Risk (≥75%) — Fork Is Likely
+## Critical Risk (≥75%) — Fork Is Likely or Active
 
 The dispute is in its final rounds. A fork is imminent or may have been triggered. This is the highest-stakes scenario.
 
-**What you must do:**
+**If the migration window is open:**
 
 - **Understand your position** — Know exactly what outcome you're betting on in disputed markets
 - **Plan your fork choice** — Which fork version do you believe represents the correct outcomes?
@@ -52,14 +61,14 @@ The dispute is in its final rounds. A fork is imminent or may have been triggere
 ### The 60-Day Fork Period
 
 - **Markets freeze:** No new trades on disputed markets
-- **You must migrate REP:** Choose which fork version you support
+- **REP migration:** Choose which fork version to support before the migration window closes
 - **Voting occurs:** Your REP migration determines your choice on the disputed outcome
 - **Communicate:** Engage in governance discussions about the right outcome
 - **Wait for resolution:** The fork window is 60 days
 
-### After Fork Resolution
+### After a Verified Fork Resolution
 
-- **Check your REP:** You now have REP on the winning fork
+- **Check your REP:** Verify which REP token corresponds to the recorded winning fork
 - **Markets settle:** Markets settle according to the winning fork's outcomes
 - **Resume trading:** Normal Augur operations resume
 - **Evaluate impact:** Assess how the fork affected your positions

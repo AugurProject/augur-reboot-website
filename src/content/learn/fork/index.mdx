@@ -5,13 +5,24 @@ description: "Learn about Augur protocol forks, how they work, and why fork risk
 
 import ProseCard from '../../../components/content/prose-card.astro'
 import MigrationCta from '../../../features/learn/migration-cta.tsx'
+import { getForkLifecycleAtBuild, isMigrationOpen, isVerifiedForkResolution } from '../../../lib/fork-data'
 
-<MigrationCta
-  className="not-prose mb-8"
-  eyebrow="CRITICAL · MIGRATION IMMINENT"
-  title="Migrate your REP before Aug 1, 2026"
-  description="Unmigrated REP will be left in a dead universe. Follow the step-by-step guide to move it safely."
-/>
+export const forkLifecycle = getForkLifecycleAtBuild()
+export const migrationOpen = isMigrationOpen(forkLifecycle.state)
+export const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state)
+
+{migrationOpen ? (
+  <MigrationCta
+    className="not-prose mb-8"
+    eyebrow="CRITICAL · MIGRATION IMMINENT"
+    title="Migrate your REP before the deadline"
+    description="Unmigrated REP will be left in a dead universe. Follow the step-by-step guide to move it safely."
+  />
+) : (
+  <ProseCard class="not-prose mb-8">
+  **MIGRATION CLOSED** — This guide is preserved as a record of the Moon Fork migration process. {resolutionVerified ? 'See the landing page for the verified Fork Record.' : 'The landing page is withholding the final resolution until it can be verified.'}
+  </ProseCard>
+)}
 
 > **New to Augur?** This guide assumes some familiarity with prediction markets. If you're completely new, start with Augur basics first.
 

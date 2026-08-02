@@ -114,7 +114,7 @@ export default function LearnNavigation({
 										<span>{topic.title}</span>
 										{topic.critical && (
 											<span className="ml-auto text-[0.65rem] opacity-80">
-												{"// ACT NOW"}
+												{"ACT NOW"}
 											</span>
 										)}
 									</a>

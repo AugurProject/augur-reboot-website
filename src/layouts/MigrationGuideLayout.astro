@@ -3,6 +3,11 @@ import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import LearnNavigation from "../features/learn/navigation.tsx";
 import Layout from "../layouts/Layout.astro";
+import {
+	getForkLifecycleAtBuild,
+	isMigrationOpen,
+	isVerifiedForkResolution,
+} from "../lib/fork-data";
 
 interface Props {
 	title: string;
@@ -10,14 +15,26 @@ interface Props {
 	deadline?: string;
 }
 
-const { title, description, deadline = "AUGUST 1, 2026" } = Astro.props;
+const { title, description, deadline = "THE RECORDED DEADLINE" } = Astro.props;
+const forkLifecycle = getForkLifecycleAtBuild();
+const migrationOpen = isMigrationOpen(forkLifecycle.state);
+const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
+const recordedDeadline = forkLifecycle.record?.migrationDeadline
+	? new Date(forkLifecycle.record.migrationDeadline * 1000)
+			.toLocaleDateString("en-US", {
+				month: "long",
+				day: "numeric",
+				year: "numeric",
+			})
+			.toUpperCase()
+	: deadline;
 
 const topics = [
 	{
 		title: "MIGRATION GUIDE",
 		slug: "fork/migration",
 		path: "/learn/fork/migration/",
-		critical: true,
+		critical: migrationOpen,
 	},
 	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
 	{
@@ -45,17 +62,16 @@ const currentPath = Astro.url.pathname;
 
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
 			<div class="max-w-3xl mx-auto">
-				{/* Alert hero — dramatic, critical-coded, glow-pulsed */}
-				<header class="relative border border-red-500/60 bg-red-500/4 px-6 py-8 mb-8">
-					<div class="font-display uppercase tracking-wider text-sm text-red-500 mb-3 flex items-center gap-2">
-						<span class="inline-block w-2 h-2 bg-red-500" aria-hidden="true"></span>
-						<span>CRITICAL · MIGRATION IMMINENT</span>
+				<header class:list={["relative px-6 py-8 mb-8", migrationOpen ? "border border-red-500/60 bg-red-500/4" : "border border-primary/40 bg-primary/4"]}>
+					<div class:list={["font-display uppercase tracking-wider text-sm mb-3 flex items-center gap-2", migrationOpen ? "text-red-500" : "text-primary"]}>
+						<span class:list={["inline-block w-2 h-2", migrationOpen ? "bg-red-500" : "bg-primary"]} aria-hidden="true"></span>
+						<span>{migrationOpen ? "CRITICAL · MIGRATION IMMINENT" : resolutionVerified ? "FORK RECORD · MIGRATION CLOSED" : "FORK STATE · VERIFICATION PENDING"}</span>
 					</div>
 					<h1 class="font-display uppercase leading-[0.95] text-3xl sm:text-3xl">
-						<span class="block text-loud-foreground">You will lose all of your REP</span>
+						<span class="block text-loud-foreground">{migrationOpen ? "You will lose all of your REP" : resolutionVerified ? "The migration window is closed" : "Resolution is pending verification"}</span>
 						<span class="block text-foreground text-2xl sm:text-2xl mt-2">
-							if you do not migrate before
-							<span class="text-red-500 fx-glow-sm-red-500">{deadline}</span>
+							{migrationOpen ? "if you do not migrate before" : resolutionVerified ? "Review the verified resolution recorded after" : "Review the recorded fork state after"}
+							<span class:list={["fx-glow-sm-red-500", migrationOpen ? "text-red-500" : "text-primary"]}>{recordedDeadline}</span>
 						</span>
 					</h1>
 				</header>

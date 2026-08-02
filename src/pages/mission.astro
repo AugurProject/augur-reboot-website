@@ -1,10 +1,19 @@
 ---
-import TimelineSection from "../features/mission/timeline-section.astro";
+import SectionHeading from "../components/content/section-heading.astro";
 import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import PageTitle from "../components/shell/page-title.astro";
-import SectionHeading from "../components/content/section-heading.astro";
+import TimelineSection from "../features/mission/timeline-section.astro";
 import Layout from "../layouts/Layout.astro";
+import {
+  getForkLifecycleAtBuild,
+  isMigrationOpen,
+  isVerifiedForkResolution,
+} from "../lib/fork-data";
+
+const forkLifecycle = getForkLifecycleAtBuild();
+const migrationOpen = isMigrationOpen(forkLifecycle.state);
+const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
 ---
 
 <Layout
@@ -129,9 +138,9 @@ import Layout from "../layouts/Layout.astro";
 
           <TimelineSection title="Migration Window Opens" date="June 2026">
             <h3>Phase 2: Mandatory Migration</h3>
-            <p>In early June, the fork backstop activated and Augur forked into competing universes—one per outcome. The <strong>2-month migration window is now open</strong>; every REP holder must migrate their tokens 1:1 into a chosen universe before it closes in early August.</p>
+            <p>In early June, the fork backstop activated and Augur forked into competing universes—one per outcome. {migrationOpen ? <><strong>The 2-month migration window is now open</strong>; every REP holder must migrate their tokens 1:1 into a chosen universe before it closes.</> : resolutionVerified ? <>The 2-month migration window is now closed; the landing page preserves the verified Fork Record and its on-chain references.</> : <>The 2-month migration window is now closed; the landing page records the fork state while resolution remains pending verification.</>}</p>
             <ul>
-              <li><strong>Deadline—early August:</strong> REP holders are being notified to migrate before the window closes; tokens left behind are stranded in the old universe</li>
+              <li><strong>Deadline—early August:</strong> {migrationOpen ? "REP holders are being notified to migrate before the window closes; tokens left behind are stranded in the old universe" : resolutionVerified ? "The migration window is closed; the landing page preserves the verified Fork Record and its on-chain references" : "The migration window is closed; the landing page records the fork state while resolution remains pending verification"}</li>
               <li><strong>Exchange support:</strong> the Lituus Foundation is coordinating with exchanges to migrate on behalf of users</li>
             </ul>
             <p>This is the first live run of Augur's fork backstop—the security model's final layer, where REP migration determines which universe carries the canonical outcome.</p>
@@ -140,7 +149,7 @@ import Layout from "../layouts/Layout.astro";
           <TimelineSection title="The Fork and Beyond" date="2026" isLast>
             <h3>Execution Begins</h3>
             <p>Full development of <strong>Augur Lituus</strong> begins this year, with continued focus on a unified REP infrastructure across both the B2C and B2B tracks.</p>
-            <p>With the Moon Fork demonstrating Augur's security model under real conditions, future official Augur development—funded by the Foundation—will continue on the fork corresponding with truth.</p>
+            <p>With the Moon Fork demonstrating Augur's security model under real conditions, future official Augur development—funded by the Foundation—will continue on the fork corresponding with truth. {migrationOpen ? "The migration window remains the current action for REP holders." : "The historical record can be revisited if future protocol work changes the implementation."}</p>
           </TimelineSection>
         </div>
       </div>

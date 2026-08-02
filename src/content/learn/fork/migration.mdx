@@ -1,6 +1,6 @@
 ---
 title: "Moon Fork Migration Guide"
-description: "Step-by-step REP migration guide. Migrate before August 1, 2026 or lose your REP."
+description: "Step-by-step historical reference for the Augur Moon Fork REP migration."
 ---
 
 import { Image } from 'astro:assets'
@@ -11,6 +11,19 @@ import step03 from '../../../assets/learn/migration/step-03.png'
 import step04 from '../../../assets/learn/migration/step-04.png'
 import step05 from '../../../assets/learn/migration/step-05.png'
 import step06 from '../../../assets/learn/migration/step-06.png'
+import { getForkLifecycleAtBuild, isMigrationOpen } from '../../../lib/fork-data'
+
+export const forkLifecycle = getForkLifecycleAtBuild()
+export const migrationOpen = isMigrationOpen(forkLifecycle.state)
+export const migrationDeadline = forkLifecycle.record?.migrationDeadline
+  ? new Date(forkLifecycle.record.migrationDeadline * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  : 'the recorded deadline'
+
+{!migrationOpen && (
+<ProseCard>
+**MIGRATION CLOSED** — The migration window has closed. The instructions below remain available as a historical reference; verify the final outcome on the landing page before acting on any token information.
+</ProseCard>
+)}
 
 ## Why?
 
@@ -28,8 +41,10 @@ Augur is forking before the next version for three reasons:
 | If you…                       | You can take action after | The last day this will happen between |
 |-------------------------------|---------------------------|---------------------------------------|
 | migrate early (40% ROI)       | April 8ᵗʰ – May 12ᵗʰ      | June 4ᵗʰ – June 11ᵗʰ                  |
-| migrate late (1:1 conversion) | June 4ᵗʰ – June 11ᵗʰ      | August 2ⁿᵈ – August 10ᵗʰ              |
+| migrate late (1:1 conversion) | June 4ᵗʰ – June 11ᵗʰ      | the contract deadline shown below      |
 </ProseCard>
+
+**Recorded migration deadline:** {migrationDeadline}
 
 ## Moon Fork Migration Guide
 
@@ -76,7 +91,7 @@ Make sure the page says **"You have 0 REPv1"**. If not, convert all REPv1 into R
 
 ### 5. Wait until June 11ᵗʰ
 
-Augur will have forked by this date, enabling unlimited migration. You will have until **August 1ˢᵗ** to migrate or sell your REP before it becomes worthless — possibly up to 10 days longer.
+Augur will have forked by this date, enabling unlimited migration. The migration window ends at the **{migrationDeadline}** deadline shown by the deployed contract. {migrationOpen ? 'If the window is still open, migrate or sell your REP before it closes.' : 'The recorded migration deadline has passed; the remaining instructions are historical reference only.'}
 
 ### 6. Open the migration page
 

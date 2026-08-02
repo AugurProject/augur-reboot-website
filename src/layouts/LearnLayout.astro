@@ -5,6 +5,7 @@ import PageHeader from "../components/shell/page-header.tsx";
 import PageTitle from "../components/shell/page-title.astro";
 import LearnNavigation from "../features/learn/navigation.tsx";
 import Layout from "../layouts/Layout.astro";
+import { getForkLifecycleAtBuild, isMigrationOpen } from "../lib/fork-data";
 
 interface Props {
 	title: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const migrationOpen = isMigrationOpen(getForkLifecycleAtBuild().state);
 
 // Topic navigation data
 const topics = [
@@ -19,7 +21,7 @@ const topics = [
 		title: "MIGRATION GUIDE",
 		slug: "fork/migration",
 		path: "/learn/fork/migration/",
-		critical: true,
+		critical: migrationOpen,
 	},
 	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
 	{
