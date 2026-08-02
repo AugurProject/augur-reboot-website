@@ -9,17 +9,20 @@ Augur.net serves structured JSON at stable URLs under `/data/` for external cons
 
 ## Compatibility
 
-The current endpoint does not expose an explicit schema version. Treat renaming, removing, or changing the type of an existing field as a breaking change and coordinate it with known consumers. Adding an optional field is backward-compatible.
+The endpoint now emits additive schema version 2 fields. Treat renaming, removing, or changing the type of an existing field as a breaking change and coordinate it with known consumers. Older consumers can continue reading the existing risk and `forkActive` fields.
 
 ## Endpoints
 
 ### `/data/fork-risk.json`
 
-Live fork status from on-chain Augur contracts. Updated hourly by CI.
+Fork status from on-chain Augur contracts. Updated by the fork-monitoring
+workflow while monitoring is active. The lifecycle record remains available
+after the migration deadline; monitoring cadence is a separate operational
+decision.
 
 ```
 GET /data/fork-risk.json
-Refresh: every hour (GitHub Actions cron: 0 * * * *)
+Refresh: currently hourly (GitHub Actions cron: `0 * * * *`); cadence changes are handled by the monitoring workflow
 Pipeline: scripts/calculate-fork-risk.ts
 ```
 
@@ -28,6 +31,8 @@ Pipeline: scripts/calculate-fork-risk.ts
 | Field | Type | Description |
 |---|---|---|
 | `lastRiskChange` | `string` (ISO 8601) | Timestamp of the latest calculation. Poll this to detect staleness. |
+| `schemaVersion` | `number`, optional | Versioned data contract; current generated records use `2`. |
+| `generatedAt` | `string` (ISO 8601), optional | Timestamp used to derive the emitted lifecycle status. |
 | `blockNumber` | `number`, optional | Ethereum block at time of calculation; omitted from error results |
 | `riskLevel` | `enum` | `none` \| `low` \| `moderate` \| `high` \| `critical` \| `unknown` |
 | `riskPercentage` | `number \| null` | Round progress as percentage (0–100). `null` when projection unavailable. |
@@ -35,7 +40,8 @@ Pipeline: scripts/calculate-fork-risk.ts
 | `rpcInfo` | `object`, optional | RPC endpoint used, latency, fallback count |
 | `calculation` | `object` | `forkThreshold` — REP threshold that triggers fork |
 | `cacheValidation` | `object`, optional | Cache health: `isHealthy: boolean`, optional `discrepancy` |
-| `forkActive` | `object`, optional | Present only when a fork is live (below) |
+| `fork` | `object \| null`, optional | Normalized fork lifecycle record (schema v2, below) |
+| `forkActive` | `object`, optional | Backward-compatible active-fork fields or preserved compatibility snapshot (below) |
 | `error` | `string`, optional | Error message if the pipeline failed |
 
 #### `metrics`
@@ -52,7 +58,8 @@ Pipeline: scripts/calculate-fork-risk.ts
 
 #### `forkActive`
 
-Present only when a fork is live. Omitted otherwise.
+Present for an active fork and may be retained in the finalized record for
+older consumers. New consumers should use `fork` as the lifecycle source.
 
 | Field | Type | Description |
 |---|---|---|
@@ -70,6 +77,23 @@ Present only when a fork is live. Omitted otherwise.
 | `label` | `string` | Human-readable outcome label |
 | `childUniverse` | `string \| null` | Child universe address, or `null` if none created |
 | `migratedRep` | `number` | REP migrated to this outcome so far |
+
+#### `fork` (schema v2)
+
+The normalized record is the source for lifecycle presentation. `status` can be `migration-open`, `migration-open-resolved`, `migration-closed-resolved`, or `migration-closed-unverified`; non-fork records use `fork: null`.
+
+| Field | Type | Description |
+|---|---|---|
+| `status` | `enum` | Lifecycle status emitted at generation time |
+| `parentUniverse` | `string \| null` | Parent/forking universe address |
+| `forkingMarket` | `string` | Market that triggered the fork |
+| `migrationDeadline` | `number` | Unix timestamp at which migration closes |
+| `reputationGoal` | `number` | REP needed for early resolution |
+| `winningChildUniverse` | `string \| null` | Contract-reported winner, when known |
+| `outcomes` | `array` | Outcome records, including child universe, REP token, and migrated REP |
+| `observedBlock` | `number`, optional | Ethereum block used for the record |
+
+The browser derives the current display state from `fork.winningChildUniverse`, `fork.migrationDeadline`, and current time. A winner known before the deadline does not make the endpoint post-fork; it remains `migration-open-resolved` until the deadline.
 
 **Risk level thresholds**: `none` (0%), `low` (1–24%), `moderate` (25–49%), `high` (50–74%), `critical` (75–100%). When `forkActive` is present, `riskLevel` is always `critical` and `roundProgress` is `100`.
 

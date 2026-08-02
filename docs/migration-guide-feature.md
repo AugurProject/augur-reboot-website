@@ -5,7 +5,7 @@ tags: [migration, feature, learn, fork]
 
 # Migration Guide Feature
 
-> The Moon Fork migration guide: a step-by-step walkthrough for REP holders who must migrate before the deadline.
+> The Moon Fork migration guide: a step-by-step walkthrough for REP holders while the migration window is open, preserved as historical reference after closure.
 
 ## Overview
 
@@ -41,7 +41,7 @@ The migration guide lives at `/learn/fork/migration/` and uses a dedicated **Mig
 
 A dedicated layout distinct from [[technical-architecture]]'s standard LearnLayout:
 
-- **Header**: Red-bordered alert box with `CRITICAL · MIGRATION IMMINENT` eyebrow and deadline display (default: "AUGUST 1, 2026")
+- **Header**: Red-bordered alert box with `CRITICAL · MIGRATION IMMINENT` while migration is open; after closure it becomes a state-aware Fork Record or verification-pending header with the recorded deadline.
 - **Navigation**: Uses the same `LearnNavigation.tsx` sidebar with migration guide as the first/critical topic
 - **Prose**: Same typographic treatment as LearnLayout articles
 

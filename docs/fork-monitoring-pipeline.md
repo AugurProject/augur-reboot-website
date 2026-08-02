@@ -40,7 +40,7 @@ risk-monitor          →  build              →  deploy
 
 1. Shallow checkout (`fetch-depth: 1`)
 2. Restore event cache from `actions/cache`
-3. Run `scripts/calculate-fork-risk.ts`
+3. Run `scripts/calculate-fork-risk.ts` (including the post-deadline fork-record preservation path)
 4. On a cache miss, save the resulting cache under `event-cache-v1`
 5. Upload `fork-risk.json` as artifact (`fork-risk-data`)
 
@@ -122,6 +122,7 @@ Top-level group for the entire workflow. Prevents:
 |----------|--------|
 | RPC endpoint down | Script auto-falls back to next endpoint |
 | All RPC endpoints fail | Script fails → pipeline stops → retry next hour |
+| Parent universe reports `isForking()` false after the deadline | The calculation path re-reads fork metadata and preserves the historical record; if metadata cannot be verified, it emits an unavailable result instead of ordinary risk data |
 | Cache missing | 30-day scan + seed file; successful job creates the static cache snapshot |
 | Artifact missing in build | Build fails → no deploy → site stays on last good version |
 | Workflow failure | No deploy; retry on the next scheduled run |

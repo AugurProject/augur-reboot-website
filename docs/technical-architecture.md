@@ -26,11 +26,16 @@ Layout.astro (Base HTML shell — toggles html.boot class for CSS-driven intro)
 │   ├── index.astro (Homepage)
 │   │   ├── features/home/intro.tsx (client:load — CRT boot overlay, removes html.boot on complete)
 │   │   ├── features/home/hero-banner.tsx (client:load — CSS-animated entrance)
-│   │   │   └── features/fork-monitor/monitor.tsx (client:load — Fork Gauge island)
-│   │   │       ├── data-provider.tsx (data fetching)
+│   │   │   └── features/fork-monitor/monitor.tsx (client:load — shared Fork Experience island)
+│   │   │       ├── data-provider.tsx (data fetching and validation)
+│   │   │       ├── clock.tsx (shared deadline clock for synchronized transitions)
+│   │   │       ├── derive-fork-lifecycle.ts (winner/deadline state derivation)
+│   │   │       ├── validate-fork-data.ts (runtime JSON validation)
 │   │   │       ├── gauge.tsx (SVG visualization)
 │   │   │       ├── stats.tsx (progressive disclosure)
-│   │   │       ├── display.tsx (layout)
+│   │   │       ├── display.tsx (lifecycle layout)
+│   │   │       ├── fork-action.tsx (state-aware migration CTA)
+│   │   │       ├── post-fork-record.tsx (closed record and resolution dialog)
 │   │   │       ├── details-card.tsx (expanded metrics + ascii-art)
 │   │   │       └── controls.tsx (demo mode, F2 toggle)
 │   │   └── features/home/featured-posts.astro → post-card.astro
@@ -59,15 +64,20 @@ When `.boot` is present, the CRT overlay (`#crt-overlay`) is shown and all hero 
 ### React Context (Island-scoped)
 - `features/fork-monitor/data-provider.tsx` — provides fork risk data to the gauge island
 - `features/fork-monitor/mock-provider.tsx` — demo mode data override
+- `features/fork-monitor/clock.tsx` — provides one ticking timestamp so the CTA, countdown, and post-fork record transition together
 
 ### Data Flow
 
-`ForkDataProvider` fetches `/data/fork-risk.json` for the gauge island and refreshes it on an interval. `ForkMockProvider` wraps the same island for development-only demo scenarios.
+`ForkDataProvider` fetches `/data/fork-risk.json`, validates schema-compatible data, and refreshes it on an interval. `ForkMockProvider` wraps the same island for development-only demo scenarios. `ForkExperience` places both the hero CTA and lower display under one provider so they cannot disagree about whether migration is still actionable.
+
+The browser derives one of the lifecycle states `monitoring`, `migration-open`, `migration-open-resolved`, `migration-closed-resolved`, `migration-closed-unverified`, or `data-unavailable`. A known winner changes only the CTA while migration remains open. The shared fork clock re-evaluates the CTA and lower display at the same deadline, so the active countdown cannot remain visible at zero. The Fork Record and dialog are available only after the verified deadline.
 
 The monitor's calculation and CI data pipeline are intentionally documented outside this architecture page:
 
 - [[fork-monitoring-methodology]] — calculation method and risk signal
 - [[fork-monitoring-pipeline]] — GitHub Actions pipeline and artifact flow
+
+Astro content pages use `src/lib/fork-data.ts` during the build to state-gate urgent migration warnings and the `ACT NOW` navigation treatment from the same generated JSON lifecycle.
 
 ## Content Collections
 
