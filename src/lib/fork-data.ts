@@ -33,6 +33,10 @@ export const isMigrationOpen = (
 	state: ReturnType<typeof getForkLifecycleAtBuild>["state"],
 ) => state === "migration-open" || state === "migration-open-resolved";
 
+export const isMigrationClosed = (
+	state: ReturnType<typeof getForkLifecycleAtBuild>["state"],
+) => state === "migration-closed-resolved" || state === "migration-closed-unverified";
+
 export const isVerifiedForkResolution = (
 	state: ReturnType<typeof getForkLifecycleAtBuild>["state"],
 ) => state === "migration-closed-resolved";

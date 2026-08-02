@@ -4,19 +4,10 @@ description: "Action items to take at different fork risk levels."
 ---
 
 import ProseCard from '../../../components/content/prose-card.astro'
-import { getForkLifecycleAtBuild, isMigrationOpen } from '../../../lib/fork-data'
-
-export const migrationOpen = isMigrationOpen(getForkLifecycleAtBuild().state)
-
-{!migrationOpen && (
-<ProseCard>
-**MIGRATION CLOSED** — The Moon Fork migration window has closed. The guidance below explains the fork process and its historical decision points; it is not a current instruction to migrate.
-</ProseCard>
-)}
 
 # What To Do Around Fork Risk
 
-**TL;DR** — Fork risk is manageable at low levels. Monitor more closely as it rises. During an active migration window, follow the current state and deadline shown on the landing page. {!migrationOpen && 'The current Moon Fork guidance is now historical.'}
+**TL;DR** — Fork risk is manageable at low levels. Monitor more closely as it rises. During an active migration window, participants follow the current state and deadline shown on the landing page.
 
 ## Risk Overview
 
