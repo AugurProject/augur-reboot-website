@@ -122,7 +122,8 @@ Top-level group for the entire workflow. Prevents:
 |----------|--------|
 | RPC endpoint down | Script auto-falls back to next endpoint |
 | All RPC endpoints fail | Script fails → pipeline stops → retry next hour |
-| Parent universe reports `isForking()` false after the deadline | The calculation path re-reads fork metadata and preserves the historical record; if metadata cannot be verified, it emits an unavailable result instead of ordinary risk data |
+| Parent universe reports `isForking()` false after the deadline | The calculation path re-reads fork metadata and preserves the historical record |
+| Lifecycle metadata read fails | The script retries the RPC endpoints; if none can verify lifecycle state, the job fails and no deploy occurs, preserving the last verified site |
 | Cache missing | 30-day scan + seed file; successful job creates the static cache snapshot |
 | Artifact missing in build | Build fails → no deploy → site stays on last good version |
 | Workflow failure | No deploy; retry on the next scheduled run |

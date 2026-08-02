@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readForkLifecycleSignals } from "./calculate-fork-risk.ts";
 import {
 	deriveForkLifecycle,
 	getForkRecord,
@@ -11,6 +12,39 @@ const parentUniverse = "0x1111111111111111111111111111111111111111";
 const market = "0x2222222222222222222222222222222222222222";
 const winningChild = "0x3333333333333333333333333333333333333333";
 const otherChild = "0x4444444444444444444444444444444444444444";
+
+test("keeps a successful pre-fork zero deadline as ordinary monitoring", async () => {
+	const signals = await readForkLifecycleSignals({
+		isForking: async () => false,
+		getForkEndTime: async () => 0n,
+	});
+
+	assert.deepEqual(signals, { isForking: false, forkEndTime: 0 });
+});
+
+test("does not guess when the forking status read fails", async () => {
+	await assert.rejects(
+		readForkLifecycleSignals({
+			isForking: async () => {
+				throw new Error("RPC unavailable");
+			},
+			getForkEndTime: async () => 0n,
+		}),
+		/RPC unavailable/u,
+	);
+});
+
+test("does not guess when the fork deadline read fails", async () => {
+	await assert.rejects(
+		readForkLifecycleSignals({
+			isForking: async () => false,
+			getForkEndTime: async () => {
+				throw new Error("RPC unavailable");
+			},
+		}),
+		/RPC unavailable/u,
+	);
+});
 
 const baseData = (
 	winningChildUniverse: string | null = null,

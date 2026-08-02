@@ -17,6 +17,20 @@ const forkLifecycle = getForkLifecycleAtBuild();
 const migrationOpen = isMigrationOpen(forkLifecycle.state);
 const migrationClosed = isMigrationClosed(forkLifecycle.state);
 const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
+const faqIntro = (() => {
+	switch (forkLifecycle.state) {
+		case "migration-closed-resolved":
+			return "Augur's first algorithmic fork is now recorded. This page explains what happened, how migration worked, and where to verify the resulting universe.";
+		case "migration-closed-unverified":
+			return "Augur's first algorithmic fork has reached the end of its migration window. This page explains what happened while the final resolution remains pending verification.";
+		case "data-unavailable":
+			return "Current fork status is temporarily unavailable. This page remains available as an educational reference.";
+		case "monitoring":
+			return "There is no active migration window at this time. This page explains Augur's fork and migration process.";
+		default:
+			return "This page explains Augur's fork and migration process.";
+	}
+})();
 ---
 
 <Layout
@@ -56,9 +70,7 @@ const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
           </p>
         ) : (
           <p class="text-center normal-case leading-tight text-foreground mb-12 mx-auto max-w-xl">
-            {resolutionVerified
-              ? "Augur's first algorithmic fork is now recorded. This page explains what happened, how migration worked, and where to verify the resulting universe."
-              : "Augur's first algorithmic fork has reached the end of its migration window. This page explains what happened while the final resolution remains pending verification."}
+            {faqIntro}
           </p>
         )}
 

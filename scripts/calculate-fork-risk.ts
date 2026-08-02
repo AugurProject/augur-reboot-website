@@ -219,6 +219,26 @@ async function retryContractCall<T>(
 	throw new Error(`Unexpected retry flow for ${methodName}`);
 }
 
+export interface ForkLifecycleSignals {
+	isForking: boolean;
+	forkEndTime: number | null;
+}
+
+export const readForkLifecycleSignals = async (readers: {
+	isForking: () => Promise<boolean>;
+	getForkEndTime: () => Promise<bigint | number | string>;
+}): Promise<ForkLifecycleSignals> => {
+	const isForking = await readers.isForking();
+	if (isForking) return { isForking: true, forkEndTime: null };
+
+	const forkEndTime = Number(await readers.getForkEndTime());
+	if (!Number.isFinite(forkEndTime) || forkEndTime < 0) {
+		throw new Error("Fork end time is invalid.");
+	}
+
+	return { isForking: false, forkEndTime };
+};
+
 async function loadContracts(
 	provider: ethers.JsonRpcProvider,
 ): Promise<Record<string, ethers.Contract>> {
@@ -333,19 +353,21 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				);
 			}
 
-			// Check if universe is already forking with retry logic
-			let isForking = false;
-			try {
-				isForking = await retryContractCall(
-					() => contracts.universe.isForking(),
-					"universe.isForking()",
-				);
-			} catch {
-				console.warn(
-					"⚠️ Failed to check forking status, continuing with dispute calculation",
-				);
-				// Continue with graceful degradation
-			}
+			// Lifecycle reads are required evidence. If either read fails, allow the
+			// RPC fallback wrapper to try another endpoint instead of guessing.
+			const lifecycle = await readForkLifecycleSignals({
+				isForking: () =>
+					retryContractCall(
+						() => contracts.universe.isForking(),
+						"universe.isForking()",
+					),
+				getForkEndTime: () =>
+					retryContractCall(
+						() => contracts.universe.getForkEndTime(),
+						"universe.getForkEndTime()",
+					),
+			});
+			const { isForking, forkEndTime: recordedForkEndTime } = lifecycle;
 
 			if (isForking) {
 				console.log("⚠️ UNIVERSE IS FORKING! Setting maximum risk level");
@@ -361,22 +383,9 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			// immediately after the migration deadline. Preserve the historical fork
 			// record in that case instead of falling back to an unrelated pre-fork
 			// risk calculation.
-			let recordedForkEndTime = 0;
-			try {
-				recordedForkEndTime = Number(
-					await retryContractCall(
-						() => contracts.universe.getForkEndTime(),
-						"universe.getForkEndTime() after fork closure",
-						1,
-					),
-				);
-			} catch {
-				// A non-forking universe may not expose fork metadata; continue with
-				// ordinary dispute monitoring in that case.
-			}
 
 			if (
-				Number.isFinite(recordedForkEndTime) &&
+				recordedForkEndTime !== null &&
 				recordedForkEndTime > 0 &&
 				Math.floor(Date.now() / 1000) >= recordedForkEndTime
 			) {
@@ -388,7 +397,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					contracts.universe,
 				);
 				if (!closedFork) {
-					return getErrorResult(
+					throw new Error(
 						"Fork metadata could not be verified after the migration deadline.",
 					);
 				}
