@@ -14,6 +14,12 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { ethers } from "ethers";
+import { deriveForkLifecycle } from "../src/features/fork-monitor/derive-fork-lifecycle.ts";
+import type {
+	ForkOutcome,
+	ForkRecordData,
+} from "../src/features/fork-monitor/types.ts";
+import { validateForkRiskData } from "../src/features/fork-monitor/validate-fork-data.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +58,8 @@ interface Calculation {
 type RiskLevel = "none" | "low" | "moderate" | "high" | "critical" | "unknown";
 
 interface ForkRiskData {
+	schemaVersion?: number;
+	generatedAt?: string;
 	lastRiskChange: string;
 	blockNumber?: number;
 	riskLevel: RiskLevel;
@@ -64,17 +72,14 @@ interface ForkRiskData {
 		isHealthy: boolean;
 		discrepancy?: string;
 	};
+	fork?: ForkRecordData | null;
 	forkActive?: {
 		forkingMarket: string;
 		forkEndTime: number;
+		winningChildUniverse?: string | null;
 		forkReputationGoal: number;
 		universeRepSupply: number;
-		outcomes: Array<{
-			index: number;
-			label: string;
-			childUniverse: string | null;
-			migratedRep: number;
-		}>;
+		outcomes: ForkOutcome[];
 	};
 }
 
@@ -352,6 +357,50 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				);
 			}
 
+			// Some deployed universe implementations stop reporting `isForking()`
+			// immediately after the migration deadline. Preserve the historical fork
+			// record in that case instead of falling back to an unrelated pre-fork
+			// risk calculation.
+			let recordedForkEndTime = 0;
+			try {
+				recordedForkEndTime = Number(
+					await retryContractCall(
+						() => contracts.universe.getForkEndTime(),
+						"universe.getForkEndTime() after fork closure",
+						1,
+					),
+				);
+			} catch {
+				// A non-forking universe may not expose fork metadata; continue with
+				// ordinary dispute monitoring in that case.
+			}
+
+			if (
+				Number.isFinite(recordedForkEndTime) &&
+				recordedForkEndTime > 0 &&
+				Math.floor(Date.now() / 1000) >= recordedForkEndTime
+			) {
+				console.log(
+					"⚠️ Migration deadline has passed; preserving the fork record snapshot",
+				);
+				const closedFork = await fetchForkActiveDetails(
+					connection.provider,
+					contracts.universe,
+				);
+				if (!closedFork) {
+					return getErrorResult(
+						"Fork metadata could not be verified after the migration deadline.",
+					);
+				}
+				return await getForkingResult(
+					blockNumber,
+					connection,
+					forkThresholdRep,
+					contracts.universe,
+					closedFork,
+				);
+			}
+
 			// Calculate key metrics
 			// Read dispute round duration from chain (for ETA calculation)
 			let disputeRoundDurationSeconds = 7 * 24 * 60 * 60; // fallback: 7 days
@@ -415,8 +464,11 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			const riskPercentage = roundProgress;
 
 			// Prepare results
+			const generatedAt = new Date().toISOString();
 			const results: ForkRiskData = {
-				lastRiskChange: new Date().toISOString(),
+				schemaVersion: 2,
+				generatedAt,
+				lastRiskChange: generatedAt,
 				blockNumber,
 				riskLevel,
 				riskPercentage:
@@ -442,7 +494,14 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 					forkThreshold: forkThresholdRep,
 				},
 				cacheValidation,
+				fork: null,
 			};
+			const validation = validateForkRiskData(results);
+			if (!validation.valid) {
+				throw new Error(
+					`Generated fork data failed validation:\n${validation.errors.join("\n")}`,
+				);
+			}
 
 			console.log("Calculation completed successfully");
 			console.log(`Risk Level: ${riskLevel}`);
@@ -1246,6 +1305,7 @@ const FORK_ACTIVE_UNIVERSE_ABI = [
 	"function getForkingMarket() view returns (address)",
 	"function getForkEndTime() view returns (uint256)",
 	"function getForkReputationGoal() view returns (uint256)",
+	"function getWinningChildUniverse() view returns (address)",
 	"function getReputationToken() view returns (address)",
 	"function getChildUniverse(bytes32 parentPayoutDistributionHash) view returns (address)",
 ];
@@ -1293,6 +1353,14 @@ async function fetchForkActiveDetails(
 				u.getForkReputationGoal(),
 				u.getReputationToken(),
 			]);
+		const winningChildUniverseRaw = await u
+			.getWinningChildUniverse()
+			.catch(() => ethers.ZeroAddress);
+		const winningChildUniverse =
+			String(winningChildUniverseRaw).toLowerCase() ===
+			ethers.ZeroAddress.toLowerCase()
+				? null
+				: String(winningChildUniverseRaw);
 
 		const repToken = new ethers.Contract(
 			repTokenAddr,
@@ -1331,16 +1399,16 @@ async function fetchForkActiveDetails(
 				const childAddr: string = await u.getChildUniverse(payoutHash);
 				const isZero = !childAddr || /^0x0+$/i.test(childAddr);
 				let migratedRep = 0;
-				let childRepLabel: string | null = null;
+				let childRepToken: string | null = null;
 				let label = positionalLabel(k);
 				if (!isZero) {
-					childRepLabel = childAddr;
 					const childUniverse = new ethers.Contract(
 						childAddr,
 						FORK_ACTIVE_UNIVERSE_ABI,
 						provider,
 					);
 					const childRepAddr = await childUniverse.getReputationToken();
+					childRepToken = childRepAddr;
 					const childRep = new ethers.Contract(
 						childRepAddr,
 						FORK_ACTIVE_ERC20_ABI,
@@ -1359,7 +1427,8 @@ async function fetchForkActiveDetails(
 				return {
 					index: k,
 					label,
-					childUniverse: childRepLabel,
+					childUniverse: isZero ? null : childAddr,
+					reputationToken: childRepToken,
 					migratedRep,
 				};
 			}),
@@ -1368,6 +1437,7 @@ async function fetchForkActiveDetails(
 		return {
 			forkingMarket,
 			forkEndTime: Number(forkEndTimeRaw),
+			winningChildUniverse,
 			forkReputationGoal: Number(ethers.formatEther(forkRepGoalWei)),
 			universeRepSupply: Number(ethers.formatEther(universeRepSupplyWei)),
 			outcomes,
@@ -1385,13 +1455,30 @@ async function getForkingResult(
 	connection: RpcConnection,
 	forkThresholdRep: number,
 	universe: ethers.Contract,
+	existingForkActive?: ForkRiskData["forkActive"],
 ): Promise<ForkRiskData> {
-	const forkActive = await fetchForkActiveDetails(
-		connection.provider,
-		universe,
-	);
-	return {
-		lastRiskChange: new Date().toISOString(),
+	const forkActive =
+		existingForkActive ??
+		(await fetchForkActiveDetails(connection.provider, universe));
+	if (!forkActive) {
+		throw new Error("Fork is active but fork details could not be read");
+	}
+
+	const generatedAt = new Date().toISOString();
+	const forkRecord: ForkRecordData = {
+		status: "migration-open",
+		parentUniverse: await universe.getAddress(),
+		forkingMarket: forkActive.forkingMarket,
+		migrationDeadline: forkActive.forkEndTime,
+		reputationGoal: forkActive.forkReputationGoal,
+		winningChildUniverse: forkActive.winningChildUniverse ?? null,
+		outcomes: forkActive.outcomes,
+		observedBlock: blockNumber,
+	};
+	const results: ForkRiskData = {
+		schemaVersion: 2,
+		generatedAt,
+		lastRiskChange: generatedAt,
 		blockNumber,
 		riskLevel: "critical",
 		riskPercentage: 100,
@@ -1424,7 +1511,22 @@ async function getForkingResult(
 		},
 		cacheValidation: { isHealthy: true },
 		forkActive,
+		fork: forkRecord,
 	};
+
+	const lifecycle = deriveForkLifecycle(
+		results,
+		Math.floor(Date.parse(generatedAt) / 1000),
+	);
+	forkRecord.status = lifecycle.state;
+	const validation = validateForkRiskData(results);
+	if (!validation.valid) {
+		throw new Error(
+			`Generated fork data failed validation:\n${validation.errors.join("\n")}`,
+		);
+	}
+
+	return results;
 }
 
 function getErrorResult(errorMessage: string): ForkRiskData {

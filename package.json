@@ -10,6 +10,7 @@
 		"build:fork-data": "node --experimental-strip-types scripts/calculate-fork-risk.ts",
 		"lint:blog": "node --experimental-strip-types scripts/blog-lint/index.ts",
 		"test:blog-lint": "node --experimental-strip-types --test scripts/blog-lint/*.test.ts",
+		"test:fork-lifecycle": "node --experimental-strip-types --test scripts/fork-lifecycle.test.ts",
 		"typecheck:scripts": "tsc --noEmit -p tsconfig.scripts.json",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",

@@ -8,7 +8,37 @@ export interface RiskLevel {
 	level: "No Risk" | "Low" | "Moderate" | "High" | "Critical" | "Unknown";
 }
 
+export type ForkLifecycleState =
+	| "monitoring"
+	| "migration-open"
+	| "migration-open-resolved"
+	| "migration-closed-resolved"
+	| "migration-closed-unverified"
+	| "data-unavailable";
+
+export interface ForkOutcome {
+	index: number;
+	label: string;
+	childUniverse: string | null;
+	reputationToken?: string | null;
+	migratedRep: number;
+	isWinner?: boolean;
+}
+
+export interface ForkRecordData {
+	status: ForkLifecycleState;
+	parentUniverse: string | null;
+	forkingMarket: string;
+	migrationDeadline: number;
+	reputationGoal: number;
+	winningChildUniverse: string | null;
+	outcomes: ForkOutcome[];
+	observedBlock?: number;
+}
+
 export interface ForkRiskData {
+	schemaVersion?: number;
+	generatedAt?: string;
 	lastRiskChange: string;
 	blockNumber?: number;
 	riskLevel: "none" | "low" | "moderate" | "high" | "critical" | "unknown";
@@ -42,17 +72,14 @@ export interface ForkRiskData {
 		isHealthy: boolean;
 		discrepancy?: string;
 	};
+	fork?: ForkRecordData | null;
 	forkActive?: {
 		forkingMarket: string;
 		forkEndTime: number;
+		winningChildUniverse?: string | null;
 		forkReputationGoal: number;
 		universeRepSupply: number;
-		outcomes: Array<{
-			index: number;
-			label: string;
-			childUniverse: string | null;
-			migratedRep: number;
-		}>;
+		outcomes: ForkOutcome[];
 	};
 	error?: string;
 }
