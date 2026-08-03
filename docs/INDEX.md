@@ -16,6 +16,12 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 |---|---|
 | [Augur v2 Protocol Glossary](augur-v2-protocol-glossary.md) | Quick lookup for Augur v2 terms, constants, and formulas — cited to the whitepaper PDF |
 
+## Public Knowledge Architecture
+
+| Doc | When to Read |
+|---|---|
+| [Public Knowledge Architecture](public-knowledge-architecture.md) | Proposed route map, Learn taxonomy, surface boundaries, Moon Fork canonical route, archive/redirect policy, and downstream handoff for #146 |
+
 ## Architecture & UI
 
 | Doc | When to Read |
