@@ -6,23 +6,15 @@ import PageTitle from "../components/shell/page-title.astro";
 import FaqItem from "../features/faq/item.astro";
 import MigrationCta from "../features/learn/migration-cta.tsx";
 import Layout from "../layouts/Layout.astro";
-import {
-  getForkLifecycleAtBuild,
-  isMigrationClosed,
-  isMigrationOpen,
-  isVerifiedForkResolution,
-} from "../lib/fork-data";
+import { getForkLifecycleAtBuild, isMigrationOpen } from "../lib/fork-data";
 
 const forkLifecycle = getForkLifecycleAtBuild();
 const migrationOpen = isMigrationOpen(forkLifecycle.state);
-const migrationClosed = isMigrationClosed(forkLifecycle.state);
-const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
 const faqIntro = (() => {
 	switch (forkLifecycle.state) {
 		case "migration-closed-resolved":
-			return "Augur's first algorithmic fork is now recorded. This page explains what happened, how migration worked, and where to verify the resulting universe.";
 		case "migration-closed-unverified":
-			return "Augur's first algorithmic fork has reached the end of its migration window. This page explains what happened while the final resolution remains pending verification.";
+			return "Augur's first algorithmic fork is now complete. This page explains what happened, what it means for REP holders, and where the token stands now.";
 		case "data-unavailable":
 			return "Current fork status is temporarily unavailable. This page remains available as an educational reference.";
 		case "monitoring":
@@ -35,7 +27,7 @@ const faqIntro = (() => {
 
 <Layout
   title="FAQ — Fork & Migration | Augur"
-  description="If you own REP, read this. Everything you need to know about the Augur fork and how to migrate your tokens safely."
+  description="What happened in Augur's first algorithmic fork, what it means for REP holders, and where the token stands now."
   keywords={[
     "augur fork",
     "REP migration",
@@ -83,11 +75,11 @@ const faqIntro = (() => {
           />
         )}
 
-        <!-- WHAT IS HAPPENING -->
-        <SectionHeading text="What is happening?" />
+        <!-- WHAT HAPPENED -->
+        <SectionHeading text="What happened?" />
         <div class="faq-group mb-12">
-          <FaqItem question="I OWN REPV2. WHAT IS HAPPENING?">
-              <p>Micah Zoltu, an Augur community member, raised funds to trigger a fork over whether the Artemis II mission successfully lifted off (it did). The fork split Augur into universes, one for each outcome. {migrationOpen ? "REP holders must migrate their REP before the migration deadline." : migrationClosed ? resolutionVerified ? "The migration window has closed; the landing page records the verified outcome." : "The migration window has closed; the landing page is waiting for resolution verification." : "The fork is not currently in its migration window."}</p>
+          <FaqItem question="I OWN REPV2. WHAT HAPPENED?">
+              <p>Micah Zoltu, an Augur community member, raised funds to trigger a fork over whether the Artemis II mission successfully lifted off (it did). The fork split Augur into universes, one for each outcome. REP holders had until the migration deadline to move their tokens into the universe they believed was correct. That window has closed.</p>
               <p><strong>Learn more:</strong></p>
               <ul>
                 <li><a href="/blog/the-augur-fork-is-here/" target="_blank">The Augur Fork is Here</a></li>
@@ -95,45 +87,40 @@ const faqIntro = (() => {
                 <li><a href="/blog/phase-2-the-fork-migration/" target="_blank">Phase 2: The Fork Migration</a></li>
               </ul>
             </FaqItem>
-          <FaqItem question="WHY IS AUGUR FORKING?">
-              <p>Forks are part of Augur's design. They happen when there is a major dispute. This fork is an intentional test of Augur's core mechanism.</p>
+          <FaqItem question="I DIDN'T MIGRATE IN TIME. IS THERE ANYTHING I CAN DO?">
+              <p>No. The deadline was enforced by the fork contract rather than by policy, so it cannot be reopened or extended, and no one can migrate on your behalf. REP left in the parent universe is expected to be worthless, since Augur development continues on the forked token, REPv2_Yes_1, instead.</p>
+              <p>Anyone offering to migrate, recover, or unlock that REP now is running a scam.</p>
+            </FaqItem>
+          <FaqItem question="WHY DID AUGUR FORK?">
+              <p>Forks are part of Augur's design. They happen when there is a major dispute — in this case, over the outcome of the Artemis II market.</p>
             </FaqItem>
           <FaqItem question={`WHAT IS A "FORK" IN SIMPLE TERMS?`}>
-              <p>The system splits into multiple versions (called universes). You must choose the correct one by moving your REP.</p>
+              <p>The system splits into multiple versions (called universes). Holders choose the correct one by moving their REP into it.</p>
             </FaqItem>
         </div>
 
         <!-- TIMELINE -->
         <SectionHeading text="Timeline" />
         <div class="faq-group mb-12">
-          <FaqItem question="WHEN DOES THE FORK START AND END?">
+          <FaqItem question="WHEN DID THE FORK START AND END?">
               <p><strong>Start:</strong> April 8, 2026</p>
               <p><strong>Escalation Game (Phase 1):</strong> April - early June. Complete.</p>
-              <p><strong>Migration Window (Phase 2):</strong> early June - early August. {migrationOpen ? "Open now." : migrationClosed ? resolutionVerified ? "Closed; see the Fork Record for the recorded resolution." : "Closed; see the landing page for the resolution status." : "Not currently active."}</p>
-            </FaqItem>
-          <FaqItem question="WHEN DO I NEED TO TAKE ACTION?">
-              <p>{migrationOpen ? "If you hold REP, you need to migrate before the deadline. Early migration has already ended, so the remaining action is to complete the migration before the window closes." : migrationClosed ? resolutionVerified ? "The migration deadline has passed. The landing page records the verified outcome and the migration guide remains available as a historical reference." : "The migration deadline has passed. The landing page is withholding a final outcome until it can be verified; the migration guide remains available as a historical reference." : "There is no active migration deadline. This page explains the fork process and its historical migration procedure."}</p>
+              <p><strong>Migration Window (Phase 2):</strong> early June - early August 2026. Complete.</p>
             </FaqItem>
         </div>
 
-        <!-- REQUIRED ACTION -->
-        <SectionHeading text="Required Action" />
+        <!-- HOW IT PLAYED OUT -->
+        <SectionHeading text="How the fork played out" />
         <div class="faq-group mb-12">
           <FaqItem question="WHAT HAPPENED DURING THE ESCALATION GAME (PHASE 1)?">
               <p>People could dispute outcomes by staking REP in an escalation game, where each round requires a larger stake on opposing sides. If they backed the correct outcome, they could earn a return from those on the losing side (up to ~40% in this test). Participation was optional.</p>
               <p>Phase 1 is complete: enough REP was staked to reach the fork threshold.</p>
             </FaqItem>
-          <FaqItem question="WHAT HAPPENS DURING THE MIGRATION WINDOW (PHASE 2)?">
-              <p>The fork split Augur into multiple universes, one for each outcome. REP holders could migrate their tokens 1:1 to the universe they believed was correct, receiving the new token for that universe. The recorded outcome is shown on the landing page.</p>
+          <FaqItem question="WHAT HAPPENED DURING THE MIGRATION WINDOW (PHASE 2)?">
+              <p>The fork split Augur into multiple universes, one for each outcome. REP holders could migrate their tokens 1:1 to the universe they believed was correct, receiving the new token for that universe. Migrated REP went overwhelmingly to the universe for the truthful outcome, whose token is REPv2_Yes_1.</p>
             </FaqItem>
-          <FaqItem question="WHAT HAPPENS IF I DON'T MIGRATE?">
-              <p>{migrationOpen ? "Your REP will remain in the parent universe if you do not migrate before the deadline, and it will likely have no value." : migrationClosed ? resolutionVerified ? "REP left in the parent universe was not part of the migration path; consult the recorded Fork Record for the resulting universe." : "The migration window is closed; consult the landing page for the verified resolution once it is available." : "The migration window is not currently active."}</p>
-            </FaqItem>
-          <FaqItem question="WHAT HAPPENS IF I MIGRATE TO THE WRONG UNIVERSE?">
-              <p>Your REP will likely become worthless, since that universe will not be used going forward.</p>
-            </FaqItem>
-          <FaqItem question="HOW DO I MIGRATE?">
-              {migrationOpen ? <><p>You will use the official tool at <a href="https://6.augurfork.eth.limo/#/migration" target="_blank">6.augurfork.eth.limo/#/migration</a>.</p><p><strong><a href="/learn/fork/migration/">→ Read the full step-by-step migration guide</a></strong> for wallet setup, token addresses, and every step in order.</p></> : migrationClosed ? <p>The migration window is closed. The <a href="/learn/fork/migration/">migration guide</a> remains available as historical reference; review the landing page for the current Fork Record or verification status.</p> : <p>Migration instructions will be available if a fork enters the migration phase.</p>}
+          <FaqItem question={`WHAT HAPPENED IF SOMEONE MIGRATED TO THE "NO" UNIVERSE?`}>
+              <p>That REP is expected to be worthless. Augur's next iteration will not be built in that universe, so there will be no activity there.</p>
             </FaqItem>
         </div>
 
@@ -141,58 +128,44 @@ const faqIntro = (() => {
         <SectionHeading text="Tokens" />
         <div class="faq-group mb-12">
           <FaqItem question="IS THERE A NEW REP TOKEN?">
-              <p>Yes. The fork created a new REP token for each universe; you receive the token of the universe you migrate to, 1:1.</p>
-              <p>Augur development will continue on the token corresponding to the truthful outcome. The Lituus Foundation has already migrated its own holdings and added liquidity.</p>
+              <p>Yes. The fork created a new REP token for each universe; holders received the token of the universe they migrated to, 1:1.</p>
+              <p>Augur development continues on <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank">REPv2_Yes_1</a>, the token for the truthful outcome. The Lituus Foundation has migrated its own holdings and added liquidity. It trades as <a href="https://pro.kraken.com/app/trade/AUGUR-USD" target="_blank">AUGUR on Kraken</a> and on <a href="https://app.uniswap.org/explore/tokens/ethereum/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank">Uniswap</a>.</p>
             </FaqItem>
-          <FaqItem question="WILL THE OLD REP TOKEN STILL EXIST?">
-              <p>Yes, but it will likely have no value or use.</p>
+          <FaqItem question={`IS "AUGUR" ON KRAKEN THE SAME AS REPV2_YES_1?`}>
+              <p>Yes. REPv2_Yes_1 is the token's on-chain name, used on Uniswap and <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank">Etherscan</a>; Kraken lists that same token under the ticker AUGUR.</p>
             </FaqItem>
-          <FaqItem question="WILL MY TOKEN BALANCE CHANGE?">
-              <p>No. You will have the same number of REP tokens after migration. However, tokens that are not migrated will be left behind, so active holders will represent a larger share of the total supply.</p>
+          <FaqItem question="DOES THE OLD REP TOKEN STILL EXIST?">
+              <p>Yes, but it is not expected to have value or use going forward.</p>
             </FaqItem>
           <FaqItem question="THE NEW TOKEN DOESN'T APPEAR IN MY WALLET YET. IS SOMETHING WRONG?">
-              <p>Usually nothing is wrong. The fork tokens are new, so most wallets don't detect them automatically yet. We are in contact with most platforms and wallets to add support. Most wallets also let you add tokens manually via an "import token" or "add custom token" feature; check your wallet's guide for the steps.</p>
-              <p>After migrating, double-check that the new token shows up in your wallet: reconnect to the <a href="https://6.augurfork.eth.limo/#/migration" target="_blank">migration tool</a> and confirm no REPv2 is left, or look up your address on a block explorer like Etherscan.</p>
-            </FaqItem>
-        </div>
-
-        <!-- REPV1 HOLDERS -->
-        <SectionHeading text="REPv1 Holders" />
-        <div class="faq-group mb-12">
-          <FaqItem question="I OWN REPV1. WHAT SHOULD I DO?">
-              <p>{migrationOpen ? <>Convert it to REPv2 first, then complete the migration like any other REP holder. The <a href="/learn/fork/migration/">migration guide</a> walks you through both steps with the official tool at <a href="https://6.augurfork.eth.limo" target="_blank">6.augurfork.eth.limo</a>.</> : migrationClosed ? <>The migration window is closed. The <a href="/learn/fork/migration/">migration guide</a> preserves the historical REPv1-to-REPv2 and migration steps.</> : <>The migration window is not currently active.</>}</p>
-            </FaqItem>
-          <FaqItem question="CAN I SKIP REPV2 AND GO DIRECTLY TO THE NEW TOKEN?">
-              <p>No. You must go through REPv2 first.</p>
+              <p>Usually nothing is wrong. The forked token is new, so many wallets don't detect it automatically yet. We are in contact with platforms and wallets to add support. Most wallets also let you add a token manually via an "import token" or "add custom token" feature — use the REPv2_Yes_1 contract address 0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D.</p>
+              <p>To confirm your balance independently, look up your address on <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank">Etherscan</a>.</p>
             </FaqItem>
         </div>
 
         <!-- EXCHANGES -->
         <SectionHeading text="Exchanges" />
         <div class="faq-group mb-12">
-          <FaqItem question="MY REP IS ON KRAKEN. DO I NEED TO DO ANYTHING?">
-              <p>No. Kraken has confirmed it will support the fork and will migrate REP on behalf of its users. Balances are converted 1:1 into the new token (listed on Kraken as AUGUR), expected to be credited by July 31, 2026.</p>
+          <FaqItem question="MY REP WAS ON KRAKEN. DID I NEED TO DO ANYTHING?">
+              <p>No. Kraken supported the fork and migrated REP on behalf of its users, converting balances 1:1 into the new token, which it lists as <a href="https://pro.kraken.com/app/trade/AUGUR-USD" target="_blank">AUGUR</a>.</p>
               <p><strong><a href="https://support.kraken.com/articles/augur-migration" target="_blank">→ Read Kraken's full migration notice</a></strong></p>
             </FaqItem>
-          <FaqItem question="MY REP IS ON AN EXCHANGE (GATE, UPBIT). WHAT SHOULD I DO?">
-              <p>{migrationOpen ? <><strong>Best option:</strong> withdraw to your own wallet and migrate yourself. Exchange support status changes frequently — verify the latest at <a href="https://v3.augur.net/#exchange-support" target="_blank">v3.augur.net</a> before making a decision.</> : migrationClosed ? <>The migration window is closed. This FAQ preserves the historical exchange-support context; check the landing page for the current Fork Record.</> : <>The migration window is not currently active.</>}</p>
+          <FaqItem question="WHAT ABOUT REP ON OTHER EXCHANGES (GATE, UPBIT)?">
+              <p>Exchange support varied, and not every exchange migrated on behalf of its users. The safest route was to withdraw REP to a self-custodied wallet and migrate directly. If you held REP on an exchange through the fork and have not seen the new token credited, contact that exchange.</p>
+              <p><strong><a href="https://v3.augur.net/#exchange-support" target="_blank">→ Check which exchanges supported the migration</a></strong></p>
             </FaqItem>
-          <FaqItem question="WHAT HAPPENS IF I LEAVE MY REP ON AN EXCHANGE?">
-              <p>If the exchange does not support migration, you may end up holding a worthless version of REP.</p>
+          <FaqItem question="WHAT HAPPENED TO REP LEFT ON AN EXCHANGE?">
+              <p>If the exchange did not support the migration, its holders may be left with a worthless version of REP.</p>
+              <p><strong><a href="https://v3.augur.net/#exchange-support" target="_blank">→ See whether your exchange supported the migration</a></strong></p>
             </FaqItem>
         </div>
 
-        <!-- SAFETY & PROCESS -->
-        <SectionHeading text="Safety & Process" />
+        <!-- SCAMS & SAFETY -->
+        <SectionHeading text="Scams & Safety" />
         <div class="faq-group mb-12">
-          <FaqItem question="IS MIGRATION REVERSIBLE?">
-              <p>No. Once you migrate, it cannot be undone.</p>
-            </FaqItem>
-          <FaqItem question="IS THERE A DEADLINE?">
-              <p>{migrationOpen ? "Yes. You have until the migration deadline to migrate. REP that is not migrated before the deadline will remain in the parent universe and is expected to become worthless." : migrationClosed ? resolutionVerified ? "The migration window is closed. The landing page's Fork Record preserves the verified resolution and links to the relevant on-chain addresses." : "The migration window is closed. The landing page is waiting for resolution verification before making a canonical-universe claim." : "There is no active migration deadline."}</p>
-            </FaqItem>
-          <FaqItem question="WHERE CAN I TRACK THE FORK AND MIGRATION STATUS?">
-              <p><a href="https://v3.augur.net/" target="_blank">ForkWatch</a> was the official support page for the migration window. It showed fork status, the deadline, migration progress, the exchange-support list, and a REP checker that showed whether an address held REPv1 or REPv2.</p>
+          <FaqItem question="SOMEONE OFFERED TO MIGRATE OR RECOVER MY REP. IS THAT REAL?">
+              <p>No. Migration closed in early August 2026 and cannot be reopened, so any site, DM, or "support agent" offering to migrate, recover, or unlock REP is a scam.</p>
+              <p>Nobody from Augur or the Lituus Foundation will DM you first, and no legitimate process will ever ask for your seed phrase or private keys, or ask you to sign a transaction to "verify" your holdings.</p>
             </FaqItem>
         </div>
 
