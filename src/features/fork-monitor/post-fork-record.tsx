@@ -39,6 +39,7 @@ const etherscanAddress = (address: string): string =>
 	`https://etherscan.io/address/${address}`;
 
 const FORKWATCH_URL = "https://v3.augur.net/";
+const FAQ_URL = "/faq/";
 
 const AddressValue = ({
 	address,
@@ -180,6 +181,9 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 				className="w-full uppercase"
 			>
 				Open ForkWatch
+			</Button>
+			<Button variant="outline" href={FAQ_URL} className="w-full uppercase">
+				Read the FAQ
 			</Button>
 		</div>
 	</DialogContent>
