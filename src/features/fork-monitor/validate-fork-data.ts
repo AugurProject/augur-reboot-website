@@ -69,8 +69,21 @@ const validateRecord = (record: ForkRecordData, errors: string[]): void => {
 		) {
 			errors.push(`Outcome ${outcome.index} has an invalid child universe.`);
 		}
+		if (
+			outcome.reputationToken !== undefined &&
+			outcome.reputationToken !== null &&
+			!isEthereumAddress(outcome.reputationToken)
+		) {
+			errors.push(`Outcome ${outcome.index} has an invalid reputation token.`);
+		}
 		if (!Number.isFinite(outcome.migratedRep) || outcome.migratedRep < 0) {
 			errors.push(`Outcome ${outcome.index} has invalid migrated REP.`);
+		}
+		if (
+			outcome.migratedRepWei !== undefined &&
+			!/^\d+$/u.test(outcome.migratedRepWei)
+		) {
+			errors.push(`Outcome ${outcome.index} has invalid migrated REP wei.`);
 		}
 	}
 
@@ -126,8 +139,25 @@ export const validateForkRiskData = (
 			) {
 				errors.push(`Legacy outcome ${outcome.index} has an invalid child universe.`);
 			}
+			if (
+				outcome.reputationToken !== undefined &&
+				outcome.reputationToken !== null &&
+				!isEthereumAddress(outcome.reputationToken)
+			) {
+				errors.push(
+					`Legacy outcome ${outcome.index} has an invalid reputation token.`,
+				);
+			}
 			if (!Number.isFinite(outcome.migratedRep) || outcome.migratedRep < 0) {
 				errors.push(`Legacy outcome ${outcome.index} has invalid migrated REP.`);
+			}
+			if (
+				outcome.migratedRepWei !== undefined &&
+				!/^\d+$/u.test(outcome.migratedRepWei)
+			) {
+				errors.push(
+					`Legacy outcome ${outcome.index} has invalid migrated REP wei.`,
+				);
 			}
 		}
 

@@ -239,6 +239,43 @@ export const readForkLifecycleSignals = async (readers: {
 	return { isForking: false, forkEndTime };
 };
 
+export type ForkDataMode =
+	| "active-fork"
+	| "post-deadline-record"
+	| "monitoring";
+
+export const selectForkDataMode = (
+	signals: ForkLifecycleSignals,
+	observedBlockTimestamp: number,
+): ForkDataMode => {
+	if (signals.isForking) return "active-fork";
+	if (
+		signals.forkEndTime !== null &&
+		signals.forkEndTime > 0 &&
+		observedBlockTimestamp >= signals.forkEndTime
+	) {
+		return "post-deadline-record";
+	}
+	return "monitoring";
+};
+
+export const readObservedBlockTimestamp = async (
+	readBlock: (blockNumber: number) => Promise<{ timestamp: number } | null>,
+	blockNumber: number,
+): Promise<number> => {
+	const block = await readBlock(blockNumber);
+	if (!block || !Number.isInteger(block.timestamp) || block.timestamp <= 0) {
+		throw new Error(`Observed block ${blockNumber} could not be read.`);
+	}
+	return block.timestamp;
+};
+
+export const classifyForkRecordAtObservedTime = (
+	data: Parameters<typeof deriveForkLifecycle>[0],
+	observedBlockTimestamp: number,
+): ForkRecordData["status"] =>
+	deriveForkLifecycle(data, observedBlockTimestamp).state;
+
 async function loadContracts(
 	provider: ethers.JsonRpcProvider,
 ): Promise<Record<string, ethers.Contract>> {
@@ -336,13 +373,21 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 		return await executeWithRpcFallback(async (connection, contracts) => {
 			// Get current blockchain state
 			const blockNumber = await connection.provider.getBlockNumber();
+			const observedBlockTimestamp = await readObservedBlockTimestamp(
+				(blockTag) => connection.provider.getBlock(blockTag),
+				blockNumber,
+			);
 			console.log(`Block Number: ${blockNumber}`);
+			console.log(
+				`Block Time: ${new Date(observedBlockTimestamp * 1000).toISOString()}`,
+			);
 
 			// Read fork threshold from chain (varies per universe)
 			let forkThresholdRep = 275000; // fallback constant
 			try {
 				const thresholdWei = await retryContractCall(
-					() => contracts.universe.getDisputeThresholdForFork(),
+					() =>
+						contracts.universe.getDisputeThresholdForFork({ blockTag: blockNumber }),
 					"universe.getDisputeThresholdForFork()",
 				);
 				forkThresholdRep = Number(ethers.formatEther(thresholdWei));
@@ -358,43 +403,44 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 			const lifecycle = await readForkLifecycleSignals({
 				isForking: () =>
 					retryContractCall(
-						() => contracts.universe.isForking(),
+						() => contracts.universe.isForking({ blockTag: blockNumber }),
 						"universe.isForking()",
 					),
 				getForkEndTime: () =>
 					retryContractCall(
-						() => contracts.universe.getForkEndTime(),
+						() => contracts.universe.getForkEndTime({ blockTag: blockNumber }),
 						"universe.getForkEndTime()",
 					),
 			});
-			const { isForking, forkEndTime: recordedForkEndTime } = lifecycle;
+			const forkDataMode = selectForkDataMode(
+				lifecycle,
+				observedBlockTimestamp,
+			);
 
-			if (isForking) {
-				console.log("⚠️ UNIVERSE IS FORKING! Setting maximum risk level");
+			if (forkDataMode === "active-fork") {
+				console.log(
+					"⚠️ UNIVERSE REPORTS A FORK RECORD! Setting maximum risk level",
+				);
 				return await getForkingResult(
 					blockNumber,
+					observedBlockTimestamp,
 					connection,
 					forkThresholdRep,
 					contracts.universe,
 				);
 			}
 
-			// Some deployed universe implementations stop reporting `isForking()`
-			// immediately after the migration deadline. Preserve the historical fork
-			// record in that case instead of falling back to an unrelated pre-fork
-			// risk calculation.
-
-			if (
-				recordedForkEndTime !== null &&
-				recordedForkEndTime > 0 &&
-				Math.floor(Date.now() / 1000) >= recordedForkEndTime
-			) {
+			// Preserve a closed record even if a compatible parent universe no longer
+			// reports `isForking()` after its recorded migration deadline.
+			if (forkDataMode === "post-deadline-record") {
 				console.log(
 					"⚠️ Migration deadline has passed; preserving the fork record snapshot",
 				);
 				const closedFork = await fetchForkActiveDetails(
 					connection.provider,
 					contracts.universe,
+					blockNumber,
+					observedBlockTimestamp,
 				);
 				if (!closedFork) {
 					throw new Error(
@@ -403,6 +449,7 @@ async function calculateForkRisk(): Promise<ForkRiskData> {
 				}
 				return await getForkingResult(
 					blockNumber,
+					observedBlockTimestamp,
 					connection,
 					forkThresholdRep,
 					contracts.universe,
@@ -1324,8 +1371,13 @@ const FORK_ACTIVE_MARKET_ABI = [
 ];
 const FORK_ACTIVE_ERC20_ABI = [
 	"function totalSupply() view returns (uint256)",
+	"function getTotalMigrated() view returns (uint256)",
 	"function symbol() view returns (string)",
 ];
+const EXPECTED_CURRENT_REP = {
+	address: "0xcf6a0a7826fa124b7705d6f3c675ead76f1e540d",
+	symbol: "REPv2_Yes_1",
+};
 
 function positionalLabel(index: number): string {
 	// Fallback label — actual outcome names are market-specific and
@@ -1347,6 +1399,8 @@ function labelFromTokenSymbol(symbol: string): string | null {
 async function fetchForkActiveDetails(
 	provider: ethers.JsonRpcProvider,
 	universe: ethers.Contract,
+	blockTag: number,
+	observedBlockTimestamp: number,
 ): Promise<ForkRiskData["forkActive"] | undefined> {
 	try {
 		const u = new ethers.Contract(
@@ -1357,14 +1411,22 @@ async function fetchForkActiveDetails(
 
 		const [forkingMarket, forkEndTimeRaw, forkRepGoalWei, repTokenAddr] =
 			await Promise.all([
-				u.getForkingMarket(),
-				u.getForkEndTime(),
-				u.getForkReputationGoal(),
-				u.getReputationToken(),
+				u.getForkingMarket({ blockTag }),
+				u.getForkEndTime({ blockTag }),
+				u.getForkReputationGoal({ blockTag }),
+				u.getReputationToken({ blockTag }),
 			]);
-		const winningChildUniverseRaw = await u
-			.getWinningChildUniverse()
-			.catch(() => ethers.ZeroAddress);
+		let winningChildUniverseRaw: unknown;
+		try {
+			winningChildUniverseRaw = await u.getWinningChildUniverse({ blockTag });
+		} catch (error) {
+			if (observedBlockTimestamp >= Number(forkEndTimeRaw)) {
+				throw new Error(
+					`Winning child universe could not be verified after the migration deadline: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
+			winningChildUniverseRaw = ethers.ZeroAddress;
+		}
 		const winningChildUniverse =
 			String(winningChildUniverseRaw).toLowerCase() ===
 			ethers.ZeroAddress.toLowerCase()
@@ -1376,7 +1438,7 @@ async function fetchForkActiveDetails(
 			FORK_ACTIVE_ERC20_ABI,
 			provider,
 		);
-		const universeRepSupplyWei = await repToken.totalSupply();
+		const universeRepSupplyWei = await repToken.totalSupply({ blockTag });
 
 		const market = new ethers.Contract(
 			forkingMarket,
@@ -1384,8 +1446,8 @@ async function fetchForkActiveDetails(
 			provider,
 		);
 		const [numOutcomesRaw, numTicksRaw] = await Promise.all([
-			market.getNumberOfOutcomes(),
-			market.getNumTicks(),
+			market.getNumberOfOutcomes({ blockTag }),
+			market.getNumTicks({ blockTag }),
 		]);
 		const numOutcomes = Number(numOutcomesRaw);
 		const numTicks = BigInt(numTicksRaw);
@@ -1405,9 +1467,12 @@ async function fetchForkActiveDetails(
 				const payoutHash = ethers.keccak256(
 					ethers.solidityPacked(packedTypes, numerators),
 				);
-				const childAddr: string = await u.getChildUniverse(payoutHash);
+				const childAddr: string = await u.getChildUniverse(payoutHash, {
+					blockTag,
+				});
 				const isZero = !childAddr || /^0x0+$/i.test(childAddr);
 				let migratedRep = 0;
+				let migratedRepWei = "0";
 				let childRepToken: string | null = null;
 				let label = positionalLabel(k);
 				if (!isZero) {
@@ -1416,21 +1481,30 @@ async function fetchForkActiveDetails(
 						FORK_ACTIVE_UNIVERSE_ABI,
 						provider,
 					);
-					const childRepAddr = await childUniverse.getReputationToken();
+					const childRepAddr = await childUniverse.getReputationToken({ blockTag });
 					childRepToken = childRepAddr;
 					const childRep = new ethers.Contract(
 						childRepAddr,
 						FORK_ACTIVE_ERC20_ABI,
 						provider,
 					);
-					const [supplyWei, symbol] = await Promise.all([
-						childRep.totalSupply(),
-						childRep.symbol().catch(() => null as string | null),
+					const [totalMigratedWei, symbol] = await Promise.all([
+						childRep.getTotalMigrated({ blockTag }),
+						childRep.symbol({ blockTag }),
 					]);
-					migratedRep = Number(ethers.formatEther(supplyWei));
-					if (symbol) {
-						const parsed = labelFromTokenSymbol(symbol);
-						if (parsed) label = parsed;
+					migratedRepWei = totalMigratedWei.toString();
+					migratedRep = Number(ethers.formatEther(totalMigratedWei));
+					const parsed = labelFromTokenSymbol(symbol);
+					if (parsed) label = parsed;
+
+					if (
+						winningChildUniverse?.toLowerCase() === childAddr.toLowerCase() &&
+						(childRepAddr.toLowerCase() !== EXPECTED_CURRENT_REP.address ||
+							symbol !== EXPECTED_CURRENT_REP.symbol)
+					) {
+						throw new Error(
+							`Current REP discrepancy: expected ${EXPECTED_CURRENT_REP.symbol} at ${EXPECTED_CURRENT_REP.address}, received ${symbol} at ${childRepAddr}.`,
+						);
 					}
 				}
 				return {
@@ -1439,6 +1513,7 @@ async function fetchForkActiveDetails(
 					childUniverse: isZero ? null : childAddr,
 					reputationToken: childRepToken,
 					migratedRep,
+					migratedRepWei,
 				};
 			}),
 		);
@@ -1461,6 +1536,7 @@ async function fetchForkActiveDetails(
 
 async function getForkingResult(
 	blockNumber: number,
+	observedBlockTimestamp: number,
 	connection: RpcConnection,
 	forkThresholdRep: number,
 	universe: ethers.Contract,
@@ -1468,12 +1544,26 @@ async function getForkingResult(
 ): Promise<ForkRiskData> {
 	const forkActive =
 		existingForkActive ??
-		(await fetchForkActiveDetails(connection.provider, universe));
+		(await fetchForkActiveDetails(
+			connection.provider,
+			universe,
+			blockNumber,
+			observedBlockTimestamp,
+		));
 	if (!forkActive) {
 		throw new Error("Fork is active but fork details could not be read");
 	}
 
 	const generatedAt = new Date().toISOString();
+	const compatibilityOutcomes = forkActive.outcomes.map((outcome) => {
+		const compatibilityOutcome = { ...outcome };
+		delete compatibilityOutcome.migratedRepWei;
+		return compatibilityOutcome;
+	});
+	const forkActiveCompatibility = {
+		...forkActive,
+		outcomes: compatibilityOutcomes,
+	};
 	const forkRecord: ForkRecordData = {
 		status: "migration-open",
 		parentUniverse: await universe.getAddress(),
@@ -1519,15 +1609,14 @@ async function getForkingResult(
 			forkThreshold: forkThresholdRep,
 		},
 		cacheValidation: { isHealthy: true },
-		forkActive,
+		forkActive: forkActiveCompatibility,
 		fork: forkRecord,
 	};
 
-	const lifecycle = deriveForkLifecycle(
+	forkRecord.status = classifyForkRecordAtObservedTime(
 		results,
-		Math.floor(Date.parse(generatedAt) / 1000),
+		observedBlockTimestamp,
 	);
-	forkRecord.status = lifecycle.state;
 	const validation = validateForkRiskData(results);
 	if (!validation.valid) {
 		throw new Error(

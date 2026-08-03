@@ -7,7 +7,7 @@ tags: [homepage, fork, post-fork, implementation, github-actions]
 
 ## Status
 
-**Implementation complete locally; post-deadline observation pending.** This document defines the change from the current fork-migration hero to a durable post-fork record. Protocol signals are verified, the versioned fork JSON contract and lifecycle derivation are implemented, the on-chain generator emits the winner, the data job preserves the record when `isForking()` flips false at closure, and the local UI now covers open, resolved-open, closed-resolved, and closed-unverified states. Monitoring continues after closure; reducing its cadence is a separate operational follow-up.
+**Implementation and post-deadline verification complete.** This document defines the change from the fork-migration hero to a durable post-fork record. The authoritative evidence is preserved in [[moon-fork-final-record]]. The versioned fork JSON contract and lifecycle derivation are implemented, the generator reads exact migration counters at one observed block, and the defensive post-deadline path preserves the record if a compatible parent reports `isForking() == false`. The deployed Augur v2 parent continued to return `true` after closure, consistent with its “forking or has forked” source semantics. Monitoring continues after closure; reducing its cadence is a separate operational follow-up.
 
 ## Local Review Demo
 
@@ -28,15 +28,15 @@ The local CTA copy is tied to the lifecycle signal: an unknown winner keeps the 
 
 ## Protocol Verification Snapshot
 
-The read-only probe confirmed the Phase 0 contract semantics against Ethereum mainnet at block `25,662,284`:
+A finalized, post-deadline read at Ethereum mainnet block `25,677,103` (`2026-08-03T21:36:23Z`) established the durable record:
 
-- Forking universe: `0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA`.
-- `isForking()` is `true`.
-- `getForkEndTime()` is `2026-08-03T01:00:59Z`, the current migration deadline exposed by the contract.
-- `getWinningChildUniverse()` returns `0x281171519Fb41540528398d8ED3EA257f0F32A9f` before the deadline.
-- That child matches outcome index `1` (`Yes`) and its migrated REP supply exceeds the fork reputation goal.
+- The migration deadline was `2026-08-03T01:00:59Z`, 20 hours, 35 minutes, and 24 seconds before the observation.
+- `getWinningChildUniverse()` returned `0x281171519Fb41540528398d8ED3EA257f0F32A9f`, outcome index `1` (`Yes`).
+- The winning universe's REP token was `REPv2_Yes_1` at `0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`.
+- Final migration counters were `6,398,081.4136814946108694 REP` for Yes, `1,786.227400866527400056 REP` for No, and `0 REP` for Invalid.
+- Two RPC endpoints reproduced the material values at the same finalized block.
 
-This confirms the transitional state used by the local demo: a winner can be established while migration remains open. The probe result is an acceptance fixture, not a permanent claim about future chain state; generated data must continue to read these values from the contract.
+See [[moon-fork-final-record]] for exact wei values, the block hash, contract methods, source-code permalinks, conflict resolution, and final versus observed-only fields.
 
 ## Confirmed Product Decisions
 

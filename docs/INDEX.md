@@ -9,6 +9,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 | [Fork Mechanics](fork-mechanics.md) | What a fork is, how dispute bonds escalate, why the monitor exists. Start here for context. |
 | [Fork Monitoring Pipeline](fork-monitoring-pipeline.md) | The CI/CD pipeline: three-job workflow, cache strategy, concurrency, failure handling |
 | [Fork Monitoring Methodology](fork-monitoring-methodology.md) | How the calculation script discovers markets, reads bonds, computes the threshold percentage |
+| [Final Moon Fork Record](moon-fork-final-record.md) | Authoritative post-deadline block observation, winner/current REP, exact migration totals, provenance, and finality boundaries |
 
 ## Protocol Reference
 

@@ -22,6 +22,7 @@ export interface ForkOutcome {
 	childUniverse: string | null;
 	reputationToken?: string | null;
 	migratedRep: number;
+	migratedRepWei?: string;
 	isWinner?: boolean;
 }
 
