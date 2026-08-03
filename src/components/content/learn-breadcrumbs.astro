@@ -1,0 +1,18 @@
+---
+import type { LearnTopicContext } from "../../lib/learn";
+
+interface Props {
+	topic: LearnTopicContext;
+	currentLabel: string;
+}
+
+const { topic, currentLabel } = Astro.props;
+---
+
+<nav aria-label="Learn breadcrumbs" class="mb-6 font-display text-xs uppercase tracking-[0.2em] text-muted-foreground">
+	<span>LEARN</span>
+	<span class="mx-2" aria-hidden="true">/</span>
+	<a href={topic.path} class="hover:text-primary transition-colors">{topic.label}</a>
+	<span class="mx-2" aria-hidden="true">/</span>
+	<span aria-current="page" class="text-foreground">{currentLabel}</span>
+</nav>

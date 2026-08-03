@@ -2,38 +2,60 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import LearnLayout from "../../layouts/LearnLayout.astro";
 import MigrationGuideLayout from "../../layouts/MigrationGuideLayout.astro";
+import {
+	assertLearnEntries,
+	getLearnPageContext,
+	usesHistoricalPresentation,
+} from "../../lib/learn";
+import type { LearnNavigationItem, LearnTopicContext } from "../../lib/learn";
 
 export const prerender = true;
 
 interface Props {
 	entry: CollectionEntry<"learn">;
+	topic: LearnTopicContext;
+	navigation: LearnNavigationItem[];
 }
 
 export async function getStaticPaths() {
 	const learnCollection = await getCollection("learn");
+	assertLearnEntries(learnCollection);
 
 	return learnCollection.map((entry) => {
-		// Create slug from the entry's file path
-		const slug = entry.slug;
+		const { topic, navigation } = getLearnPageContext(
+			entry,
+			learnCollection,
+		);
 
 		return {
-			params: { slug },
-			props: { entry },
+			params: { slug: entry.slug },
+			props: { entry, topic, navigation },
 		};
 	});
 }
 
-const { entry } = Astro.props;
+const { entry, topic, navigation } = Astro.props;
 const { Content } = await entry.render();
-const { title, description } = entry.data;
+const { title, description, presentation } = entry.data;
+const historicalPresentation = usesHistoricalPresentation(presentation);
 ---
 
-{entry.slug === 'fork/migration' ? (
-  <MigrationGuideLayout title={title} description={description}>
-    <Content />
-  </MigrationGuideLayout>
+{historicalPresentation ? (
+	<MigrationGuideLayout
+		title={title}
+		description={description}
+		topic={topic}
+		navigation={navigation}
+	>
+		<Content />
+	</MigrationGuideLayout>
 ) : (
-  <LearnLayout title={title} description={description}>
-    <Content />
-  </LearnLayout>
+	<LearnLayout
+		title={title}
+		description={description}
+		topic={topic}
+		navigation={navigation}
+	>
+		<Content />
+	</LearnLayout>
 )}

@@ -1,68 +1,49 @@
 ---
 import ArticleContent from "../components/content/article-content.astro";
+import LearnBreadcrumbs from "../components/content/learn-breadcrumbs.astro";
 import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import PageTitle from "../components/shell/page-title.astro";
 import LearnNavigation from "../features/learn/navigation.tsx";
 import Layout from "../layouts/Layout.astro";
-import { getForkLifecycleAtBuild, isMigrationOpen } from "../lib/fork-data";
+import type { LearnNavigationItem, LearnTopicContext } from "../lib/learn";
 
 interface Props {
 	title: string;
 	description?: string;
+	topic: LearnTopicContext;
+	navigation: LearnNavigationItem[];
 }
 
-const { title, description } = Astro.props;
-const migrationOpen = isMigrationOpen(getForkLifecycleAtBuild().state);
-
-// Topic navigation data
-const topics = [
-	{
-		title: "MIGRATION GUIDE",
-		slug: "fork/migration",
-		path: "/learn/fork/migration/",
-		critical: migrationOpen,
-	},
-	{ title: "WHAT IS A FORK?", slug: "fork/index", path: "/learn/fork/" },
-	{
-		title: "HOW DISPUTES & BONDS WORK",
-		slug: "fork/disputes-and-bonds",
-		path: "/learn/fork/disputes-and-bonds/",
-	},
-	{
-		title: "WHAT TO DO",
-		slug: "fork/what-to-do",
-		path: "/learn/fork/what-to-do/",
-	},
-];
-
+const { title, description, topic, navigation } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
 <Layout
-	title={`${title} - Augur Fork Mechanics`}
-	description={description || "Learn about Augur protocol forks and fork mechanics"}
+	title={`${title} - ${topic.label}`}
+	description={description ?? topic.description}
 	ogType="article"
 >
 	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
-		{/* Top Section: Navigation */}
 		<PageHeader client:load backHref="/" />
 
-		{/* Middle Section: Scrollable Content */}
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
 			<div class="max-w-3xl mx-auto">
+				<LearnBreadcrumbs topic={topic} currentLabel={title} />
 				<PageTitle prefix="LEARN" title={title} />
 
-				{/* Main Content */}
 				<ArticleContent>
 					<slot />
 				</ArticleContent>
 			</div>
 		</main>
 
-		{/* Bottom Section: Sticky Navigation + Footer */}
-		<LearnNavigation client:load currentPath={currentPath} currentTitle={title} topics={topics} />
+		<LearnNavigation
+			client:load
+			currentPath={currentPath}
+			topicLabel={topic.label}
+			entries={navigation}
+		/>
 		<Footer />
 	</div>
-
 </Layout>
