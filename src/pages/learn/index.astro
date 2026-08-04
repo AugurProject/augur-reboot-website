@@ -50,7 +50,10 @@ const topicCards = getLearnTopicCatalog(learnCollection).map((item) => ({
 	],
 }));
 
-const startTopic = topicCards[0];
+const startTopic = topicCards.find(({ topic }) => topic.key === "fork");
+if (!startTopic) {
+	throw new Error("Learn landing requires the available Fork topic");
+}
 
 function renderEntryAudience(contentType: LearnContentType): string {
 	return audienceByContentType[contentType];

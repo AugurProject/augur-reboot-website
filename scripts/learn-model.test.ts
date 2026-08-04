@@ -147,6 +147,46 @@ test("builds the landing catalog from available metadata", () => {
 		[{ label: "MIGRATION GUIDE", status: "archived" }],
 	);
 	assert.equal(getLearnEntryGroup(catalog[0].archivedEntries[0]), "historical-record");
+	assert.deepEqual(
+		catalog[1].availableEntries.map(({ label, path }) => ({ label, path })),
+		[{ label: "ORACLE BASICS", path: "/learn/oracle/" }],
+	);
+});
+
+test("rejects available child content without an available topic landing entry", () => {
+	const registry = {
+		...learnTopicRegistry,
+		oracle: {
+			label: "Oracle",
+			description: "Learn how the oracle works.",
+		},
+	};
+
+	assert.throws(
+		() =>
+			getLearnTopicCatalog(
+				[
+					entry("oracle/reference", {
+						topic: "oracle",
+						order: 1,
+						contentType: "reference",
+						label: "ORACLE REFERENCE",
+						historical: false,
+						status: "available",
+						presentation: "reference",
+					}),
+				],
+				registry,
+			),
+		/Learn topic oracle has available content but no available topic landing entry at \/learn\/oracle\//u,
+	);
+});
+
+test("classifies historical case studies as case studies", () => {
+	assert.equal(
+		getLearnEntryGroup({ contentType: "case-study", historical: true }),
+		"case-study",
+	);
 });
 
 test("the landing route consumes the shared catalog and canonical topic paths", () => {
@@ -158,6 +198,11 @@ test("the landing route consumes the shared catalog and canonical topic paths", 
 	assert.match(route, /getCollection\("learn"\)/u);
 	assert.match(route, /getLearnTopicCatalog\(learnCollection\)/u);
 	assert.match(route, /href=\{topic\.topic\.path\}/u);
+	assert.match(
+		route,
+		/const startTopic = topicCards\.find\(\(\{ topic \}\) => topic\.key === "fork"\)/u,
+	);
+	assert.doesNotMatch(route, /const startTopic = topicCards\[0\]/u);
 	assert.match(route, /Historical records/u);
 });
 
