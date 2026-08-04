@@ -25,9 +25,9 @@ const audienceByContentType: Record<LearnContentType, string> = {
 };
 
 const groupDescription: Record<LearnEntryGroup, string> = {
-	core: "Reusable explanations and guides for understanding how Augur works.",
-	"case-study": "Dated accounts of completed events, kept separate from evergreen lessons.",
-	"historical-record": "Archived material preserved for evidence and historical reference.",
+	core: "Explanations and guides for understanding how Augur works.",
+	"case-study": "Accounts of completed events.",
+	"historical-record": "Past procedures and records kept for reference.",
 };
 
 const topicCards = getLearnTopicCatalog(learnCollection).map((item) => ({
@@ -73,9 +73,8 @@ function renderEntryAudience(contentType: LearnContentType): string {
 				<PageTitle prefix="LEARN" title="START HERE" class="mb-8" />
 
 				<p class="text-center leading-tight mb-12 max-w-2xl mx-auto">
-					Learn is Augur's guided knowledge base: start with the core concepts, then follow
-					the material that matches what you need to understand. Available lessons are
-					listed here; event records and archived procedures are clearly marked.
+					Learn is Augur's guide to the concepts, mechanisms, and history behind the protocol.
+					Start with the core ideas, then explore the lessons and records that interest you.
 				</p>
 
 				{startTopic && (
@@ -112,16 +111,15 @@ function renderEntryAudience(contentType: LearnContentType): string {
 					</section>
 				)}
 
-				<section aria-labelledby="available-topics">
+				<section aria-labelledby="learn-topics">
 					<h2
-						id="available-topics"
+						id="learn-topics"
 						class="font-display uppercase tracking-widest text-xl text-loud-foreground mb-3"
 					>
-						Available topics
+						Explore topics
 					</h2>
 					<p class="text-sm leading-snug text-muted-foreground mb-8">
-						Only topics with available material appear below. Planned topics stay out of the
-						catalog until they have a coherent landing page and content to read.
+						Choose a topic to explore Augur’s concepts, mechanisms, and history.
 					</p>
 
 					<div class="space-y-8">
@@ -130,7 +128,7 @@ function renderEntryAudience(contentType: LearnContentType): string {
 								<div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 									<div>
 										<p class="font-display text-xs tracking-widest text-primary mb-2">
-											AVAILABLE TOPIC
+											TOPIC
 										</p>
 										<h3 class="font-display uppercase text-2xl text-loud-foreground">
 											<a href={topic.topic.path} class="hover:text-primary transition-colors">
@@ -177,7 +175,7 @@ function renderEntryAudience(contentType: LearnContentType): string {
 									</div>
 								)}
 
-								{topic.availableCaseStudyEntries.length > 0 ? (
+								{topic.availableCaseStudyEntries.length > 0 && (
 									<div class="border-t border-foreground/20 pt-5 mt-5">
 										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
 											Case studies
@@ -187,17 +185,10 @@ function renderEntryAudience(contentType: LearnContentType): string {
 											{topic.availableCaseStudyEntries.map((entry) => (
 												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
 													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-													<span class="text-xs text-muted-foreground">AVAILABLE · {renderEntryAudience(entry.contentType)}</span>
+													<span class="text-xs text-muted-foreground">{renderEntryAudience(entry.contentType)}</span>
 												</li>
 											))}
 										</ul>
-									</div>
-								) : (
-									<div class="border-t border-foreground/20 pt-5 mt-5">
-										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
-											Case studies
-										</h4>
-										<p class="text-sm text-muted-foreground">No case studies are currently published for this topic.</p>
 									</div>
 								)}
 
@@ -211,7 +202,7 @@ function renderEntryAudience(contentType: LearnContentType): string {
 											{topic.historicalEntries.map((entry) => (
 												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
 													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-													<span class="text-xs text-muted-foreground">{entry.status.toUpperCase()} · {renderEntryAudience(entry.contentType)}</span>
+													<span class="text-xs text-muted-foreground">HISTORICAL REFERENCE · {renderEntryAudience(entry.contentType)}</span>
 												</li>
 											))}
 										</ul>
