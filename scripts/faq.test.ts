@@ -25,8 +25,6 @@ const faqAnchorIds = [
 	"what-was-the-moon-fork",
 	"which-outcome-won-the-moon-fork",
 	"where-is-the-moon-fork-record",
-	"what-is-lituus",
-	"how-does-lituus-relate-to-augur",
 	"how-do-i-verify-a-token",
 	"where-should-i-learn-more",
 ];
@@ -37,6 +35,8 @@ test("keeps the FAQ general and the Moon Fork subsection historical", () => {
 	assert.match(faq, /Moon Fork · Historical Record/u);
 	assert.match(faq, /archived migration record/u);
 	assert.doesNotMatch(faq, /MigrationCta|isMigrationOpen|migrationOpen/u);
+	assert.doesNotMatch(faq, /Lituus|lituus/u);
+	assert.doesNotMatch(featureDocumentation, /\*\*Lituus\*\*|what-is-lituus|how-does-lituus/u);
 	assert.doesNotMatch(
 		faq,
 		/migration-open|migration window is open|Open now|active migration|must migrate/iu,

@@ -9,7 +9,7 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout
   title="Augur FAQ | Augur"
-  description="Concise answers about Augur prediction markets, reporting, REP, forks, Lituus, and the completed Moon Fork."
+  description="Concise answers about Augur prediction markets, reporting, REP, forks, and the completed Moon Fork."
   keywords={[
     "Augur FAQ",
     "prediction markets",
@@ -17,8 +17,7 @@ import Layout from "../layouts/Layout.astro";
     "Augur reporting",
     "Augur disputes",
     "Augur forks",
-    "Moon Fork",
-    "Lituus oracle"
+    "Moon Fork"
   ]}
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
@@ -29,7 +28,7 @@ import Layout from "../layouts/Layout.astro";
         <PageTitle prefix="FAQ" title="AUGUR" class="mb-8" />
 
         <p class="text-center normal-case leading-tight text-foreground mb-12 mx-auto max-w-xl">
-          Short answers about Augur markets, reporting, REP, forks, Lituus, and the completed Moon Fork.
+          Short answers about Augur markets, reporting, REP, forks, and the completed Moon Fork.
           Use <a href="/learn/fork/">Learn</a> for deeper explanations and the archived
           <a href="/learn/fork/migration/">Moon Fork migration record</a> for historical procedure.
         </p>
@@ -85,16 +84,6 @@ import Layout from "../layouts/Layout.astro";
           </FaqItem>
           <FaqItem id="where-is-the-moon-fork-record" question="Where can I read the Moon Fork record?">
             <p>The <a href="/learn/fork/migration/">archived migration record</a> preserves the historical procedure, screenshots, and token distinctions. It is available for reference and is not current migration guidance.</p>
-          </FaqItem>
-        </div>
-
-        <SectionHeading text="Lituus" />
-        <div class="faq-group mb-12">
-          <FaqItem id="what-is-lituus" question="What is Lituus?">
-            <p>Lituus is a standalone decentralized oracle, not a prediction-market platform. It publishes outcomes for other protocols that need decentralized resolution.</p>
-          </FaqItem>
-          <FaqItem id="how-does-lituus-relate-to-augur" question="How does Lituus relate to Augur?">
-            <p>Lituus generalizes the oracle in Augur v2 into standalone infrastructure and redesigns parts of its reporting, fee, and fork mechanisms. They are distinct protocol designs.</p>
           </FaqItem>
         </div>
 

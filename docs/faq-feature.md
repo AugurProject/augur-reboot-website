@@ -25,7 +25,7 @@ The page uses the same `grid grid-rows-[auto_1fr_auto] min-h-screen` shell as th
 - **Middle:** A general Augur FAQ with concise native disclosure items.
 - **Bottom:** Standard `Footer` component.
 
-The title treatment is `FAQ // AUGUR`. Metadata describes Augur markets, reporting, REP, forks, Lituus, and the completed Moon Fork.
+The title treatment is `FAQ // AUGUR`. Metadata describes Augur markets, reporting, REP, forks, and the completed Moon Fork.
 
 ## Content Structure
 
@@ -35,8 +35,7 @@ The Q&A is grouped by subject:
 2. **Markets & Reporting** — market resolution, dispute bonds, and the fork threshold.
 3. **Forks & REP** — universes, one-way migration, and parent-universe behavior.
 4. **Moon Fork · Historical Record** — the completed event, verified token identity, and the archived procedure.
-5. **Lituus** — its role as a standalone oracle and relationship to Augur.
-6. **Safety & Participation** — token verification and links into the Fork Learn topic.
+5. **Safety & Participation** — token verification and links into the Fork Learn topic.
 
 Answers stay short and link to existing Learn routes for depth. The archived `/learn/fork/migration/` page is linked only as a historical record. The FAQ does not present migration as an available action or duplicate the Learn curriculum.
 
@@ -58,8 +57,6 @@ Each question has a stable `id` on its `<details>` element. Current anchors are:
 - `#what-was-the-moon-fork`
 - `#which-outcome-won-the-moon-fork`
 - `#where-is-the-moon-fork-record`
-- `#what-is-lituus`
-- `#how-does-lituus-relate-to-augur`
 - `#how-do-i-verify-a-token`
 - `#where-should-i-learn-more`
 
