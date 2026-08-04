@@ -1,0 +1,226 @@
+---
+import { getCollection } from "astro:content";
+import Footer from "../../components/shell/footer.astro";
+import PageHeader from "../../components/shell/page-header.tsx";
+import PageTitle from "../../components/shell/page-title.astro";
+import Layout from "../../layouts/Layout.astro";
+import {
+	assertLearnEntries,
+	getLearnEntryGroup,
+	getLearnTopicCatalog,
+	type LearnContentType,
+	type LearnEntryGroup,
+} from "../../lib/learn";
+
+const learnCollection = await getCollection("learn");
+assertLearnEntries(learnCollection);
+
+const audienceByContentType: Record<LearnContentType, string> = {
+	topic: "New users starting with the basics",
+	lesson: "Readers who want to understand the mechanism",
+	guide: "REP holders preparing for fork risk",
+	reference: "Readers looking up protocol details",
+	"case-study": "Readers studying a completed event",
+	"historical-record": "Readers consulting historical reference",
+};
+
+const groupDescription: Record<LearnEntryGroup, string> = {
+	core: "Reusable explanations and guides for understanding how Augur works.",
+	"case-study": "Dated accounts of completed events, kept separate from evergreen lessons.",
+	"historical-record": "Archived material preserved for evidence and historical reference.",
+};
+
+const topicCards = getLearnTopicCatalog(learnCollection).map((item) => ({
+	...item,
+	availableCoreEntries: item.availableEntries.filter(
+		(entry) => getLearnEntryGroup(entry) === "core",
+	),
+	availableCaseStudyEntries: item.availableEntries.filter(
+		(entry) => getLearnEntryGroup(entry) === "case-study",
+	),
+	historicalEntries: item.entries.filter(
+		(entry) => getLearnEntryGroup(entry) === "historical-record",
+	),
+	audiences: [
+		...new Set(
+			item.availableEntries.map(
+				(entry) => audienceByContentType[entry.contentType],
+			),
+		),
+	],
+}));
+
+const startTopic = topicCards[0];
+
+function renderEntryAudience(contentType: LearnContentType): string {
+	return audienceByContentType[contentType];
+}
+---
+
+<Layout
+	title="Learn - Augur"
+	description="Start here to understand Augur's fork mechanism, dispute system, and historical records."
+	ogType="website"
+>
+	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+		<PageHeader client:load backHref="/" />
+
+		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
+			<div class="max-w-4xl mx-auto">
+				<PageTitle prefix="LEARN" title="START HERE" class="mb-8" />
+
+				<p class="text-center leading-tight mb-12 max-w-2xl mx-auto">
+					Learn is Augur's guided knowledge base: start with the core concepts, then follow
+					the material that matches what you need to understand. Available lessons are
+					listed here; event records and archived procedures are clearly marked.
+				</p>
+
+				{startTopic && (
+					<section
+						aria-labelledby="learn-start-here"
+						class="border border-primary/60 p-6 md:p-8 mb-12 fx-box-glow"
+					>
+						<p class="font-display text-sm tracking-widest text-primary mb-3">
+						START HERE
+					</p>
+						<h2
+							id="learn-start-here"
+							class="font-display uppercase text-2xl md:text-3xl text-loud-foreground mb-3"
+						>
+							<a href={startTopic.topic.path} class="hover:text-primary transition-colors">
+								{startTopic.topic.label}
+							</a>
+						</h2>
+						<p class="leading-snug mb-6">{startTopic.topic.description}</p>
+						<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+							<div>
+								<p class="font-display text-xs tracking-widest text-muted-foreground mb-1">
+									INTENDED AUDIENCE
+								</p>
+								<p class="text-sm">{startTopic.audiences.join(" · ")}</p>
+							</div>
+							<a
+								href={startTopic.topic.path}
+								class="font-display uppercase tracking-widest text-primary hover:text-loud-foreground transition-colors"
+							>
+								Begin with {startTopic.topic.label} →
+							</a>
+						</div>
+					</section>
+				)}
+
+				<section aria-labelledby="available-topics">
+					<h2
+						id="available-topics"
+						class="font-display uppercase tracking-widest text-xl text-loud-foreground mb-3"
+					>
+						Available topics
+					</h2>
+					<p class="text-sm leading-snug text-muted-foreground mb-8">
+						Only topics with available material appear below. Planned topics stay out of the
+						catalog until they have a coherent landing page and content to read.
+					</p>
+
+					<div class="space-y-8">
+						{topicCards.map((topic) => (
+							<article class="border border-foreground/30 p-6 md:p-8" id={`topic-${topic.topic.key}`}>
+								<div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+									<div>
+										<p class="font-display text-xs tracking-widest text-primary mb-2">
+											AVAILABLE TOPIC
+										</p>
+										<h3 class="font-display uppercase text-2xl text-loud-foreground">
+											<a href={topic.topic.path} class="hover:text-primary transition-colors">
+												{topic.topic.label}
+											</a>
+										</h3>
+									</div>
+									<a
+										href={topic.topic.path}
+										class="font-display uppercase tracking-widest text-sm text-primary hover:text-loud-foreground transition-colors"
+									>
+										Open topic →
+									</a>
+								</div>
+
+								<p class="leading-snug mt-4 mb-6">{topic.topic.description}</p>
+
+								<div class="border-t border-foreground/20 pt-4 mb-6">
+									<p class="font-display text-xs tracking-widest text-muted-foreground mb-1">
+										INTENDED AUDIENCE
+									</p>
+									<p class="text-sm">{topic.audiences.join(" · ")}</p>
+								</div>
+
+								{topic.availableCoreEntries.length > 0 && (
+									<div class="border-t border-foreground/20 pt-5">
+										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
+											Core learning path
+										</h4>
+										<p class="text-sm text-muted-foreground mb-4">{groupDescription.core}</p>
+										<ul class="space-y-3">
+											{topic.availableCoreEntries.map((entry) => (
+												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+													<a
+														href={entry.path}
+														class="text-primary hover:text-loud-foreground transition-colors"
+													>
+														{entry.label}
+													</a>
+													<span class="text-xs text-muted-foreground">{renderEntryAudience(entry.contentType)}</span>
+												</li>
+											))}
+										</ul>
+									</div>
+								)}
+
+								{topic.availableCaseStudyEntries.length > 0 ? (
+									<div class="border-t border-foreground/20 pt-5 mt-5">
+										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
+											Case studies
+										</h4>
+										<p class="text-sm text-muted-foreground mb-4">{groupDescription["case-study"]}</p>
+										<ul class="space-y-3">
+											{topic.availableCaseStudyEntries.map((entry) => (
+												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
+													<span class="text-xs text-muted-foreground">AVAILABLE · {renderEntryAudience(entry.contentType)}</span>
+												</li>
+											))}
+										</ul>
+									</div>
+								) : (
+									<div class="border-t border-foreground/20 pt-5 mt-5">
+										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
+											Case studies
+										</h4>
+										<p class="text-sm text-muted-foreground">No case studies are currently published for this topic.</p>
+									</div>
+								)}
+
+								{topic.historicalEntries.length > 0 && (
+									<div class="border-t border-foreground/20 pt-5 mt-5">
+										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
+											Historical records
+										</h4>
+										<p class="text-sm text-muted-foreground mb-4">{groupDescription["historical-record"]}</p>
+										<ul class="space-y-3">
+											{topic.historicalEntries.map((entry) => (
+												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
+													<span class="text-xs text-muted-foreground">{entry.status.toUpperCase()} · {renderEntryAudience(entry.contentType)}</span>
+												</li>
+											))}
+										</ul>
+									</div>
+								)}
+							</article>
+						))}
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<Footer />
+	</div>
+</Layout>

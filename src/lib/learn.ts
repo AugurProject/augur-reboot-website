@@ -63,6 +63,15 @@ export interface LearnNavigationItem {
 	status: LearnStatus;
 }
 
+export type LearnEntryGroup = "core" | "case-study" | "historical-record";
+
+export interface LearnTopicCatalogItem {
+	topic: LearnTopicContext;
+	entries: LearnNavigationItem[];
+	availableEntries: LearnNavigationItem[];
+	archivedEntries: LearnNavigationItem[];
+}
+
 export function getLearnTopic(
 	topicKey: string,
 	registry: LearnTopicRegistry = learnTopicRegistry,
@@ -136,6 +145,44 @@ export function getLearnNavigation(
 			historical: entry.data.historical,
 			status: entry.data.status,
 		}));
+}
+
+export function getLearnTopicCatalog(
+	entries: readonly LearnEntryLike[],
+	registry: LearnTopicRegistry = learnTopicRegistry,
+): LearnTopicCatalogItem[] {
+	assertLearnEntries(entries, registry);
+
+	return Object.keys(registry)
+		.map((topicKey) => {
+			const topicEntries = getLearnNavigation(entries, topicKey);
+
+			return {
+				topic: getLearnTopic(topicKey, registry),
+				entries: topicEntries,
+				availableEntries: topicEntries.filter(
+					(entry) => entry.status === "available",
+				),
+				archivedEntries: topicEntries.filter(
+					(entry) => entry.status === "archived",
+				),
+			};
+		})
+		.filter(({ availableEntries }) => availableEntries.length > 0);
+}
+
+export function getLearnEntryGroup(
+	entry: Pick<LearnNavigationItem, "contentType" | "historical">,
+): LearnEntryGroup {
+	if (entry.historical || entry.contentType === "historical-record") {
+		return "historical-record";
+	}
+
+	if (entry.contentType === "case-study") {
+		return "case-study";
+	}
+
+	return "core";
 }
 
 export function getLearnPageContext(

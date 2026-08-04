@@ -4,8 +4,10 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import {
 	assertLearnEntries,
+	getLearnEntryGroup,
 	getLearnNavigation,
 	getLearnPageContext,
+	getLearnTopicCatalog,
 	learnTopicRegistry,
 	usesHistoricalPresentation,
 	type LearnEntryLike,
@@ -68,6 +70,95 @@ test("orders navigation within each registered topic and omits planned entries",
 			{ label: "WHAT TO DO", path: "/learn/fork/what-to-do/" },
 		],
 	);
+});
+
+test("builds the landing catalog from available metadata", () => {
+	const registry = {
+		...learnTopicRegistry,
+		oracle: {
+			label: "Oracle",
+			description: "Learn how the oracle works.",
+		},
+		future: {
+			label: "Future",
+			description: "Not published yet.",
+		},
+	};
+	const entries = [
+		entry("fork/index", {
+			topic: "fork",
+			order: 1,
+			contentType: "topic",
+			label: "WHAT IS A FORK?",
+			historical: false,
+			status: "available",
+			presentation: "standard",
+		}),
+		entry("fork/migration", {
+			topic: "fork",
+			order: 4,
+			contentType: "historical-record",
+			label: "MIGRATION GUIDE",
+			historical: true,
+			status: "archived",
+			presentation: "historical-record",
+		}),
+		entry("fork/future-lesson", {
+			topic: "fork",
+			order: 5,
+			contentType: "lesson",
+			label: "FUTURE LESSON",
+			historical: false,
+			status: "planned",
+			presentation: "standard",
+		}),
+		entry("oracle/index", {
+			topic: "oracle",
+			order: 1,
+			contentType: "topic",
+			label: "ORACLE BASICS",
+			historical: false,
+			status: "available",
+			presentation: "standard",
+		}),
+		entry("future/index", {
+			topic: "future",
+			order: 1,
+			contentType: "topic",
+			label: "FUTURE TOPIC",
+			historical: false,
+			status: "planned",
+			presentation: "standard",
+		}),
+	];
+
+	const catalog = getLearnTopicCatalog(entries, registry);
+
+	assert.deepEqual(
+		catalog.map(({ topic }) => topic.key),
+		["fork", "oracle"],
+	);
+	assert.deepEqual(
+		catalog[0].availableEntries.map(({ label, path }) => ({ label, path })),
+		[{ label: "WHAT IS A FORK?", path: "/learn/fork/" }],
+	);
+	assert.deepEqual(
+		catalog[0].archivedEntries.map(({ label, status }) => ({ label, status })),
+		[{ label: "MIGRATION GUIDE", status: "archived" }],
+	);
+	assert.equal(getLearnEntryGroup(catalog[0].archivedEntries[0]), "historical-record");
+});
+
+test("the landing route consumes the shared catalog and canonical topic paths", () => {
+	const route = readFileSync(
+		fileURLToPath(new URL("../src/pages/learn/index.astro", import.meta.url)),
+		"utf8",
+	);
+
+	assert.match(route, /getCollection\("learn"\)/u);
+	assert.match(route, /getLearnTopicCatalog\(learnCollection\)/u);
+	assert.match(route, /href=\{topic\.topic\.path\}/u);
+	assert.match(route, /Historical records/u);
 });
 
 test("adds a second topic through the registry without layout changes", () => {
