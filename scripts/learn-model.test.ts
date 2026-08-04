@@ -203,14 +203,11 @@ test("the landing route consumes the shared catalog and canonical topic paths", 
 		/const startTopic = topicCards\.find\(\(\{ topic \}\) => topic\.key === "fork"\)/u,
 	);
 	assert.doesNotMatch(route, /const startTopic = topicCards\[0\]/u);
-	assert.match(route, /Explore topics/u);
-	assert.match(
-		route,
-		/Choose a topic to explore Augur’s concepts, mechanisms, and history\./u,
-	);
+	assert.match(route, /Understand how Augur resolves markets/u);
+	assert.match(route, />\s*Topics\s*</u);
 	assert.doesNotMatch(
 		route,
-		/Only topics with available material|Planned topics stay out of the catalog|AVAILABLE TOPIC|No case studies are currently published/u,
+		/Only topics with available material|Planned topics stay out of the catalog|AVAILABLE TOPIC|No case studies are currently published|Explore topics|Choose a topic to explore/u,
 	);
 	assert.match(route, /Historical records/u);
 });
