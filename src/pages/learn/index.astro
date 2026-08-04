@@ -8,30 +8,22 @@ import {
 	assertLearnEntries,
 	getLearnEntryGroup,
 	getLearnTopicCatalog,
-	type LearnEntryGroup,
 } from "../../lib/learn";
 
 const learnCollection = await getCollection("learn");
 assertLearnEntries(learnCollection);
 
-const groupDescription: Record<LearnEntryGroup, string> = {
-	core: "Follow these lessons in order.",
-	"case-study": "See how these mechanisms played out in practice.",
-	"historical-record": "Review past procedures and source records.",
-};
-
 const topicCards = getLearnTopicCatalog(learnCollection).map((item) => ({
 	...item,
-	availableCoreEntries: item.availableEntries.filter(
+	coreEntries: item.availableEntries.filter(
 		(entry) => getLearnEntryGroup(entry) === "core",
 	),
-	availableCaseStudyEntries: item.availableEntries.filter(
+	caseStudyEntries: item.availableEntries.filter(
 		(entry) => getLearnEntryGroup(entry) === "case-study",
 	),
 	historicalEntries: item.entries.filter(
 		(entry) => getLearnEntryGroup(entry) === "historical-record",
 	),
-
 }));
 
 const startTopic = topicCards.find(({ topic }) => topic.key === "fork");
@@ -39,123 +31,100 @@ if (!startTopic) {
 	throw new Error("Learn landing requires the available Fork topic");
 }
 
+const orderedTopicCards = [
+	startTopic,
+	...topicCards.filter(({ topic }) => topic.key !== startTopic.topic.key),
+];
 ---
 
 <Layout
 	title="Learn - Augur"
-	description="Start here to understand Augur's fork mechanism, dispute system, and historical records."
+	description="Understand Augur's fork mechanism, dispute system, and historical records."
 	ogType="website"
 >
 	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
 		<PageHeader client:load backHref="/" />
 
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
-			<div class="max-w-4xl mx-auto">
+			<div class="max-w-3xl mx-auto">
 				<PageTitle prefix="LEARN" title="AUGUR" class="mb-8" />
 
-				<p class="text-center leading-tight mb-12 max-w-2xl mx-auto">
+				<p class="text-center leading-tight mb-16 max-w-xl mx-auto">
 					Understand how Augur resolves markets, protects its oracle, and responds when
 					consensus breaks down.
 				</p>
 
+				<div class="border-y border-foreground/20 divide-y divide-foreground/20">
+					{orderedTopicCards.map((topic, topicIndex) => (
+						<section class="py-10 md:py-12" aria-labelledby={`topic-${topic.topic.key}`}>
+							<p class="font-display text-xs tracking-widest text-primary mb-3">
+								{topicIndex === 0 ? "START HERE" : "LEARNING PATH"}
+							</p>
+							<h2
+								id={`topic-${topic.topic.key}`}
+								class="font-display uppercase text-3xl md:text-4xl text-loud-foreground mb-4"
+							>
+								{topic.topic.label}
+							</h2>
+							<p class="leading-snug max-w-2xl mb-8">{topic.topic.description}</p>
 
-				<section aria-labelledby="learn-topics">
-					<h2
-						id="learn-topics"
-						class="font-display uppercase tracking-widest text-xl text-loud-foreground mb-8"
-					>
-						Topics
-					</h2>
-
-					<div class="space-y-8">
-						{topicCards.map((topic) => (
-							<article class="border border-foreground/30 p-6 md:p-8" id={`topic-${topic.topic.key}`}>
-								<div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-									<div>
-										<p class="font-display text-xs tracking-widest text-primary mb-2">
-											{topic.topic.key === startTopic.topic.key ? "START HERE" : "TOPIC"}
-										</p>
-										<h3 class="font-display uppercase text-2xl text-loud-foreground">
-											<a href={topic.topic.path} class="hover:text-primary transition-colors">
-												{topic.topic.label}
+							{topic.coreEntries.length > 0 && (
+								<ol class="border-t border-foreground/20">
+									{topic.coreEntries.map((entry, entryIndex) => (
+										<li class="border-b border-foreground/20">
+											<a
+												href={entry.path}
+												class="group flex items-center gap-5 py-5 text-loud-foreground hover:text-primary transition-colors"
+											>
+												<span class="font-display text-xs tracking-widest text-muted-foreground">
+													{String(entryIndex + 1).padStart(2, "0")}
+												</span>
+												<span class="font-display uppercase tracking-wider flex-1">{entry.label}</span>
+												<span aria-hidden="true" class="text-primary group-hover:translate-x-1 transition-transform">
+													→
+												</span>
 											</a>
-										</h3>
-									</div>
-									<a
-										href={topic.topic.path}
-										class="font-display uppercase tracking-widest text-sm text-primary hover:text-loud-foreground transition-colors"
-									>
-										{topic.topic.key === startTopic.topic.key
-											? `Begin with ${topic.topic.label} →`
-											: "Open topic →"}
-									</a>
+										</li>
+									))}
+								</ol>
+							)}
+
+							{topic.caseStudyEntries.length > 0 && (
+								<div class="mt-10">
+									<h3 class="font-display uppercase tracking-widest text-sm text-foreground mb-3">
+										Case studies
+									</h3>
+									<ul class="space-y-2">
+										{topic.caseStudyEntries.map((entry) => (
+											<li>
+												<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">
+													{entry.label} →
+												</a>
+											</li>
+										))}
+									</ul>
 								</div>
+							)}
 
-								<p class="leading-snug mt-4 mb-6">{topic.topic.description}</p>
-
-								<div class="border-t border-foreground/20 pt-4 mb-6">
-									<p class="font-display text-xs tracking-widest text-muted-foreground mb-1">
-										GOOD FOR
-									</p>
-									<p class="text-sm">{topic.topic.audience}</p>
+							{topic.historicalEntries.length > 0 && (
+								<div class="mt-10">
+									<h3 class="font-display uppercase tracking-widest text-sm text-muted-foreground mb-3">
+										Historical records
+									</h3>
+									<ul class="space-y-2">
+										{topic.historicalEntries.map((entry) => (
+											<li>
+												<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">
+													{entry.label} →
+												</a>
+											</li>
+										))}
+									</ul>
 								</div>
-
-								{topic.availableCoreEntries.length > 0 && (
-									<div class="border-t border-foreground/20 pt-5">
-										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
-											Core learning path
-										</h4>
-										<p class="text-sm text-muted-foreground mb-4">{groupDescription.core}</p>
-										<ul class="space-y-3">
-											{topic.availableCoreEntries.map((entry) => (
-												<li>
-													<a
-														href={entry.path}
-														class="text-primary hover:text-loud-foreground transition-colors"
-													>
-														{entry.label}
-													</a>
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-
-								{topic.availableCaseStudyEntries.length > 0 && (
-									<div class="border-t border-foreground/20 pt-5 mt-5">
-										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
-											Case studies
-										</h4>
-										<p class="text-sm text-muted-foreground mb-4">{groupDescription["case-study"]}</p>
-										<ul class="space-y-3">
-											{topic.availableCaseStudyEntries.map((entry) => (
-												<li>
-													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-
-								{topic.historicalEntries.length > 0 && (
-									<div class="border-t border-foreground/20 pt-5 mt-5">
-										<h4 class="font-display uppercase tracking-widest text-lg text-foreground mb-1">
-											Historical records
-										</h4>
-										<p class="text-sm text-muted-foreground mb-4">{groupDescription["historical-record"]}</p>
-										<ul class="space-y-3">
-											{topic.historicalEntries.map((entry) => (
-												<li>
-													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-							</article>
-						))}
-					</div>
-				</section>
+							)}
+						</section>
+					))}
+				</div>
 			</div>
 		</main>
 
