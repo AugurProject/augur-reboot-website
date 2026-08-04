@@ -4,12 +4,6 @@ import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import LearnNavigation from "../features/learn/navigation.tsx";
 import Layout from "../layouts/Layout.astro";
-import {
-	getForkLifecycleAtBuild,
-	isMigrationClosed,
-	isMigrationOpen,
-	isVerifiedForkResolution,
-} from "../lib/fork-data";
 import type { LearnNavigationItem, LearnTopicContext } from "../lib/learn";
 
 interface Props {
@@ -17,30 +11,9 @@ interface Props {
 	description?: string;
 	topic: LearnTopicContext;
 	navigation: LearnNavigationItem[];
-	deadline?: string;
 }
 
-const {
-	title,
-	description,
-	topic,
-	navigation,
-	deadline = "THE RECORDED DEADLINE",
-} = Astro.props;
-const forkLifecycle = getForkLifecycleAtBuild();
-const migrationOpen = isMigrationOpen(forkLifecycle.state);
-const migrationClosed = isMigrationClosed(forkLifecycle.state);
-const resolutionVerified = isVerifiedForkResolution(forkLifecycle.state);
-const recordedDeadline = forkLifecycle.record?.migrationDeadline
-	? new Date(forkLifecycle.record.migrationDeadline * 1000)
-			.toLocaleDateString("en-US", {
-				month: "long",
-				day: "numeric",
-				year: "numeric",
-			})
-			.toUpperCase()
-	: deadline;
-
+const { title, description, topic, navigation } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
@@ -56,67 +29,27 @@ const currentPath = Astro.url.pathname;
 			<div class="max-w-3xl mx-auto">
 				<LearnBreadcrumbs topic={topic} currentLabel={title} />
 
-				<header
-					class:list={[
-						"relative px-6 py-8 mb-8",
-						migrationOpen
-							? "border border-red-500/60 bg-red-500/4"
-							: "border border-primary/40 bg-primary/4",
-					]}
-				>
-					<div
-						class:list={[
-							"font-display uppercase tracking-wider text-sm mb-3 flex items-center gap-2",
-							migrationOpen ? "text-red-500" : "text-primary",
-						]}
-					>
+				<header class="relative px-6 py-8 mb-8 border border-primary/40 bg-primary/4">
+					<div class="font-display uppercase tracking-wider text-sm mb-3 flex items-center gap-2 text-primary">
 						<span
-							class:list={[
-								"inline-block w-2 h-2",
-								migrationOpen ? "bg-red-500" : "bg-primary",
-							]}
+							class="inline-block w-2 h-2 bg-primary"
 							aria-hidden="true"
 						></span>
-						<span>
-							{migrationOpen
-								? "CRITICAL · MIGRATION IMMINENT"
-								: migrationClosed
-									? resolutionVerified
-										? "FORK RECORD · MIGRATION CLOSED"
-										: "FORK STATE · VERIFICATION PENDING"
-									: "MIGRATION GUIDE"}
-						</span>
+						<span>ARCHIVE · MIGRATION CLOSED</span>
 					</div>
 					<h1 class="font-display uppercase leading-[0.95] text-3xl sm:text-3xl">
 						<span class="block text-loud-foreground">
-							{migrationOpen
-								? "You will lose all of your REP"
-								: migrationClosed
-									? resolutionVerified
-										? "The migration window is closed"
-										: "Resolution is pending verification"
-									: "Historical migration procedure"}
+							Moon Fork migration is closed
 						</span>
 						<span class="block text-foreground text-2xl sm:text-2xl mt-2">
-							{migrationOpen
-								? "if you do not migrate before"
-								: migrationClosed
-									? resolutionVerified
-										? "Review the verified resolution recorded after"
-										: "Review the recorded fork state after"
-									: "Documentation of the Moon Fork migration"}
-							{(migrationOpen || migrationClosed) && (
-								<span
-									class:list={[
-										"fx-glow-sm-red-500",
-										migrationOpen ? "text-red-500" : "text-primary",
-									]}
-								>
-									{recordedDeadline}
-								</span>
-							)}
+							Historical procedure and evidence only
 						</span>
 					</h1>
+					<p class="mt-4 max-w-2xl text-foreground leading-snug">
+						This page preserves the completed migration record, screenshots, and
+						historical interfaces. It is not an active guide or a recommendation
+						to connect a wallet or submit a transaction.
+					</p>
 				</header>
 
 				<article class="prose prose-invert max-w-none pt-2 px-1 prose-headings:font-display prose-headings:uppercase prose-headings:tracking-wide prose-p:leading-snug prose-li:leading-snug prose-ul:list-[square] prose-li:marker:text-muted-foreground prose-ol:marker:text-muted-foreground prose-blockquote:border-l-muted-foreground prose-blockquote:text-foreground prose-img:border prose-img:border-muted-foreground/30 prose-img:shadow-[0_0_2em_oklch(from_var(--color-primary)_l_c_h_/0.1)]">

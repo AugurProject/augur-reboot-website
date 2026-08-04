@@ -1,6 +1,6 @@
 ---
-title: "Moon Fork Migration Guide"
-description: "Step-by-step historical reference for the Augur Moon Fork REP migration."
+title: "Moon Fork Migration Record"
+description: "Archived, evidence-preserving record of the Augur Moon Fork REP migration procedure."
 topic: fork
 order: 6
 contentType: historical-record
@@ -18,121 +18,160 @@ import step03 from '../../../assets/learn/migration/step-03.png'
 import step04 from '../../../assets/learn/migration/step-04.png'
 import step05 from '../../../assets/learn/migration/step-05.png'
 import step06 from '../../../assets/learn/migration/step-06.png'
-import { getForkLifecycleAtBuild, isMigrationClosed, isMigrationOpen } from '../../../lib/fork-data'
 
-export const forkLifecycle = getForkLifecycleAtBuild()
-export const migrationOpen = isMigrationOpen(forkLifecycle.state)
-export const migrationClosed = isMigrationClosed(forkLifecycle.state)
-export const migrationDeadline = forkLifecycle.record?.migrationDeadline
-  ? new Date(forkLifecycle.record.migrationDeadline * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-  : 'the recorded deadline'
-
-{migrationClosed && (
 <ProseCard>
-**HISTORICAL RECORD** — This page documents the Moon Fork migration procedure used by REP holders. The migration window is closed, but the steps remain available for reference.
+**ARCHIVED RECORD · MIGRATION CLOSED** — The Moon Fork migration window closed at `1785718859` (`2026-08-03T01:00:59Z`). This page preserves the procedure, screenshots, and token evidence as a historical record. It is not a live migration guide, and no action should be taken from it.
+
+The archived migration and reporting interfaces linked below are retained as historical references only. They are not current recommendations.
 </ProseCard>
-)}
+
+## Final result
+
+The final record was an Ethereum mainnet observation pinned to finalized block [`25,677,103`](https://etherscan.io/block/25677103), with block hash `0xab19846fa87d598ab7cf801092d94533b1fd4f3a0ebe2dc442c49f188f3af5b7` and block time `2026-08-03T21:36:23Z`.
+
+| Fact | Final recorded value |
+| --- | --- |
+| Parent/forking universe | [`0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA`](https://etherscan.io/address/0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA) |
+| Forking market | [`0x963EED85778CC23E2D4636Cd4f29eECDF9827E9e`](https://etherscan.io/address/0x963EED85778CC23E2D4636Cd4f29eECDF9827E9e) |
+| Winning/canonical universe | [`0x281171519Fb41540528398d8ED3EA257f0F32A9f`](https://etherscan.io/address/0x281171519Fb41540528398d8ED3EA257f0F32A9f) |
+| Winning outcome | Outcome index 1, **Yes** |
+| Current REP | **REPv2_Yes_1** — [`0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D) |
+| Fork reputation goal | `5,497,186.882986651334933313 REP` |
+
+The canonical universe is the child returned by `getWinningChildUniverse()`. The current REP identity is the token returned by that universe's `getReputationToken()` and identified on-chain by the symbol `REPv2_Yes_1`. It is not inferred from a migration percentage.
+
+### Final migrated amounts
+
+These final values were each read from the child token's `getTotalMigrated()` counter at block `25,677,103`. They are not ERC-20 `totalSupply()` values.
+
+| Index / outcome | Child universe | REP token | Final migrated REP |
+| --- | --- | --- | --- |
+| 0 / Invalid | No child at the observed block | None | `0` wei — `0 REP` |
+| 1 / Yes | `0x281171519Fb41540528398d8ED3EA257f0F32A9f` | `0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D` (`REPv2_Yes_1`) | `6398081413681494610869400` wei — `6,398,081.4136814946108694 REP` |
+| 2 / No | `0xbaaD633FAa0E4847A4b66043E3E92102e5800546` | `0x2F4005456c2F098358213f01DbE34abDAa2989A4` (`REPv2_No_1`) | `1786227400866527400056` wei — `1,786.227400866527400056 REP` |
+
+The parent universe's migration deadline was `1785718859` (`2026-08-03T01:00:59Z`). It had passed before the evidence block was observed, so the migration window and its tools are closed.
+
+### Token identities preserved in this record
+
+These labels refer to different roles. All addresses below are Ethereum mainnet addresses.
+
+| Label | Address | Role and status |
+| --- | --- | --- |
+| **REPv1** | [`0x1985365e9f78359a9B6AD760e32412f4a445E862`](https://etherscan.io/token/0x1985365e9f78359a9B6AD760e32412f4a445E862) | Legacy input token; not current REP |
+| **REPv2** | [`0x221657776846890989a759BA2973e427DfF5C9bB`](https://etherscan.io/token/0x221657776846890989a759BA2973e427DfF5C9bB) | Pre-fork parent-universe token; not current REP |
+| **REPv2_Yes_1** | [`0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D) | Current REP in the winning/canonical universe |
+| **Kraken `AUGUR`** | Same contract as `REPv2_Yes_1` above | Kraken's exchange ticker for the current token, not a separate token or address |
+
+### Evidence boundary
+
+The final record used contract reads and block state pinned to `25,677,103`. The migration totals above came from `getTotalMigrated()`, while `totalSupply()` was treated as a separate supply observation. The authoritative record also preserved the distinction between the legacy REPv1 input, pre-fork REPv2 input, and current `REPv2_Yes_1` output.
+
+## Related material
+
+The [Fork topic](/learn/fork/) and [How Disputes & Bonds Work](/learn/fork/disputes-and-bonds/) pages are available on this branch for general protocol context. [The Augur Fork Is Here](/blog/the-augur-fork-is-here/) remains available as a dated historical account.
+
+The generalized migration-mechanics lesson and the Moon Fork retrospective are coordinated follow-up routes in [#150](https://github.com/AugurProject/augur-reboot-website/issues/150) and [#151](https://github.com/AugurProject/augur-reboot-website/issues/151). They are not available on this branch, so this archive does not link to unpublished site paths.
 
 ## Why?
 
-By design, when Augur forks all REP holders are required to declare what they believe to be true. This significantly increases the cost to attack Augur. Doing anything other than voting how future Augur customers would want you to vote will result in a complete loss of funds.
-
-Augur is forking before the next version for three reasons:
+The protocol design required REP holders to declare what they believed to be true when Augur forked. This increased the cost of attacking Augur. The historical announcement gave three reasons for this fork:
 
 1. To learn from and improve the forking experience.
-2. To verify the incentive mechanisms work as theorized.
-3. To increase security by removing the portion of REP holders that would fail to respond should an attack happen.
+2. To verify that the incentive mechanisms worked as theorized.
+3. To increase security by removing the portion of REP holders that would fail to respond if an attack happened.
 
 ## When?
 
+The contemporaneous procedure described the following historical phases. These dates were not a current schedule; the contract deadline recorded above was authoritative and has passed.
+
 <ProseCard>
-| If you…                       | You can take action after | The last day this will happen between |
-|-------------------------------|---------------------------|---------------------------------------|
-| migrate early (40% ROI)       | April 8ᵗʰ – May 12ᵗʰ      | June 4ᵗʰ – June 11ᵗʰ                  |
-| migrate late (1:1 conversion) | June 4ᵗʰ – June 11ᵗʰ      | the contract deadline shown below      |
+| Historical phase | Procedure-era window/status |
+| --- | --- |
+| Early migration (40% ROI) | April 8ᵗʰ – May 12ᵗʰ; the procedure described the final early-migration period as June 4ᵗʰ – June 11ᵗʰ |
+| Late migration (1:1 conversion) | June 4ᵗʰ – June 11ᵗʰ, followed by the contract deadline |
+| Contract deadline | `1785718859` — `2026-08-03T01:00:59Z`; **closed** |
 </ProseCard>
 
-**Recorded migration deadline:** {migrationDeadline}
+## Moon Fork migration procedure (historical)
 
-## Moon Fork Migration Guide
+The sections below preserve the procedure that participants used during the completed Moon Fork. The wording is intentionally historical. Screenshots and links are retained for evidence, troubleshooting, and research; the linked tools are archived interfaces.
 
-### 0. Consolidate your REP on Ethereum mainnet
+### 0. Consolidated REP on Ethereum mainnet
 
-If your REP is not on Ethereum (exchanges, L2s), send it to your Ethereum address.
+The procedure told participants whose REP was held on exchanges or Layer 2s to consolidate it to an Ethereum mainnet address they controlled. It also documented the following token identities for wallet recognition:
 
-Sometimes wallets will not automatically detect your REP. You can manually add tokens by pasting the token address:
-
-- **Legacy REPv2 (pre-fork)** — [`0x221657776846890989a759ba2973e427dff5c9bb`](https://etherscan.io/token/0x221657776846890989a759ba2973e427dff5c9bb)
+- **Pre-fork REPv2** — [`0x221657776846890989a759BA2973e427DfF5C9bB`](https://etherscan.io/token/0x221657776846890989a759BA2973e427DfF5C9bB)
 - **Legacy REPv1** — [`0x1985365e9f78359a9B6AD760e32412f4a445E862`](https://etherscan.io/token/0x1985365e9f78359a9B6AD760e32412f4a445E862)
 
-These are the legacy input tokens for the migration. The surviving fork token is **REPv2_Yes_1**, listed by Kraken as AUGUR: [`0xcf6a0a7826fa124b7705d6f3c675ead76f1e540d`](https://etherscan.io/token/0xcf6a0a7826fa124b7705d6f3c675ead76f1e540d). Do not use the legacy REPv1 or REPv2 address as the current token after migration.
+The procedure identified **REPv2_Yes_1** at [`0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D) as the surviving fork token and noted that Kraken used **AUGUR** as its ticker for that same token. It also noted that wallets might not detect the tokens automatically, so participants manually added the token addresses. The procedure told participants who held REP in multiple places, including Layer 2s, Coinbase, or other exchanges, to consolidate it to one Ethereum mainnet address they controlled. Exchange support information and the [historical exchange-support page](https://v3.augur.net/#exchange-support) are retained as archived references, not recommendations.
 
-If you have REP in multiple places, send it all to a single Ethereum address on the original Ethereum. Don't forget REP you might have on Layer 2, Coinbase, or other exchanges. You must own your Ethereum address — an Ethereum address is yours if you have the private key.
+### 1. Opened the historical migration site
 
-Exchange support status changes frequently — check the latest at [v3.augur.net/#exchange-support](https://v3.augur.net/#exchange-support).
+Participants opened the [archived Augur Fork migration site](https://6.augurfork.eth.limo/). The link is retained to identify the interface shown in the screenshot; the migration tool is closed.
 
-### 1. Open the migration site
+<Image src={step01} alt="The historical augurfork.eth.limo homepage" />
 
-Go to [https://6.augurfork.eth.limo/](https://6.augurfork.eth.limo/).
+### 2. Connected an Ethereum wallet
 
-<Image src={step01} alt="The augurfork.eth.limo homepage" />
+Participants connected an Ethereum wallet they controlled to the historical interface. No wallet connection or transaction is available through this archived page.
 
-### 2. Connect your Ethereum wallet
+<Image src={step02} alt="Historical wallet connection prompt" />
 
-<Image src={step02} alt="Wallet connection prompt" />
+### 3. Converted remaining REPv1 to pre-fork REPv2
 
-### 3. Convert any remaining REPv1 to REPv2
+The historical interface showed whether an account still held REPv1. Participants who did were directed to convert it to pre-fork REPv2 before continuing. The screenshot preserves the **“You have 0 REPv1”** state.
 
-Make sure the page says **"You have 0 REPv1"**. If not, convert all REPv1 into REPv2.
+<Image src={step03} alt="Historical REPv1 to REPv2 conversion screen" />
 
-<Image src={step03} alt="REPv1 to REPv2 conversion screen" />
+### 4. Early migration (optional historical phase)
 
-### 4. (Optional) Early Migration
+The archived procedure described early migration as follows:
 
-- Early migration is only available from April 8ᵗʰ to early June.
-- The system pays a **40% return** for early migration to the correct outcome.
-- This return comes from the penalty paid by reporters who migrate to a different outcome. The 40% return was funded by crowdsourced donations.
-- Early migration comes with one small risk compared to late migration: if less than **3.33%** of the REP supply migrates to the same outcome as you, a different outcome will win and you will lose all REP.
-- Early migration is limited to the **first 367,000 REP**.
-- You may have to check the page multiple times on different days to make it into a round before it fills. It is easiest to make it in near the end — around 75% of early migration happens during the last several days because the migration limit grows exponentially.
-- If you want to participate, check [the reporting page](https://6.augurfork.eth.limo/#/reporting?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e) each day until it allows you to migrate to the correct outcome. If you are not able to select an outcome, the yellow note at the top will tell you how long to wait.
+- Early migration was available from April 8ᵗʰ to early June.
+- The system paid a **40% return** for early migration to the selected outcome.
+- That return came from the penalty paid by reporters who migrated to a different outcome, and the 40% return was funded by crowdsourced donations.
+- Early migration carried the risk that, if less than **3.33%** of REP supply migrated to the same outcome, a different outcome would win and the early participant would lose the migrated REP.
+- Early migration was limited to the **first 367,000 REP**.
+- Participants sometimes checked on different days because the migration limit grew exponentially and the procedure said that roughly 75% of early migration happened during the last several days.
+- Participants who wanted to use this phase checked the [archived reporting interface](https://6.augurfork.eth.limo/#/reporting?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e) until it allowed migration to an outcome. The interface's wait message described when another round might be available.
 
-<Image src={step04} alt="Early migration reporting screen" />
+<Image src={step04} alt="Historical early migration reporting screen" />
 
-### 5. Wait until June 11ᵗʰ
+### 5. Waited for the fork and contract deadline
 
-Augur will have forked by this date, enabling unlimited migration. The migration window ends at the **{migrationDeadline}** deadline shown by the deployed contract. {migrationOpen ? 'If the window is still open, migrate or sell your REP before it closes.' : migrationClosed ? 'The recorded migration deadline has passed; the remaining instructions are historical reference only.' : 'The migration deadline will be established when the fork begins.'}
+The procedure told participants to wait until June 11ᵗʰ, when the fork was expected to have enabled unlimited migration. The deployed contract later recorded the final deadline as `1785718859` (`2026-08-03T01:00:59Z`). That deadline has passed, and the migration window is closed.
 
-### 6. Open the migration page
+### 6. Opened the historical migration page
 
-Go to [the migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e).
+Participants opened the [archived migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e). This link is preserved as a record of the procedure's interface, not as a current tool.
 
-### 7. Migrate all REPv2 to the correct outcome
+### 7. Migrated pre-fork REPv2 to an outcome
 
-Select the correct answer to the Augur market **"Will the Artemis II Mission successfully liftoff in the first week of April?"**. The correct answer is the one that will result in a more valuable REP token, which is usually the truthful answer.
+The historical procedure directed participants to migrate their pre-fork REPv2 to the outcome they believed was correct for the Augur market **“Will the Artemis II Mission successfully liftoff in the first week of April?”** It described the expected correct answer as the one likely to result in a more valuable token and usually the truthful answer; that was procedure-era guidance, not a current recommendation. The final record identified outcome index 1, **Yes**, as the winning outcome and `REPv2_Yes_1` as the current REP token.
 
-If you are unsure what to pick, research and debate on the [Augur Discord](https://discord.com/invite/CdCSYk9GwH). If you select the wrong answer, you should expect to receive a different REP token that has no value.
+The procedure sent participants who were unsure to the [historical Augur Discord](https://discord.com/invite/CdCSYk9GwH). That community link is retained as a historical artifact. Selecting another outcome produced a different child REP token; the final record identifies `REPv2_No_1` as the losing child token and does not present it as current REP.
 
-<Image src={step05} alt="Migration outcome selection" />
+<Image src={step05} alt="Historical migration outcome selection" />
 
-### 8. Verify the new token
+### 8. Verified the resulting token
 
-After the migration is complete, verify you hold the new token **REPv2_Yes_1** in your wallet.
+After migration, participants verified that their wallet showed **REPv2_Yes_1** at `0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D` when they had migrated to the winning/canonical universe. Kraken's **AUGUR** ticker referred to this same current token contract.
 
-### 9. If you only did late migration, you are done
+### 9. Completed the late-migration path
 
-There are no further steps. Assuming you migrated to the correct universe, the tokens you received will be used for both **Augur Lituus** and **Augur Zoltar**.
+Participants who had only used late migration had no further procedure steps after receiving the token for the selected universe. The historical procedure stated that the correct-universe token would be used for both **Augur Lituus** and **Augur Zoltar**; this page preserves that period statement rather than making a current product recommendation.
 
-### 10. If you did early migration, claim your bonus
+### 10. Claimed the early-migration bonus
 
-Return to the [migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e).
+Participants who had used early migration returned to the [archived migration page](https://6.augurfork.eth.limo/#/migration?market=0x963eed85778cc23e2d4636cd4f29eecdf9827e9e) to check for the historical bonus. The interface is closed and no claim is available through this record.
 
-### 11. Redeem fork disputes
+### 11. Redeemed fork disputes
 
-Refresh possible claims, check all boxes, then redeem fork disputes. This will give you **140%** of your early migration REP. You are done when no boxes are left to check and you have additional REPv2_Yes_1 in your wallet.
+The historical procedure told early participants to refresh possible claims, select the available claims, and redeem fork disputes. It described this as giving **140%** of the early-migrated REP, with the process complete when no claim boxes remained and the additional REP appeared in the wallet. The screenshot preserves the redemption screen and the procedure's completion state.
 
-<Image src={step06} alt="Fork dispute redemption screen" />
+<Image src={step06} alt="Historical fork dispute redemption screen" />
 
 ---
 
-For additional help, visit the **moon-fork** channel on the [Augur Discord server](https://discord.com/invite/CdCSYk9GwH) or read [The Augur Fork Is Here](https://www.augur.net/blog/the-augur-fork-is-here/).
+For additional historical context, see [The Augur Fork Is Here](/blog/the-augur-fork-is-here/). The screenshots, token addresses, contract deadline, and block-pinned final values above are retained for research; this page contains no active migration call to action.
