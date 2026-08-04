@@ -13,27 +13,33 @@ const footer = read("src/components/shell/footer.astro");
 const featureDocumentation = read("docs/faq-feature.md");
 
 const faqAnchorIds = [
-	"what-is-augur",
-	"what-is-a-prediction-market",
-	"what-is-rep-used-for",
-	"how-are-markets-resolved",
-	"what-is-a-dispute-bond",
-	"when-does-augur-fork",
-	"what-is-a-fork",
-	"is-rep-migration-reversible",
-	"what-happens-to-unmigrated-rep",
-	"what-was-the-moon-fork",
-	"which-outcome-won-the-moon-fork",
-	"where-is-the-moon-fork-record",
-	"how-do-i-verify-a-token",
-	"where-should-i-learn-more",
+	"what-is-live-today",
+	"is-this-a-trading-interface",
+	"what-is-the-reboot-building",
+	"which-rep-token-is-current",
+	"why-are-there-multiple-rep-contracts",
+	"is-another-rep-migration-required",
+	"what-happened-to-other-rep",
+	"how-do-i-verify-rep",
+	"why-did-the-moon-fork-happen",
+	"is-the-moon-fork-complete",
+	"which-universe-won",
+	"where-is-the-on-chain-evidence",
+	"where-is-the-complete-record",
+	"what-causes-an-augur-fork",
+	"what-is-a-universe",
+	"why-is-rep-migration-irreversible",
 ];
 
 test("keeps the FAQ general and the Moon Fork subsection historical", () => {
 	assert.match(faq, /title="Augur FAQ \| Augur"/u);
 	assert.match(faq, /<PageTitle prefix="FAQ" title="AUGUR"/u);
-	assert.match(faq, /Moon Fork · Historical Record/u);
-	assert.match(faq, /archived migration record/u);
+	assert.match(faq, /<SectionHeading text="Augur Today"/u);
+	assert.match(faq, /<SectionHeading text="REP After the Moon Fork"/u);
+	assert.match(faq, /<SectionHeading text="The Moon Fork"/u);
+	assert.match(faq, /<SectionHeading text="Protocol Questions"/u);
+	assert.match(faq, /archived Moon Fork record/u);
+	assert.doesNotMatch(faq, /question="What is Augur\?"|What is a prediction market\?|Where should I learn more\?|Safety & Participation/u);
 	assert.doesNotMatch(faq, /MigrationCta|isMigrationOpen|migrationOpen/u);
 	assert.doesNotMatch(faq, /Lituus|lituus/u);
 	assert.doesNotMatch(featureDocumentation, /\*\*Lituus\*\*|what-is-lituus|how-does-lituus/u);
@@ -68,9 +74,7 @@ test("links FAQ readers only to existing Learn routes and updates the footer lab
 	];
 	assert.deepEqual(learnLinks.sort(), [
 		"/learn/fork/",
-		"/learn/fork/disputes-and-bonds/",
 		"/learn/fork/migration/",
-		"/learn/fork/what-to-do/",
 	].sort());
 	assert.ok(
 		existsSync(path.join(repositoryRoot, "src/content/learn/fork/migration.mdx")),

@@ -1,22 +1,21 @@
 ---
+import FaqItem from "../features/faq/item.astro";
 import SectionHeading from "../components/content/section-heading.astro";
-import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import PageTitle from "../components/shell/page-title.astro";
-import FaqItem from "../features/faq/item.astro";
+import Footer from "../components/shell/footer.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
   title="Augur FAQ | Augur"
-  description="Concise answers about Augur prediction markets, reporting, REP, forks, and the completed Moon Fork."
+  description="Current answers about the Augur reboot, REP after the Moon Fork, the final fork record, and protocol mechanics."
   keywords={[
     "Augur FAQ",
-    "prediction markets",
+    "Augur reboot",
     "Augur REP",
-    "Augur reporting",
-    "Augur disputes",
-    "Augur forks",
+    "REPv2_Yes_1",
+    "Augur fork",
     "Moon Fork"
   ]}
 >
@@ -28,79 +27,75 @@ import Layout from "../layouts/Layout.astro";
         <PageTitle prefix="FAQ" title="AUGUR" class="mb-8" />
 
         <p class="text-center normal-case leading-tight text-foreground mb-12 mx-auto max-w-xl">
-          Short answers about Augur markets, reporting, REP, forks, and the completed Moon Fork.
-          Use <a href="/learn/fork/">Learn</a> for deeper explanations and the archived
-          <a href="/learn/fork/migration/">Moon Fork migration record</a> for historical procedure.
+          Current answers about the Augur reboot, REP after the Moon Fork, and the protocol's fork mechanics.
         </p>
 
-        <SectionHeading text="Augur Basics" />
+        <SectionHeading text="Augur Today" />
         <div class="faq-group mb-12">
-          <FaqItem id="what-is-augur" question="What is Augur?">
-            <p>Augur is a decentralized prediction-market platform and oracle on Ethereum. People create markets about real-world events, trade outcome shares, and report which outcomes occurred.</p>
+          <FaqItem id="what-is-live-today" question="What is live today?">
+            <p>The Augur reboot is active, but a new Augur-native prediction-market application has not yet been relaunched. This site publishes project updates, protocol education, and the verified record of the completed Moon Fork.</p>
           </FaqItem>
-          <FaqItem id="what-is-a-prediction-market" question="What is a prediction market?">
-            <p>A market lists possible outcomes for an event. Participants trade shares tied to those outcomes; after reporting and disputes, a finalized market settles according to its final outcome.</p>
+          <FaqItem id="is-this-a-trading-interface" question="Is this a trading interface?">
+            <p>No. Augur.net is the project's information and monitoring site. It does not create markets, hold funds, or execute trades.</p>
           </FaqItem>
-          <FaqItem id="what-is-rep-used-for" question="What is REP used for?">
-            <p>REP is Augur's reputation token. In Augur v2 it is used for reporting, disputing, and staking—not for trading. Traders use DAI for market positions.</p>
+          <FaqItem id="what-is-the-reboot-building" question="What is the reboot building toward?">
+            <p>Current work centers on a new oracle architecture, broader REP access, and an eventual Augur-native market protocol after the oracle's security and fee mechanisms are finalized. The <a href="/mission/">mission timeline</a> and <a href="/team/">team page</a> describe that work.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="Markets & Reporting" />
+        <SectionHeading text="REP After the Moon Fork" />
         <div class="faq-group mb-12">
-          <FaqItem id="how-are-markets-resolved" question="How are Augur markets resolved?">
-            <p>After an event, a designated reporter can submit an initial report. If that does not happen, reporting opens to other REP holders. Dispute rounds can challenge the tentative outcome before the market finalizes.</p>
-            <p><strong><a href="/learn/fork/disputes-and-bonds/">Learn how reporting disputes and bonds work</a>.</strong></p>
+          <FaqItem id="which-rep-token-is-current" question="Which REP token is current?">
+            <p>The winning universe's REP token is <strong>REPv2_Yes_1</strong> at <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D</a>. The final record identifies it from the winning universe's on-chain contracts.</p>
           </FaqItem>
-          <FaqItem id="what-is-a-dispute-bond" question="What is a dispute bond?">
-            <p>A dispute bond is REP committed to challenge a tentative outcome. Bonds can be funded by multiple participants and escalate as disagreement continues; a successful dispute replaces the tentative outcome.</p>
+          <FaqItem id="why-are-there-multiple-rep-contracts" question="Why are there multiple REP contracts?">
+            <p>The Moon Fork created a child universe—and a distinct REP token—for every possible outcome. Token names and tickers alone are therefore not enough to identify the winning REP contract.</p>
           </FaqItem>
-          <FaqItem id="when-does-augur-fork" question="When does Augur fork?">
-            <p>A fork begins when a dispute bond reaches at least 2.5% of all theoretical REP. In the genesis universe, that threshold is 275,000 REP. A fork is Augur's resolution method of last resort.</p>
-            <p><strong><a href="/learn/fork/">Read the fork overview in Learn</a>.</strong></p>
+          <FaqItem id="is-another-rep-migration-required" question="Is another REP migration required?">
+            <p>No further migration has been announced. The Moon Fork migration window closed on August 3, 2026. The archived migration page is retained only as a historical record.</p>
+          </FaqItem>
+          <FaqItem id="what-happened-to-other-rep" question="What happened to REP in the other universes?">
+            <p>REP migration was one-way. REP left in the parent universe was locked from new markets and staking, while REP in losing child universes remained separate from the winning universe's current REP token.</p>
+          </FaqItem>
+          <FaqItem id="how-do-i-verify-rep" question="How do I verify the correct REP contract?">
+            <p>Compare the full contract address—not only the token symbol—with the <a href="/learn/fork/migration/">final Moon Fork record</a>, then inspect that address on a block explorer such as Etherscan.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="Forks & REP" />
+        <SectionHeading text="The Moon Fork" />
         <div class="faq-group mb-12">
-          <FaqItem id="what-is-a-fork" question="What is an Augur fork?">
-            <p>A fork creates a child universe for each possible outcome, including Invalid. REP holders choose a universe by migrating REP; the child with the most migrated REP wins, and the parent universe is locked for new markets and staking.</p>
+          <FaqItem id="why-did-the-moon-fork-happen" question="Why did the Moon Fork happen?">
+            <p>A dispute over the Artemis II liftoff market reached Augur's fork threshold. That activated the protocol's last-resort process for resolving the market through REP migration.</p>
           </FaqItem>
-          <FaqItem id="is-rep-migration-reversible" question="Is REP migration reversible?">
-            <p>No. Migration is one-way, and tokens in sibling universes are separate. The general fork mechanics are explained in <a href="/learn/fork/">Learn</a>.</p>
+          <FaqItem id="is-the-moon-fork-complete" question="Is the Moon Fork complete?">
+            <p>Yes. The migration deadline passed on August 3, 2026, the forking market finalized, and the winning universe is recorded on Ethereum.</p>
           </FaqItem>
-          <FaqItem id="what-happens-to-unmigrated-rep" question="What happens to REP left in the parent universe?">
-            <p>After Augur v2's fork period, REP left in the parent universe is permanently locked and expected to lose value. This is protocol history, not a current action notice.</p>
+          <FaqItem id="which-universe-won" question="Which universe won?">
+            <p>The <strong>Yes</strong> universe won. The finalized record identifies outcome index 1 and its on-chain REP symbol, <strong>REPv2_Yes_1</strong>.</p>
+          </FaqItem>
+          <FaqItem id="where-is-the-on-chain-evidence" question="Where is the on-chain evidence?">
+            <p>The <a href="/data/fork-risk.json">published fork record</a> contains the observed block, winning universe, deadline, and migration totals. The result was reproduced through independent Ethereum RPC providers at the same pinned block.</p>
+          </FaqItem>
+          <FaqItem id="where-is-the-complete-record" question="Where is the complete historical record?">
+            <p>The <a href="/learn/fork/migration/">archived Moon Fork record</a> preserves the procedure, screenshots, and token distinctions. It is historical evidence, not current migration guidance.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="Moon Fork · Historical Record" />
+        <SectionHeading text="Protocol Questions" />
         <div class="faq-group mb-12">
-          <FaqItem id="what-was-the-moon-fork" question="What was the Moon Fork?">
-            <p>The Moon Fork was Augur v2's completed fork over the Artemis II liftoff market. It is preserved as a historical case, separate from general fork education and the archived migration procedure.</p>
+          <FaqItem id="what-causes-an-augur-fork" question="What causes an Augur fork?">
+            <p>A fork begins when a dispute bond reaches 2.5% of all theoretical REP. In Augur's genesis universe, that threshold was 275,000 REP.</p>
           </FaqItem>
-          <FaqItem id="which-outcome-won-the-moon-fork" question="Which outcome won, and what is the recorded REP token?">
-            <p>The finalized Ethereum mainnet record identifies outcome index 1, <strong>Yes</strong>, as the winner. It identifies <strong>REPv2_Yes_1</strong> at <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D</a> as the winning universe's REP token.</p>
+          <FaqItem id="what-is-a-universe" question="What is a universe?">
+            <p>A universe is a version of Augur with its own markets and REP token. A fork creates one child universe for every possible outcome of the disputed market, including Invalid.</p>
           </FaqItem>
-          <FaqItem id="where-is-the-moon-fork-record" question="Where can I read the Moon Fork record?">
-            <p>The <a href="/learn/fork/migration/">archived migration record</a> preserves the historical procedure, screenshots, and token distinctions. It is available for reference and is not current migration guidance.</p>
+          <FaqItem id="why-is-rep-migration-irreversible" question="Why is REP migration irreversible?">
+            <p>Migration is how REP holders commit to one outcome universe. Allowing REP to move back or between sibling universes would let the same stake support conflicting outcomes.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="Safety & Participation" />
-        <div class="faq-group mb-12">
-          <FaqItem id="how-do-i-verify-a-token" question="How do I verify a REP token?">
-            <p>Check the chain and contract address, not just a ticker symbol. For Moon Fork identities, compare the address with the finalized record and verify it on a block explorer such as <a href="https://etherscan.io/" target="_blank" rel="noopener noreferrer">Etherscan</a>.</p>
-          </FaqItem>
-          <FaqItem id="where-should-i-learn-more" question="Where should I learn more?">
-            <p>Start with the <a href="/learn/fork/">Fork topic</a>, then read <a href="/learn/fork/disputes-and-bonds/">disputes and bonds</a> or the <a href="/learn/fork/what-to-do/">evergreen fork-risk guide</a>. The <a href="/learn/fork/migration/">Moon Fork migration page</a> is a historical record.</p>
-          </FaqItem>
-        </div>
-
-        <div class="mt-8 border-foreground/10 text-foreground">
-          <p class="mb-3">Still have questions? Come find us in the community:</p>
-          <p class="mb-1">→ <a class="text-loud-foreground" href="https://discord.gg/Y3tCZsSmz3" target="_blank" rel="noopener noreferrer">Join the Discord</a></p>
-          <p>→ Follow <a class="text-loud-foreground" href="https://x.com/AugurProject" target="_blank" rel="noopener noreferrer">@AugurProject</a> on X</p>
+        <div class="border-t border-foreground/20 pt-8">
+          <p>For the full explanation, follow the <a href="/learn/fork/">Fork learning path</a>.</p>
         </div>
       </div>
     </main>
