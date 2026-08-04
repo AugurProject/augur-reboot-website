@@ -14,6 +14,7 @@
 		"test:learn-model": "node --experimental-strip-types --test scripts/learn-model.test.ts",
 		"test:evergreen-fork": "node --experimental-strip-types --test scripts/evergreen-fork.test.ts",
 		"test:migration-archive": "node --experimental-strip-types --test scripts/migration-archive.test.ts",
+		"test:faq": "node --experimental-strip-types --test scripts/faq.test.ts",
 		"typecheck:scripts": "tsc --noEmit -p tsconfig.scripts.json",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",

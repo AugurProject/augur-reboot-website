@@ -30,7 +30,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 | [Technical Architecture](technical-architecture.md) | React/TypeScript component hierarchy, state management (Context API), UI patterns, visual rendering |
 | [Post-Fork Landing Page Implementation Plan](post-fork-landing-page-implementation-plan.md) | Implementation status and rollout plan for the migration CTA/countdown, verified Fork Record, and lifecycle data contract |
 | [Public Data Endpoints](public-data-endpoints.md) | Structured JSON endpoints at /data/*.json for external consumers — schemas, conventions, adding new endpoints |
-| [FAQ Feature](faq-feature.md) | FAQ page design, route, collapsible Q&A, landing page/footer integration |
+| [FAQ Feature](faq-feature.md) | General `/faq` content, native disclosures, stable question anchors, and footer integration |
 | [Blog Feature](blog-feature.md) | Blog frontmatter schema, MDX integration, RSS feed, Learn section |
 | [Migration Guide Feature](migration-guide-feature.md) | Moon Fork migration guide, step-by-step REP migration, MigrationGuideLayout |
 

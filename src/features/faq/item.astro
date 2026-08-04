@@ -1,12 +1,13 @@
 ---
 export interface Props {
+	id?: string;
 	question: string;
 }
 
-const { question } = Astro.props;
+const { id, question } = Astro.props;
 ---
 
-<details class="mb-0.5 group border border-transparent focus-within:border-foreground/50">
+<details id={id} class="mb-0.5 group border border-transparent focus-within:border-foreground/50">
   <summary class="flex items-center gap-3 p-4 cursor-pointer list-none text-xl text-foreground tracking-wider font-display font-light uppercase select-none transition-colors duration-200 rounded outline-none bg-foreground/5">
     <span class="text-muted-foreground shrink-0 transition-colors duration-200 group-open:text-primary group-open:drop-shadow-[0_0_var(--glow-size-sm)_var(--color-primary)]">
       <span class="group-open:hidden">+</span>
