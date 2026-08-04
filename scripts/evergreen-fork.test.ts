@@ -203,6 +203,14 @@ test("connects evergreen lessons without importing live-event or Moon Fork facts
 	assert.doesNotMatch(evergreen, /MigrationCta|isMigrationOpen|MIGRATION IMMINENT|Migrate your REP before/iu);
 	assert.doesNotMatch(evergreen, /REPv2_Yes_1|0x[0-9a-f]{40}|Artemis II|June 11/iu);
 	assert.match(mechanics, /Current-action boundary/u);
+	assert.match(
+		mechanics,
+		/A child universe is created only when REP is migrated to that outcome/u,
+	);
+	assert.doesNotMatch(
+		mechanics,
+		/When the fork starts, Augur creates one child universe for each possible outcome/u,
+	);
 	assert.match(preparedness, /not a live migration checklist/u);
 });
 

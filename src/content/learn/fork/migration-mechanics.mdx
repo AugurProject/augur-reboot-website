@@ -24,7 +24,7 @@ A live protocol value is authoritative for its own threshold and deadline. The o
 
 ## Child universes
 
-When the fork starts, Augur creates one child universe for each possible outcome of the forking market, including Invalid. The parent universe is permanently locked for new markets and REP staking. Disputes in other non-finalized markets are paused until the fork period ends; existing markets can continue trading, but they cannot finalize during that period.
+When the fork starts, each possible outcome of the forking market, including Invalid, becomes a potential child universe. A child universe is created only when REP is migrated to that outcome, so outcomes with no migration may never have a child universe. The parent universe is permanently locked for new markets and REP staking. Disputes in other non-finalized markets are paused until the fork period ends; existing markets can continue trading, but they cannot finalize during that period.
 
 Each child universe has its own version of REP. The choice of child is therefore also a choice of which outcome's REP universe to support.
 
