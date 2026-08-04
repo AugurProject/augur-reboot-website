@@ -1,6 +1,6 @@
 ---
 title: "How Disputes & Bonds Work"
-description: "Understand dispute escalation, bond mechanics, and how fork risk is calculated."
+description: "Learn how Augur v2 dispute rounds escalate and how the fork monitor measures progress."
 topic: fork
 order: 2
 contentType: lesson
@@ -14,153 +14,64 @@ import ProseCard from '../../../components/content/prose-card.astro'
 
 # How Disputes & Bonds Work
 
-Disputes are the core mechanism that makes Augur work. When people disagree about an outcome, they challenge each other using bonds—financial commitments that keep everyone honest.
+A fork is the end of an escalation path, not the first response to disagreement. Augur first gives reporters and REP holders a sequence of reporting and dispute rounds in which a tentative outcome can be challenged.
 
-## A Real-World Example
+## From report to dispute
 
-Imagine a market asks: **"Will BTC reach $100,000 in 2025?"**
+After a market's event ends, a designated reporter has an initial reporting window. If the market receives a report, that outcome becomes tentative. A REP holder can challenge it by staking REP on a different outcome during a dispute round.
 
-1. **Reporter A** says YES and locks up REP as their report bond
-2. **Reporter B** disagrees and says NO—they lock up 2x the initial bond amount to dispute
-3. **Reporter C** thinks B is wrong and says YES again—they lock up 2x B's bond (4x initial)
-4. This continues escalating until everyone agrees... or the bond reaches 275,000 REP and a fork is triggered
+The first dispute round can last up to 24 hours. Subsequent dispute rounds can last up to seven days. The exact market state and timing come from the protocol; a dispute is not by itself evidence that a fork is imminent.
 
-## What is a Dispute Bond?
+## The bond formula
 
-A dispute bond is REP (Augur's governance token) that you must lock up to challenge an outcome. It serves three purposes:
+For dispute round *n*, the bond required to dispute in favor of outcome *ω* is:
 
-1. **Skin in the game:** Disputers must risk their own capital to challenge outcomes
-2. **Spam prevention:** High bond amounts deter frivolous disputes
-3. **Fair resolution:** If your dispute is correct, you get your bond back plus a fee
+> **B(ω, n) = 2A<sub>n</sub> − 3S(ω, n)**
 
-## The Dispute Process Step-by-Step
+Where *A<sub>n</sub>* is the total stake across all outcomes at the beginning of the round and *S(ω, n)* is the stake on the proposed outcome at that point. The formula means the target is not a simple fixed multiple of the previous bond. Bond sizes depend on the market's stake distribution.
 
-```
-┌─────────────────────────────┐         ┌─────────────────────────────┐
-│  STEP 1: Initial Report     │         │  STEP 2: First Dispute      │
-│                             │         │                             │
-│  Reporter submits outcome   │────────▶│  Someone disagrees          │
-│  Example: "YES"             │         │  Posts 2x initial bond      │
-│  Locks up initial bond      │         │  Submits: "NO"              │
-└─────────────────────────────┘         │  If no further dispute →    │
-                                        │  Market settles             │
-                                        └────────────┬────────────────┘
-                                                     ↓
-┌─────────────────────────────┐         ┌─────────────────────────────┐
-│  STEP 4: Fork Trigger       │         │  STEP 3: Escalation         │
-│                             │         │                             │
-│  Bond reaches 275,000 REP   │◀────────│  Another disputes back      │
-│  Instead of continuing,     │         │  Posts 2x previous bond     │
-│  FORK IS TRIGGERED          │         │  Submits: "YES"             │
-│                             │         │  Process repeats...         │
-│  → 60-day fork period       │         │  Bonds keep doubling        │
-│  → REP holders govern       │         └─────────────────────────────┘
-└─────────────────────────────┘
-```
+Bonds are crowdsourced: several users can contribute to the same dispute. A dispute succeeds when an outcome other than the tentative outcome accumulates enough stake to fill its bond.
 
-## Bond Escalation Example
+## What happens after a successful dispute?
 
-Here's how bonds grow with each dispute round:
+The filled bond's size, measured against all theoretical REP, determines the next state:
 
 <ProseCard>
-| Round | Bond Size | Risk Level |
-|-------|-----------|-----------|
-| 1st Dispute | 1,000 REP | Low |
-| 2nd Dispute | 2,000 REP | Low |
-| 3rd Dispute | 4,000 REP | Medium |
-| 4th Dispute | 8,000 REP | High |
-| 5th+ Disputes | 16,000+ REP | Extreme |
-
-*Actual bond amounts vary based on protocol parameters, but the doubling pattern is consistent.*
+| Filled dispute bond | Protocol result |
+|---|---|
+| Less than 0.02% of theoretical REP | The new tentative outcome enters another dispute round immediately. |
+| At least 0.02% but less than 2.5% | The new tentative outcome enters a waiting-for-window phase before another dispute round. |
+| At least 2.5% | The market enters the fork state. |
 </ProseCard>
 
-## Why 275,000 REP?
+The 2.5% threshold is a proportion of theoretical REP, not a promise that every deployment uses the genesis-universe number. In the genesis universe, the maintained reference calculates 2.5% of 11,000,000 REP as 275,000 REP.
 
-The 275,000 REP threshold was chosen as a balance:
+## Outcomes for participants
 
-<ProseCard>
-- **ACCESSIBILITY:** Low enough that disputes can escalate naturally
-- **SAFETY:** High enough that only serious, well-funded disputes trigger forks
-- **GOVERNANCE:** Ensures protocol-level disagreements go to REP holders to choose
-</ProseCard>
+During a dispute round, stake is held in escrow. Unsuccessful dispute stake is returned when the round ends. When a market finalizes without a fork, stake on an incorrect outcome is forfeited: the protocol burns 20% and redistributes the remainder to REP staked on the final outcome. The bond design targets a 40% return for successful disputers.
 
-## Bond Economics: Winning and Losing
+These are protocol incentive rules, not financial advice or a forecast of any individual result.
 
-<ProseCard>
-| OUTCOME | WHAT HAPPENS TO YOUR BOND |
-|---------|--------------------------|
-| **Your Dispute Is Correct** | **You get your bond back + a fee**<br/>The fee is additional REP awarded for being right |
-| **Your Dispute Is Incorrect** | **You lose your bond**<br/>It gets redistributed to winning disputers or the protocol |
-</ProseCard>
+## How to read fork progress
 
-## How Fork Risk is Calculated
-
-The fork meter tracks the dispute's progress through the escalation path:
+The site's monitor uses the funded dispute round and the observed bond trajectory:
 
 <ProseCard class="text-center">
-(Current Round ÷ Estimated Total Rounds) × 100 = Fork Risk %
+**(Current funded dispute round ÷ Estimated total rounds) × 100 = Round progress**
 </ProseCard>
 
-### Understanding the Formula
+- **Current funded dispute round** is the highest non-zero dispute participant observed for the market.
+- **Estimated total rounds** is projected from recent bond growth until the configured fork threshold would be reached.
+- **Round progress** is a measurement of escalation, not a probability of a fork and not a claim about the correct outcome.
 
-**Current Round**: The highest dispute round that has been funded so far. Each round corresponds to a crowdsourcer — when someone fills the bond for round 3, the dispute is at round 3.
+If there are too few rounds or the trajectory cannot support a defensible projection, the monitor preserves an unknown value rather than inventing precision.
 
-**Estimated Total Rounds**: Projected from the bond growth trajectory. Since bonds grow exponentially each round, the script extrapolates how many more rounds it would take before the bond reaches the 275,000 REP fork threshold.
+## Why this leads to migration mechanics
 
-### Two Calculation Examples
+If a successfully filled bond reaches the fork threshold, Augur creates child universes and REP holders can make a one-way choice among them. That process is separate from ordinary dispute participation.
 
-<ProseCard>
-**EXAMPLE 1: LOW RISK**
+Continue with **[How Fork Migration Works →](/learn/fork/migration-mechanics/)**. For future-oriented preparation rather than live instructions, read **[What To Do Around Fork Risk →](/learn/fork/what-to-do/)**.
 
-Current dispute round: **3**
-Estimated total rounds: **~12**
+## Protocol basis
 
-(3 ÷ 12) × 100 = **25% risk**
-
-*Interpretation: Early rounds. Bonds are still small relative to the fork threshold. Many more escalations needed before a fork is possible.*
-</ProseCard>
-
-<ProseCard>
-**EXAMPLE 2: HIGH RISK**
-
-Current dispute round: **9**
-Estimated total rounds: **~12**
-
-(9 ÷ 12) × 100 = **75% risk**
-
-*Interpretation: Late-stage dispute. Only a few more rounds of escalation remain before the bond would reach the fork threshold.*
-</ProseCard>
-
-## What Happens When Fork Conditions Are Met?
-
-Once a dispute bond reaches or exceeds 275,000 REP:
-
-<ProseCard>
-- **FORK PERIOD:** A 60-day window begins for REP holders to migrate their REP
-- **MARKETS FREEZE:** No new trades on disputed markets
-- **REP MIGRATION:** You choose which fork version you support
-- **WINNING FORK:** The fork with the most REP support becomes canonical
-- **RESOLUTION:** Markets settle according to the winning fork's outcomes
-</ProseCard>
-
-## Strategic Considerations
-
-### For Dispute Participants
-- High-conviction disputes are only worth posting if you're confident you'll win
-- Later dispute rounds become prohibitively expensive for casual participants
-- High-stakes disputes push the system toward fork, affecting all markets
-
-### For Market Users
-- Monitor disputes if your outcome is challenged
-- Disputed markets settle slower than undisputed ones
-- High-risk markets might not settle until after a fork resolves
-
-## Key Takeaways
-
-- **Disputes escalate:** Each new dispute doubles the bond size (approximately)
-- **Forks are triggered mechanically:** When the dispute bond hits 275,000 REP
-- **Risk is measurable:** The meter tracks how far through the escalation path the dispute has progressed
-- **Escalation is expensive:** High-stakes disputes require serious financial commitment
-- **Fork is ultimate resolution:** When community disagreement is severe, REP holders decide
-
-[Next: What To Do at Different Risk Levels →](/learn/fork/what-to-do)
+The thresholds, bond formula, dispute windows, and incentive descriptions follow the [Augur v2 whitepaper preserved by this project](https://github.com/AugurProject/augur-reboot-website/blob/main/docs/raw/augur-whitepaper-v2.pdf) and its maintained protocol glossary. The fork-state and migration behavior are implemented in the pinned [`Universe.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/Universe.sol) and [`ReputationToken.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/ReputationToken.sol).

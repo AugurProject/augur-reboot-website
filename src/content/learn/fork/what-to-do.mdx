@@ -1,10 +1,10 @@
 ---
-title: "What To Do"
-description: "Action items to take at different fork risk levels."
+title: "What To Do Around Fork Risk"
+description: "Prepare for possible Augur fork conditions without treating historical material as live instructions."
 topic: fork
-order: 3
+order: 4
 contentType: guide
-label: "WHAT TO DO"
+label: "WHAT TO DO AROUND FORK RISK"
 historical: false
 status: available
 presentation: standard
@@ -14,68 +14,51 @@ import ProseCard from '../../../components/content/prose-card.astro'
 
 # What To Do Around Fork Risk
 
-**TL;DR** — Fork risk is manageable at low levels. Monitor more closely as it rises. During an active migration window, participants follow the current state and deadline shown on the landing page.
+This is a preparedness guide, not a live migration checklist. No current fork or migration deadline is implied here. The goal is to help you understand what to verify if a future fork condition is reported, while keeping historical Moon Fork instructions in their archived context.
 
-## Risk Overview
+## Use the monitor as a signal
+
+The monitor describes observed dispute escalation. Its round-progress percentage is not a probability, a prediction, or a statement about which outcome is true.
 
 <ProseCard>
-| LEVEL | SITUATION | YOUR ACTION |
-|-------|-----------|-------------|
-| No Risk (0%) | No disputes active | Trade normally. Check meter occasionally. |
-| Low (&lt;25%) | Early disputes | Identify which markets are disputed. Understand the disagreement. |
-| Moderate (25-50%) | Disputes escalating | Calculate your exposure. Think about exit strategies if needed. |
-| High (50-75%) | Large bonds active | Monitor daily. Consider reducing exposure. Prepare for fork governance. |
-| Critical (≥75%) | Fork imminent or active | Check the landing page for the current fork state and deadline. |
+| Display | What it describes | Prepared response |
+|---|---|---|
+| None / 0% | No funded dispute progress is being reported for the tracked market. | Learn the market's resolution source and check the monitor periodically. |
+| Low | Early observed escalation. | Identify the disputed market and read the underlying outcome evidence. |
+| Moderate | Escalation has progressed, but a fork is not established by this label. | Review your exposure and the protocol mechanics; do not infer a deadline from the gauge. |
+| High | Late observed escalation. | Verify the market and bond data from maintained sources and understand the possible fork states. |
+| Critical | The observed projection is near its configured fork threshold. | Treat this as a reason to verify protocol state, not as an instruction to migrate or trade. |
+| Unknown | A defensible round projection is unavailable. | Avoid guessing; use the underlying data and maintained project guidance. |
 </ProseCard>
 
-## High Risk (50-75%) — Prepare
+## Always be prepared
 
-The dispute has passed the halfway point. Fork is increasingly likely with continued escalation.
+- Know the market's resolution source and what evidence would distinguish its possible outcomes.
+- Keep track of which network, wallet, exchange, and REP version a record refers to. Historical token addresses are not automatically current recommendations.
+- Treat external links, screenshots, and old announcements as dated evidence. Confirm consequential information against the deployed contracts and maintained project records.
+- Do not treat a monitoring label as financial advice or as a guarantee that a fork will occur.
+- Read the general **[dispute and bond mechanics](/learn/fork/disputes-and-bonds/)** before interpreting escalation.
 
-**What you should do:**
+## If a future fork is confirmed
 
-- **Reduce exposure if uncomfortable** — Consider exiting disputed positions
-- **Monitor daily** — Check the fork meter and dispute progress regularly
-- **Understand the disagreement** — Review community discussions about the disputed outcome
-- **Prepare for fork governance** — If a fork occurs, be ready to choose with your REP
-- **Avoid new large bets** — Don't enter high-risk markets during escalation
-- **Know your positions** — Understand exactly how a fork would affect you
+These are verification questions for a future event, not actions to take now:
 
-## Critical Risk (≥75%) — Fork Is Likely or Active
+1. **Is the fork state real?** Confirm the forking market, parent universe, and fork state from the deployed protocol rather than from a screenshot or social post.
+2. **What are the child universes?** Match each child to the forking market's possible outcome, including Invalid where present.
+3. **What is the contract deadline?** Use the deployed universe's fork-end value. Do not copy a date from an old guide.
+4. **What does migration commit?** Migration is one-way, and sibling universes cannot be used to reverse the choice. Understand the consequence before any transaction.
+5. **Which result is authoritative?** A child receiving the most migrated REP becomes the winning universe under the reference mechanics. Confirm the contract-reported result after the relevant deadline before treating it as final history.
 
-The dispute is in its final rounds. A fork is imminent or may have been triggered. This is the highest-stakes scenario.
+The **[general migration mechanics lesson](/learn/fork/migration-mechanics/)** explains these rules without attaching them to a named event.
 
-**If the migration window is open:**
+## After a fork becomes history
 
-- **Understand your position** — Know exactly what outcome you're betting on in disputed markets
-- **Plan your fork choice** — Which fork version do you believe represents the correct outcomes?
-- **Prepare to migrate REP** — You'll choose which fork version to support during the 60-day period
-- **Engage with the community** — Discuss the disputed outcomes with other REP holders
-- **Be ready to act** — The fork period requires active participation and decision-making
-- **Prepare for market freezes** — Disputed markets will be frozen until the fork resolves
+A completed event should be read as a case study: separate observed facts, protocol behavior, and interpretation. The existing **[Moon Fork Migration Record](/learn/fork/migration/)** remains available at its public URL because it preserves useful historical steps and evidence. Its old tools, dates, addresses, and instructions are not a current action path.
 
-## During a Fork Event
+A future Moon Fork case study belongs beside this guide, not inside it. It should carry its own dates and provenance rather than turning event facts into evergreen protocol claims.
 
-### The 60-Day Fork Period
+## Continue the path
 
-- **Markets freeze:** No new trades on disputed markets
-- **REP migration:** Choose which fork version to support before the migration window closes
-- **Voting occurs:** Your REP migration determines your choice on the disputed outcome
-- **Communicate:** Engage in governance discussions about the right outcome
-- **Wait for resolution:** The fork window is 60 days
-
-### After a Verified Fork Resolution
-
-- **Check your REP:** Verify which REP token corresponds to the recorded winning fork
-- **Markets settle:** Markets settle according to the winning fork's outcomes
-- **Resume trading:** Normal Augur operations resume
-- **Evaluate impact:** Assess how the fork affected your positions
-
-## General Best Practices
-
-- **Check the meter regularly:** Make fork risk checking part of your routine
-- **Understand disputed outcomes:** Know what you're betting on before a dispute arises
-- **Size positions appropriately:** Don't over-commit to markets that could fork
-- **Stay informed:** Follow Augur discussions and governance
-- **Plan ahead:** Think through fork scenarios before they happen
-- **Engage with the community:** Forks are community decisions
+- Return to **[What Is a Fork?](/learn/fork/)** for the full sequence.
+- Review **[How Fork Migration Works](/learn/fork/migration-mechanics/)** for general protocol mechanics.
+- Use the **[historical migration record](/learn/fork/migration/)** only as dated reference material.

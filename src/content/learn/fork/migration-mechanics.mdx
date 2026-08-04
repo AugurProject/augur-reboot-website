@@ -1,0 +1,58 @@
+---
+title: "How Fork Migration Works"
+description: "Understand Augur v2 child universes, one-way REP migration, and fork resolution in general."
+topic: fork
+order: 3
+contentType: lesson
+label: "HOW FORK MIGRATION WORKS"
+historical: false
+status: available
+presentation: standard
+---
+
+import ProseCard from '../../../components/content/prose-card.astro'
+
+# How Fork Migration Works
+
+Fork migration is a protocol mechanism for choosing among competing outcomes. It is not a routine software upgrade and it is not a vote that can be changed later. This lesson describes the general Augur v2 mechanics; it does not provide instructions for a current event.
+
+## What starts migration?
+
+Migration becomes relevant only after a market dispute reaches the fork threshold: a successfully filled dispute bond of at least 2.5% of theoretical REP. The forked market supplies the possible outcomes for the child universes.
+
+A live protocol value is authoritative for its own threshold and deadline. The often-cited 275,000 REP value is the 2.5% genesis-universe reference, not a universal current value.
+
+## Child universes
+
+When the fork starts, Augur creates one child universe for each possible outcome of the forking market, including Invalid. The parent universe is permanently locked for new markets and REP staking. Disputes in other non-finalized markets are paused until the fork period ends; existing markets can continue trading, but they cannot finalize during that period.
+
+Each child universe has its own version of REP. The choice of child is therefore also a choice of which outcome's REP universe to support.
+
+## The migration choice
+
+During the forking period, REP in the parent universe can be migrated to a chosen child universe:
+
+1. **Choose an outcome universe.** The child must correspond to one of the forking market's possible outcomes.
+2. **Commit once.** Migration is one-way. REP cannot be moved from one sibling universe to another after it has migrated.
+3. **Respect protocol-specific staking rules.** REP staked on the forking market is constrained to the corresponding child; other staking positions are handled by the protocol's fork logic.
+4. **Use the deployed deadline.** The reference mechanics allow a forking period of up to 60 days. The deployed universe's fork-end value, not an old article or screenshot, determines whether the contract will accept a migration.
+
+<ProseCard>
+**Current-action boundary** — These rules explain what migration means if a future fork is confirmed. They do not establish that a fork is active, that a migration window is open, or that anyone should move REP now. Confirm current state and maintained instructions separately before taking any consequential action.
+</ProseCard>
+
+## How a fork resolves
+
+The child universe receiving the most migrated REP by the end of the forking period becomes the winning universe. Its corresponding outcome becomes the final outcome of the forking market. The protocol's fork reputation goal is half of theoretical REP, which is the amount needed for a child to win early under the reference implementation; the final result still depends on the contract state and deadline.
+
+The fork outcome cannot be disputed through the ordinary dispute process. Non-finalized markets from the parent can continue only in the winning universe after the fork. A migration percentage by itself is not proof of a winner or of the correct real-world outcome.
+
+## General mechanics versus event history
+
+The completed Moon Fork is a case study, not an example to reuse as protocol configuration. Its dates, market address, universe addresses, token identities, migration totals, and observed blocks belong in event-specific historical material. The existing **[Moon Fork Migration Record](/learn/fork/migration/)** preserves the old procedure at its public URL, but it is an archive rather than a current checklist.
+
+For future-oriented preparation, continue to **[What To Do Around Fork Risk →](/learn/fork/what-to-do/)**. For the escalation that precedes migration, return to **[How Disputes & Bonds Work →](/learn/fork/disputes-and-bonds/)**.
+
+## Protocol basis
+
+This lesson follows the [Augur v2 whitepaper preserved by this project](https://github.com/AugurProject/augur-reboot-website/blob/main/docs/raw/augur-whitepaper-v2.pdf), the maintained [Augur v2 protocol glossary](https://github.com/AugurProject/augur-reboot-website/blob/main/docs/augur-v2-protocol-glossary.md), and the pinned implementation in [`Universe.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/Universe.sol) and [`ReputationToken.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/ReputationToken.sol).

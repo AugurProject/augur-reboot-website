@@ -1,6 +1,6 @@
 ---
-title: "What is a Fork?"
-description: "Learn about Augur protocol forks, how they work, and why fork risk matters."
+title: "What Is a Fork?"
+description: "An evergreen introduction to Augur v2 fork mechanics, dispute escalation, and preparedness."
 topic: fork
 order: 1
 contentType: topic
@@ -11,83 +11,76 @@ presentation: standard
 ---
 
 import ProseCard from '../../../components/content/prose-card.astro'
-import MigrationCta from '../../../features/learn/migration-cta.tsx'
-import { getForkLifecycleAtBuild, isMigrationOpen } from '../../../lib/fork-data'
 
-export const migrationOpen = isMigrationOpen(getForkLifecycleAtBuild().state)
+# What Is a Fork?
 
-{migrationOpen && (
-  <MigrationCta
-    className="not-prose mb-8"
-    eyebrow="CRITICAL · MIGRATION IMMINENT"
-    title="Migrate your REP before the deadline"
-    description="Unmigrated REP will be left in a dead universe. Follow the step-by-step guide to move it safely."
-  />
-)}
+A fork is Augur's resolution method of last resort. It begins when a market disagreement survives the ordinary reporting and dispute process and a dispute bond reaches the protocol's fork threshold. The protocol then creates child universes so REP holders can commit to the outcome they believe is correct.
 
-> **New to Augur?** This guide assumes some familiarity with prediction markets. If you're completely new, start with Augur basics first.
+This page is evergreen protocol education. It does not announce a live fork, set a migration deadline, or tell anyone to move REP.
 
-# What is a Fork?
+> **New to this topic?** This path assumes a basic familiarity with prediction markets and Augur's reporting cycle. It starts with the fork trigger, then explains disputes, general migration mechanics, preparedness, and the boundary between protocol education and historical event material.
 
-**TL;DR** — A fork is Augur's emergency mechanism when the community can't agree on an outcome. It's rare, but important to monitor.
+## Learning outcomes
 
-A fork happens when a severe disagreement about an outcome escalates through the dispute system. When disputes get expensive and serious enough (bond reaches 275,000 REP), the protocol splits into two branches and REP holders choose which version is correct.
+By the end of this path, you should be able to:
 
-## Key Terms
+- distinguish an initial report, a dispute, and a fork;
+- explain why dispute bonds escalate and what the fork threshold means;
+- describe one-way REP migration without treating it as a current action;
+- read the site's fork monitor as a measurement of protocol state, not a probability forecast; and
+- separate reusable mechanics from facts about the completed Moon Fork.
+
+## The Fork learning path
+
+The lessons are ordered so each one supplies context for the next:
+
+1. **[What Is a Fork?](/learn/fork/)** — the trigger, lifecycle, and vocabulary.
+2. **[How Disputes & Bonds Work](/learn/fork/disputes-and-bonds/)** — the escalation mechanism that can lead to a fork.
+3. **[How Fork Migration Works](/learn/fork/migration-mechanics/)** — general child-universe and migration mechanics.
+4. **[What To Do Around Fork Risk](/learn/fork/what-to-do/)** — preparedness for a possible future fork, not an active-event checklist.
+5. A separate Moon Fork case study records what happened in that named event. Its dates, addresses, totals, and outcome are not protocol rules.
+6. **[Moon Fork Migration Record](/learn/fork/migration/)** — the existing historical procedure, retained for research and troubleshooting rather than current instructions.
+
+## Key terms
 
 <ProseCard>
-**REP** — Augur's governance token. Used to report outcomes and settle disputes.
+**REP** — Augur v2's reputation token. It is used in reporting and disputes; it is not the currency used to trade market shares.
 
-**Dispute** — A challenge to an outcome. When someone disagrees with the current outcome, they post a bond to dispute it.
+**Tentative outcome** — The outcome currently proposed by the reporting process. It can change when a dispute succeeds.
 
-**Bond** — REP locked up to challenge an outcome. Bonds grow larger with each dispute round.
+**Dispute bond** — The protocol-calculated amount of REP that must be filled to successfully dispute a tentative outcome. A bond can be crowdsourced by multiple participants.
 
-**Fork Threshold** — 275,000 REP. When the largest active dispute bond hits this amount, a fork is triggered.
+**Universe** — An Augur protocol context containing markets and a REP token. A fork creates a child universe for each possible outcome, including Invalid.
+
+**Theoretical REP** — The supply basis used by the protocol for percentage thresholds. The genesis-universe reference is 11,000,000 REP, so 2.5% is 275,000 REP; a live deployment's configured value is authoritative.
 </ProseCard>
 
-## Why Forks Matter
+## What the monitor means
 
-Forks are Augur's ultimate security mechanism. They ensure that:
-
-- **No single entity controls outcomes** — Disputes can always be escalated to the community
-- **REP holders govern** — When serious disagreements arise, the community chooses what's correct
-- **Bad actors face consequences** — Invalid outcomes get rejected by the network
-
-## How to Monitor Fork Risk
-
-The fork meter tracks **how far through the escalation path the largest dispute has progressed**:
+The fork monitor measures progress through an observed dispute escalation path:
 
 <ProseCard class="text-center">
-The Formula
-
-**(Current Dispute Round ÷ Estimated Total Rounds) × 100 = Risk %**
+**(Current funded dispute round ÷ Estimated total rounds) × 100 = Round progress**
 </ProseCard>
 
-The percentage tells you how far along the path to a fork the dispute has reached:
+The estimate is derived from the observed bond trajectory. It is a display signal for how far escalation has progressed; it is not a probability that a fork will happen, a judgment about which outcome is true, or evidence that migration is open.
 
-<ProseCard>
-| LEVEL | RANGE | WHAT IT MEANS |
-|-------|-------|--------------|
-| NO RISK | 0% | No disputes. Normal trading. |
-| LOW | &lt;25% | Early dispute rounds. Fork unlikely. |
-| MODERATE | 25-50% | Mid-escalation. Monitor closely. |
-| HIGH | 50-75% | Late-stage dispute. Fork possible. |
-| CRITICAL | ≥75% | Approaching fork threshold. |
-</ProseCard>
+## Fork lifecycle in brief
 
-## What Happens If a Fork Occurs
+1. **A dispute reaches the threshold.** A successfully filled dispute bond of at least 2.5% of theoretical REP puts the market into the fork state. The 275,000 REP figure is the genesis-universe reference, not a universal substitute for the deployed protocol value.
+2. **Child universes are created.** There is one child for each possible outcome of the forking market, including Invalid.
+3. **The parent universe is locked.** No new markets or REP staking begin there. Disputes in other non-finalized markets are put on hold, although trading can continue and those markets cannot finalize until the fork period ends.
+4. **REP can be migrated once.** Holders choose a child universe, and that choice cannot be reversed or moved to a sibling universe. The fork period lasts up to 60 days under the Augur v2 reference mechanics.
+5. **The fork resolves.** The child receiving the most migrated REP by the end of the forking period becomes the winning universe, and its corresponding outcome becomes the forking market's final outcome.
+6. **The result becomes historical protocol state.** Non-finalized markets can continue only in the winning universe. Event-specific addresses, totals, deadlines, and observations belong in a case study or historical record, not in this lesson.
 
-When a fork is triggered:
+## Continue
 
-1. **Fork period starts** — 60 days for REP holders to choose
-2. **Markets freeze** — No new trades on disputed markets
-3. **You choose a fork** — Migrate your REP to the branch you believe is correct
-4. **Community chooses** — Most REP wins; that fork becomes the new Augur
-5. **Markets settle** — According to the winning fork's outcomes
+- Continue to **[How Disputes & Bonds Work →](/learn/fork/disputes-and-bonds/)**.
+- Then read **[How Fork Migration Works →](/learn/fork/migration-mechanics/)** for the general mechanics.
+- Use **[What To Do Around Fork Risk →](/learn/fork/what-to-do/)** for future-oriented preparation.
+- The **[Moon Fork Migration Record](/learn/fork/migration/)** is preserved at its existing URL as historical material.
 
-## Learn More
+## Protocol basis
 
-Ready to dive deeper? Here's what you should know:
-
-- **[How Disputes & Bonds Work](/learn/fork/disputes-and-bonds)** — Understand dispute escalation and why bonds matter
-- **[What To Do at Different Risk Levels](/learn/fork/what-to-do)** — Practical actions for each risk level
+This explanation follows the maintained Augur v2 reference and the version-controlled implementation: the [Augur v2 whitepaper preserved by this project](https://github.com/AugurProject/augur-reboot-website/blob/main/docs/raw/augur-whitepaper-v2.pdf), [`Universe.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/Universe.sol), and [`ReputationToken.sol`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/ReputationToken.sol).
