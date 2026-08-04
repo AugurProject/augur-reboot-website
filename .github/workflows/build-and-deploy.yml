@@ -91,6 +91,9 @@ jobs:
       - name: Check
         run: npm run check
 
+      - name: Test migration archive
+        run: npm run test:migration-archive
+
       - name: Build site
         run: npm run build
         env:
