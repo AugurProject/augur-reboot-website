@@ -8,21 +8,11 @@ import {
 	assertLearnEntries,
 	getLearnEntryGroup,
 	getLearnTopicCatalog,
-	type LearnContentType,
 	type LearnEntryGroup,
 } from "../../lib/learn";
 
 const learnCollection = await getCollection("learn");
 assertLearnEntries(learnCollection);
-
-const audienceByContentType: Record<LearnContentType, string> = {
-	topic: "Anyone new to Augur",
-	lesson: "Anyone learning how the protocol works",
-	guide: "REP holders preparing for fork conditions",
-	reference: "Anyone checking protocol details",
-	"case-study": "Anyone studying a completed event",
-	"historical-record": "Anyone researching Augur's history",
-};
 
 const groupDescription: Record<LearnEntryGroup, string> = {
 	core: "Follow these lessons in order.",
@@ -41,13 +31,7 @@ const topicCards = getLearnTopicCatalog(learnCollection).map((item) => ({
 	historicalEntries: item.entries.filter(
 		(entry) => getLearnEntryGroup(entry) === "historical-record",
 	),
-	audiences: [
-		...new Set(
-			item.availableEntries.map(
-				(entry) => audienceByContentType[entry.contentType],
-			),
-		),
-	],
+
 }));
 
 const startTopic = topicCards.find(({ topic }) => topic.key === "fork");
@@ -55,9 +39,6 @@ if (!startTopic) {
 	throw new Error("Learn landing requires the available Fork topic");
 }
 
-function renderEntryAudience(contentType: LearnContentType): string {
-	return audienceByContentType[contentType];
-}
 ---
 
 <Layout
@@ -77,39 +58,6 @@ function renderEntryAudience(contentType: LearnContentType): string {
 					consensus breaks down.
 				</p>
 
-				{startTopic && (
-					<section
-						aria-labelledby="learn-start-here"
-						class="border border-primary/60 p-6 md:p-8 mb-12 fx-box-glow"
-					>
-						<p class="font-display text-sm tracking-widest text-primary mb-3">
-						START HERE
-					</p>
-						<h2
-							id="learn-start-here"
-							class="font-display uppercase text-2xl md:text-3xl text-loud-foreground mb-3"
-						>
-							<a href={startTopic.topic.path} class="hover:text-primary transition-colors">
-								{startTopic.topic.label}
-							</a>
-						</h2>
-						<p class="leading-snug mb-6">{startTopic.topic.description}</p>
-						<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-							<div>
-								<p class="font-display text-xs tracking-widest text-muted-foreground mb-1">
-									GOOD FOR
-								</p>
-								<p class="text-sm">{startTopic.audiences.join(" · ")}</p>
-							</div>
-							<a
-								href={startTopic.topic.path}
-								class="font-display uppercase tracking-widest text-primary hover:text-loud-foreground transition-colors"
-							>
-								Begin with {startTopic.topic.label} →
-							</a>
-						</div>
-					</section>
-				)}
 
 				<section aria-labelledby="learn-topics">
 					<h2
@@ -125,7 +73,7 @@ function renderEntryAudience(contentType: LearnContentType): string {
 								<div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 									<div>
 										<p class="font-display text-xs tracking-widest text-primary mb-2">
-											TOPIC
+											{topic.topic.key === startTopic.topic.key ? "START HERE" : "TOPIC"}
 										</p>
 										<h3 class="font-display uppercase text-2xl text-loud-foreground">
 											<a href={topic.topic.path} class="hover:text-primary transition-colors">
@@ -137,7 +85,9 @@ function renderEntryAudience(contentType: LearnContentType): string {
 										href={topic.topic.path}
 										class="font-display uppercase tracking-widest text-sm text-primary hover:text-loud-foreground transition-colors"
 									>
-										Open topic →
+										{topic.topic.key === startTopic.topic.key
+											? `Begin with ${topic.topic.label} →`
+											: "Open topic →"}
 									</a>
 								</div>
 
@@ -147,7 +97,7 @@ function renderEntryAudience(contentType: LearnContentType): string {
 									<p class="font-display text-xs tracking-widest text-muted-foreground mb-1">
 										GOOD FOR
 									</p>
-									<p class="text-sm">{topic.audiences.join(" · ")}</p>
+									<p class="text-sm">{topic.topic.audience}</p>
 								</div>
 
 								{topic.availableCoreEntries.length > 0 && (
@@ -158,14 +108,13 @@ function renderEntryAudience(contentType: LearnContentType): string {
 										<p class="text-sm text-muted-foreground mb-4">{groupDescription.core}</p>
 										<ul class="space-y-3">
 											{topic.availableCoreEntries.map((entry) => (
-												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+												<li>
 													<a
 														href={entry.path}
 														class="text-primary hover:text-loud-foreground transition-colors"
 													>
 														{entry.label}
 													</a>
-													<span class="text-xs text-muted-foreground">{renderEntryAudience(entry.contentType)}</span>
 												</li>
 											))}
 										</ul>
@@ -180,9 +129,8 @@ function renderEntryAudience(contentType: LearnContentType): string {
 										<p class="text-sm text-muted-foreground mb-4">{groupDescription["case-study"]}</p>
 										<ul class="space-y-3">
 											{topic.availableCaseStudyEntries.map((entry) => (
-												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+												<li>
 													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-													<span class="text-xs text-muted-foreground">{renderEntryAudience(entry.contentType)}</span>
 												</li>
 											))}
 										</ul>
@@ -197,9 +145,8 @@ function renderEntryAudience(contentType: LearnContentType): string {
 										<p class="text-sm text-muted-foreground mb-4">{groupDescription["historical-record"]}</p>
 										<ul class="space-y-3">
 											{topic.historicalEntries.map((entry) => (
-												<li class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+												<li>
 													<a href={entry.path} class="text-primary hover:text-loud-foreground transition-colors">{entry.label}</a>
-													<span class="text-xs text-muted-foreground">HISTORICAL REFERENCE · {renderEntryAudience(entry.contentType)}</span>
 												</li>
 											))}
 										</ul>

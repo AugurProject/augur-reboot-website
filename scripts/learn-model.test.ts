@@ -78,10 +78,12 @@ test("builds the landing catalog from available metadata", () => {
 		oracle: {
 			label: "Oracle",
 			description: "Learn how the oracle works.",
+			audience: "Prediction market participants",
 		},
 		future: {
 			label: "Future",
 			description: "Not published yet.",
+			audience: "Future readers",
 		},
 	};
 	const entries = [
@@ -159,6 +161,7 @@ test("rejects available child content without an available topic landing entry",
 		oracle: {
 			label: "Oracle",
 			description: "Learn how the oracle works.",
+			audience: "Prediction market participants",
 		},
 	};
 
@@ -205,6 +208,9 @@ test("the landing route consumes the shared catalog and canonical topic paths", 
 	assert.doesNotMatch(route, /const startTopic = topicCards\[0\]/u);
 	assert.match(route, /Understand how Augur resolves markets/u);
 	assert.match(route, />\s*Topics\s*</u);
+	assert.match(route, /topic\.topic\.audience/u);
+	assert.match(route, /topic\.topic\.key === startTopic\.topic\.key/u);
+	assert.doesNotMatch(route, /learn-start-here|audienceByContentType|renderEntryAudience/u);
 	assert.doesNotMatch(
 		route,
 		/Only topics with available material|Planned topics stay out of the catalog|AVAILABLE TOPIC|No case studies are currently published|Explore topics|Choose a topic to explore/u,
@@ -236,6 +242,7 @@ test("adds a second topic through the registry without layout changes", () => {
 		oracle: {
 			label: "Oracle",
 			description: "Learn how the oracle works.",
+			audience: "Prediction market participants",
 		},
 	};
 	const entries = [
@@ -267,6 +274,7 @@ test("adds a second topic through the registry without layout changes", () => {
 		path: "/learn/oracle/",
 		label: "Oracle",
 		description: "Learn how the oracle works.",
+		audience: "Prediction market participants",
 	});
 	assert.deepEqual(
 		context.navigation.map(({ label, path }) => ({ label, path })),

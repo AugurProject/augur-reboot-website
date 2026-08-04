@@ -33,6 +33,7 @@ export interface LearnMetadata {
 export interface LearnTopicDefinition {
 	label: string;
 	description: string;
+	audience: string;
 }
 
 export type LearnTopicRegistry = Record<string, LearnTopicDefinition>;
@@ -40,7 +41,9 @@ export type LearnTopicRegistry = Record<string, LearnTopicDefinition>;
 export const learnTopicRegistry = {
 	fork: {
 		label: "Fork",
-		description: "Learn about Augur protocol forks and fork mechanics.",
+		description:
+			"Understand what triggers an Augur fork, how it works, and what REP holders need to know.",
+		audience: "New Augur users and REP holders",
 	},
 } as const satisfies LearnTopicRegistry;
 
