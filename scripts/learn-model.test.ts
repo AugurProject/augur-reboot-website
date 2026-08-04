@@ -206,6 +206,24 @@ test("the landing route consumes the shared catalog and canonical topic paths", 
 	assert.match(route, /Historical records/u);
 });
 
+test("links child Learn breadcrumbs to the Learn root", () => {
+	const breadcrumbs = readFileSync(
+		fileURLToPath(
+			new URL("../src/components/content/learn-breadcrumbs.astro", import.meta.url),
+		),
+		"utf8",
+	);
+
+	assert.match(
+		breadcrumbs,
+		/<a href="\/learn\/" class="hover:text-primary transition-colors">LEARN<\/a>/u,
+	);
+	assert.match(
+		breadcrumbs,
+		/<span aria-current="page" class="text-foreground">\{currentLabel\}<\/span>/u,
+	);
+});
+
 test("adds a second topic through the registry without layout changes", () => {
 	const registry = {
 		...learnTopicRegistry,
