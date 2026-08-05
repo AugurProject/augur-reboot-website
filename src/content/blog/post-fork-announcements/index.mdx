@@ -1,0 +1,64 @@
+---
+title: "The Augur Moon Fork Is Complete"
+description: "Augur v2’s forking mechanism, the protocol’s last resort for settling disputes, has now completed its first full end-to-end run on Ethereum ..."
+author: "@AugurProject"
+publishDate: 2026-08-05
+tags: ["clippings"]
+---
+
+Augur v2’s forking mechanism, the protocol’s last resort for settling disputes, has now completed its first full end-to-end run on Ethereum mainnet.
+
+## TL;DR
+
+- On April 8, 2026, longtime Augur community member Micah Zoltu began the [dispute process](https://x.com/AugurProject/status/2055354290961596585) that led to the Moon Fork. After two months of escalation, Augur entered a two-month [migration phase](https://x.com/AugurProject/status/2062602583634546902), during which participating REP holders chose a universe by migrating their tokens.
+- The migration window closed on August 3, 2026, at 01:00 UTC. Of the total supply of 11,000,000 REP, 6,547,546.66 REP migrated in total (~59.52% of supply). Of that amount, 6,545,760.43 went to the Yes universe, which won the fork.
+- If you migrated REP, or Kraken did it for you, you hold post-fork REP. Migration is now permanently closed: REP that did not migrate stays in the old universe. The new address for REPv2\_Yes\_1: [0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D)
+
+## What happened
+
+The Moon Fork, Augur's fork over its Artemis II launch market, is complete. The migration window closed on August 3, 2026, at 01:00 UTC. Out of a total supply of 11,000,000 REP, 6,547,546.66 migrated, 6,545,760.43 of it to the Yes universe. In Augur v2's terms Yes is the winning universe: the child universe that received the most migrated REP.
+
+Forking has been part of Augur's design since the protocol first launched, and until this year it had never run.
+
+The final numbers:
+
+- Window closed: August 3, 2026, 01:00 UTC
+- Eligible supply: 11,000,000 REP
+- Total REP migrated, all universes combined: 6,547,546.66
+- Migration as a share of total supply: 59.52%
+- REP migrated to Yes: 6,545,760.43
+- REP migrated to No: 1,786.23
+
+## What happens to REP now
+
+Migration is permanently closed. Both post-fork universes exist onchain and keep running, so REPv2\_No\_1 is a live token in a live universe. What separates them is where the holders went: the Yes universe received all but 1,786.23 of the migrated supply. REP that never migrated, meaning REPv1 and unmigrated REPv2, stays in the old universe and can no longer follow either way.
+
+The REP that migrated to the Yes universe is REPv2\_Yes\_1. Onchain it is Reputation (REPv2\_Yes\_1), at [0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D) on Ethereum. Exchanges may show it under their own labels (Kraken lists it as AUGUR), so before touching anything presented as REP, check that the contract address matches. The next iteration of Augur, currently in development, is being built around REPv2\_Yes\_1.
+
+Ahead of the fork, the Lituus Foundation contacted exchanges listing REP and worked with them through the migration window. Kraken, OKX, and Bitpanda supported the fork and migrated balances on behalf of their customers, and we thank them for it. If your REP was on one of those exchanges, it moved to the Yes universe and is REPv2\_Yes\_1.
+
+## Why the fork matters
+
+Forking is Augur's last resort for settling disputes. Market outcomes are decided by REP holders, and most disagreements get resolved through rounds of staked disputes. When a dispute escalates past the point where that process can settle it, the protocol splits into one universe per outcome and every holder chooses a side by migrating their REP.
+
+A fork also flushes out sleeping REP. Augur's security depends on REP holders showing up to dispute bad outcomes, but part of the supply never does. Tokens sit in lost wallets or with holders who stopped watching years ago. That REP counts toward supply while contributing nothing to security, so the oracle looks better defended than it really is. The fork forced every holder to act or be left behind, and around 40% of supply never moved. What came through is a smaller pool, but all of it belongs to holders who showed up, and those are the only holders the oracle can actually count on. REP is not a passive asset and every REP holder has a duty to show up when called.
+
+## What we learned
+
+The mechanism worked. A system that had only ever existed as a threat carried a real dispute all the way to a settled outcome, and there was no switch anyone could have pulled to force the result. The contracts did what the whitepaper says they should, and so did the incentives: every dispute bond in the escalation game filled because the returns were good enough on their own, not because anyone was doing the protocol a favor. The fork that stands behind every ordinary dispute round is no longer theoretical.
+
+Onchain, migration is a single transaction; around it sat four months of coordination, because most of the ecosystem runs on the assumption that the token never splits. Holders had to find out in time, and exchanges had to decide whether to move balances on behalf of their customers. The balances they moved make up a meaningful share of everything that crossed. Downstream, wallets and data providers needed the new token explained to them before they could display it correctly. Underneath it all was one mission: reach every REP holder before the window closed. We went after them through every channel we could find, and that work is now a playbook, so the next time the protocol calls, we know the way.
+
+## What happens next
+
+We are working with exchanges, token-data providers, wallets, and explorers so the new token is recognized and labeled correctly everywhere. The rest is building: Augur Lituus is in development, and the fork just settled which REP it will be built on.
+
+## Join us
+
+To every holder and exchange that migrated: thank you for showing up. The fork worked because you did.
+
+The fork is complete, but the work continues. Follow along for the updates and join the discussion through Augur's official channels.
+
+→ [Discord](https://discord.com/invite/Y3tCZsSmz3) → [Telegram](https://t.me/augurlituus) → [Augur.net](https://www.augur.net/)
+
+— The Lituus Foundation
