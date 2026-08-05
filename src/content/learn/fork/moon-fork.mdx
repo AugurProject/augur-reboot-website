@@ -1,0 +1,134 @@
+---
+title: "The Moon Fork"
+description: "A dated, evidence-based case study of Augur's first algorithmic fork, from dispute escalation through the final on-chain result."
+topic: fork
+order: 5
+contentType: case-study
+label: "THE MOON FORK"
+historical: true
+status: available
+presentation: case-study
+---
+
+import ProseCard from '../../../components/content/prose-card.astro'
+
+# The Moon Fork
+
+The Moon Fork was Augur's first completed algorithmic fork. Augur community member Micah Zoltu raised funds to drive a dispute over the market **“Will the Artemis II Mission successfully liftoff in the first week of April?”** through the protocol's escalation path. The event ended with outcome index 1, **Yes**, as the contract-reported winner.
+
+This page is a historical case study, not a migration guide. The migration deadline was `2026-08-03T01:00:59Z`; it cannot be reopened, and no action is available here.
+
+<ProseCard>
+**EXECUTIVE RECORD · OBSERVED 2026-08-03**
+
+- **Evidence block:** Ethereum mainnet block [`25,677,103`](https://etherscan.io/block/25677103), observed at `2026-08-03T21:36:23Z`
+- **Forking market:** [`0x963EED85778CC23E2D4636Cd4f29eECDF9827E9e`](https://etherscan.io/address/0x963EED85778CC23E2D4636Cd4f29eECDF9827E9e)
+- **Winning/canonical universe:** [`0x281171519Fb41540528398d8ED3EA257f0F32A9f`](https://etherscan.io/address/0x281171519Fb41540528398d8ED3EA257f0F32A9f)
+- **Winning outcome:** index 1, **Yes**
+- **Current REP:** **REPv2_Yes_1** at [`0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D)
+</ProseCard>
+
+## Event timeline
+
+The dates below separate the public event timeline from the final contract observation.
+
+| Date | Recorded event |
+| --- | --- |
+| April 8, 2026 | The public Moon Fork process began. The disputed Artemis II market entered the escalation path described in the project's contemporary fork announcements. |
+| April–early June 2026 | Participants filled increasingly large dispute bonds. The escalation game ended after enough REP was staked to reach the fork threshold. |
+| Early June 2026 | The completed escalation opened the outcome-specific migration phase. REP could be moved one way from the parent universe into a selected child universe. |
+| August 3, 2026 at `01:00:59Z` | The contract-enforced migration deadline passed. Migration could no longer be extended or reopened. |
+| August 3, 2026 at `21:36:23Z` | The final evidence record was read at block `25,677,103`, 20 hours, 35 minutes, and 24 seconds after the deadline. Two independent Ethereum RPC providers returned the same material result. |
+
+The dated announcements remain useful artifacts: [The Augur Fork Is Here](/blog/the-augur-fork-is-here/), [Phase 1: The Escalation Game](/blog/phase-1-the-escalation-game/), and [Phase 2: The Fork Migration](/blog/phase-2-the-fork-migration/). They record what the project communicated at the time; this case study is the canonical durable account.
+
+## What the protocol was expected to do
+
+Augur v2 uses a fork only after ordinary reporting and escalating dispute bonds fail to settle a market. Once the fork threshold is reached:
+
+1. The disputed market becomes the forking market for its parent universe.
+2. REP holders can make a one-way migration toward a possible market outcome.
+3. A child universe and its REP token are created only when migration first targets that outcome; unused outcomes do not require an eagerly created child.
+4. The parent universe's fork end time bounds migration at the contract level.
+5. The child selected by `getWinningChildUniverse()` becomes the winning universe, and its outcome finalizes the forking market.
+
+The evergreen lessons explain these rules in more depth: [What Is a Fork?](/learn/fork/), [How Disputes & Bonds Work](/learn/fork/disputes-and-bonds/), and [How Fork Migration Works](/learn/fork/migration-mechanics/).
+
+## What the final record showed
+
+All values in this section were read from Ethereum mainnet at block `25,677,103`. The block hash was `0xab19846fa87d598ab7cf801092d94533b1fd4f3a0ebe2dc442c49f188f3af5b7`.
+
+| Protocol fact | Final recorded value |
+| --- | --- |
+| Parent/forking universe | [`0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA`](https://etherscan.io/address/0x49244BD018Ca9fd1f06ecC07B9E9De773246e5AA) |
+| Fork reputation goal | `5,497,186.882986651334933313 REP` |
+| Winning universe | [`0x281171519Fb41540528398d8ED3EA257f0F32A9f`](https://etherscan.io/address/0x281171519Fb41540528398d8ED3EA257f0F32A9f) |
+| Winning outcome | index 1, **Yes** |
+| Current REP | **REPv2_Yes_1** — [`0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D`](https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D) |
+
+### Outcome-specific migration
+
+The totals below use each child REP token's `getTotalMigrated()` counter. They are not ERC-20 `totalSupply()` values.
+
+| Outcome | Child universe and token | Final migrated REP |
+| --- | --- | --- |
+| Invalid | No child existed at the evidence block; no token was created | `0` wei — `0 REP` |
+| Yes | `0x281171519Fb41540528398d8ED3EA257f0F32A9f`; `REPv2_Yes_1` | `6398081413681494610869400` wei — `6,398,081.4136814946108694 REP` |
+| No | `0xbaaD633FAa0E4847A4b66043E3E92102e5800546`; `REPv2_No_1` | `1786227400866527400056` wei — `1,786.227400866527400056 REP` |
+
+The existence of Yes and No children, while Invalid had no child, is direct evidence of lazy child-universe creation during migration. The Yes child held the largest recorded migrated amount and is the exact child returned by `getWinningChildUniverse()`.
+
+## Expected behavior compared with observation
+
+| Expected protocol behavior | Moon Fork observation | Evidence boundary |
+| --- | --- | --- |
+| Escalating disputes can reach the fork threshold and start a fork. | The escalation game completed and the parent universe recorded the Artemis II market as its forking market. | This confirms the deployed path executed; it does not measure whether every incentive was optimal. |
+| Migration creates outcome-specific children on demand. | Yes and No children existed; Invalid had no child at the evidence block. | A missing Invalid child means no migration created it, not that Invalid was removed as a possible outcome. |
+| REP migration is counted by the child token's dedicated counter. | `getTotalMigrated()` recorded about 6.398 million REP for Yes and 1,786.227 REP for No. | `totalSupply()` includes other protocol mint and burn effects and is not a migration tally. |
+| The contract determines the winner from fork state. | `getWinningChildUniverse()` returned the Yes universe, whose REP token is `REPv2_Yes_1`. | “Canonical universe” is this site's name for that contract-returned child, not a conclusion inferred from a chart. |
+| The fork end time closes migration. | The evidence block was more than 20 hours after the deadline, and `migrateIn()` rejects migration at or after that time. | The parent still returning `isForking() == true` means “forking or has forked” in the deployed code; it does not mean migration remained open. |
+
+## Participation and interface record
+
+The on-chain totals show how much REP migrated to each created child. They do **not** establish how many distinct people participated, how much activity was self-custodied, or how much was handled by exchanges. Those questions require holder-level and custodial evidence that is outside this record.
+
+Several practical boundaries were visible during and after the event:
+
+- **Wallet discovery:** new child REP tokens were not always detected automatically. Users sometimes needed the exact Ethereum mainnet contract address to add the token to a wallet.
+- **Exchange handling:** support varied by exchange. Kraken migrated supported balances and lists the current token under the ticker **AUGUR**, while its on-chain symbol remains **REPv2_Yes_1**.
+- **Tool lifecycle:** ForkWatch, reporting, and migration interfaces were useful during the event but needed explicit historical labeling after the deadline. The [Moon Fork Migration Record](/learn/fork/migration/) preserves those interfaces and screenshots without presenting them as current tools.
+- **Token naming:** REPv1, pre-fork REPv2, `REPv2_Yes_1`, and Kraken's `AUGUR` ticker refer to different lifecycle roles or labels. Documentation must always pair a token name with its chain, contract address, and current or legacy status.
+
+## Interpretation and lessons
+
+The observations above support several project lessons. These are interpretations, not additional protocol facts.
+
+1. **Contract state should outrank schedule prose.** Human-readable dates help participants, but the on-chain fork end time is the authoritative deadline.
+2. **Domain counters should outrank convenient proxies.** The first post-close snapshot treated child-token `totalSupply()` as migrated REP. Comparing it with `getTotalMigrated()` exposed a difference of `147,679.019985211005520574 REP`; the public generator was corrected to use the dedicated migration counter.
+3. **Lifecycle labels need contract-aware semantics.** A persistent `isForking()` value after closure could be misread as an open event. Public interfaces should derive “migration open” from the deadline and verified result rather than from that flag alone.
+4. **Outcome interfaces should account for lazy creation.** A possible outcome can remain valid even when no child contract exists because no REP migrated to it.
+5. **Token identity needs one durable source of truth.** Wallet names and exchange tickers can differ. The winning universe's `getReputationToken()` result, token symbol, chain, and contract address together identify current REP.
+6. **Custodial support must be communicated explicitly.** Exchange migration can reduce action for custodial users, but support cannot be assumed across venues.
+7. **Historical tools should remain inspectable without remaining actionable.** Preserving the procedure and screenshots helps research and troubleshooting; closed-state warnings prevent that evidence from becoming unsafe guidance.
+
+## Implications for future Augur and Lituus work
+
+The Moon Fork demonstrates that Augur v2's deployed fork path reached a contract-selected result under real transaction and interface conditions. It does not, by itself, prove the security or economics of a future oracle architecture, and it should not be used as evidence that Lituus mechanisms have already been validated.
+
+It does provide concrete requirements for future work: publish machine-readable evidence alongside reader-facing explanations, expose authoritative deadlines and domain counters, plan wallet and exchange naming before a token transition, test closed-state presentation, and preserve event artifacts after their operational period ends. Those requirements can inform Augur and Lituus implementation and communication without predetermining their protocol design.
+
+## Sources and provenance
+
+| Claim family | Primary source | Supporting source |
+| --- | --- | --- |
+| Block, deadline, market, universe, winner, token, and migrated totals | Ethereum mainnet contract reads pinned to block `25,677,103` | [Final Moon Fork Record](https://github.com/AugurProject/augur-reboot-website/blob/main/docs/moon-fork-final-record.md) |
+| Winner selection and post-deadline state semantics | [`Universe.sol` at deployed source commit `bd13a797`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/Universe.sol) | [How Fork Migration Works](/learn/fork/migration-mechanics/) |
+| Deadline enforcement and migration counter | [`ReputationToken.sol` at deployed source commit `bd13a797`](https://github.com/AugurProject/augur/blob/bd13a797016b373834e9414096c6086f35aa628f/packages/augur-core/src/contracts/reporting/ReputationToken.sol) | [Moon Fork Migration Record](/learn/fork/migration/) |
+| Event communication and phase descriptions | Dated project announcements linked in the timeline | The final contract record where announcement-era dates or terminology differ |
+| Current REP registry identity | Winning universe `getReputationToken()` plus the token's on-chain symbol | [ForkWatch REP registry at commit `19a05e5c`](https://github.com/AugurProject/augur-forkwatch-website/blob/19a05e5c276e0b9088ae57d8db54241797a95a22/src/domain/tokens/rep-tokens.ts#L20-L48) |
+
+## Continue
+
+- Review the reusable mechanics in **[How Fork Migration Works →](/learn/fork/migration-mechanics/)**.
+- Inspect the preserved procedure and screenshots in the **[Moon Fork Migration Record →](/learn/fork/migration/)**.
+- Return to the **[Fork learning path →](/learn/fork/)** or the full **[Learn catalog →](/learn/)**.

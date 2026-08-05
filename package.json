@@ -15,6 +15,7 @@
 		"test:evergreen-fork": "node --experimental-strip-types --test scripts/evergreen-fork.test.ts",
 		"test:migration-archive": "node --experimental-strip-types --test scripts/migration-archive.test.ts",
 		"test:faq": "node --experimental-strip-types --test scripts/faq.test.ts",
+		"test:moon-fork-retrospective": "node --experimental-strip-types --test scripts/moon-fork-retrospective.test.ts",
 		"typecheck:scripts": "tsc --noEmit -p tsconfig.scripts.json",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",

@@ -14,7 +14,7 @@ import ProseCard from '../../../components/content/prose-card.astro'
 
 # What Is a Fork?
 
-A fork is Augur's resolution method of last resort. It begins when a market disagreement survives the ordinary reporting and dispute process and a dispute bond reaches the protocol's fork threshold. The protocol then creates child universes so REP holders can commit to the outcome they believe is correct.
+A fork is Augur's resolution method of last resort. It begins when a market disagreement survives the ordinary reporting and dispute process and a dispute bond reaches the protocol's fork threshold. The protocol then makes outcome-specific child universes available so REP holders can commit to the outcome they believe is correct; each child is created only when migration first targets that outcome.
 
 This page is evergreen protocol education. It does not announce a live fork, set a migration deadline, or tell anyone to move REP.
 
@@ -38,7 +38,7 @@ The lessons are ordered so each one supplies context for the next:
 2. **[How Disputes & Bonds Work](/learn/fork/disputes-and-bonds/)** — the escalation mechanism that can lead to a fork.
 3. **[How Fork Migration Works](/learn/fork/migration-mechanics/)** — general child-universe and migration mechanics.
 4. **[What To Do Around Fork Risk](/learn/fork/what-to-do/)** — preparedness for a possible future fork, not an active-event checklist.
-5. A separate Moon Fork case study records what happened in that named event. Its dates, addresses, totals, and outcome are not protocol rules.
+5. **[The Moon Fork](/learn/fork/moon-fork/)** — the completed event as a dated, evidence-based case study.
 6. **[Moon Fork Migration Record](/learn/fork/migration/)** — the existing historical procedure, retained for research and troubleshooting rather than current instructions.
 
 ## Key terms
@@ -50,7 +50,7 @@ The lessons are ordered so each one supplies context for the next:
 
 **Dispute bond** — The protocol-calculated amount of REP that must be filled to successfully dispute a tentative outcome. A bond can be crowdsourced by multiple participants.
 
-**Universe** — An Augur protocol context containing markets and a REP token. A fork creates a child universe for each possible outcome, including Invalid.
+**Universe** — An Augur protocol context containing markets and a REP token. A fork makes a child universe available for each possible outcome, including Invalid; the child is created when migration first targets that outcome.
 
 **Theoretical REP** — The supply basis used by the protocol for percentage thresholds. The genesis-universe reference is 11,000,000 REP, so 2.5% is 275,000 REP; a live deployment's configured value is authoritative.
 </ProseCard>
@@ -68,7 +68,7 @@ The estimate is derived from the observed bond trajectory. It is a display signa
 ## Fork lifecycle in brief
 
 1. **A dispute reaches the threshold.** A successfully filled dispute bond of at least 2.5% of theoretical REP puts the market into the fork state. The 275,000 REP figure is the genesis-universe reference, not a universal substitute for the deployed protocol value.
-2. **Child universes are created.** There is one child for each possible outcome of the forking market, including Invalid.
+2. **Child universes become available.** There is a possible child for each outcome of the forking market, including Invalid. A child universe and its REP token are created only when migration first targets that outcome.
 3. **The parent universe is locked.** No new markets or REP staking begin there. Disputes in other non-finalized markets are put on hold, although trading can continue and those markets cannot finalize until the fork period ends.
 4. **REP can be migrated once.** Holders choose a child universe, and that choice cannot be reversed or moved to a sibling universe. The fork period lasts up to 60 days under the Augur v2 reference mechanics.
 5. **The fork resolves.** The child receiving the most migrated REP by the end of the forking period becomes the winning universe, and its corresponding outcome becomes the forking market's final outcome.
@@ -79,6 +79,7 @@ The estimate is derived from the observed bond trajectory. It is a display signa
 - Continue to **[How Disputes & Bonds Work →](/learn/fork/disputes-and-bonds/)**.
 - Then read **[How Fork Migration Works →](/learn/fork/migration-mechanics/)** for the general mechanics.
 - Use **[What To Do Around Fork Risk →](/learn/fork/what-to-do/)** for future-oriented preparation.
+- Read **[The Moon Fork →](/learn/fork/moon-fork/)** for the completed event and its evidence.
 - The **[Moon Fork Migration Record](/learn/fork/migration/)** is preserved at its existing URL as historical material.
 
 ## Protocol basis

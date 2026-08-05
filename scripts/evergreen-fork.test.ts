@@ -51,6 +51,15 @@ const expectedEntries = [
 		status: "available",
 	},
 	{
+		file: "moon-fork.mdx",
+		slug: "fork/moon-fork",
+		order: 5,
+		contentType: "case-study",
+		label: "THE MOON FORK",
+		historical: true,
+		status: "available",
+	},
+	{
 		file: "migration.mdx",
 		slug: "fork/migration",
 		order: 6,
@@ -157,6 +166,14 @@ test("defines the ordered evergreen Fork sequence and preserves the archive URL"
 				status: "available",
 			},
 			{
+				label: "THE MOON FORK",
+				path: "/learn/fork/moon-fork/",
+				order: 5,
+				contentType: "case-study",
+				historical: true,
+				status: "available",
+			},
+			{
 				label: "MOON FORK MIGRATION RECORD",
 				path: "/learn/fork/migration/",
 				order: 6,
@@ -178,10 +195,13 @@ test("uses declarative presentation metadata for evergreen and archived entries"
 		const metadata = readFrontmatter(expected.file);
 
 		assert.equal(metadata.topic, "fork");
-		assert.equal(
-			metadata.presentation,
-			expected.historical ? "historical-record" : "standard",
-		);
+		const expectedPresentation =
+			expected.contentType === "case-study"
+				? "case-study"
+				: expected.contentType === "historical-record"
+					? "historical-record"
+					: "standard";
+		assert.equal(metadata.presentation, expectedPresentation);
 	}
 });
 
@@ -195,6 +215,7 @@ test("connects evergreen lessons without importing live-event or Moon Fork facts
 	assert.match(index, /disputes-and-bonds/u);
 	assert.match(index, /migration-mechanics/u);
 	assert.match(index, /what-to-do/u);
+	assert.match(index, /\/learn\/fork\/moon-fork\//u);
 	assert.match(disputes, /migration-mechanics/u);
 	assert.match(mechanics, /what-to-do/u);
 	assert.match(preparedness, /migration-mechanics/u);
@@ -207,9 +228,13 @@ test("connects evergreen lessons without importing live-event or Moon Fork facts
 		mechanics,
 		/A child universe is created only when REP is migrated to that outcome/u,
 	);
+	assert.match(
+		index,
+		/each child is created only when migration first targets that outcome/u,
+	);
 	assert.doesNotMatch(
-		mechanics,
-		/When the fork starts, Augur creates one child universe for each possible outcome/u,
+		[index, mechanics].join("\n"),
+		/When the fork starts, Augur creates one child universe for each possible outcome|A fork creates a child universe for each possible outcome/u,
 	);
 	assert.match(preparedness, /not a live migration checklist/u);
 });

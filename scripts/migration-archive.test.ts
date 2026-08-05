@@ -26,8 +26,9 @@ test("keeps the migration route as an archived historical record", () => {
 	assert.match(migration, /MIGRATION CLOSED/u);
 	assert.match(migration, /2026-08-03T01:00:59Z/u);
 	assert.match(migration, /this page contains no active migration call to action/iu);
-	assert.match(migration, /generalized migration-mechanics lesson.*Moon Fork retrospective/isu);
-	assert.match(migration, /not available on this branch/iu);
+	assert.match(migration, /\/learn\/fork\/migration-mechanics\//u);
+	assert.match(migration, /\/learn\/fork\/moon-fork\//u);
+	assert.doesNotMatch(migration, /not available on this branch/iu);
 });
 
 test("preserves final evidence and unambiguous REP identities", () => {
@@ -67,7 +68,7 @@ test("keeps every historical screenshot and archived tool reference", () => {
 	assert.match(migration, /archived migration page/u);
 });
 
-test("uses an archive-only presentation and avoids unpublished site links", () => {
+test("uses an archive-only presentation and links only to published routes", () => {
 	assert.match(layout, /ARCHIVE · MIGRATION CLOSED/u);
 	assert.match(layout, /Historical procedure and evidence only/u);
 	assert.doesNotMatch(layout, /isMigrationOpen|isMigrationClosed|MIGRATION IMMINENT/u);
@@ -76,19 +77,35 @@ test("uses an archive-only presentation and avoids unpublished site links", () =
 	assert.doesNotMatch(migration, /migration instructions will be available/u);
 
 	const internalLinks = new Set(
-	[...migration.matchAll(/\]\((\/[^)]+)\)/gu)].map(([, path]) => path),
-);
-assert.deepEqual(internalLinks, new Set([
-	"/blog/the-augur-fork-is-here/",
-	"/learn/fork/",
-	"/learn/fork/disputes-and-bonds/",
-]));
+		[...migration.matchAll(/\]\((\/[^)]+)\)/gu)].map(([, path]) => path),
+	);
+	assert.deepEqual(
+		internalLinks,
+		new Set([
+			"/blog/the-augur-fork-is-here/",
+			"/learn/fork/",
+			"/learn/fork/disputes-and-bonds/",
+			"/learn/fork/migration-mechanics/",
+			"/learn/fork/moon-fork/",
+		]),
+	);
 
-for (const [route, source] of [
-	["/blog/the-augur-fork-is-here/", "src/content/blog/the-augur-fork-is-here/index.mdx"],
-	["/learn/fork/", "src/content/learn/fork/index.mdx"],
-	["/learn/fork/disputes-and-bonds/", "src/content/learn/fork/disputes-and-bonds.mdx"],
-] as const) {
-	assert.ok(existsSync(resolve(root, source)), `missing source for ${route}`);
-}
+	for (const [route, source] of [
+		[
+			"/blog/the-augur-fork-is-here/",
+			"src/content/blog/the-augur-fork-is-here/index.mdx",
+		],
+		["/learn/fork/", "src/content/learn/fork/index.mdx"],
+		[
+			"/learn/fork/disputes-and-bonds/",
+			"src/content/learn/fork/disputes-and-bonds.mdx",
+		],
+		[
+			"/learn/fork/migration-mechanics/",
+			"src/content/learn/fork/migration-mechanics.mdx",
+		],
+		["/learn/fork/moon-fork/", "src/content/learn/fork/moon-fork.mdx"],
+	] as const) {
+		assert.ok(existsSync(resolve(root, source)), `missing source for ${route}`);
+	}
 });
