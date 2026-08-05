@@ -1,22 +1,23 @@
 ---
-import FaqItem from "../features/faq/item.astro";
 import SectionHeading from "../components/content/section-heading.astro";
+import Footer from "../components/shell/footer.astro";
 import PageHeader from "../components/shell/page-header.tsx";
 import PageTitle from "../components/shell/page-title.astro";
-import Footer from "../components/shell/footer.astro";
+import FaqItem from "../features/faq/item.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
   title="Augur FAQ | Augur"
-  description="Current answers about the Augur reboot, REP after the Moon Fork, the final fork record, and protocol mechanics."
+  description="Current answers about using Augur today and the completed Moon Fork, including REP tokens, exchanges, and safety."
   keywords={[
     "Augur FAQ",
     "Augur reboot",
     "Augur REP",
     "REPv2_Yes_1",
     "Augur fork",
-    "Moon Fork"
+    "Moon Fork",
+    "REP migration"
   ]}
 >
   <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
@@ -27,75 +28,111 @@ import Layout from "../layouts/Layout.astro";
         <PageTitle prefix="FAQ" title="AUGUR" class="mb-8" />
 
         <p class="text-center normal-case leading-tight text-foreground mb-12 mx-auto max-w-xl">
-          Current answers about the Augur reboot, REP after the Moon Fork, and the protocol's fork mechanics.
+          Current answers about using Augur today and the completed Moon Fork.
         </p>
 
         <SectionHeading text="Augur Today" />
         <div class="faq-group mb-12">
-          <FaqItem id="what-is-live-today" question="What is live today?">
-            <p>The Augur reboot is active, but a new Augur-native prediction-market application has not yet been relaunched. This site publishes project updates, protocol education, and the verified record of the completed Moon Fork.</p>
-          </FaqItem>
-          <FaqItem id="is-this-a-trading-interface" question="Is this a trading interface?">
-            <p>No. Augur.net is the project's information and monitoring site. It does not create markets, hold funds, or execute trades.</p>
+          <FaqItem id="can-i-use-augur-today" question="Can I use Augur today?">
+            <p>Not as a new Augur-native prediction-market application: one has not yet relaunched. You can use this site to read project updates, inspect the <a href="https://v3.augur.net/" target="_blank" rel="noopener noreferrer">ForkWatch record</a>, and study the <a href="/learn/fork/">Learn material</a>, but Augur.net is not a trading interface and no migration action is available here.</p>
           </FaqItem>
           <FaqItem id="what-is-the-reboot-building" question="What is the reboot building toward?">
             <p>Current work centers on a new oracle architecture, broader REP access, and an eventual Augur-native market protocol after the oracle's security and fee mechanisms are finalized. The <a href="/mission/">mission timeline</a> and <a href="/team/">team page</a> describe that work.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="REP After the Moon Fork" />
-        <div class="faq-group mb-12">
-          <FaqItem id="which-rep-token-is-current" question="Which REP token is current?">
-            <p>The winning universe's REP token is <strong>REPv2_Yes_1</strong> at <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D</a>. The final record identifies it from the winning universe's on-chain contracts.</p>
-          </FaqItem>
-          <FaqItem id="why-are-there-multiple-rep-contracts" question="Why are there multiple REP contracts?">
-            <p>The Moon Fork created a child universe—and a distinct REP token—for every possible outcome. Token names and tickers alone are therefore not enough to identify the winning REP contract.</p>
-          </FaqItem>
-          <FaqItem id="is-another-rep-migration-required" question="Is another REP migration required?">
-            <p>No further migration has been announced. The Moon Fork migration window closed on August 3, 2026. The archived migration page is retained only as a historical record.</p>
-          </FaqItem>
-          <FaqItem id="what-happened-to-other-rep" question="What happened to REP in the other universes?">
-            <p>REP migration was one-way. REP left in the parent universe was locked from new markets and staking, while REP in losing child universes remained separate from the winning universe's current REP token.</p>
-          </FaqItem>
-          <FaqItem id="how-do-i-verify-rep" question="How do I verify the correct REP contract?">
-            <p>Compare the full contract address—not only the token symbol—with the <a href="/learn/fork/migration/">final Moon Fork record</a>, then inspect that address on a block explorer such as Etherscan.</p>
-          </FaqItem>
-        </div>
-
         <SectionHeading text="The Moon Fork" />
         <div class="faq-group mb-12">
-          <FaqItem id="why-did-the-moon-fork-happen" question="Why did the Moon Fork happen?">
-            <p>A dispute over the Artemis II liftoff market reached Augur's fork threshold. That activated the protocol's last-resort process for resolving the market through REP migration.</p>
+          <FaqItem id="i-own-repv2-what-happened" question="I own REPv2. What happened?">
+            <p>Micah Zoltu, an Augur community member, raised funds to trigger a fork over whether the Artemis II mission successfully lifted off (it did). The fork opened a path to an outcome-specific universe for each possible outcome; each child universe was created when REP first migrated to it. REP holders had until the migration deadline to move their tokens into the universe they believed was correct. That window has closed.</p>
+            <p><strong>Learn more:</strong></p>
+            <ul>
+              <li><a href="/blog/the-augur-fork-is-here/">The Augur Fork is Here</a></li>
+              <li><a href="/blog/phase-1-the-escalation-game/">Phase 1: The Escalation Game</a></li>
+              <li><a href="/blog/phase-2-the-fork-migration/">Phase 2: The Fork Migration</a></li>
+            </ul>
           </FaqItem>
-          <FaqItem id="is-the-moon-fork-complete" question="Is the Moon Fork complete?">
-            <p>Yes. The migration deadline passed on August 3, 2026, the forking market finalized, and the winning universe is recorded on Ethereum.</p>
+          <FaqItem id="i-didnt-migrate-in-time-is-there-anything-i-can-do" question="I didn't migrate in time. Is there anything I can do?">
+            <p>No. The deadline was enforced by the fork contract rather than by policy, so it cannot be reopened or extended, and no one can migrate on your behalf. REP left in the parent universe is expected to be worthless, since Augur development continues on the forked token, REPv2_Yes_1, instead.</p>
+            <p>Anyone offering to migrate, recover, or unlock that REP now is running a scam.</p>
           </FaqItem>
-          <FaqItem id="which-universe-won" question="Which universe won?">
-            <p>The <strong>Yes</strong> universe won. The finalized record identifies outcome index 1 and its on-chain REP symbol, <strong>REPv2_Yes_1</strong>.</p>
+          <FaqItem id="why-did-augur-fork" question="Why did Augur fork?">
+            <p>Forks are part of Augur's design. They happen when there is a major dispute — in this case, over the outcome of the Artemis II market.</p>
           </FaqItem>
-          <FaqItem id="where-is-the-on-chain-evidence" question="Where is the on-chain evidence?">
-            <p>The <a href="/data/fork-risk.json">published fork record</a> contains the observed block, winning universe, deadline, and migration totals. The result was reproduced through independent Ethereum RPC providers at the same pinned block.</p>
-          </FaqItem>
-          <FaqItem id="where-is-the-complete-record" question="Where is the complete historical record?">
-            <p>The <a href="/learn/fork/migration/">archived Moon Fork record</a> preserves the procedure, screenshots, and token distinctions. It is historical evidence, not current migration guidance.</p>
+          <FaqItem id="what-is-a-fork-in-simple-terms" question={`What is a "fork" in simple terms?`}>
+            <p>The system can split into multiple versions, called universes. Holders choose the correct one by moving their REP into it.</p>
           </FaqItem>
         </div>
 
-        <SectionHeading text="Protocol Questions" />
+        <SectionHeading text="Timeline" />
         <div class="faq-group mb-12">
-          <FaqItem id="what-causes-an-augur-fork" question="What causes an Augur fork?">
-            <p>A fork begins when a dispute bond reaches 2.5% of all theoretical REP. In Augur's genesis universe, that threshold was 275,000 REP.</p>
-          </FaqItem>
-          <FaqItem id="what-is-a-universe" question="What is a universe?">
-            <p>A universe is a version of Augur with its own markets and REP token. A fork creates one child universe for every possible outcome of the disputed market, including Invalid.</p>
-          </FaqItem>
-          <FaqItem id="why-is-rep-migration-irreversible" question="Why is REP migration irreversible?">
-            <p>Migration is how REP holders commit to one outcome universe. Allowing REP to move back or between sibling universes would let the same stake support conflicting outcomes.</p>
+          <FaqItem id="when-did-the-fork-start-and-end" question="When did the fork start and end?">
+            <p><strong>Start:</strong> April 8, 2026</p>
+            <p><strong>Escalation Game (Phase 1):</strong> April–early June 2026. Complete.</p>
+            <p><strong>Migration Window (Phase 2):</strong> early June–August 3, 2026. Complete.</p>
           </FaqItem>
         </div>
 
-        <div class="border-t border-foreground/20 pt-8">
-          <p>For the full explanation, follow the <a href="/learn/fork/">Fork learning path</a>.</p>
+        <SectionHeading text="How the Fork Played Out" />
+        <div class="faq-group mb-12">
+          <FaqItem id="what-happened-during-the-escalation-game-phase-1" question="What happened during the escalation game (Phase 1)?">
+            <p>People could dispute outcomes by staking REP in an escalation game, where each round required a larger stake on opposing sides. If they backed the correct outcome, they could earn a return from those on the losing side (up to ~40% in this test). Participation was optional.</p>
+            <p>Phase 1 is complete: enough REP was staked to reach the fork threshold.</p>
+          </FaqItem>
+          <FaqItem id="what-happened-during-the-migration-window-phase-2" question="What happened during the migration window (Phase 2)?">
+            <p>REP holders could migrate their tokens 1:1 into the outcome-specific universe they believed was correct. A child universe and its REP token were created when REP first migrated to that outcome. Migrated REP went overwhelmingly to the universe for the truthful outcome, whose token is REPv2_Yes_1.</p>
+          </FaqItem>
+          <FaqItem id="what-happened-if-someone-migrated-to-the-no-universe" question={`What happened if someone migrated to the "No" universe?`}>
+            <p>That REP is expected to be worthless. Augur's next iteration will not be built in that universe, so there will be no activity there.</p>
+          </FaqItem>
+        </div>
+
+        <SectionHeading text="Tokens" />
+        <div class="faq-group mb-12">
+          <FaqItem id="is-there-a-new-rep-token" question="Is there a new REP token?">
+            <p>Yes. The fork made a distinct REP token possible for each outcome; a token was created with its child universe when REP first migrated to that outcome. Holders received the token of the universe they migrated to, 1:1.</p>
+            <p>Augur development continues on <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">REPv2_Yes_1</a>, the token for the truthful outcome. The Lituus Foundation has migrated its own holdings and added liquidity. It trades as <a href="https://pro.kraken.com/app/trade/AUGUR-USD" target="_blank" rel="noopener noreferrer">AUGUR on Kraken</a> and on <a href="https://app.uniswap.org/explore/tokens/ethereum/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">Uniswap</a>.</p>
+          </FaqItem>
+          <FaqItem id="is-augur-on-kraken-the-same-as-repv2-yes-1" question={`Is "AUGUR" on Kraken the same as REPv2_Yes_1?`}>
+            <p>Yes. REPv2_Yes_1 is the token's on-chain name, used on Uniswap and <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">Etherscan</a>; Kraken lists that same token under the ticker AUGUR.</p>
+          </FaqItem>
+          <FaqItem id="does-the-old-rep-token-still-exist" question="Does the old REP token still exist?">
+            <p>Yes, but it is not expected to have value or use going forward.</p>
+          </FaqItem>
+          <FaqItem id="the-new-token-doesnt-appear-in-my-wallet-yet-is-something-wrong" question="The new token doesn't appear in my wallet yet. Is something wrong?">
+            <p>Usually nothing is wrong. The forked token is new, so many wallets don't detect it automatically yet. We are in contact with platforms and wallets to add support. Most wallets also let you add a token manually via an “import token” or “add custom token” feature — use the REPv2_Yes_1 contract address 0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D.</p>
+            <p>To confirm your balance independently, look up your address on <a href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D" target="_blank" rel="noopener noreferrer">Etherscan</a>.</p>
+          </FaqItem>
+        </div>
+
+        <SectionHeading text="Exchanges" />
+        <div class="faq-group mb-12">
+          <FaqItem id="my-rep-was-on-kraken-did-i-need-to-do-anything" question="My REP was on Kraken. Did I need to do anything?">
+            <p>No. Kraken supported the fork and migrated REP on behalf of its users, converting balances 1:1 into the new token, which it lists as <a href="https://pro.kraken.com/app/trade/AUGUR-USD" target="_blank" rel="noopener noreferrer">AUGUR</a>.</p>
+            <p><strong><a href="https://support.kraken.com/articles/augur-migration" target="_blank" rel="noopener noreferrer">→ Read Kraken's full migration notice</a></strong></p>
+          </FaqItem>
+          <FaqItem id="what-about-rep-on-other-exchanges-gate-upbit" question="What about REP on other exchanges (Gate, Upbit)?">
+            <p>Exchange support varied, and not every exchange migrated on behalf of its users. The safest route was to withdraw REP to a self-custodied wallet and migrate directly. If you held REP on an exchange through the fork and have not seen the new token credited, contact that exchange.</p>
+            <p><strong><a href="https://v3.augur.net/#exchange-support" target="_blank" rel="noopener noreferrer">→ Check which exchanges supported the migration</a></strong></p>
+          </FaqItem>
+          <FaqItem id="what-happened-to-rep-left-on-an-exchange" question="What happened to REP left on an exchange?">
+            <p>If the exchange did not support the migration, its holders may be left with a worthless version of REP.</p>
+            <p><strong><a href="https://v3.augur.net/#exchange-support" target="_blank" rel="noopener noreferrer">→ See whether your exchange supported the migration</a></strong></p>
+          </FaqItem>
+        </div>
+
+        <SectionHeading text="Scams & Safety" />
+        <div class="faq-group mb-12">
+          <FaqItem id="someone-offered-to-migrate-or-recover-my-rep-is-that-real" question="Someone offered to migrate or recover my REP. Is that real?">
+            <p>No. Migration closed in early August 2026 and cannot be reopened, so any site, DM, or “support agent” offering to migrate, recover, or unlock REP is a scam.</p>
+            <p>Nobody from Augur or the Lituus Foundation will DM you first, and no legitimate process will ever ask for your seed phrase or private keys, or ask you to sign a transaction to “verify” your holdings.</p>
+          </FaqItem>
+        </div>
+
+        <div class="mt-8 border-foreground/10 text-foreground">
+          <p class="mb-3">Still have questions? Come find us in the community:</p>
+          <p class="mb-1">→ <a class="text-loud-foreground" href="https://discord.gg/Y3tCZsSmz3" target="_blank" rel="noopener noreferrer">Join the Discord</a></p>
+          <p>→ Follow <a class="text-loud-foreground" href="https://x.com/AugurProject" target="_blank" rel="noopener noreferrer">@AugurProject</a> on X</p>
         </div>
       </div>
     </main>
