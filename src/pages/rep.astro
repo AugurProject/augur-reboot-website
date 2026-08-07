@@ -11,13 +11,14 @@ const siteOrigin = Astro.site?.origin ?? "https://www.augur.net";
 const canonicalURL = new URL("/rep/", siteOrigin).href;
 
 const published = { iso: "2026-08-05", display: "5 August 2026" };
-const lastUpdated = { iso: "2026-08-05", display: "5 August 2026" };
+const lastUpdated = { iso: "2026-08-07", display: "7 August 2026" };
 
 const etherscanToken = (address: string) =>
 	`https://etherscan.io/token/${address}`;
 
 const repToken = {
 	name: "Reputation",
+	listingName: "AUGUR",
 	symbol: "REPv2_Yes_1",
 	chain: "Ethereum mainnet (chain ID 1)",
 	address: "0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D",
@@ -117,34 +118,38 @@ const linkClass =
 
         <PageTitle prefix="REP" title="TOKEN CONTRACT REFERENCE" class="mb-6" />
 
-        <!-- TODO(temporary): remove once the CoinGecko listing is updated -->
-        <div class="border border-loud-foreground/40 bg-loud-foreground/5 px-6 py-3 mb-4 text-sm normal-case text-center">
-          <span class="font-display uppercase tracking-wide text-loud-foreground">Temporary notice · {lastUpdated.display}</span>
-          <span class="text-muted-foreground"> — The Lituus Foundation confirms it is currently reaching out to CoinGecko to update the REP token listing. This page is the official reference for that request.</span>
-        </div>
-
-        <div class="border border-primary/40 bg-primary/5 p-6 mb-8 text-sm normal-case">
-          <p class="font-display uppercase tracking-wide text-loud-foreground mb-3">
-            Notice for token verification reviewers
-          </p>
-          <p class="text-muted-foreground">
-            Following the Augur Moon Fork, completed 3 August 2026, the Lituus Foundation is requesting that token listings and price trackers for REP be updated. The current REP token is the contract of the winning child universe,
-            <span class="select-all break-all text-loud-foreground">{repToken.address}</span>
-            (symbol <span class="select-all">{repToken.symbol}</span>). The earlier REPv2 and REPv1 contracts are now legacy contracts. This page is the citable reference for that change.
-          </p>
-        </div>
-
         <p class="text-center normal-case leading-tight text-foreground mb-4 mx-auto max-w-xl">
           Maintained by the
           <span class="text-loud-foreground">Lituus Foundation</span>
           so that exchanges, wallets, aggregators, and block explorers can confirm which REP contract is current.
         </p>
 
-        <p class="text-center text-sm text-muted-foreground mb-12">
+        <p class="text-center text-sm text-muted-foreground mb-8">
           Published <time datetime={published.iso}>{published.display}</time>
           <span class="mx-2">//</span>
           Last updated <time datetime={lastUpdated.iso}>{lastUpdated.display}</time>
         </p>
+
+        <!-- TODO(temporary): remove once the CoinMarketCap and CoinGecko listings are updated -->
+        <div class="border border-loud-foreground/40 bg-loud-foreground/5 p-6 mb-4 text-sm normal-case">
+          <p class="font-display uppercase tracking-wide text-loud-foreground mb-3">
+            Temporary notice · {lastUpdated.display}
+          </p>
+          <p class="text-muted-foreground">
+            The Lituus Foundation is currently reaching out to CoinMarketCap and CoinGecko to update the REP token listing. This page is the official reference for those requests.
+          </p>
+        </div>
+
+        <div class="border border-primary/40 bg-primary/5 p-6 mb-12 text-sm normal-case">
+          <p class="font-display uppercase tracking-wide text-loud-foreground mb-3">
+            Notice for token verification reviewers
+          </p>
+          <p class="text-muted-foreground">
+            Following the Augur Moon Fork, completed 3 August 2026, the Lituus Foundation is requesting that token listings and price trackers for REP be updated. The current REP token is the contract of the winning child universe,
+            <span class="select-all break-all text-loud-foreground">{repToken.address}</span>
+            (symbol <span class="select-all">{repToken.symbol}</span>). The earlier REPv2 and REPv1 contracts are now legacy contracts. The Foundation requests that the token be listed under the name {repToken.listingName}, as it already trades on Kraken. This page is the citable reference for that change.
+          </p>
+        </div>
 
         <!-- CURRENT TOKEN -->
         <SectionHeading text="Current token" />
@@ -154,7 +159,10 @@ const linkClass =
 
         <div class="border border-primary/40 bg-primary/5 p-6 mb-12">
           <dl class="grid grid-cols-1 sm:grid-cols-[minmax(9rem,max-content)_1fr] gap-x-6 text-sm">
-            <dt class={dtClass}>Name</dt>
+            <dt class={dtClass}>Listing name</dt>
+            <dd class={ddClass}>{repToken.listingName}</dd>
+
+            <dt class={dtClass}>On-chain name</dt>
             <dd class={ddClass}>{repToken.name}</dd>
 
             <dt class={dtClass}>Symbol</dt>
