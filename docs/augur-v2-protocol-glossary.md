@@ -6,7 +6,7 @@ tags: [augur, protocol, reference]
 # Augur v2 Protocol Glossary
 
 > Terms, constants, and formulas from the Augur v2 whitepaper, cited by section.
-> Source: `docs/raw/augur-whitepaper-v2.pdf`
+> Source: [Augur v2 whitepaper, release v2.0.16](https://github.com/AugurProject/whitepaper/releases/download/v2.0.16/augur-whitepaper-v2.pdf)
 >
 > **Related**: [[fork-mechanics]] for the narrative fork explanation. [[augur-v2-whitepaper-summary]] for a synthesized read of the full paper.
 
