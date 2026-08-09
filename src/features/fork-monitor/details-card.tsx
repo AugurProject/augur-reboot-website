@@ -122,7 +122,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 				<div className="space-y-2">
 					<CTAButton href="/learn/fork">Learn More About Forking</CTAButton>
 					<CTAButton
-						href="https://docs.google.com/viewer?url=https://github.com/AugurProject/whitepaper/releases/download/v2.0.6/augur-whitepaper-v2.pdf"
+						href="https://github.com/AugurProject/whitepaper/releases/download/v2.0.16/augur-whitepaper-v2.pdf"
 						target="_blank"
 						rel="noopener noreferrer"
 					>

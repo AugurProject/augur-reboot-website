@@ -1,0 +1,17 @@
+# Augur: a Decentralized Oracle and Prediction Market Platform (v2.0)
+
+Jack Peterson, Joseph Krug, Micah Zoltu, Austin K. Williams, and Stephanie Alexander
+
+_Forecast Foundation_
+
+_(Dated: March 21, 2025)_
+
+Augur is a trustless, decentralized oracle and platform for prediction markets. The outcomes of Augur’s prediction markets are chosen by users that hold Augur’s native Reputation token, who stake their tokens on the actual observed outcome and, in return, receive settlement fees from the markets. Augur’s incentive structure is designed to ensure that honest, accurate reporting of outcomes is always the most profitable option for Reputation token holders. Token holders can post progressively-larger Reputation bonds to dispute proposed market outcomes. If the size of these bonds reaches a certain threshold, Reputation splits into multiple versions, one for each possible outcome of the disputed market; token holders must then exchange their Reputation tokens for one of these versions. Versions of Reputation which do not correspond to the real-world outcome will become worthless, as no one will participate in prediction markets unless they are confident that the markets will resolve correctly. Therefore, token holders will select the only version of Reputation which they know will continue to have value: the version that corresponds to reality.
+
+Augur is a trustless, decentralized oracle and prediction market platform. In a prediction market, individuals can speculate on the outcomes of future events; those who forecast the outcome correctly win money, and those who forecast incorrectly lose money [1–3]. The price of a prediction market can serve as a precise and well-calibrated indicator of how likely an event is to occur [4–7].
+
+Using Augur, people will have the ability to trade in prediction markets at very low cost. The only significant expenses participants assume is compensation to market creators and to users that report on the outcomes of markets once the event has taken place. The result is a prediction market where trust requirements, friction, and fees will be as low as competitive market forces can drive them.
+
+Historically, prediction markets have been centralized. The simplest way to aggregate trades in a prediction market is for a trustworthy entity to maintain a ledger; similarly, the simplest way to determine the outcome of an event and distribute payouts to traders is for an impartial, trusted judge to determine the outcomes of the markets. However, centralized prediction markets have many risks and limitations: they do not allow global participation, they limit what types of markets can be created or traded, and they require traders to trust the market operator to not steal funds and to resolve markets correctly.
+
+Augur aims to resolve markets in a fully decentralized way. Decentralized, trustless networks, such as Bitcoin[8] and Ethereum[9], eliminate the risk that self-interest will turn into corruption or theft. The only role of the Augur developers is to publish smart contracts to the Ethereum network. The Augur contracts are totally automated: the developers do not have the ability to spend funds that are held in escrow on-contract, do not control how markets resolve, do not approve or reject trades or other transactions on the network, cannot undo trades, cannot modify or cancel orders, etc. The Augur oracle allows information to be migrated from the real world to a blockchain without relying on a trusted intermediary. Augur will be the world’s first decentralized oracle.
