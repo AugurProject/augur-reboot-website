@@ -1,0 +1,117 @@
+---
+import ArticleContent from "../components/content/article-content.astro";
+import Footer from "../components/shell/footer.astro";
+import PageHeader from "../components/shell/page-header.tsx";
+import Layout from "../layouts/Layout.astro";
+import {
+	getWhitepaperRoot,
+	type WhitepaperEdition,
+	type WhitepaperNavigationLink,
+} from "../lib/whitepaper";
+
+interface Props {
+	edition: WhitepaperEdition;
+	title: string;
+	rawHref: string;
+	isIndex?: boolean;
+	previous?: WhitepaperNavigationLink;
+	next?: WhitepaperNavigationLink;
+}
+
+const { edition, title, rawHref, isIndex = false, previous, next } = Astro.props;
+const editionRoot = getWhitepaperRoot(edition);
+---
+
+<Layout
+	title={`${title} - ${edition.shortTitle}`}
+	description={edition.description}
+	ogType="article"
+	alternateLinks={[{
+		href: rawHref,
+		type: "text/markdown",
+		title: `${title} — Markdown`,
+	}]}
+>
+	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+		<PageHeader client:load backHref="/" />
+
+		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
+			<div class="max-w-4xl mx-auto">
+				<nav
+					aria-label="Whitepaper breadcrumbs"
+					class="mb-6 font-display text-xs uppercase tracking-[0.2em] text-muted-foreground"
+				>
+					<a href={editionRoot} class="hover:text-primary transition-colors">
+						{edition.shortTitle}
+					</a>
+					{!isIndex && (
+						<>
+							<span class="mx-2" aria-hidden="true">/</span>
+							<span aria-current="page" class="text-foreground">{title}</span>
+						</>
+					)}
+				</nav>
+
+				<div class="flex flex-wrap items-center justify-between gap-3 border-y border-primary/20 py-3 mb-2">
+					<span class="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground">
+						Source-faithful edition · {edition.release}
+					</span>
+					<div class="flex flex-wrap gap-x-5 gap-y-2 font-display text-xs uppercase tracking-[0.15em]">
+						<a
+							href={rawHref}
+							class="text-primary hover:text-loud-foreground transition-colors"
+						>
+							View Markdown
+						</a>
+						<a
+							href={edition.pdfUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-primary hover:text-loud-foreground transition-colors"
+						>
+							View original PDF ↗
+						</a>
+						<a
+							href={edition.sourceRepositoryUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-primary hover:text-loud-foreground transition-colors"
+						>
+							Source repository ↗
+						</a>
+					</div>
+				</div>
+
+				<p class="mt-3 mb-8 text-xs text-muted-foreground">
+					Authoritative source revision: <code>{edition.sourceRevision}</code>
+				</p>
+
+				<ArticleContent>
+					<slot />
+				</ArticleContent>
+
+				{(previous || next) && (
+					<nav
+						aria-label="Whitepaper section navigation"
+						class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-y border-primary/20 mt-12 py-5 font-display uppercase tracking-wider"
+					>
+						{previous ? (
+							<a href={previous.href} class="group text-left hover:text-primary transition-colors">
+								<span class="block text-xs tracking-[0.2em] text-muted-foreground mb-2">← Previous</span>
+								<span class="text-sm">{previous.title}</span>
+							</a>
+						) : <span />}
+						{next && (
+							<a href={next.href} class="group text-right hover:text-primary transition-colors">
+								<span class="block text-xs tracking-[0.2em] text-muted-foreground mb-2">Next →</span>
+								<span class="text-sm">{next.title}</span>
+							</a>
+						)}
+					</nav>
+				)}
+			</div>
+		</main>
+
+		<Footer />
+	</div>
+</Layout>

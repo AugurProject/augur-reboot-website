@@ -10,6 +10,11 @@ interface Props {
 	ogImage?: string;
 	ogType?: string;
 	canonicalURL?: string;
+	alternateLinks?: Array<{
+		href: string;
+		type: string;
+		title?: string;
+	}>;
 	noindex?: boolean;
 	author?: string;
 	keywords?: string[];
@@ -25,6 +30,7 @@ const {
 	ogImage = "/og-image.png",
 	ogType = "website",
 	canonicalURL = defaultCanonicalURL,
+	alternateLinks = [],
 	noindex = false,
 	author = "Augur Project",
 	keywords = [
@@ -61,6 +67,9 @@ const {
 		<meta name="author" content={author} />
 		<meta name="keywords" content={keywords.join(", ")} />
 		<link rel="canonical" href={canonicalURL} />
+		{alternateLinks.map(({ href, type, title }) => (
+			<link rel="alternate" href={href} type={type} title={title} />
+		))}
 		{noindex && <meta name="robots" content="noindex, nofollow" />}
 
 		<!-- Open Graph meta tags -->

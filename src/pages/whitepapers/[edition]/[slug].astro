@@ -1,0 +1,51 @@
+---
+import WhitepaperLayout from "../../../layouts/WhitepaperLayout.astro";
+import {
+	getWhitepaperEditions,
+	getWhitepaperEntries,
+	getWhitepaperNavigation,
+	getWhitepaperRawPath,
+	getWhitepaperTitle,
+	type WhitepaperEdition,
+	type WhitepaperEntry,
+} from "../../../lib/whitepaper";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const paths = [];
+
+	for (const edition of getWhitepaperEditions()) {
+		const entries = await getWhitepaperEntries(edition);
+		for (const entry of entries) {
+			if (entry.slug === "index") continue;
+			paths.push({
+				params: { edition: edition.slug, slug: entry.slug },
+				props: { edition, entry, entries },
+			});
+		}
+	}
+
+	return paths;
+}
+
+interface Props {
+	edition: WhitepaperEdition;
+	entry: WhitepaperEntry;
+	entries: WhitepaperEntry[];
+}
+
+const { edition, entry, entries } = Astro.props;
+const { Content } = await entry.render();
+const navigation = getWhitepaperNavigation(edition, entries, entry.slug);
+---
+
+<WhitepaperLayout
+	edition={edition}
+	title={getWhitepaperTitle(entry)}
+	rawHref={getWhitepaperRawPath(edition, entry)}
+	previous={navigation.previous}
+	next={navigation.next}
+>
+	<Content />
+</WhitepaperLayout>
