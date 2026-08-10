@@ -22,6 +22,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 | Doc | When to Read |
 |---|---|
 | [Public Knowledge Architecture](public-knowledge-architecture.md) | Proposed route map, Learn taxonomy, surface boundaries, Moon Fork canonical route, archive/redirect policy, and downstream handoff for #146 |
+| [Whitepaper Publication Contract](whitepaper-publication-contract.md) | Authority, routes, representations, link semantics, fidelity policy, machine discovery, and release gates for public whitepaper editions |
 
 ## Architecture & UI
 
@@ -37,7 +38,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 
 ## Whitepaper Summaries
 
-Distilled knowledge from source whitepapers. Original PDFs live in `docs/raw/` and are immutable.
+Distilled knowledge from canonical upstream whitepapers. Legacy PDFs in `docs/raw/` are research inputs pending migration to pinned upstream provenance.
 
 | Doc | When to Read |
 |---|---|

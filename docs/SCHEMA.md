@@ -10,6 +10,7 @@
 - **Architecture**: component hierarchy, state management, build system
 - **Protocol reference**: Augur v2 mechanics, Lituus oracle, fork risk
 - **Whitepaper summaries**: distilled knowledge from source papers
+- **Publication architecture**: durable contracts for public whitepaper editions and provenance
 
 Docs are written for agents and contributors who need to understand or modify a system. They are not user-facing.
 
@@ -19,9 +20,9 @@ Docs are written for agents and contributors who need to understand or modify a 
 docs/
 ├── SCHEMA.md                                # This file
 ├── INDEX.md                                 # Content catalog — start here
-├── *.md                                     # Feature, system, and summary docs
+├── *.md                                     # Feature, system, summary, and decision docs
 └── raw/
-    └── *.pdf                               # Original source papers (immutable)
+    └── *.pdf                                # Legacy research inputs pending upstream migration
 ```
 
 ## Writing conventions
@@ -50,7 +51,9 @@ docs/
 
 ### Source whitepapers
 
-PDFs in `raw/` are immutable — never modify them. Summary docs (`*-summary.md`) are derived knowledge distilled from these sources. Always attribute the source paper at the top of a summary.
+Canonical whitepaper repositories and release artifacts remain authoritative. Do not add new PDF copies to `docs/raw/`, `src/content/`, `public/`, or generated routes. Legacy files in `docs/raw/` are research inputs pending migration to pinned upstream provenance; do not modify their bytes.
+
+Summary docs (`*-summary.md`) are derived knowledge distilled from canonical sources. Always attribute the source paper at the top of a summary. Public HTML, Markdown, figure, route, and linking conventions are defined in [[whitepaper-publication-contract]].
 
 ## Operations
 
