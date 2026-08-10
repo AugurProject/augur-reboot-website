@@ -1,0 +1,44 @@
+---
+import WhitepaperLayout from "../../../layouts/WhitepaperLayout.astro";
+import {
+	getWhitepaperEditions,
+	getWhitepaperEntries,
+	getWhitepaperRawPath,
+	getWhitepaperTitle,
+	type WhitepaperEdition,
+	type WhitepaperEntry,
+} from "../../../lib/whitepaper";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const paths = [];
+
+	for (const edition of getWhitepaperEditions()) {
+		const entries = await getWhitepaperEntries(edition);
+		const entry = entries.find(({ slug }) => slug === "index");
+		if (!entry) throw new Error(`Missing index entry for ${edition.slug}`);
+
+		paths.push({ params: { edition: edition.slug }, props: { edition, entry } });
+	}
+
+	return paths;
+}
+
+interface Props {
+	edition: WhitepaperEdition;
+	entry: WhitepaperEntry;
+}
+
+const { edition, entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<WhitepaperLayout
+	edition={edition}
+	title={getWhitepaperTitle(entry)}
+	rawHref={getWhitepaperRawPath(edition, entry)}
+	isIndex
+>
+	<Content />
+</WhitepaperLayout>

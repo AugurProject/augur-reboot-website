@@ -2,12 +2,15 @@
 
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
+import rehypeKatex from "rehype-katex";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import rehypeCallouts from "./src/lib/rehype-callouts.mjs";
 import rehypeHeadingIcons from "./src/lib/rehype-heading-icons.mjs";
+import rehypeWhitepaperLinks from "./src/lib/rehype-whitepaper-links.mjs";
+import remarkMath from "remark-math";
 
 // Check if building in GitHub Actions (for GitHub Pages)
 const isGitHubActions = process.env.GITHUB_ACTIONS === "true";
@@ -35,6 +38,10 @@ export default defineConfig({
 	...(process.env.SITE_URL && { site: process.env.SITE_URL }),
 	vite: {
 		plugins: [tailwindcss()],
+	},
+	markdown: {
+		remarkPlugins: [remarkMath],
+		rehypePlugins: [rehypeKatex, rehypeWhitepaperLinks],
 	},
 	integrations: [
 		react(),

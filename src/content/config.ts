@@ -32,7 +32,12 @@ const blogCollection = defineCollection({
 	}),
 });
 
+const whitepaperCollection = defineCollection({
+	type: "content",
+});
+
 export const collections = {
 	learn: learnCollection,
 	blog: blogCollection,
+	"whitepaper-v2": whitepaperCollection,
 };
