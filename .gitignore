@@ -48,6 +48,9 @@ public/data/fork-risk.json
 public/data/exchange-support.json
 public/cache/
 
+# Generated supply endpoints
+public/api/
+
 # TypeScript build cache
 .tscache/
 *.tsbuildinfo

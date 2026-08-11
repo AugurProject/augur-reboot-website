@@ -8,6 +8,7 @@
 		"build": "astro build",
 		"build:gh-pages": "GITHUB_ACTIONS=true GITHUB_REPOSITORY=AugurProject/augur-reboot-website astro build",
 		"build:fork-data": "node --experimental-strip-types scripts/calculate-fork-risk.ts",
+		"build:supply-data": "node --experimental-strip-types scripts/generate-supply-endpoints.ts",
 		"lint:blog": "node --experimental-strip-types scripts/blog-lint/index.ts",
 		"test:blog-lint": "node --experimental-strip-types --test scripts/blog-lint/*.test.ts",
 		"test:fork-lifecycle": "node --experimental-strip-types --test scripts/fork-lifecycle.test.ts",

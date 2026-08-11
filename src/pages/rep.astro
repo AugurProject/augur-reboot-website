@@ -11,10 +11,18 @@ const siteOrigin = Astro.site?.origin ?? "https://www.augur.net";
 const canonicalURL = new URL("/rep/", siteOrigin).href;
 
 const published = { iso: "2026-08-05", display: "5 August 2026" };
-const lastUpdated = { iso: "2026-08-07", display: "7 August 2026" };
+const lastUpdated = { iso: "2026-08-13", display: "13 August 2026" };
 
 const etherscanToken = (address: string) =>
 	`https://etherscan.io/token/${address}`;
+
+// Base-aware so the links also work on the fork's subpath preview.
+// Mirrors the fork-risk data providers' BASE_URL handling.
+const baseUrl = import.meta.env.BASE_URL || "/";
+const supplyUrl = (file: string) =>
+	baseUrl.endsWith("/")
+		? `${baseUrl}api/supply/${file}`
+		: `${baseUrl}/api/supply/${file}`;
 
 const repToken = {
 	name: "Reputation",
@@ -189,6 +197,12 @@ const linkClass =
               </span>
               <span class="block text-muted-foreground">
                 Read on <time datetime={repToken.totalSupplyReadOn.iso}>{repToken.totalSupplyReadOn.display}</time>.
+              </span>
+              <span class="block text-muted-foreground">
+                Live value, refreshed hourly from this contract's totalSupply():
+                <a class={linkClass} href={supplyUrl("total/")}>total</a>,
+                <a class={linkClass} href={supplyUrl("circulating/")}>circulating</a>,
+                <a class={linkClass} href={supplyUrl("meta.json")}>metadata</a>.
               </span>
             </dd>
 

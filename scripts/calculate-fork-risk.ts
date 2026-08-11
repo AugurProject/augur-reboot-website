@@ -341,7 +341,9 @@ async function executeWithRpcFallback<T>(
 
 			const connection: RpcConnection = {
 				provider,
-				endpoint: rpc,
+				// Hostname only: the full URL may embed a private RPC API key,
+				// and rpcInfo.endpoint is published in the public fork-risk.json
+				endpoint: new URL(rpc).hostname,
 				latency,
 				fallbacksAttempted,
 			};

@@ -4,10 +4,6 @@ on:
   schedule:
     - cron: '0 * * * *'  # Every hour
   workflow_dispatch:
-    inputs:
-      eth_rpc_url:
-        description: 'Custom Ethereum RPC URL (optional)'
-        required: false
   push:
     branches:
       - main
@@ -15,14 +11,15 @@ on:
     branches:
       - main
 
+# Read-only by default; the deploy job declares its own pages/id-token grants
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
 
+# Ref-scoped so PR runs can never displace a pending main/cron deploy run;
+# superseded PR runs are cancelled instead of queueing.
 concurrency:
-  group: fork-risk-pipeline
-  cancel-in-progress: false
+  group: fork-risk-pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   risk-monitor:
@@ -61,8 +58,38 @@ jobs:
           path: public/data/fork-risk.json
           retention-days: 1
 
+  rep-supply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate REP supply endpoints
+        run: npm run build:supply-data
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL || '' }}
+
+      - name: Upload supply data
+        uses: actions/upload-artifact@v7
+        with:
+          name: supply-data
+          path: public/api/supply/
+          retention-days: 1
+
   build:
-    needs: risk-monitor
+    needs: [risk-monitor, rep-supply]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -87,6 +114,19 @@ jobs:
 
       - name: Verify fork-risk data exists
         run: test -f public/data/fork-risk.json
+
+      - name: Download supply data
+        uses: actions/download-artifact@v8
+        with:
+          name: supply-data
+          path: public/api/supply
+
+      - name: Verify supply endpoints exist
+        run: |
+          test -s public/api/supply/meta.json
+          for field in total circulating; do
+            test -s "public/api/supply/$field/index.html"
+          done
 
       - name: Check
         run: npm run check

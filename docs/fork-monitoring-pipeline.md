@@ -15,8 +15,8 @@ tags: [fork-monitoring, github-actions, pipeline]
 | Aspect | Value |
 |--------|-------|
 | Frequency | Hourly (`0 * * * *`) + push to main + manual trigger |
-| Architecture | Three-job pipeline: `risk-monitor` → `build` → `deploy` |
-| Concurrency | Top-level group `fork-risk-pipeline`, queued not cancelled |
+| Architecture | Three-job pipeline: `risk-monitor` → `build` → `deploy`; an independent `rep-supply` job also feeds `build` (see [[public-data-endpoints]]) |
+| Concurrency | Ref-scoped group `fork-risk-pipeline-${{ github.ref }}`; main runs queue, superseded PR runs cancel |
 | Data integrity | Fail the build if fork-risk data is missing |
 
 ---
@@ -44,11 +44,15 @@ risk-monitor          →  build              →  deploy
 4. On a cache miss, save the resulting cache under `event-cache-v1`
 5. Upload `fork-risk.json` as artifact (`fork-risk-data`)
 
-### build (always runs, needs: risk-monitor)
+### rep-supply (always runs, parallel to risk-monitor)
+
+Generates the bare-number REP supply endpoints under `public/api/supply/` via `scripts/generate-supply-endpoints.ts`. Same fail-closed model as risk-monitor: RPC fallback chain, identity and bounds validation, no output on failure. Documented in [[public-data-endpoints]].
+
+### build (always runs, needs: risk-monitor + rep-supply)
 
 1. Shallow checkout
-2. Download `fork-risk-data` artifact
-3. **Verify `fork-risk.json` exists** — fail if missing
+2. Download `fork-risk-data` and `supply-data` artifacts
+3. **Verify `fork-risk.json` and the supply files exist** — fail if missing
 4. Type check, lint, build Astro site
 5. Upload Pages artifact
 
@@ -105,14 +109,15 @@ When the cache is missing, the script performs a 30-day event scan (~7 minutes, 
 
 ```yaml
 concurrency:
-  group: fork-risk-pipeline
-  cancel-in-progress: false
+  group: fork-risk-pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 ```
 
-Top-level group for the entire workflow. Prevents:
+Ref-scoped top-level group. Cron, push-to-main, and dispatch runs all resolve to `refs/heads/main` and stay serialized (queued, never cancelled), which prevents:
 - **Duplicate artifacts** — two runs producing separate `github-pages` artifacts (caused a deploy failure on the old workflow)
 - **Cache races** — two runs writing to the cache simultaneously
-- Queues rather than cancels — preserves data integrity
+
+Each PR gets its own `refs/pull/N/merge` group, so a PR run can never displace a pending main deploy run (GitHub cancels the *pending* run in a group when a new run queues, regardless of `cancel-in-progress`). Superseded PR runs are cancelled instead of consuming runner time and RPC quota.
 
 ---
 

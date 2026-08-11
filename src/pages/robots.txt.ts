@@ -13,7 +13,8 @@ Sitemap: ${origin}/sitemap-0.xml
 # Crawl delay (be respectful to server resources)
 Crawl-delay: 1
 
-# Block common bot paths
+# Block common bot paths (aggregator supply endpoints stay fetchable)
+Allow: /api/supply/
 Disallow: /api/
 Disallow: /_astro/
 Disallow: /admin/
