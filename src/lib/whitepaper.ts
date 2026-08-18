@@ -106,6 +106,12 @@ export function getWhitepaperTitle(entry: WhitepaperEntry) {
 	return heading ?? "References";
 }
 
+export function getWhitepaperBreadcrumbTitle(entry: WhitepaperEntry) {
+	return entry.slug === "abstract-and-introduction"
+		? "Abstract"
+		: getWhitepaperTitle(entry);
+}
+
 export function getWhitepaperPagePath(
 	edition: WhitepaperEdition,
 	entry: WhitepaperEntry,

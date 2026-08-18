@@ -6,10 +6,10 @@ We begin with some notation, definitions, and observations.
 
 **Definition 6.** For $n \ge 1$ and $\omega \in \Omega_M$, let $S(\omega,n)$ denote the total amount of stake on outcome $\omega$ at the beginning of dispute round $n$. This includes all stake from all successful dispute bonds in favor of $\omega$ over all previous dispute rounds.
 
-**Definition 7.** For $n \ge 1$ and $\omega \in \Omega_M$, let $S(\bar{\omega},n)$ denote the amount of stake on all outcomes in $\Omega_M$ except for $\omega$ at the beginning of dispute round $n$:
+**Definition 7.** For $n \ge 1$ and $\omega \in \Omega_M$, let $S(\overline{\omega},n)$ denote the amount of stake on all outcomes in $\Omega_M$ except for $\omega$ at the beginning of dispute round $n$:
 
 $$
-S(\bar{\omega},n) = \sum_{\substack{\gamma \in \Omega_M \\ \gamma \ne \omega}} S(\gamma,n).
+S(\overline{\omega},n) = \sum_{\substack{\gamma \in \Omega_M \\ \gamma \ne \omega}} S(\gamma,n).
 $$
 
 **Definition 8.** For $n \ge 1$, let $A_n$ denote the total stake over all outcomes $M$ at the beginning of dispute round $n$:
@@ -21,7 +21,7 @@ $$
 **Observation 3.** It follows that
 
 $$
-A_n - S(\omega,n) = S(\bar{\omega},n).
+A_n - S(\omega,n) = S(\overline{\omega},n).
 $$
 
 **Definition 9.** For $n \ge 1$, let $\hat{\omega}_n$ denote the tentative outcome at the beginning of dispute round $n$. For example, $\hat{\omega}_1$ is the outcome reported by the initial reporter.
@@ -51,7 +51,7 @@ That is, if a dispute bond is not entirely filled in favor of outcome $\omega$, 
 **Observation 6.** For all $n \ge 2$,
 
 $$
-A_n = A_{n-1} + B(\hat{\omega}_{n-1},n-1).
+A_n = A_{n-1} + B(\hat{\omega}_{n},n-1).
 $$
 
 That is, the total stake over all outcomes at the beginning of a dispute round is simply the total stake from the beginning of the previous dispute round plus the successful dispute stake from the previous dispute round. All other stake is returned to users at the end of the previous dispute round.
@@ -59,7 +59,7 @@ That is, the total stake over all outcomes at the beginning of a dispute round i
 **Lemma 1.**
 
 $$
-S(\hat{\omega}_n,n) = 2S(\bar{\omega}_n,n), \qquad \text{for } n \ge 2.
+S(\hat{\omega}_n,n) = 2S(\overline{\hat{\omega}_n},n), \qquad \text{for } n \ge 2.
 $$
 
 **Proof.** Suppose a market enters dispute round $n$, where $n \ge 2$. During dispute round $n-1$, the outcome $\hat{\omega}_{n-1}$ must have been successfully disputed in favor of outcome $\hat{\omega}_n$. According to Eq. 1, the size of that dispute bond is
@@ -71,7 +71,7 @@ $$
 Using Observation 3 this can be rewritten as
 
 $$
-B(\hat{\omega}_n,n-1) + S(\hat{\omega}_n,n-1) = 2S(\bar{\omega}_n,n-1) \tag{A1}
+B(\hat{\omega}_n,n-1) + S(\hat{\omega}_n,n-1) = 2S(\overline{\hat{\omega}_n},n-1) \tag{A1}
 $$
 
 We know the dispute bond was successfully filled during round $n-1$. Using Observation 4, we see that
@@ -80,16 +80,16 @@ $$
 B(\hat{\omega}_n,n-1) + S(\hat{\omega}_n,n-1) = S(\hat{\omega}_n,n).
 $$
 
-Observation 5 tells us that the total amount staked on $\hat{\omega}_n$ is unchanged from round $n-1$ to $n$:
+Observation 5 tells us that the total amount staked on $\overline{\hat{\omega}_n}$ is unchanged from round $n-1$ to $n$:
 
 $$
-2S(\bar{\omega}_n,n-1) = 2S(\bar{\omega}_n,n).
+2S(\overline{\hat{\omega}_n},n-1) = 2S(\overline{\hat{\omega}_n},n).
 $$
 
 Thus, Eq. A1 reduces to
 
 $$
-S(\hat{\omega}_n,n) = 2S(\bar{\omega}_n,n).
+S(\hat{\omega}_n,n) = 2S(\overline{\hat{\omega}_n},n).
 $$
 
 **Theorem 2.** Any REP holders successfully disputing an outcome in favor of a market’s final outcome will receive a 40% ROI on their dispute stake (measured in REP that exists in a universe that corresponds to the market’s final outcome), unless the market is interrupted by some other market causing a fork.
@@ -105,10 +105,10 @@ $$
 Then by Lemma 1 we know that
 
 $$
-S(\omega_{\mathrm{Final}},n) = 2S(\bar{\omega}_{\mathrm{Final}},n).
+S(\omega_{\mathrm{Final}},n) = 2S(\overline{\omega_{\mathrm{Final}}},n).
 $$
 
-Since the market resolves at the end of round $n$ with no further stake added to any outcome, the above equation shows the final amount of stake on the market’s final outcome, $\omega_{\mathrm{Final}}$, and the sum of all stake on the market’s other outcomes, $\bar{\omega}_{\mathrm{Final}}$. Note that there is exactly twice as much stake on the market’s final outcome as there is on all other outcomes combined. Augur burns 20% of the all stake on the non-final outcomes and redistributes the rest to users who staked on $\omega_{\mathrm{Final}}$, in proportion to the amount of REP they staked. Therefore the users who successfully filled a dispute bond in favor of $\omega_{\mathrm{Final}}$ get a 40% ROI on their staked REP.
+Since the market resolves at the end of round $n$ with no further stake added to any outcome, the above equation shows the final amount of stake on the market’s final outcome, $\omega_{\mathrm{Final}}$, and the sum of all stake on the market’s other outcomes, $\overline{\omega_{\mathrm{Final}}}$. Note that there is exactly twice as much stake on the market’s final outcome as there is on all other outcomes combined. Augur burns 20% of the all stake on the non-final outcomes and redistributes the rest to users who staked on $\omega_{\mathrm{Final}}$, in proportion to the amount of REP they staked. Therefore the users who successfully filled a dispute bond in favor of $\omega_{\mathrm{Final}}$ get a 40% ROI on their staked REP.
 
 Next, consider the maximum number of dispute rounds required to resolve a market. Eq. 1 is minimized when $\omega$ is chosen to be the non-tentative outcome that begins the dispute round with the greatest amount of stake. Lemma 1 implies that the non-tentative outcome with the greatest amount of stake is the previous dispute round’s tentative outcome. Therefore, the smallest possible dispute bond size that can be successfully filled during dispute round $n$, where $n \ge 2$, is $B(\hat{\omega}_{n-1},n)$. In other words, the dispute bond size grows slowest when the same two outcomes are repeatedly disputed in favor of one another. It follows that the number of dispute rounds required for a market to initiate a fork is maximized when the same two outcomes are repeatedly disputed in favor of one another. Therefore we can determine the maximum number of dispute rounds that any market may undergo before initiating a fork by finding the maximum number of dispute rounds that can occur in the particular case where the same two market outcomes are repeatedly disputed in favor of one another. We examine that case now. Suppose that every successful dispute bond is filled in favor of the previous dispute round’s tentative outcome. Then the two tentative outcomes that are iteratively disputed in favor of one another are $\hat{\omega}_1$ and $\hat{\omega}_2$.
 

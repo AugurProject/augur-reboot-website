@@ -3,6 +3,7 @@ import WhitepaperLayout from "../../../layouts/WhitepaperLayout.astro";
 import {
 	getWhitepaperEditions,
 	getWhitepaperEntries,
+	getWhitepaperBreadcrumbTitle,
 	getWhitepaperNavigation,
 	getWhitepaperRawPath,
 	getWhitepaperTitle,
@@ -43,6 +44,7 @@ const navigation = getWhitepaperNavigation(edition, entries, entry.slug);
 <WhitepaperLayout
 	edition={edition}
 	title={getWhitepaperTitle(entry)}
+	breadcrumbTitle={getWhitepaperBreadcrumbTitle(entry)}
 	rawHref={getWhitepaperRawPath(edition, entry)}
 	previous={navigation.previous}
 	next={navigation.next}
