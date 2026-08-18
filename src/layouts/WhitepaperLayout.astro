@@ -24,6 +24,7 @@ const { edition, title, breadcrumbTitle = title, rawHref, isIndex = false, previ
 const editionRoot = getWhitepaperRoot(edition);
 const publicSiteOrigin = Astro.site?.origin ?? "https://www.augur.net";
 const publicMarkdownUrl = new URL(rawHref, publicSiteOrigin).href;
+const canonicalURL = new URL(Astro.url.pathname, publicSiteOrigin).href;
 const assistantPrompt = [
 	`I'm reading the ${edition.shortTitle}, release ${edition.release}.`,
 	`Read the Markdown source for "${title}": ${publicMarkdownUrl}`,
@@ -38,6 +39,7 @@ const claudeHref = `https://claude.ai/new?${assistantQuery}`;
 	title={`${title} - ${edition.shortTitle}`}
 	description={edition.description}
 	ogType="article"
+	canonicalURL={canonicalURL}
 	alternateLinks={[{
 		href: rawHref,
 		type: "text/markdown",
@@ -48,11 +50,15 @@ const claudeHref = `https://claude.ai/new?${assistantQuery}`;
 		<PageHeader client:load backHref="/" />
 
 		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
-			<div class="max-w-4xl mx-auto">
+			<div class="max-w-5xl mx-auto pt-8">
 				<nav
 					aria-label="Whitepaper breadcrumbs"
 					class="mb-6 font-display text-xs uppercase tracking-[0.2em] text-muted-foreground"
 				>
+					<a href="/whitepapers/" class="hover:text-primary transition-colors">
+						Whitepapers
+					</a>
+					<span class="mx-2" aria-hidden="true">/</span>
 					<a href={editionRoot} class="hover:text-primary transition-colors">
 						{edition.shortTitle}
 					</a>
@@ -64,14 +70,14 @@ const claudeHref = `https://claude.ai/new?${assistantQuery}`;
 					)}
 				</nav>
 
-				<div class="flex flex-wrap items-center justify-between gap-3 border-y border-primary/20 py-3 mb-2">
-					<div class="font-display text-xs uppercase tracking-[0.2em]">
+				<div class="flex flex-wrap items-center justify-between gap-3 border-y border-primary/20 px-4 py-3 mb-2 md:flex-nowrap">
+					<div class="min-w-0 font-display text-xs uppercase tracking-[0.2em]">
 						<span class="block text-foreground">{edition.shortTitle}</span>
 						<span class="mt-1 block text-muted-foreground">
 							Release {edition.release} (<code class="normal-case tracking-normal">{edition.sourceRevision}</code>)
 						</span>
 					</div>
-					<div class="flex flex-wrap gap-2 font-display text-xs uppercase tracking-[0.15em]">
+					<div class="flex shrink-0 flex-wrap gap-2 font-display text-xs uppercase tracking-[0.15em]">
 						<WhitepaperActions
 							client:load
 							markdownHref={rawHref}
@@ -97,22 +103,23 @@ const claudeHref = `https://claude.ai/new?${assistantQuery}`;
 							class="inline-flex h-9 items-center gap-2 border border-primary/60 px-3 text-primary transition-colors hover:border-primary hover:bg-primary/10 hover:text-loud-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
 						>
 							<svg aria-hidden="true" viewBox="0 0 16 16" class="size-4" fill="none">
-								<circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5" />
-								<path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.5" />
+								<path d="m6 4-4 4 4 4M10 4l4 4-4 4M9 2.5 7 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
-							Source
+							View source
 						</a>
 					</div>
 				</div>
 
-				<ArticleContent>
-					<slot />
-				</ArticleContent>
+				<div class="max-w-4xl mx-auto">
+					<ArticleContent>
+						<slot />
+					</ArticleContent>
+				</div>
 
 				{(previous || next) && (
 					<nav
 						aria-label="Whitepaper section navigation"
-						class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-y border-primary/20 mt-12 py-5 font-display uppercase tracking-wider"
+					class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-y border-primary/20 px-4 mt-12 py-5 font-display uppercase tracking-wider"
 					>
 						{previous ? (
 							<a href={previous.href} class="group text-left hover:text-primary transition-colors">
