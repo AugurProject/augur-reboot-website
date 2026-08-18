@@ -4,6 +4,7 @@ import {
 	getWhitepaperEditions,
 	getWhitepaperEntries,
 	getWhitepaperRawPath,
+	getWhitepaperBreadcrumbTitle,
 	getWhitepaperTitle,
 	type WhitepaperEdition,
 	type WhitepaperEntry,
@@ -37,6 +38,7 @@ const { Content } = await entry.render();
 <WhitepaperLayout
 	edition={edition}
 	title={getWhitepaperTitle(entry)}
+	breadcrumbTitle={getWhitepaperBreadcrumbTitle(entry)}
 	rawHref={getWhitepaperRawPath(edition, entry)}
 	isIndex
 >
