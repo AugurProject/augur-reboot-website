@@ -1,0 +1,164 @@
+---
+import Footer from "../../components/shell/footer.astro";
+import PageHeader from "../../components/shell/page-header.tsx";
+import Layout from "../../layouts/Layout.astro";
+import { getWhitepaperEditions, getWhitepaperRoot } from "../../lib/whitepaper";
+
+const editions = getWhitepaperEditions();
+const lituusWhitepaper = {
+	shortTitle: "Augur Lituus Whitepaper",
+	title: "A Bribery-Resistant Group-Strategyproof Oracle",
+	pdfUrl:
+		"https://github.com/AugurProject/whitepaper/blob/master/Lituus/English/Augur_Lituus_Whitepaper.pdf",
+	sourceUrl: "https://github.com/AugurProject/whitepaper/tree/master/Lituus/English",
+};
+---
+
+<Layout
+	title="Whitepapers - Augur"
+	description="Published Augur whitepaper editions with web, Markdown, original PDF, and source repository links."
+>
+	<div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+		<PageHeader client:load backHref="/" />
+
+		<main class="overflow-y-auto px-4 md:px-8 pt-8 mb-12">
+			<div class="max-w-5xl mx-auto">
+				<header class="py-8 mb-8">
+					<p class="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground mb-3">
+						Knowledge base / primary sources
+					</p>
+					<h1 class="font-display text-3xl md:text-5xl uppercase tracking-wider text-loud-foreground">
+						Whitepapers
+					</h1>
+					<p class="mt-4 max-w-3xl text-muted-foreground leading-relaxed">
+						Explore the research behind Augur. Read the Augur v2 whitepaper as a navigable web edition, or open the original publications and source materials alongside it for provenance and deeper study.
+					</p>
+				</header>
+
+				<div class="grid gap-6 md:grid-cols-2">
+					{editions.map((edition) => (
+						<article class="grid grid-rows-[1fr_auto] gap-8 border border-primary/20 bg-background/70 p-6 md:p-8">
+							<div>
+									<p class="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Release {edition.release}
+									</p>
+									<h2 class="mt-2 font-display text-2xl uppercase tracking-wide text-loud-foreground">
+										<a href={getWhitepaperRoot(edition)} class="hover:text-primary transition-colors">
+											{edition.shortTitle}
+										</a>
+									</h2>
+									<p class="mt-3 leading-relaxed text-muted-foreground">{edition.title}</p>
+								</div>
+
+							<div class="whitepaper-actions-grid border-t border-primary/20 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 font-display text-xs uppercase tracking-[0.12em]">
+									<a
+										href={edition.pdfUrl}
+										style="grid-area: pdf;"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="inline-flex h-9 w-full items-center justify-center border border-primary/60 px-2 text-primary transition-colors hover:border-primary hover:bg-primary/10 hover:text-loud-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+									>
+										<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+											<path d="M3 2.5h6l4 4v7H3v-11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+											<path d="M9 2.5v4h4M8 8v3m0 0-1.5-1.5M8 11l1.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+										DOWNLOAD PDF
+									</a>
+									<a
+										href={edition.sourceRepositoryUrl}
+										style="grid-area: source;"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="inline-flex h-9 w-full items-center justify-center border border-primary/60 px-2 text-primary transition-colors hover:border-primary hover:bg-primary/10 hover:text-loud-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+									>
+										<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+											<path d="m6 4-4 4 4 4M10 4l4 4-4 4M9 2.5 7 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+										VIEW SOURCE
+									</a>
+									<a
+										href={getWhitepaperRoot(edition)}
+										style="grid-area: web;"
+										class="inline-flex h-9 w-full items-center justify-center border border-primary bg-primary px-2 text-background transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/60"
+									>
+										<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+											<rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.5" />
+											<path d="M2 5.5h12M5 4h.01M7 4h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+										</svg>
+										VIEW WEB
+									</a>
+								</div>
+						</article>
+					))}
+
+					<article class="grid grid-rows-[1fr_auto] gap-8 border border-primary/20 bg-background/70 p-6 md:p-8">
+						<div>
+							<p class="font-display text-xs uppercase tracking-[0.2em] text-muted-foreground">
+								Original publication
+							</p>
+							<h2 class="mt-2 font-display text-2xl uppercase tracking-wide text-loud-foreground">
+								{lituusWhitepaper.shortTitle}
+							</h2>
+							<p class="mt-3 leading-relaxed text-muted-foreground">{lituusWhitepaper.title}</p>
+						</div>
+
+							<div class="whitepaper-actions-grid border-t border-primary/20 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 font-display text-xs uppercase tracking-[0.12em]">
+							<a
+								href={lituusWhitepaper.pdfUrl}
+								style="grid-area: pdf;"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex h-9 w-full items-center justify-center border border-primary/60 px-2 text-primary transition-colors hover:border-primary hover:bg-primary/10 hover:text-loud-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+							>
+								<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+									<path d="M3 2.5h6l4 4v7H3v-11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+									<path d="M9 2.5v4h4M8 8v3m0 0-1.5-1.5M8 11l1.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+										DOWNLOAD PDF
+							</a>
+							<a
+								href={lituusWhitepaper.sourceUrl}
+								style="grid-area: source;"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex h-9 w-full items-center justify-center border border-primary/60 px-2 text-primary transition-colors hover:border-primary hover:bg-primary/10 hover:text-loud-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+							>
+								<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+									<path d="m6 4-4 4 4 4M10 4l4 4-4 4M9 2.5 7 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+										VIEW SOURCE
+							</a>
+							<button
+								type="button"
+								disabled
+								title="Web edition not published yet"
+								style="grid-area: web;"
+								class="inline-flex h-9 w-full cursor-not-allowed items-center justify-center border border-primary bg-primary px-2 text-background opacity-40"
+							>
+								<svg aria-hidden="true" class="mr-2 size-3.5" viewBox="0 0 16 16" fill="none">
+									<rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.5" />
+									<path d="M2 5.5h12M5 4h.01M7 4h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+								</svg>
+										VIEW WEB
+							</button>
+						</div>
+					</article>
+				</div>
+			</div>
+		</main>
+
+		<Footer />
+	</div>
+</Layout>
+
+<style>
+	.whitepaper-actions-grid {
+		grid-template-areas: "pdf" "source" "web";
+	}
+
+	@media (min-width: 640px) {
+		.whitepaper-actions-grid {
+			grid-template-areas: "pdf source" "web web";
+		}
+	}
+</style>

@@ -45,7 +45,9 @@ export default defineConfig({
 	},
 	integrations: [
 		react(),
-		sitemap(),
+		sitemap({
+			filter: (page) => !page.endsWith(".md"),
+		}),
 		mdx({ rehypePlugins: [rehypeHeadingIcons, rehypeCallouts] }),
 	],
 	...(isGitHubActions ? gitHubPagesConfig : cloudflareConfig),
