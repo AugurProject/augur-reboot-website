@@ -124,7 +124,7 @@ export const ForkDetailsCard = ({ gauge }: ForkDetailsCardProps) => {
 					<CTAButton
 						href="/whitepapers/augur-v2/"
 					>
-						<DocumentIcon /> Read The Web Edition
+						<DocumentIcon /> Read The Whitepaper
 					</CTAButton>
 				</div>
 			</DialogContent>
