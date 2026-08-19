@@ -108,6 +108,20 @@ test("keeps finalized FAQ destinations and the combined footer updates", () => {
 	assert.match(footer, /AUGUR FAQ/u);
 	assert.doesNotMatch(footer, /FORK & MIGRATION FAQ/u);
 	assert.match(footer, /https:\/\/github\.com\/darkflorist/u);
-	assert.match(footer, /AUGUR V2 WHITEPAPER/u);
-	assert.match(footer, /AUGUR LITUUS WHITEPAPER/u);
+
+	const knowledgeBase = footer.match(
+		/<h4[^>]*>&gt;_ KB<\/h4>\s*<ul[^>]*>([\s\S]*?)<\/ul>/u,
+	)?.[1];
+	assert.ok(knowledgeBase, "footer KB group must exist");
+
+	const knowledgeBaseLinks = [...knowledgeBase.matchAll(
+		/<Button[^>]*href="([^"]+)"[^>]*>\s*([^<]+?)\s*<\/Button>/gu,
+	)]
+		.map(([, href, label]) => `${label.trim()}|${href}`)
+		.sort();
+
+	assert.deepEqual(knowledgeBaseLinks, [
+		"AUGUR FAQ|/faq",
+		"WHITEPAPERS|/whitepapers/",
+	]);
 });

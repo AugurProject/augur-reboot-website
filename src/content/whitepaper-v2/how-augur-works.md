@@ -24,11 +24,7 @@ Augur’s reporting system runs on a cycle of consecutive 7-day long dispute win
 
 ### 2. Participation Tokens
 
-During any dispute window, REP holders may purchase any number of participation tokens[^8] for one attorep[^9] each (participation tokens are ERC777 tokens on the Ethereum network). At the end of the dispute window, they may redeem their participation tokens for one attorep each, in addition to a proportional share of the dispute window’s reporting fee pool. If there were no actions (e.g., submitting a report or disputing a report submitted by another user) needed of a reporter, the reporter may purchase participation tokens to indicate that they showed up for the dispute window. Just like staked REP, participation tokens may be redeemed by their owners for a pro rata portion of fees in this dispute window. Participation tokens are primarily the means by which Augur pays fees to REP holders, but they may also serve as an additional incentive for REP holders to monitor the platform at least once per week. Even REP holders who do not want to participate in the reporting process may be incentivized to check-in with Augur once per 7-day dispute window in order to buy participation tokens and collect fees. This regular, active checking-in will ensure that they are familiar with how to use Augur, will be aware of forks when they occur, and thus should be more ready to participate in forks when they happen.
-
-![Figure 2. Reporting flowchart.](figures/figure-2-reporting-flowchart.jpeg)
-
-*Figure 2. Reporting flowchart.*
+During any dispute window, REP holders may purchase any number of participation tokens[^8] for one attorep[^9] each. At the end of the dispute window, they may redeem their participation tokens for one attorep each, in addition to a proportional share of the dispute window’s reporting fee pool. If there were no actions (e.g., submitting a report or disputing a report submitted by another user) needed of a reporter, the reporter may purchase participation tokens to indicate that they showed up for the dispute window. Just like staked REP, participation tokens may be redeemed by their owners for a pro rata portion of fees in this dispute window. Participation tokens are primarily the means by which Augur pays fees to REP holders, but they may also serve as an additional incentive for REP holders to monitor the platform at least once per week. Even REP holders who do not want to participate in the reporting process may be incentivized to check-in with Augur once per 7-day dispute window in order to buy participation tokens and collect fees. This regular, active checking-in will ensure that they are familiar with how to use Augur, will be aware of forks when they occur, and thus should be more ready to participate in forks when they happen.
 
 ### 3. Market State Progression
 
@@ -42,6 +38,10 @@ Augur markets can be in seven different states after creation. The potential sta
 - Fork
 - Finalized
 The relationship between these states can be seen in Fig. 2.
+
+![Figure 2. Reporting flowchart.](figures/figure-2-reporting-flowchart.jpeg)
+
+*Figure 2. Reporting flowchart.*
 
 ### 4. Pre-reporting
 
