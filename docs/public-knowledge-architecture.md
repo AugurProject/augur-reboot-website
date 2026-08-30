@@ -7,7 +7,7 @@ tags: [architecture, learn, faq, blog, moon-fork, migration]
 
 ## Decision status
 
-**Proposed for review for GitHub issue #146.** This is an architecture decision, not a route or content implementation. It bounds the work in roadmap #156 and gives #148–#155 concrete destinations to implement.
+**Settled and implemented; verified for GitHub issues #148–#155.** This is the architecture and release contract for the implemented public knowledge model. It records the decisions that bounded the work in roadmap #156 and gave #148–#155 concrete destinations.
 
 The public knowledge system has four distinct jobs:
 
@@ -22,16 +22,16 @@ The first canonical case study is **`/learn/fork/moon-fork/`**. Keep `fork` sing
 
 ## Route map
 
-The following are the proposed canonical public routes. A trailing slash is retained for nested Learn content because those paths already exist in public links. Existing top-level route shapes such as `/faq` and `/blog` are preserved.
+The following are the canonical public routes. A trailing slash is retained for nested Learn content because those paths already exist in public links. Existing top-level route shapes such as `/faq` and `/blog` are preserved.
 
 | Route | Surface / type | Status and destination |
 |---|---|---|
-| `/learn` | Learn hub | New first-class entry point. Show only topics with available, coherent content. |
+| `/learn` | Learn hub | Implemented first-class entry point. Shows only topics with available, coherent content. |
 | `/learn/fork/` | Learn topic landing | Existing URL retained as the Fork topic start-here page. |
 | `/learn/fork/disputes-and-bonds/` | Lesson | Existing URL retained as evergreen protocol education. |
-| `/learn/fork/migration-mechanics/` | Lesson | New evergreen lesson explaining fork migration in general; not the Moon Fork procedure. |
+| `/learn/fork/migration-mechanics/` | Lesson | Implemented evergreen lesson explaining fork migration in general; not the Moon Fork procedure. |
 | `/learn/fork/what-to-do/` | Guide | Existing URL retained and reframed as evergreen preparedness for fork conditions. |
-| `/learn/fork/moon-fork/` | Case study | **New canonical Moon Fork retrospective.** Durable, dated, verifiable, and linked from the homepage Fork Record. |
+| `/learn/fork/moon-fork/` | Case study | **Canonical Moon Fork retrospective.** Durable, dated, verifiable, and linked from the homepage Fork Record. |
 | `/learn/fork/migration/` | Historical record | **Existing URL retained in place.** Archived Moon Fork procedure and screenshots; never presented as a current action guide. |
 | `/faq` | General Augur FAQ | Existing URL retained. Organize concise answers across Augur, with a focused historical Moon Fork subsection. |
 | `/blog` and `/blog/<slug>` | Blog archive and post | Existing URLs retained. Posts remain dated editorial/history, even when they link to Learn or the case study. |
@@ -60,7 +60,7 @@ Every Learn entry should have one primary `contentType`. `historical: true` and 
 | `case-study` | A durable analysis of a named event, separating observed facts from interpretation and lessons. | `/learn/<topic>/<slug>/`; case-study presentation and provenance. |
 | `historical-record` | A preserved record of a completed event or procedure, including useful evidence that is no longer actionable. | `/learn/<topic>/<slug>/`; archive banner, past tense, closed status, and archived-link treatment. |
 
-The implementation from #148 should centralize, or otherwise derive, at least these fields:
+The #148 implementation centralizes, or otherwise derives, at least these fields:
 
 ```text
 topic            stable topic key, initially "fork"
@@ -78,12 +78,12 @@ presentation     standard | reference | case-study | historical-record
 
 This is the required disposition of every current Learn page. No page is deleted or moved by #146.
 
-| Current file / URL | Proposed primary type | Proposed destination and treatment |
+| Current file / URL | Primary type | Implemented destination and treatment |
 |---|---|---|
-| `src/content/learn/fork/index.mdx` — `/learn/fork/` | `topic` | Retain as the Fork topic landing/start-here page. Move event-specific detail into the appropriate lesson, guide, case study, or archive during #150. |
-| `src/content/learn/fork/disputes-and-bonds.mdx` — `/learn/fork/disputes-and-bonds/` | `lesson` | Retain the URL and make the protocol explanation evergreen. Verify claims against maintained protocol knowledge. |
-| `src/content/learn/fork/what-to-do.mdx` — `/learn/fork/what-to-do/` | `guide` | Retain the URL and reframe as preparedness. It may describe what to check if a future fork occurs, but must not imply that Moon Fork migration is actionable. |
-| `src/content/learn/fork/migration.mdx` — `/learn/fork/migration/` | `historical-record` | Retain the URL and screenshots. Put the final result and closed/archive warning before the historical steps; label tools and links as historical interfaces. |
+| `src/content/learn/fork/index.mdx` — `/learn/fork/` | `topic` | Retained as the Fork topic landing/start-here page; event-specific detail is separated into the appropriate lesson, guide, case study, or archive. |
+| `src/content/learn/fork/disputes-and-bonds.mdx` — `/learn/fork/disputes-and-bonds/` | `lesson` | Retained the URL as evergreen protocol education, with claims anchored to maintained protocol knowledge. |
+| `src/content/learn/fork/what-to-do.mdx` — `/learn/fork/what-to-do/` | `guide` | Retained the URL and reframed it as preparedness for a future fork; it does not imply that Moon Fork migration is actionable. |
+| `src/content/learn/fork/migration.mdx` — `/learn/fork/migration/` | `historical-record` | Retained the URL and screenshots, leads with the final result and closed/archive warning, and labels tools and links as historical interfaces. |
 
 The new generalized migration lesson is intentionally not assigned the existing `migration` slug. Keeping `/learn/fork/migration/` for the historical procedure avoids breaking useful links and makes the distinction between general mechanics and the Moon Fork event explicit.
 
@@ -93,11 +93,11 @@ The new generalized migration lesson is intentionally not assigned the existing 
 
 | Current entry point | Destination / decision |
 |---|---|
-| Homepage migration/Fork Record experience | Keep as the operational/status surface while relevant and as a factual Fork Record after closure. Link the completed record to `/learn/fork/moon-fork/`. Do not duplicate the full case study in the hero. |
-| `src/pages/faq.astro` — `/faq` | Evolve into the general Augur FAQ. Keep concise Moon Fork questions in one subsection; link to Learn, the case study, and the archived procedure for depth. Remove expired calls to action. |
-| `src/pages/blog/index.astro` — `/blog` | Keep as the chronological blog archive. Do not fold blog posts into the Learn navigation merely because they discuss forks. |
-| `src/pages/learn/[...slug].astro` — nested Learn routes | Generalize around typed entries and topic metadata in #148. The existing catch-all route shape can accommodate `/learn/fork/moon-fork/` without a new public route family. |
-| Footer and persistent navigation | Add `/learn` and retain `/faq` as distinct entry points. Do not use an active-event label for the archived migration record. |
+| Homepage migration/Fork Record experience | Retained as the operational/status surface while relevant and as a factual Fork Record after closure. The completed record links to `/learn/fork/moon-fork/`; the full case study is not duplicated in the hero. |
+| `src/pages/faq.astro` — `/faq` | Implemented as the general Augur FAQ. It keeps concise Moon Fork questions in one subsection, links to Learn, the case study, and the archived procedure for depth, and removes expired calls to action. |
+| `src/pages/blog/index.astro` — `/blog` | Remains the chronological blog archive. Blog posts are not folded into the Learn navigation merely because they discuss forks. |
+| `src/pages/learn/[...slug].astro` — nested Learn routes | Uses typed entries and topic metadata from #148. The existing catch-all route shape serves `/learn/fork/moon-fork/` without a new public route family. |
+| Footer and persistent navigation | Includes `/learn` and `/faq` as distinct entry points. The archived migration record has no active-event label. |
 | `public/data/fork-risk.json` | Preserve the URL and compatibility fields. It is evidence/input for the live Fork Record, not a replacement for the human-readable retrospective. |
 
 ### Existing blog posts
@@ -160,7 +160,7 @@ The Moon Fork is a completed historical case study, not a blog post and not an a
 
 The case study should contain an executive record, triggering market, escalation timeline, migration participation, resolution, observed-versus-expected behavior, and lessons for Augur/Lituus. It must distinguish protocol facts from interpretation and attach a source/provenance note to dates, addresses, totals, outcomes, and token claims.
 
-The final factual values are a dependency of #147, not something this decision invents. The retrospective should use the post-deadline verified record, including the winning universe, current REP token, migration deadline, outcome totals, observed block, and authoritative source for each value. If a value cannot be verified, label it unverified rather than inferring it from a migration percentage or an old blog post.
+The final factual values are sourced from #147's post-deadline verified record. The retrospective uses the winning universe, current REP token, migration deadline, outcome totals, observed block, and authoritative source for each value. If a value cannot be verified, label it unverified rather than inferring it from a migration percentage or an old blog post.
 
 The archived migration page remains the evidence-preserving home for:
 
@@ -175,16 +175,16 @@ Address and token labels must always identify the chain, historical/current stat
 ## URL, redirect, and archive conventions
 
 1. **Canonical path first.** Use lowercase kebab-case. Keep `fork` singular. Every page has one canonical URL in metadata and internal links use that URL.
-2. **Preserve existing useful URLs.** The four current Learn URLs remain in place. In particular, `/learn/fork/migration/` is not renamed or redirected away; it is the historical migration record.
+2. **Preserve existing useful URLs.** Existing useful Learn URLs remain in place. In particular, `/learn/fork/migration/` is not renamed or redirected away; it is the historical migration record.
 3. **Redirect only after a deliberate move.** If a later implementation genuinely moves a page, retain the old path as an explicit permanent redirect or alias generated by the static build, and test the old path, new path, and canonical metadata. Never silently delete a public content URL.
 4. **Do not use redirects to hide the archive.** A historical page with useful evidence remains directly readable. Redirects are for aliases or moved pages, not for replacing the archive with the case study.
 5. **Archive in place where possible.** Add a prominent historical/closed status before procedural content, use past tense, state the relevant date or last verification, and mark expired tools and external links as archived interfaces. Do not remove screenshots solely because the procedure is expired.
 6. **Redirects are not content migration.** A redirect must not be used to turn a blog post into a Learn page or to make `/learn/fork/migration/` appear to be the evergreen migration lesson. The new evergreen route is `/learn/fork/migration-mechanics/`.
-7. **Verify static-host behavior.** Because deployment is static GitHub Pages, #155 must verify the generated redirect/alias behavior rather than assuming server-side redirect rules exist.
+7. **Verify static-host behavior.** Because deployment is static GitHub Pages, #155 verifies generated routes and aliases rather than assuming server-side redirect rules exist.
 
 ## Initial Learn catalog
 
-The initial public catalog should show **one available topic: Fork**. It is the only current topic with a coherent set of public entries, and showing it alone is more honest than presenting empty or incomplete topics as finished. The `/learn` hub should link to `/learn/fork/` as the start-here path.
+The initial public catalog shows **one available topic: Fork**. It is the only current topic with a coherent set of public entries, and showing it alone is more honest than presenting empty or incomplete topics as finished. The `/learn` hub links to `/learn/fork/` as the start-here path.
 
 The planned topic backlog is recorded for authoring, but is not presented as available content in this milestone:
 
@@ -198,16 +198,16 @@ These names are topic candidates, not promises that their pages exist. A future 
 
 ## Downstream handoff: #148–#155
 
-| Issue | Decision supplied by this page | Implementation can proceed without a routing decision |
+| Issue | Decision supplied by this page | Implementation status / boundary |
 |---|---|---|
-| #148 — Learn model | Use centralized topic metadata with `topic`, `order`, `contentType`, `label`, `historical`, `status`, and `presentation`. Keep `fork` singular; special pages select presentation declaratively. | Yes. Remaining work is schema/layout implementation and content metadata authoring. |
-| #149 — Learn landing | Create `/learn`; show Fork as the only available initial topic; link to `/learn/fork/`; keep future topics hidden or explicitly planned, never complete. | Yes. |
-| #150 — Evergreen Fork path | Use the sequence in this document; add `/learn/fork/migration-mechanics/`; preserve the four existing URLs; route the Moon Fork event to the case study and the old procedure to the archive. | Yes. |
-| #151 — Moon Fork retrospective | Publish the case study at `/learn/fork/moon-fork/`, not `/blog` and not `/learn/fork/migration/`; link to evergreen lessons and the archive; use #147's verified evidence. | Yes, pending factual inputs from #147 only. |
-| #152 — Migration archive | Keep `/learn/fork/migration/` in place as `historical-record`; lead with final result/closed status; preserve screenshots and REP evidence; label tools archived; no active CTA. | Yes. |
-| #153 — General FAQ | Keep `/faq`; organize general Augur questions with a focused Moon Fork subsection; keep answers concise and link to Learn; never imply migration is open. | Yes. |
-| #154 — Integration | Persistent navigation links to `/learn` and `/faq`; homepage Fork Record links to `/learn/fork/moon-fork/`; cross-link topic, case study, evergreen mechanics, and archive. | Yes. |
-| #155 — Release validation | Validate the route table, canonical URLs, old-path preservation, static redirects/aliases, archive labels, REP terminology, and absence of expired CTAs. | Yes. |
+| #148 — Learn model | Implemented centralized topic metadata with `topic`, `order`, `contentType`, `label`, `historical`, `status`, and `presentation`. `fork` remains singular; special pages select presentation declaratively. | Complete. |
+| #149 — Learn landing | Implemented `/learn`; it shows Fork as the only available initial topic and links to `/learn/fork/`; future topics remain hidden or explicitly planned, never complete. | Complete. |
+| #150 — Evergreen Fork path | Implemented the sequence in this document; added `/learn/fork/migration-mechanics/`; preserved the four existing URLs; routed the Moon Fork event to the case study and the old procedure to the archive. | Complete. |
+| #151 — Moon Fork retrospective | Published the case study at `/learn/fork/moon-fork/`, not `/blog` and not `/learn/fork/migration/`; it links to evergreen lessons and the archive and uses #147's verified evidence. | Complete. |
+| #152 — Migration archive | Kept `/learn/fork/migration/` in place as `historical-record`; it leads with the final result/closed status, preserves screenshots and REP evidence, labels tools archived, and has no active CTA. | Complete. |
+| #153 — General FAQ | Kept `/faq`; it organizes general Augur questions with a focused Moon Fork subsection, keeps answers concise, links to Learn, and never implies migration is open. | Complete. |
+| #154 — Integration | Persistent navigation links to `/learn` and `/faq`; the homepage Fork Record links to `/learn/fork/moon-fork/`; the topic, case study, evergreen mechanics, and archive are cross-linked. | Complete. |
+| #155 — Release validation | Validated the route table, canonical URLs, old-path preservation, static routes, archive labels, REP terminology, and absence of expired CTAs. | Complete for this release scope; CI wiring is deferred to a later RFC. |
 
 ## Review boundaries and unresolved inputs
 

@@ -122,6 +122,7 @@ test("keeps finalized FAQ destinations and the combined footer updates", () => {
 
 	assert.deepEqual(knowledgeBaseLinks, [
 		"AUGUR FAQ|/faq",
+		"AUGUR LEARN|/learn",
 		"WHITEPAPERS|/whitepapers/",
 	]);
 });

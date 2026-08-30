@@ -88,8 +88,7 @@ A deep link scrolls to the relevant `<details>` element. It does not force the i
 
 The FAQ remains linked from:
 
-1. `src/features/home/hero-banner.tsx` — the landing-page menu.
-2. `src/components/shell/footer.astro` — the `>_ KB` section, labeled **AUGUR FAQ**.
-3. `src/features/fork-monitor/post-fork-record.tsx` — the verified Fork Record dialog.
+1. `src/components/shell/footer.astro` — the `>_ KB` section, containing **AUGUR LEARN**, **AUGUR FAQ**, and **WHITEPAPERS**.
+2. `src/features/fork-monitor/post-fork-record.tsx` — the verified Fork Record dialog.
 
 The footer also preserves the post-fork Dark Florist and whitepaper-link corrections introduced with the closed-migration messaging.
