@@ -21,7 +21,7 @@ Start here to find the right doc. Read deeper only when the task calls for it.
 
 | Doc | When to Read |
 |---|---|
-| [Public Knowledge Architecture](public-knowledge-architecture.md) | Proposed route map, Learn taxonomy, surface boundaries, Moon Fork canonical route, archive/redirect policy, and downstream handoff for #146 |
+| [Public Knowledge Architecture](public-knowledge-architecture.md) | Implemented route map, Learn taxonomy, surface boundaries, Moon Fork canonical route, archive/redirect policy, and release validation contract |
 | [Whitepaper Publication Contract](whitepaper-publication-contract.md) | Authority, routes, representations, link semantics, fidelity policy, machine discovery, and release gates for public whitepaper editions |
 
 ## Architecture & UI

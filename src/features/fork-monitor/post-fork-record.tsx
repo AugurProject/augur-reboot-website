@@ -40,6 +40,7 @@ const etherscanAddress = (address: string): string =>
 
 const FORKWATCH_URL = "https://v3.augur.net/";
 const FAQ_URL = "/faq/";
+const MOON_FORK_URL = "/learn/fork/moon-fork/";
 
 const AddressValue = ({
 	address,
@@ -185,6 +186,13 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 			<Button variant="outline" href={FAQ_URL} className="w-full uppercase">
 				Read the FAQ
 			</Button>
+			<Button
+				variant="outline"
+				href={MOON_FORK_URL}
+				className="w-full uppercase"
+			>
+				Read the Moon Fork case study
+			</Button>
 		</div>
 	</DialogContent>
 );
@@ -256,6 +264,12 @@ export const ForkRecord = (): React.JSX.Element | null => {
 						</div>
 					</button>
 				</DialogTrigger>
+				<a
+					href={MOON_FORK_URL}
+					className="mt-3 block text-center text-xs uppercase tracking-wide text-primary hover:text-loud-foreground hover:underline focus:underline"
+				>
+					Read the Moon Fork case study →
+				</a>
 			</div>
 			<ForkResolutionDialog record={record} />
 		</Dialog>
