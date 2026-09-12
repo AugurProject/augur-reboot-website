@@ -38,6 +38,10 @@ const formatShortDate = (timestamp: number): string => {
 const etherscanAddress = (address: string): string =>
 	`https://etherscan.io/address/${address}`;
 
+// REPv2_Yes_1 totalSupply(), verified via PublicNode and dRPC at block 25,962,917.
+// intentionally hardcoded. no need to fetch for now; that is extra work.
+const NEW_REP_TOTAL_SUPPLY = 6_545_760.433666705;
+
 const FORKWATCH_URL = "https://v3.augur.net/";
 const FAQ_URL = "/faq/";
 const MOON_FORK_URL = "/learn/fork/moon-fork/";
@@ -83,7 +87,7 @@ const OutcomeRow = ({
 }) => (
 	<div
 		className={cn(
-			"grid grid-cols-[1fr_auto] gap-3 border-t border-foreground/15 py-3",
+			"grid grid-cols-[1fr_auto] gap-3 border-t border-foreground/15 py-2",
 			isWinner && "text-primary",
 		)}
 	>
@@ -116,7 +120,7 @@ const OutcomeRow = ({
 );
 
 const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
-	<DialogContent className="max-h-[85vh] overflow-y-auto bg-background border border-foreground/20 backdrop-blur-sm">
+	<DialogContent className="w-[calc(100%-2rem)] max-w-xl max-h-[85vh] overflow-y-auto bg-background border border-foreground/20 backdrop-blur-sm">
 		<DialogTitle className="font-display uppercase tracking-widest text-primary">
 			Fork resolution
 		</DialogTitle>
@@ -125,7 +129,7 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 			addresses and migration totals below are the recorded protocol data.
 		</DialogDescription>
 
-		<div className="space-y-2 border-y border-foreground/20 py-4 text-sm font-mono">
+		<div className="space-y-2 border-y border-foreground/20 py-3 text-sm font-mono">
 			<AddressValue label="Parent universe" address={record.parentUniverse} />
 			<AddressValue label="Forking market" address={record.forkingMarket} />
 			<AddressValue
@@ -142,6 +146,12 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 					<span>{record.observedBlock.toLocaleString()}</span>
 				</div>
 			)}
+			<div className="flex items-center justify-between gap-4">
+				<span className="text-muted-foreground">REPv2_Yes_1 total supply</span>
+				<span className="whitespace-nowrap tabular-nums">
+					{formatRep(NEW_REP_TOTAL_SUPPLY)} REP
+				</span>
+			</div>
 		</div>
 
 		<div>
@@ -160,17 +170,13 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 			))}
 		</div>
 
-		<div className="space-y-2">
+		<div className="grid sm:grid-cols-2 gap-2">
 			<Button
 				variant="outline"
-				href={
-					record.winningChildUniverse
-						? etherscanAddress(record.winningChildUniverse)
-						: "https://etherscan.io/"
-				}
+				href="https://etherscan.io/token/0xCf6A0A7826fa124B7705d6f3c675eAD76f1e540D"
 				target="_blank"
 				rel="noopener noreferrer"
-				className="w-full uppercase"
+				className="w-full whitespace-normal px-2 leading-tight uppercase"
 			>
 				Verify on Etherscan
 			</Button>
@@ -179,19 +185,19 @@ const ForkResolutionDialog = ({ record }: { record: ForkRecordData }) => (
 				href={FORKWATCH_URL}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="w-full uppercase"
+				className="w-full whitespace-normal px-2 leading-tight uppercase"
 			>
 				Open ForkWatch
 			</Button>
-			<Button variant="outline" href={FAQ_URL} className="w-full uppercase">
+			<Button variant="outline" href={FAQ_URL} className="w-full whitespace-normal px-2 leading-tight uppercase">
 				Read the FAQ
 			</Button>
 			<Button
 				variant="outline"
 				href={MOON_FORK_URL}
-				className="w-full uppercase"
+				className="w-full whitespace-normal px-2 leading-tight uppercase"
 			>
-				Read the Moon Fork case study
+				Moon Fork case study
 			</Button>
 		</div>
 	</DialogContent>
